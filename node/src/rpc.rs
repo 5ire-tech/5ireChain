@@ -143,7 +143,7 @@ where
 /// Instantiate all full RPC extensions.
 pub fn create_full<C, P, SC, B,BE,A>(
 	deps: FullDeps<C, P, SC, B,A>,
-    //subscription_task_executor: SubscriptionTaskExecutor,
+   // subscription_task_executor: SubscriptionTaskExecutor,
 ) -> Result<RpcModule<()>, Box<dyn std::error::Error + Send + Sync>>
 where
     BE: Backend<Block> + 'static,
@@ -163,7 +163,7 @@ where
 	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
 	C::Api: BabeApi<Block>,
 	C::Api: BlockBuilder<Block>,
-	P: TransactionPool + 'static,
+	P: TransactionPool<Block=Block> + 'static,
 	SC: SelectChain<Block> + 'static,
     C::Api: fp_rpc::ConvertTransactionRuntimeApi<Block>,
 	C::Api: fp_rpc::EthereumRuntimeRPCApi<Block>,
@@ -178,16 +178,17 @@ where
 	use sc_finality_grandpa_rpc::{Grandpa, GrandpaApiServer};
 
     use fc_rpc::{
-		Eth,  EthDevSigner, EthFilter, EthFilterApiServer, EthPubSub,
-		 EthSigner, Net, NetApiServer, Web3, Web3ApiServer,
+		Eth,  EthDevSigner, EthFilter, EthFilterApiServer, EthPubSub,EthPubSubApiServer,
+		 EthSigner, Net, NetApiServer, Web3, Web3ApiServer,EthApiServer
 	};
-
 
 	// use fc_rpc::{
 	// 	Eth, EthApiServer, EthDevSigner, EthFilterApi, EthFilterApiServer, EthPubSubApi,
 	// 	EthPubSubApiServer, EthSigner, HexEncodedIdProvider, NetApi, NetApiServer, Web3Api,
 	// 	Web3ApiServer,Web3,Net,EthFilter
 	// };
+
+
 
 	let mut io = RpcModule::new(());
 	let FullDeps { client, pool, select_chain, chain_spec: _, deny_unsafe, babe, grandpa,graph,
@@ -210,7 +211,7 @@ where
 		subscription_executor,
 		finality_provider,
 	} = grandpa;
-
+let  pp=pool.clone();
 	io.merge(System::new(client.clone(), pool, deny_unsafe).into_rpc())?;
 
 	io.merge(TransactionPayment::new(client.clone()).into_rpc())?;
@@ -243,24 +244,25 @@ where
 		.into_rpc(),
 	)?;
 
-    // io.merge(
-	// 	Eth::new(
-	// 		client.clone(),
-	// 		pool.clone(),
-	// 		graph,
-	// 		Some(node_template_runtime::TransactionConverter),
-	// 		network.clone(),
-	// 		signers,
-	// 		overrides.clone(),
-	// 		backend.clone(),
-	// 		// Is authority.
-	// 		is_authority,
-	// 		block_data_cache.clone(),
-	// 		fee_history_cache,
-	// 		fee_history_cache_limit,
-	// 	)
-	// 	.into_rpc(),
-	// )?;
+    io.merge(
+		Eth::new(
+			client.clone(),
+			pp,
+			graph,
+			Some(node_template_runtime::TransactionConverter),
+			network.clone(),
+			signers,
+			overrides.clone(),
+			backend.clone(),
+			// Is authority.
+			is_authority,
+			block_data_cache.clone(),
+			fee_history_cache,
+			fee_history_cache_limit,
+		)
+		.into_rpc(),
+	)?;
+//	P: TransactionPool<Block = B> + Send + Sync + 'static,
 
     if let Some(filter_pool) = filter_pool {
 		
@@ -281,7 +283,7 @@ where
 	// 		pool,
 	// 		client.clone(),
 	// 		network.clone(),
-	// 		//,
+	// 		subscription_task_executor,
 	// 		overrides,
 	// 	)
 	// 	.into_rpc(),

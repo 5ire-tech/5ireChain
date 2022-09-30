@@ -18,7 +18,7 @@
 
 #[cfg(test)]
 mod tests {
-	use frontier_template_runtime::RuntimeApi;
+	use node_template_runtime::RuntimeApi;
 	use substrate_test_runtime_client::{
 		BlockBuilderExt, ClientBlockImportExt, ClientExt, DefaultTestClientBuilderExt,
 		TestClientBuilder,
