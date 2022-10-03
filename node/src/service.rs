@@ -14,10 +14,14 @@ use std::{
 	collections::BTreeMap,
 	path::PathBuf,
 	sync::{Arc, Mutex},
+	time::Duration,
 };
+use sc_client_api::BlockchainEvents;
+
+use futures::{future, StreamExt};
 
 // Frontier
-// use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
+use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
 use fc_rpc::{EthTask, OverrideHandle};
 use fc_rpc_core::types::{FeeHistoryCache, FeeHistoryCacheLimit, FilterPool};
 // Our native executor instance.
@@ -509,21 +513,21 @@ fn spawn_frontier_tasks(
 	fee_history_cache: FeeHistoryCache,
 	fee_history_cache_limit: FeeHistoryCacheLimit,
 ) {
-	// task_manager.spawn_essential_handle().spawn(
-	// 	"frontier-mapping-sync-worker",
-	// 	None,
-	// 	MappingSyncWorker::new(
-	// 		client.import_notification_stream(),
-	// 		Duration::new(6, 0),
-	// 		client.clone(),
-	// 		backend,
-	// 		frontier_backend,
-	// 		3,
-	// 		0,
-	// 		SyncStrategy::Normal,
-	// 	)
-	// 	.for_each(|()| future::ready(())),
-	// );
+	task_manager.spawn_essential_handle().spawn(
+		"frontier-mapping-sync-worker",
+		None,
+		MappingSyncWorker::new(
+			client.import_notification_stream(),
+			Duration::new(6, 0),
+			client.clone(),
+			backend,
+			frontier_backend,
+			3,
+			0,
+			SyncStrategy::Normal,
+		)
+		.for_each(|()| future::ready(())),
+	);
 
 	// Spawn Frontier EthFilterApi maintenance task.
 	if let Some(filter_pool) = filter_pool {

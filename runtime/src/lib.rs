@@ -466,10 +466,10 @@ impl pallet_base_fee::Config for Runtime {
 	type DefaultBaseFeePerGas = DefaultBaseFeePerGas;
 }
 
-// impl pallet_hotfix_sufficients::Config for Runtime {
-// 	type AddressMapping = HashedAddressMapping<BlakeTwo256>;
-// 	type WeightInfo = pallet_hotfix_sufficients::weights::SubstrateWeight<Runtime>;
-// }
+impl pallet_hotfix_sufficients::Config for Runtime {
+	type AddressMapping = HashedAddressMapping<BlakeTwo256>;
+	type WeightInfo = pallet_hotfix_sufficients::weights::SubstrateWeight<Runtime>;
+}
 
 parameter_types! {
 	pub const TransactionByteFee: Balance = 10 * MILLICENTS;
@@ -1143,7 +1143,7 @@ construct_runtime!(
 		EVM: pallet_evm,
 		DynamicFee: pallet_dynamic_fee,
 		BaseFee: pallet_base_fee,
-	//	HotfixSufficients: pallet_hotfix_sufficients,
+	    HotfixSufficients: pallet_hotfix_sufficients,
 	}
 );
 
@@ -1627,7 +1627,7 @@ impl_runtime_apis! {
 		) {
 			use frame_benchmarking::{baseline, Benchmarking, BenchmarkList};
 			use frame_support::traits::StorageInfoTrait;
-			//use pallet_hotfix_sufficients::Pallet as PalletHotfixSufficients;
+			use pallet_hotfix_sufficients::Pallet as PalletHotfixSufficients;
 
 			// Trying to add benchmarks directly to the offences Pallet caused cyclic dependency
 			// issues. To get around that, we separated the Session benchmarks into its own crate,
@@ -1639,7 +1639,7 @@ impl_runtime_apis! {
 
 			let mut list = Vec::<BenchmarkList>::new();
 			list_benchmarks!(list, extra);
-			//list_benchmark!(list, extra, pallet_hotfix_sufficients, PalletHotfixSufficients::<Runtime>);
+			list_benchmark!(list, extra, pallet_hotfix_sufficients, PalletHotfixSufficients::<Runtime>);
 
 			let storage_info = AllPalletsWithSystem::storage_info();
 
@@ -1655,7 +1655,7 @@ impl_runtime_apis! {
 			use baseline::Pallet as BaselineBench;
 
 			use pallet_evm::Pallet as PalletEvmBench;
-			//use pallet_hotfix_sufficients::Pallet as PalletHotfixSufficients;
+			use pallet_hotfix_sufficients::Pallet as PalletHotfixSufficients;
 
 			// Trying to add benchmarks directly to the offences Pallet caused cyclic dependency
 			// issues. To get around that, we separated the Session benchmarks into its own crate,
@@ -1685,7 +1685,7 @@ impl_runtime_apis! {
 			add_benchmarks!(params, batches);
 
 			add_benchmark!(params, batches, pallet_evm, PalletEvmBench::<Runtime>);
-		//	add_benchmark!(params, batches, pallet_hotfix_sufficients, PalletHotfixSufficients::<Runtime>);
+		    add_benchmark!(params, batches, pallet_hotfix_sufficients, PalletHotfixSufficients::<Runtime>);
 
 			if batches.is_empty() { return Err("Benchmark not found for this pallet.".into()) }
 			

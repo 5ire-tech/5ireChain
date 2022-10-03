@@ -1778,6 +1778,7 @@ dependencies = [
  "frame-benchmarking",
  "frame-benchmarking-cli",
  "frame-system",
+ "futures",
  "hex",
  "hex-literal",
  "jsonrpc-core",

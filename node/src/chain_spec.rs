@@ -44,24 +44,24 @@ fn session_keys(babe: BabeId, grandpa: GrandpaId, im_online: ImOnlineId) -> Sess
 }
 
 /// Transfer slice into unchecked evm address
-pub fn transfer_evm_uncheck(raw_account: &[u8]) -> Option<H160> {
-    let data = if raw_account.len() == 20 {
-        raw_account.to_vec()
-    } else if raw_account.len() == 40 {
-        hex::decode(raw_account).ok()?
-    } else if raw_account.len() == 42 {
-        let mut key = [0u8; 40];
-        // remove 0x prefix
-        key.copy_from_slice(&raw_account[2..42]);
-        hex::decode(key).ok()?
-    } else {
-        return None;
-    };
+// pub fn transfer_evm_uncheck(raw_account: &[u8]) -> Option<H160> {
+//     let data = if raw_account.len() == 20 {
+//         raw_account.to_vec()
+//     } else if raw_account.len() == 40 {
+//         hex::decode(raw_account).ok()?
+//     } else if raw_account.len() == 42 {
+//         let mut key = [0u8; 40];
+//         // remove 0x prefix
+//         key.copy_from_slice(&raw_account[2..42]);
+//         hex::decode(key).ok()?
+//     } else {
+//         return None;
+//     };
 
-    let mut key = [0u8; 20];
-    key.copy_from_slice(&data);
-    H160::try_from(key).ok()
-}
+//     let mut key = [0u8; 20];
+//     key.copy_from_slice(&data);
+//     H160::try_from(key).ok()
+// }
 
 /// Generate an account ID from seed.
 pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
