@@ -42,6 +42,8 @@ pallet-offences = { version = "4.0.0-dev", default-features = false, git = "http
 pallet-offences-benchmarking = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master", optional = true }
 pallet-im-online = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
 
+pallet-authority-discovery = { version = "4.0.0-dev", default-features = false,git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master"}
+
 # primitives
 node-primitives = { version = "2.0.0", default-features = false, path = "../primitives/node-primitives" }
 sp-api = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
@@ -58,6 +60,7 @@ sp-session = { version = "4.0.0-dev", default-features = false, git = "https://g
 sp-std = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
 sp-transaction-pool = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
 sp-version = { version = "5.0.0", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sp-authority-discovery = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
 
 # governance pallets
 pallet-scheduler = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
@@ -109,6 +112,7 @@ version = '1.0.101'
 [features]
 default = ["std"]
 std = [
+	"sp-authority-discovery/std",
 	"codec/std",
 	"scale-info/std",
 	"log/std",
@@ -116,6 +120,7 @@ std = [
 	"frame-support/std",
 	"frame-system-rpc-runtime-api/std",
 	"frame-system/std",
+	"pallet-authority-discovery/std",
 	"pallet-authorship/std",
 	"pallet-babe/std",
 	"pallet-balances/std",
@@ -172,6 +177,7 @@ runtime-benchmarks = [
 	"frame-system-benchmarking",
 	"frame-system/runtime-benchmarks",
 	"hex-literal",
+	"pallet-authority-discovery/try-runtime",
 	"pallet-balances/runtime-benchmarks",
 	"pallet-template/runtime-benchmarks",
 	"pallet-timestamp/runtime-benchmarks",

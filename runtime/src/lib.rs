@@ -31,6 +31,7 @@ use pallet_grandpa::{
 };
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sp_api::impl_runtime_apis;
+use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_core::{
 	crypto::{ KeyTypeId},
 	OpaqueMetadata, H160, H256, U256,
@@ -125,6 +126,7 @@ pub mod opaque {
 			pub babe: Babe,
 			pub grandpa: Grandpa,
 			pub im_online: ImOnline,
+			pub authority_discovery: AuthorityDiscovery,
 		}
 	}
 }
@@ -325,6 +327,10 @@ impl pallet_babe::Config for Runtime {
 		pallet_babe::EquivocationHandler<Self::KeyOwnerIdentification, Offences, ReportLongevity>;
 
 	type WeightInfo = ();
+	type MaxAuthorities = MaxAuthorities;
+}
+
+impl pallet_authority_discovery::Config for Runtime {
 	type MaxAuthorities = MaxAuthorities;
 }
 
@@ -1111,6 +1117,7 @@ construct_runtime!(
 		Timestamp: pallet_timestamp,
 		// Authorship must be before session in order to note author in the correct session and era
 		// for im-online and staking.
+		AuthorityDiscovery: pallet_authority_discovery,
 		Authorship: pallet_authorship,
 		Balances: pallet_balances,
 		Babe: pallet_babe,
@@ -1403,6 +1410,11 @@ impl_runtime_apis! {
 		}
 	}
 
+	impl sp_authority_discovery::AuthorityDiscoveryApi<Block> for Runtime {
+		fn authorities() -> Vec<AuthorityDiscoveryId> {
+			AuthorityDiscovery::authorities()
+		}
+	}
 	impl sp_session::SessionKeys<Block> for Runtime {
 		fn generate_session_keys(seed: Option<Vec<u8>>) -> Vec<u8> {
 			opaque::SessionKeys::generate(seed)
@@ -1467,7 +1479,7 @@ impl_runtime_apis! {
 			let is_transactional = false;
 			let validate = true;
 			let evm_config = config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config());
-			<Runtime as pallet_evm::Config>::Runner::call(
+		    <Runtime as pallet_evm::Config>::Runner::call(
 				from,
 				to,
 				data,
