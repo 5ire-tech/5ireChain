@@ -403,7 +403,7 @@ impl pallet_balances::Config for Runtime {
 // }
 
 parameter_types! {
-	pub const ChainId: u64 = 42;
+	pub const ChainId: u64 = 999;
 	pub BlockGasLimit: U256 = U256::from(u32::max_value());
 	//pub BlockGasLimit: U256 = U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT / WEIGHT_PER_GAS);
 	pub PrecompilesValue: FrontierPrecompiles<Runtime> = FrontierPrecompiles::<_>::new();

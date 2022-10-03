@@ -143,7 +143,7 @@ where
 /// Instantiate all full RPC extensions.
 pub fn create_full<C, P, SC, B,BE,A>(
 	deps: FullDeps<C, P, SC, B,A>,
-   // subscription_task_executor: SubscriptionTaskExecutor,
+    subscription_task_executor: SubscriptionTaskExecutor,
 ) -> Result<RpcModule<()>, Box<dyn std::error::Error + Send + Sync>>
 where
     BE: Backend<Block> + 'static,
@@ -212,6 +212,7 @@ where
 		finality_provider,
 	} = grandpa;
 let  pp=pool.clone();
+let  pbp=pool.clone();
 	io.merge(System::new(client.clone(), pool, deny_unsafe).into_rpc())?;
 
 	io.merge(TransactionPayment::new(client.clone()).into_rpc())?;
@@ -278,16 +279,16 @@ let  pp=pool.clone();
 			.into_rpc(),
 		)?;
 	}
-	// io.merge(
-	// 	EthPubSub::new(
-	// 		pool,
-	// 		client.clone(),
-	// 		network.clone(),
-	// 		subscription_task_executor,
-	// 		overrides,
-	// 	)
-	// 	.into_rpc(),
-	// )?;
+	io.merge(
+		EthPubSub::new(
+			pbp,
+			client.clone(),
+			network.clone(),
+			subscription_task_executor,
+			overrides,
+		)
+		.into_rpc(),
+	)?;
 
 	io.merge(
 		Net::new(
