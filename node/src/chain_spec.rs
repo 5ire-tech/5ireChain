@@ -411,7 +411,7 @@ fn testnet_genesis(
 					// SS58: 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
 					// hex: 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d
 					// Using the full hex key, truncating to the first 20 bytes (the first 40 hex chars)
-					H160::from_str("4e74d137fa0fB4E268dE0581AAe6A77Fb09985a7")
+					H160::from_str("d43593c715fdd31c61141abd04a99fd6822c8558")
 						.expect("internal H160 is valid; qed"),
 					fp_evm::GenesisAccount {
 						balance: U256::from_str("0xfffffffffffffffffffff")
