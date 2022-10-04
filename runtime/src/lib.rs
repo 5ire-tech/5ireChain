@@ -16,6 +16,7 @@ pub fn wasm_binary_unwrap() -> &'static [u8] {
 	)
 }
 
+use frame_support::traits::Nothing;
 use codec::{Decode, Encode};
 use pallet_evm::FeeCalculator;
 
@@ -25,12 +26,14 @@ use frame_election_provider_support::{
 use frame_system::EnsureRoot;
 pub use node_primitives::Signature;
 use node_primitives::{AccountId, Balance, BlockNumber, Hash, Index, Moment};
+use pallet_contracts::weights::WeightInfo;
 use pallet_election_provider_multi_phase::SolutionAccuracyOf;
 use pallet_grandpa::{
 	fg_primitives, AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList,
 };
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sp_api::impl_runtime_apis;
+use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_core::{
 	crypto::{ KeyTypeId},
 	OpaqueMetadata, H160, H256, U256,
@@ -125,6 +128,7 @@ pub mod opaque {
 			pub babe: Babe,
 			pub grandpa: Grandpa,
 			pub im_online: ImOnline,
+			pub authority_discovery: AuthorityDiscovery,
 		}
 	}
 }
@@ -234,6 +238,55 @@ pub fn native_version() -> NativeVersion {
 	NativeVersion { runtime_version: VERSION, can_author_with: Default::default() }
 }
 
+parameter_types! {
+	pub const DepositPerItem: Balance = deposit(1, 0);
+	pub const DepositPerByte: Balance = deposit(0, 1);
+	pub const MaxValueSize: u32 = 16 * 1024;
+	// The lazy deletion runs inside on_initialize.
+	pub DeletionWeightLimit: Weight = RuntimeBlockWeights::get()
+		.per_class
+		.get(DispatchClass::Normal)
+		.max_total
+		.unwrap_or(RuntimeBlockWeights::get().max_block);
+	// The weight needed for decoding the queue should be less or equal than a fifth
+	// of the overall weight dedicated to the lazy deletion.
+	pub DeletionQueueDepth: u32 = ((DeletionWeightLimit::get() / (
+			<Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(1) -
+			<Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(0)
+		)) / 5) as u32;
+	pub Schedule: pallet_contracts::Schedule<Runtime> = Default::default();
+}
+
+
+impl pallet_contracts::Config for Runtime {
+	type Time = Timestamp;
+	type Randomness = RandomnessCollectiveFlip;
+	type Currency = Balances;
+	type Event = Event;
+	type Call = Call;
+	/// The safest default is to allow no calls at all.
+	///
+	/// Runtimes should whitelist dispatchables that are allowed to be called from contracts
+	/// and make sure they are stable. Dispatchables exposed to contracts are not allowed to
+	/// change because that would break already deployed contracts. The `Call` structure itself
+	/// is not allowed to change the indices of existing pallets, too.
+	type CallFilter = Nothing;
+	type DepositPerItem = DepositPerItem;
+	type DepositPerByte = DepositPerByte;
+	type CallStack = [pallet_contracts::Frame<Self>; 31];
+	type WeightPrice = pallet_transaction_payment::Pallet<Self>;
+	type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
+	type ChainExtension = ();
+	type DeletionQueueDepth = DeletionQueueDepth;
+	type DeletionWeightLimit = DeletionWeightLimit;
+	type Schedule = Schedule;
+	type AddressGenerator = pallet_contracts::DefaultAddressGenerator;
+	type ContractAccessWeight = pallet_contracts::DefaultContractAccessWeight<RuntimeBlockWeights>;
+	type MaxCodeLen = ConstU32<{ 128 * 1024 }>;
+	type RelaxedMaxCodeLen = ConstU32<{ 256 * 1024 }>;
+}
+
+
 const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
 /// We allow for 2 seconds of compute with a 6 second average block time.
 pub const MAXIMUM_BLOCK_WEIGHT: Weight = 2 * WEIGHT_PER_SECOND;
@@ -337,6 +390,10 @@ impl pallet_babe::Config for Runtime {
 		pallet_babe::EquivocationHandler<Self::KeyOwnerIdentification, Offences, ReportLongevity>;
 
 	type WeightInfo = ();
+	type MaxAuthorities = MaxAuthorities;
+}
+
+impl pallet_authority_discovery::Config for Runtime {
 	type MaxAuthorities = MaxAuthorities;
 }
 
@@ -1123,6 +1180,7 @@ construct_runtime!(
 		Timestamp: pallet_timestamp,
 		// Authorship must be before session in order to note author in the correct session and era
 		// for im-online and staking.
+		AuthorityDiscovery: pallet_authority_discovery,
 		Authorship: pallet_authorship,
 		Balances: pallet_balances,
 		Babe: pallet_babe,
@@ -1140,6 +1198,7 @@ construct_runtime!(
 		// Governance
 		Scheduler: pallet_scheduler,
 		Treasury: pallet_treasury,
+		Contracts: pallet_contracts,
 		Democracy: pallet_democracy,
 		Council: pallet_collective::<Instance1>,
 		TechnicalCommittee: pallet_collective::<Instance2>,
@@ -1289,6 +1348,7 @@ mod benches {
 		[pallet_bags_list, BagsList]
 		[pallet_balances, Balances]
 		[pallet_timestamp, Timestamp]
+		[pallet_contracts, Contracts]
 		[pallet_utility, Utility]
 		[pallet_offences, OffencesBench::<Runtime>]
 		[pallet_im_online, ImOnline]
@@ -1415,6 +1475,63 @@ impl_runtime_apis! {
 		}
 	}
 
+
+
+
+	impl pallet_contracts_rpc_runtime_api::ContractsApi<
+		Block, AccountId, Balance, BlockNumber, Hash,
+	>
+		for Runtime
+	{
+		fn call(
+			origin: AccountId,
+			dest: AccountId,
+			value: Balance,
+			gas_limit: u64,
+			storage_deposit_limit: Option<Balance>,
+			input_data: Vec<u8>,
+		) -> pallet_contracts_primitives::ContractExecResult<Balance> {
+			Contracts::bare_call(origin, dest, value, gas_limit, storage_deposit_limit, input_data, true)
+		}
+
+		fn instantiate(
+			origin: AccountId,
+			value: Balance,
+			gas_limit: u64,
+			storage_deposit_limit: Option<Balance>,
+			code: pallet_contracts_primitives::Code<Hash>,
+			data: Vec<u8>,
+			salt: Vec<u8>,
+		) -> pallet_contracts_primitives::ContractInstantiateResult<AccountId, Balance>
+		{
+			Contracts::bare_instantiate(origin, value, gas_limit, storage_deposit_limit, code, data, salt, true)
+		}
+
+		fn upload_code(
+			origin: AccountId,
+			code: Vec<u8>,
+			storage_deposit_limit: Option<Balance>,
+		) -> pallet_contracts_primitives::CodeUploadResult<Hash, Balance>
+		{
+			Contracts::bare_upload_code(origin, code, storage_deposit_limit)
+		}
+
+		fn get_storage(
+			address: AccountId,
+			key: [u8; 32],
+		) -> pallet_contracts_primitives::GetStorageResult {
+			Contracts::get_storage(address, key)
+		}
+	}
+
+
+
+
+	impl sp_authority_discovery::AuthorityDiscoveryApi<Block> for Runtime {
+		fn authorities() -> Vec<AuthorityDiscoveryId> {
+			AuthorityDiscovery::authorities()
+		}
+	}
 	impl sp_session::SessionKeys<Block> for Runtime {
 		fn generate_session_keys(seed: Option<Vec<u8>>) -> Vec<u8> {
 			opaque::SessionKeys::generate(seed)
@@ -1479,7 +1596,7 @@ impl_runtime_apis! {
 			let is_transactional = false;
 			let validate = true;
 			let evm_config = config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config());
-			<Runtime as pallet_evm::Config>::Runner::call(
+		    <Runtime as pallet_evm::Config>::Runner::call(
 				from,
 				to,
 				data,

@@ -1,7 +1,7 @@
 use hex_literal::hex;
 use node_primitives::*;
 use node_template_runtime::{
-	constants::currency::*, opaque::SessionKeys, BabeConfig, BalancesConfig, CouncilConfig,
+	constants::currency::*, opaque::SessionKeys,AuthorityDiscoveryConfig, BabeConfig, BalancesConfig, CouncilConfig,
 	DemocracyConfig, ElectionsConfig, GenesisConfig, GrandpaConfig, ImOnlineConfig, MaxNominations,
 	SessionConfig, StakerStatus, StakingConfig, SudoConfig, SystemConfig, TechnicalCommitteeConfig,
 	NominationPoolsConfig,EVMConfig,EthereumConfig,
@@ -13,6 +13,7 @@ use sc_telemetry::TelemetryEndpoints;
 use sp_consensus_babe::AuthorityId as BabeId;
 use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public,H160, U256};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
+use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 
 use std::str::FromStr;
 
@@ -39,8 +40,8 @@ type AccountPublic = <Signature as Verify>::Signer;
 
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 
-fn session_keys(babe: BabeId, grandpa: GrandpaId, im_online: ImOnlineId) -> SessionKeys {
-	SessionKeys { babe, grandpa, im_online }
+fn session_keys(babe: BabeId, grandpa: GrandpaId, im_online: ImOnlineId,authority_discovery: AuthorityDiscoveryId,) -> SessionKeys {
+	SessionKeys { babe, grandpa, im_online,authority_discovery }
 }
 
 /// Transfer slice into unchecked evm address
@@ -72,13 +73,14 @@ where
 }
 
 /// Helper function to generate stash, controller and session key from seed
-pub fn authority_keys_from_seed(s: &str) -> (AccountId, AccountId, BabeId, GrandpaId, ImOnlineId) {
+pub fn authority_keys_from_seed(s: &str) -> (AccountId, AccountId, BabeId, GrandpaId, ImOnlineId,AuthorityDiscoveryId) {
 	(
 		get_account_id_from_seed::<sr25519::Public>(&format!("{}//stash", s)),
 		get_account_id_from_seed::<sr25519::Public>(s),
 		get_from_seed::<BabeId>(s),
 		get_from_seed::<GrandpaId>(s),
 		get_from_seed::<ImOnlineId>(s),
+		get_from_seed::<AuthorityDiscoveryId>(s),
 	)
 }
 
@@ -236,7 +238,7 @@ fn staging_network_config_genesis() -> GenesisConfig {
 	// for i in 1 2 3 4; do for j in babe; do subkey --sr25519 inspect "$SECRET//$i//$j"; done; done
 	// for i in 1 2 3 4; do for j in grandpa; do subkey --ed25519 inspect "$SECRET//$i//$j"; done; done
 	// for i in 1 2 3 4; do for j in im_online; do subkey --sr25519 inspect "$SECRET//$i//$j"; done; done
-	let initial_authorities: Vec<(AccountId, AccountId, BabeId, GrandpaId, ImOnlineId)> = vec![
+	let initial_authorities: Vec<(AccountId, AccountId, BabeId, GrandpaId, ImOnlineId,AuthorityDiscoveryId,)> = vec![
 		(
 			//5FNCTJVDxfFnmUYKHqbJHjUi7UFbZ6pzC39sL6E5RVpB4vc9
 			hex!["920c238572e2b31c2efd19dad1a5674c8188388d9a30d0d01847759a5dc64069"].into(),
@@ -246,6 +248,8 @@ fn staging_network_config_genesis() -> GenesisConfig {
 			hex!["a3859016b0b17b7ed6a5b2efcb4ce0e2b6b56ec8594d416c0ea3685929f0a15c"].unchecked_into(),
 			//5CyLUbfTe941tZDvQQ5AYPXZ6zzqwS987DTwFGnZ3yPFX5wB
 			hex!["2824087e4d670acc6f2ac4251736b7fb581b5bff414437b6abc88dc118ea8d5c"].unchecked_into(),
+			//5CahSqUXepwzCkbC7KNUSghUcuJxPDPKiQ4ow144Gb9qBPsX
+			hex!["16dffa9a82c7bb62f0f9929407223bf156458a4e7970ec4007ab2da7fb389f7d"].unchecked_into(),
 			//5CahSqUXepwzCkbC7KNUSghUcuJxPDPKiQ4ow144Gb9qBPsX
 			hex!["16dffa9a82c7bb62f0f9929407223bf156458a4e7970ec4007ab2da7fb389f7d"].unchecked_into(),
 			),
@@ -260,6 +264,8 @@ fn staging_network_config_genesis() -> GenesisConfig {
 			hex!["b087cc20818f98e543c55989afccd3ec28c57e425dae970d9dd63cad806c1f6d"].unchecked_into(),
 			//5DknzWSQVCpo7bNf2NnBsjb529K2WVpvGv6Q3kn9RgcFgoeQ
 			hex!["4acf560d0aa80158ee06971c0ebbf4e6a1a407e6de2df16a003a765b73e63d7b"].unchecked_into(),
+			//5CahSqUXepwzCkbC7KNUSghUcuJxPDPKiQ4ow144Gb9qBPsX
+			hex!["16dffa9a82c7bb62f0f9929407223bf156458a4e7970ec4007ab2da7fb389f7d"].unchecked_into(),
 			),
 			(
 			//5DJQ1NXeThmu2N5yQHZUsY64Lmgm95nnchpRWi1nSBU2rgod
@@ -272,6 +278,8 @@ fn staging_network_config_genesis() -> GenesisConfig {
 			hex!["8e3b579b007999dce44a28bb266f73b54e6f7ec219c495ae23fe0dc3c101e158"].unchecked_into(),
 			//5GRarw8oivnRh5ViPC9kH6ztbPNiyrfb61BitYz2YzhoqS4L
 			hex!["c0dd89e234665e119ac8396af69c37d1956ffbf4a0173c21ee5872fea2366026"].unchecked_into(),
+			//5CahSqUXepwzCkbC7KNUSghUcuJxPDPKiQ4ow144Gb9qBPsX
+			hex!["16dffa9a82c7bb62f0f9929407223bf156458a4e7970ec4007ab2da7fb389f7d"].unchecked_into(),
 			),
 	];
 
@@ -294,7 +302,7 @@ fn staging_network_config_genesis() -> GenesisConfig {
 
 /// Configure initial storage state for FRAME modules.
 fn testnet_genesis(
-	initial_authorities: Vec<(AccountId, AccountId, BabeId, GrandpaId, ImOnlineId)>,
+	initial_authorities: Vec<(AccountId, AccountId, BabeId, GrandpaId, ImOnlineId,AuthorityDiscoveryId)>,
 	initial_nominators: Vec<AccountId>,
 	root_key: AccountId,
 	mut endowed_accounts: Vec<AccountId>,
@@ -346,7 +354,7 @@ fn testnet_genesis(
 			keys: initial_authorities
 				.iter()
 				.map(|x| {
-					(x.0.clone(), x.0.clone(), session_keys(x.2.clone(), x.3.clone(), x.4.clone()))
+					(x.0.clone(), x.0.clone(), session_keys(x.2.clone(), x.3.clone(), x.4.clone(),x.5.clone()))
 				})
 				.collect::<Vec<_>>(),
 		},
@@ -362,6 +370,7 @@ fn testnet_genesis(
 		babe: BabeConfig { authorities: vec![], epoch_config: Some(BABE_GENESIS_EPOCH_CONFIG) },
 		grandpa: GrandpaConfig { authorities: vec![] },
 		im_online: ImOnlineConfig { keys: vec![] },
+		authority_discovery: AuthorityDiscoveryConfig { keys: vec![] },
 		democracy: DemocracyConfig::default(),
 		elections: ElectionsConfig {
 			members: endowed_accounts
@@ -402,7 +411,7 @@ fn testnet_genesis(
 					// SS58: 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
 					// hex: 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d
 					// Using the full hex key, truncating to the first 20 bytes (the first 40 hex chars)
-					H160::from_str("d43593c715fdd31c61141abd04a99fd6822c8558")
+					H160::from_str("43e318e18f4C61460B5fb9E1c0bf26A1502044BD")
 						.expect("internal H160 is valid; qed"),
 					fp_evm::GenesisAccount {
 						balance: U256::from_str("0xfffffffffffffffffffff")
@@ -414,10 +423,10 @@ fn testnet_genesis(
 				);
 				map.insert(
 					// H160 address of CI test runner account
-					H160::from_str("8097c3C354652CB1EEed3E5B65fBa2576470678A")
+					H160::from_str("482E579993cA638c96Dd4D20df60836a2Fd7DcBe")
 						.expect("internal H160 is valid; qed"),
 					fp_evm::GenesisAccount {
-						balance: U256::from_str("0xfffffffffffffffffffff")
+						balance: U256::from_str("0xfffff")
 							.expect("internal U256 is valid; qed"),
 						code: Default::default(),
 						nonce: Default::default(),

@@ -1785,6 +1785,7 @@ dependencies = [
  "jsonrpsee",
  "node-primitives",
  "node-template-runtime",
+ "pallet-contracts-rpc",
  "pallet-im-online",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc",
@@ -1811,6 +1812,7 @@ dependencies = [
  "sc-transaction-pool",
  "sc-transaction-pool-api",
  "sp-api",
+ "sp-authority-discovery",
  "sp-authorship",
  "sp-block-builder",
  "sp-blockchain",
@@ -4191,12 +4193,16 @@ dependencies = [
  "hex-literal",
  "log",
  "node-primitives",
+ "pallet-authority-discovery",
  "pallet-authorship",
  "pallet-babe",
  "pallet-bags-list",
  "pallet-balances",
  "pallet-base-fee",
  "pallet-collective",
+ "pallet-contracts",
+ "pallet-contracts-primitives",
+ "pallet-contracts-rpc-runtime-api",
  "pallet-democracy",
  "pallet-dynamic-fee",
  "pallet-election-provider-multi-phase",
@@ -4230,6 +4236,7 @@ dependencies = [
  "scale-info",
  "serde",
  "sp-api",
+ "sp-authority-discovery",
  "sp-block-builder",
  "sp-consensus-babe",
  "sp-core",
@@ -4449,6 +4456,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-authority-discovery"
+version = "4.0.0-dev"
+source = "git+https://github.com/5ire-tech/5ire-substrate.git?branch=master#4c1c4b1204e4b4bf5debec8fbb03dd4efb84d938"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "pallet-session",
+ "parity-scale-codec",
+ "scale-info",
+ "sp-application-crypto",
+ "sp-authority-discovery",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "pallet-authorship"
 version = "4.0.0-dev"
 source = "git+https://github.com/5ire-tech/5ire-substrate.git?branch=master#4c1c4b1204e4b4bf5debec8fbb03dd4efb84d938"
@@ -4545,6 +4568,88 @@ dependencies = [
  "scale-info",
  "sp-core",
  "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
+name = "pallet-contracts"
+version = "4.0.0-dev"
+source = "git+https://github.com/5ire-tech/5ire-substrate.git?branch=master#4c1c4b1204e4b4bf5debec8fbb03dd4efb84d938"
+dependencies = [
+ "bitflags",
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "log",
+ "pallet-contracts-primitives",
+ "pallet-contracts-proc-macro",
+ "parity-scale-codec",
+ "rand 0.8.5",
+ "rand_pcg 0.3.1",
+ "scale-info",
+ "serde",
+ "smallvec",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-sandbox",
+ "sp-std",
+ "wasm-instrument",
+ "wasmi-validation",
+]
+
+[[package]]
+name = "pallet-contracts-primitives"
+version = "6.0.0"
+source = "git+https://github.com/5ire-tech/5ire-substrate.git?branch=master#4c1c4b1204e4b4bf5debec8fbb03dd4efb84d938"
+dependencies = [
+ "bitflags",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "sp-core",
+ "sp-rpc",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
+name = "pallet-contracts-proc-macro"
+version = "4.0.0-dev"
+source = "git+https://github.com/5ire-tech/5ire-substrate.git?branch=master#4c1c4b1204e4b4bf5debec8fbb03dd4efb84d938"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "pallet-contracts-rpc"
+version = "4.0.0-dev"
+source = "git+https://github.com/5ire-tech/5ire-substrate.git?branch=master#4c1c4b1204e4b4bf5debec8fbb03dd4efb84d938"
+dependencies = [
+ "jsonrpsee",
+ "pallet-contracts-primitives",
+ "pallet-contracts-rpc-runtime-api",
+ "parity-scale-codec",
+ "serde",
+ "sp-api",
+ "sp-blockchain",
+ "sp-core",
+ "sp-rpc",
+ "sp-runtime",
+]
+
+[[package]]
+name = "pallet-contracts-rpc-runtime-api"
+version = "4.0.0-dev"
+source = "git+https://github.com/5ire-tech/5ire-substrate.git?branch=master#4c1c4b1204e4b4bf5debec8fbb03dd4efb84d938"
+dependencies = [
+ "pallet-contracts-primitives",
+ "parity-scale-codec",
+ "scale-info",
+ "sp-api",
  "sp-runtime",
  "sp-std",
 ]
@@ -7561,6 +7666,19 @@ dependencies = [
  "sp-debug-derive",
  "sp-std",
  "static_assertions",
+]
+
+[[package]]
+name = "sp-authority-discovery"
+version = "4.0.0-dev"
+source = "git+https://github.com/5ire-tech/5ire-substrate.git?branch=master#4c1c4b1204e4b4bf5debec8fbb03dd4efb84d938"
+dependencies = [
+ "parity-scale-codec",
+ "scale-info",
+ "sp-api",
+ "sp-application-crypto",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]

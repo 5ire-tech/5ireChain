@@ -42,6 +42,13 @@ pallet-offences = { version = "4.0.0-dev", default-features = false, git = "http
 pallet-offences-benchmarking = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master", optional = true }
 pallet-im-online = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
 
+
+pallet-contracts = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+pallet-contracts-primitives = { version = "6.0.0", default-features = false,git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master"}
+pallet-contracts-rpc-runtime-api = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+
+pallet-authority-discovery = { version = "4.0.0-dev", default-features = false,git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master"}
+
 # primitives
 node-primitives = { version = "2.0.0", default-features = false, path = "../primitives/node-primitives" }
 sp-api = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
@@ -58,6 +65,7 @@ sp-session = { version = "4.0.0-dev", default-features = false, git = "https://g
 sp-std = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
 sp-transaction-pool = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
 sp-version = { version = "5.0.0", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sp-authority-discovery = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
 
 # governance pallets
 pallet-scheduler = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
@@ -109,6 +117,7 @@ version = '1.0.101'
 [features]
 default = ["std"]
 std = [
+	"sp-authority-discovery/std",
 	"codec/std",
 	"scale-info/std",
 	"log/std",
@@ -116,6 +125,7 @@ std = [
 	"frame-support/std",
 	"frame-system-rpc-runtime-api/std",
 	"frame-system/std",
+	"pallet-authority-discovery/std",
 	"pallet-authorship/std",
 	"pallet-babe/std",
 	"pallet-balances/std",
@@ -125,6 +135,9 @@ std = [
 	"pallet-scheduler/std",
 	"pallet-treasury/std",
 	"pallet-collective/std",
+	"pallet-contracts/std",
+	"pallet-contracts-primitives/std",
+	"pallet-contracts-rpc-runtime-api/std",
 	"pallet-membership/std",
 	"pallet-democracy/std",
 	"pallet-elections-phragmen/std",
@@ -172,6 +185,7 @@ runtime-benchmarks = [
 	"frame-system-benchmarking",
 	"frame-system/runtime-benchmarks",
 	"hex-literal",
+	"pallet-authority-discovery/try-runtime",
 	"pallet-balances/runtime-benchmarks",
 	"pallet-template/runtime-benchmarks",
 	"pallet-timestamp/runtime-benchmarks",
@@ -182,6 +196,7 @@ runtime-benchmarks = [
 	"pallet-scheduler/runtime-benchmarks",
 	"pallet-treasury/runtime-benchmarks",
 	"pallet-collective/runtime-benchmarks",
+	"pallet-contracts/runtime-benchmarks",
 	"pallet-membership/runtime-benchmarks",
 	"pallet-democracy/runtime-benchmarks",
 	"pallet-elections-phragmen/runtime-benchmarks",
@@ -190,3 +205,11 @@ runtime-benchmarks = [
     'pallet-evm/runtime-benchmarks',
 		"pallet-hotfix-sufficients/runtime-benchmarks",
 ]
+
+try-runtime = [
+"pallet-contracts/try-runtime",
+]
+
+# Make contract callable functions marked as __unstable__ available. Do not enable
+# on live chains as those are subject to change.
+contracts-unstable-interface = ["pallet-contracts/unstable-interface"]

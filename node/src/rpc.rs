@@ -161,6 +161,7 @@ where
     C: Send + Sync + 'static,
 	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
 	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
+	C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>,
 	C::Api: BabeApi<Block>,
 	C::Api: BlockBuilder<Block>,
 	P: TransactionPool<Block=Block> + 'static,
@@ -172,6 +173,7 @@ where
     A: ChainApi<Block = Block> + 'static,
 
 {
+	use pallet_contracts_rpc::{Contracts, ContractsApiServer};
 	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApiServer};
 	use substrate_frame_rpc_system::{System, SystemApiServer};
 	use sc_consensus_babe_rpc::{Babe, BabeApiServer};
@@ -290,6 +292,7 @@ let  pbp=pool.clone();
 		.into_rpc(),
 	)?;
 
+	io.merge(Contracts::new(client.clone()).into_rpc())?;
 	io.merge(
 		Net::new(
 			client.clone(),
