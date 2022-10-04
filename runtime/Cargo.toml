@@ -42,6 +42,11 @@ pallet-offences = { version = "4.0.0-dev", default-features = false, git = "http
 pallet-offences-benchmarking = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master", optional = true }
 pallet-im-online = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
 
+
+pallet-contracts = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+pallet-contracts-primitives = { version = "6.0.0", default-features = false,git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master"}
+pallet-contracts-rpc-runtime-api = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+
 pallet-authority-discovery = { version = "4.0.0-dev", default-features = false,git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master"}
 
 # primitives
@@ -130,6 +135,9 @@ std = [
 	"pallet-scheduler/std",
 	"pallet-treasury/std",
 	"pallet-collective/std",
+	"pallet-contracts/std",
+	"pallet-contracts-primitives/std",
+	"pallet-contracts-rpc-runtime-api/std",
 	"pallet-membership/std",
 	"pallet-democracy/std",
 	"pallet-elections-phragmen/std",
@@ -188,6 +196,7 @@ runtime-benchmarks = [
 	"pallet-scheduler/runtime-benchmarks",
 	"pallet-treasury/runtime-benchmarks",
 	"pallet-collective/runtime-benchmarks",
+	"pallet-contracts/runtime-benchmarks",
 	"pallet-membership/runtime-benchmarks",
 	"pallet-democracy/runtime-benchmarks",
 	"pallet-elections-phragmen/runtime-benchmarks",
@@ -196,3 +205,11 @@ runtime-benchmarks = [
     'pallet-evm/runtime-benchmarks',
 		"pallet-hotfix-sufficients/runtime-benchmarks",
 ]
+
+try-runtime = [
+"pallet-contracts/try-runtime",
+]
+
+# Make contract callable functions marked as __unstable__ available. Do not enable
+# on live chains as those are subject to change.
+contracts-unstable-interface = ["pallet-contracts/unstable-interface"]
