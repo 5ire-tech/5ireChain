@@ -32,6 +32,7 @@ pallet-transaction-payment = { version = "4.0.0-dev", default-features = false, 
 pallet-bags-list = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
 pallet-session = { version = "4.0.0-dev", default-features = false, features = [ "historical" ], git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
 pallet-nomination-pools = { version = "1.0.0", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+pallet-nomination-pools-benchmarking = { version = "1.0.0", default-features = false, optional = true, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
 pallet-staking = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
 pallet-staking-reward-curve = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
 pallet-election-provider-multi-phase = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
@@ -41,6 +42,8 @@ pallet-utility = { version = "4.0.0-dev", default-features = false, git = "https
 pallet-offences = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
 pallet-offences-benchmarking = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master", optional = true }
 pallet-im-online = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+pallet-session-benchmarking = { version = "4.0.0-dev",  git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false, optional = true }
+pallet-election-provider-support-benchmarking = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master", optional = true }
 
 
 pallet-contracts = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
@@ -186,6 +189,8 @@ runtime-benchmarks = [
 	"frame-system/runtime-benchmarks",
 	"hex-literal",
 	"pallet-authority-discovery/try-runtime",
+	"pallet-session-benchmarking",
+	"pallet-nomination-pools-benchmarking",
 	"pallet-balances/runtime-benchmarks",
 	"pallet-template/runtime-benchmarks",
 	"pallet-timestamp/runtime-benchmarks",
@@ -200,10 +205,11 @@ runtime-benchmarks = [
 	"pallet-membership/runtime-benchmarks",
 	"pallet-democracy/runtime-benchmarks",
 	"pallet-elections-phragmen/runtime-benchmarks",
+	"pallet-election-provider-support-benchmarking/runtime-benchmarks",
 	"pallet-preimage/runtime-benchmarks",
-	 'pallet-ethereum/runtime-benchmarks',
+	'pallet-ethereum/runtime-benchmarks',
     'pallet-evm/runtime-benchmarks',
-		"pallet-hotfix-sufficients/runtime-benchmarks",
+	"pallet-hotfix-sufficients/runtime-benchmarks",
 ]
 
 try-runtime = [
