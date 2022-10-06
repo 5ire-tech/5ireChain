@@ -471,6 +471,15 @@ impl GasWeightMapping for FixedGasWeightMapping {
 	}
 }
 
+// pub struct IntoAddressMapping;
+
+// impl<T: From<H160>> pallet_evm::AddressMapping<T> for IntoAddressMapping {
+// 	fn into_account_id(address: H160) -> T {
+// 		address.into()
+// 	}
+// }
+
+
 parameter_types! {
 	pub const ChainId: u64 = 999;
 	// pub BlockGasLimit: U256 = U256::from(u32::max_value());
@@ -485,6 +494,7 @@ impl pallet_evm::Config for Runtime {
 	type CallOrigin = EnsureAddressTruncated;
 	type WithdrawOrigin = EnsureAddressTruncated;
 	type AddressMapping = HashedAddressMapping<BlakeTwo256>;
+	// type AddressMapping = IntoAddressMapping;
 	type Currency = Balances;
 	type Event = Event;
 	type Runner = pallet_evm::runner::stack::Runner<Self>;
@@ -1345,6 +1355,7 @@ mod benches {
 		[frame_benchmarking, BaselineBench::<Runtime>]
 		[frame_system, SystemBench::<Runtime>]
 		[pallet_babe, Babe]
+		[pallet_nomination_pools, NominationPoolsBench::<Runtime>]
 		[pallet_bags_list, BagsList]
 		[pallet_balances, Balances]
 		[pallet_timestamp, Timestamp]
@@ -1359,6 +1370,8 @@ mod benches {
 		[pallet_membership, TechnicalMembership]
 		[pallet_elections_phragmen, Elections]
 		[pallet_preimage, Preimage]
+		[pallet_session, SessionBench::<Runtime>]
+		[pallet_election_provider_support_benchmarking, EPSBench::<Runtime>]
 		[pallet_template, TemplateModule]
 		[pallet_evm, EVM]
 	);
@@ -1762,9 +1775,11 @@ impl_runtime_apis! {
 			// issues. To get around that, we separated the Session benchmarks into its own crate,
 			// which is why we need these two lines below.
 			use pallet_offences_benchmarking::Pallet as OffencesBench;
-
+			use pallet_session_benchmarking::Pallet as SessionBench;
 			use frame_system_benchmarking::Pallet as SystemBench;
+			use pallet_election_provider_support_benchmarking::Pallet as EPSBench;
 			use baseline::Pallet as BaselineBench;
+			use pallet_nomination_pools_benchmarking::Pallet as NominationPoolsBench;
 
 			let mut list = Vec::<BenchmarkList>::new();
 			list_benchmarks!(list, extra);
@@ -1782,6 +1797,9 @@ impl_runtime_apis! {
 
 			use frame_system_benchmarking::Pallet as SystemBench;
 			use baseline::Pallet as BaselineBench;
+			use pallet_nomination_pools_benchmarking::Pallet as NominationPoolsBench;
+			use pallet_session_benchmarking::Pallet as SessionBench;
+			use pallet_election_provider_support_benchmarking::Pallet as EPSBench;
 
 			use pallet_evm::Pallet as PalletEvmBench;
 			use pallet_hotfix_sufficients::Pallet as PalletHotfixSufficients;
@@ -1792,8 +1810,11 @@ impl_runtime_apis! {
 			use pallet_offences_benchmarking::Pallet as OffencesBench;
 
 			impl pallet_offences_benchmarking::Config for Runtime {}
+			impl pallet_election_provider_support_benchmarking::Config for Runtime {}
+			impl pallet_session_benchmarking::Config for Runtime {}
 
 			impl frame_system_benchmarking::Config for Runtime {}
+			impl pallet_nomination_pools_benchmarking::Config for Runtime {}
 			impl baseline::Config for Runtime {}
 
 			let whitelist: Vec<TrackedStorageKey> = vec![
