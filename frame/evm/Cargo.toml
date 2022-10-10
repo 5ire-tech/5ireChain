@@ -16,6 +16,7 @@ evm = { git = "https://github.com/rust-blockchain/evm", rev = "01bcbd2205a212c34
 hex = { version = "0.4.3", default-features = false, features = ["alloc"] }
 log = { version = "0.4.17", default-features = false }
 serde = { version = "1.0.139", optional = true, features = ["derive"] }
+num-traits = { version = "0.2.8", default-features = false }
 
 # Parity
 codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = ["derive"] }
@@ -33,7 +34,6 @@ frame-benchmarking = { version = "4.0.0-dev", git = "https://github.com/5ire-tec
 frame-support = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
 frame-system = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
 pallet-timestamp = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
-
 # Frontier
 fp-evm = { version = "3.0.0-dev", path = "../../primitives/evm", default-features = false }
 

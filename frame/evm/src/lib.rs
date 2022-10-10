@@ -78,7 +78,6 @@ use sp_runtime::{
 	AccountId32, DispatchErrorWithPostInfo,
 };
 use sp_std::{cmp::min, vec::Vec};
-
 pub use evm::{
 	Config as EvmConfig, Context, ExitError, ExitFatal, ExitReason, ExitRevert, ExitSucceed,
 };
@@ -152,7 +151,7 @@ pub mod pallet {
 			&LONDON_CONFIG
 		}
 	}
-
+	
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
 		/// Withdraw balance from EVM into currency/balances pallet.
@@ -165,18 +164,20 @@ pub mod pallet {
 			let destination = T::WithdrawOrigin::ensure_address_origin(&address, origin)?;
 			let address_account_id = T::AddressMapping::into_account_id(address);
 
+			let evm_value= value.saturating_mul(10u64.pow(18u32).unique_saturated_into());
+			let native_value= value.saturating_mul(10u64.pow(12u32).unique_saturated_into());
+
 			T::Currency::transfer(
 				&address_account_id,
 				&destination,
-				value,
+				native_value,
 				ExistenceRequirement::AllowDeath,
 			)?;
-
+			let slashed_value= evm_value.saturating_sub(native_value);
+			T::Currency::slash(&address_account_id,slashed_value);
 			Ok(())
 		}
 
-
-		
 		/// Issue an EVM call operation. This is similar to a message call transaction in Ethereum.
 		#[pallet::weight(T::GasWeightMapping::gas_to_weight(*gas_limit))]
 		pub fn call(
@@ -218,16 +219,16 @@ pub mod pallet {
 						},
 						error: e.error.into(),
 					})
-				}
+				},
 			};
 
 			match info.exit_reason {
 				ExitReason::Succeed(_) => {
 					Pallet::<T>::deposit_event(Event::<T>::Executed { address: target });
-				}
+				},
 				_ => {
 					Pallet::<T>::deposit_event(Event::<T>::ExecutedFailed { address: target });
-				}
+				},
 			};
 
 			Ok(PostDispatchInfo {
@@ -278,28 +279,20 @@ pub mod pallet {
 						},
 						error: e.error.into(),
 					})
-				}
+				},
 			};
 
 			match info {
 				CreateInfo {
-					exit_reason: ExitReason::Succeed(_),
-					value: create_address,
-					..
+					exit_reason: ExitReason::Succeed(_), value: create_address, ..
 				} => {
-					Pallet::<T>::deposit_event(Event::<T>::Created {
-						address: create_address,
-					});
-				}
-				CreateInfo {
-					exit_reason: _,
-					value: create_address,
-					..
-				} => {
+					Pallet::<T>::deposit_event(Event::<T>::Created { address: create_address });
+				},
+				CreateInfo { exit_reason: _, value: create_address, .. } => {
 					Pallet::<T>::deposit_event(Event::<T>::CreatedFailed {
 						address: create_address,
 					});
-				}
+				},
 			}
 
 			Ok(PostDispatchInfo {
@@ -351,28 +344,20 @@ pub mod pallet {
 						},
 						error: e.error.into(),
 					})
-				}
+				},
 			};
 
 			match info {
 				CreateInfo {
-					exit_reason: ExitReason::Succeed(_),
-					value: create_address,
-					..
+					exit_reason: ExitReason::Succeed(_), value: create_address, ..
 				} => {
-					Pallet::<T>::deposit_event(Event::<T>::Created {
-						address: create_address,
-					});
-				}
-				CreateInfo {
-					exit_reason: _,
-					value: create_address,
-					..
-				} => {
+					Pallet::<T>::deposit_event(Event::<T>::Created { address: create_address });
+				},
+				CreateInfo { exit_reason: _, value: create_address, .. } => {
 					Pallet::<T>::deposit_event(Event::<T>::CreatedFailed {
 						address: create_address,
 					});
-				}
+				},
 			}
 
 			Ok(PostDispatchInfo {
@@ -571,7 +556,7 @@ where
 		origin.into().and_then(|o| match o {
 			RawOrigin::Signed(who) if AsRef::<[u8; 32]>::as_ref(&who)[0..20] == address[0..20] => {
 				Ok(who)
-			}
+			},
 			r => Err(OuterOrigin::from(r)),
 		})
 	}
@@ -777,9 +762,7 @@ where
 			let account_id = T::AddressMapping::into_account_id(*who);
 
 			// Calculate how much refund we should return
-			let refund_amount = paid
-				.peek()
-				.saturating_sub(corrected_fee.unique_saturated_into());
+			let refund_amount = paid.peek().saturating_sub(corrected_fee.unique_saturated_into());
 			// refund to the account that paid the fees. If this fails, the
 			// account might have dropped below the existential balance. In
 			// that case we don't refund anything.
