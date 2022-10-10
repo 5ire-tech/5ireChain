@@ -30,7 +30,7 @@ use sp_runtime::{
 };
 use sp_std::{boxed::Box, prelude::*, str::FromStr};
 
-use crate::{EnsureAddressNever, EnsureAddressRoot, FeeCalculator, IdentityAddressMapping};
+use crate::{EnsureAddressNever,EnsureAddressRoot, FeeCalculator, IdentityAddressMapping};
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;

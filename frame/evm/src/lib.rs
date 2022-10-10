@@ -64,10 +64,11 @@ pub mod runner;
 mod tests;
 
 use frame_support::{
+	log,
 	dispatch::DispatchResultWithPostInfo,
 	traits::{
 		tokens::fungible::Inspect, Currency, ExistenceRequirement, FindAuthor, Get, Imbalance,
-		OnUnbalanced, SignedImbalance, WithdrawReasons,
+		OnUnbalanced, SignedImbalance, WithdrawReasons
 	},
 	weights::{Pays, PostDispatchInfo, Weight},
 };
@@ -120,6 +121,7 @@ pub mod pallet {
 		type CallOrigin: EnsureAddressOrigin<Self::Origin>;
 		/// Allow the origin to withdraw on behalf of given address.
 		type WithdrawOrigin: EnsureAddressOrigin<Self::Origin, Success = Self::AccountId>;
+		
 
 		/// Mapping from address to account id.
 		type AddressMapping: AddressMapping<Self::AccountId>;
@@ -163,7 +165,6 @@ pub mod pallet {
 		) -> DispatchResult {
 			let destination = T::WithdrawOrigin::ensure_address_origin(&address, origin)?;
 			let address_account_id = T::AddressMapping::into_account_id(address);
-
 			let evm_value= value.saturating_mul(10u64.pow(18u32).unique_saturated_into());
 			let native_value= value.saturating_mul(10u64.pow(12u32).unique_saturated_into());
 
@@ -178,6 +179,32 @@ pub mod pallet {
 			Ok(())
 		}
 
+
+
+		/// Deposit balance from EVM into currency/balances pallet.
+		#[pallet::weight(0)]
+		pub fn deposit(
+			origin: OriginFor<T>,
+			address: H160,
+			value: BalanceOf<T>,
+		) -> DispatchResult {
+			let destination = ensure_signed(origin.clone())?;
+			let address_account_id = T::AddressMapping::into_account_id(address);
+			let evm_value= value.saturating_mul(10u64.pow(18u32).unique_saturated_into());
+			let native_value= value.saturating_mul(10u64.pow(12u32).unique_saturated_into());
+			let mint_value= evm_value.saturating_sub(native_value);
+
+			T::Currency::transfer(
+				&destination,
+				&address_account_id,
+				native_value,
+				ExistenceRequirement::AllowDeath,
+			)?;
+			T::Currency::deposit_creating(&address_account_id,mint_value);
+			Ok(())
+		}
+
+		
 		/// Issue an EVM call operation. This is similar to a message call transaction in Ethereum.
 		#[pallet::weight(T::GasWeightMapping::gas_to_weight(*gas_limit))]
 		pub fn call(
@@ -496,6 +523,7 @@ pub trait EnsureAddressOrigin<OuterOrigin> {
 	) -> Result<Self::Success, OuterOrigin>;
 }
 
+
 /// Ensure that the EVM address is the same as the Substrate address. This only works if the account
 /// ID is `H160`.
 pub struct EnsureAddressSame;
@@ -505,7 +533,6 @@ where
 	OuterOrigin: Into<Result<RawOrigin<H160>, OuterOrigin>> + From<RawOrigin<H160>>,
 {
 	type Success = H160;
-
 	fn try_address_origin(address: &H160, origin: OuterOrigin) -> Result<H160, OuterOrigin> {
 		origin.into().and_then(|o| match o {
 			RawOrigin::Signed(who) if &who == address => Ok(who),
@@ -513,6 +540,9 @@ where
 		})
 	}
 }
+
+
+
 
 /// Ensure that the origin is root.
 pub struct EnsureAddressRoot<AccountId>(sp_std::marker::PhantomData<AccountId>);
@@ -531,6 +561,9 @@ where
 	}
 }
 
+
+
+
 /// Ensure that the origin never happens.
 pub struct EnsureAddressNever<AccountId>(sp_std::marker::PhantomData<AccountId>);
 
@@ -541,6 +574,8 @@ impl<OuterOrigin, AccountId> EnsureAddressOrigin<OuterOrigin> for EnsureAddressN
 		Err(origin)
 	}
 }
+
+
 
 /// Ensure that the address is truncated hash of the origin. Only works if the account id is
 /// `AccountId32`.
@@ -561,6 +596,8 @@ where
 		})
 	}
 }
+
+
 
 pub trait AddressMapping<A> {
 	fn into_account_id(address: H160) -> A;
