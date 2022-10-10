@@ -82,7 +82,7 @@ use fp_rpc::TransactionStatus;
 use pallet_ethereum::{Call::transact, Transaction as EthereumTransaction};
 
 use pallet_evm::{
-	Account as EVMAccount, EnsureAddressTruncated, HashedAddressMapping, Runner,GasWeightMapping
+	Account as EVMAccount, EnsureAddressTruncated,HashedAddressMapping, Runner,GasWeightMapping
 };
 
 
