@@ -4793,6 +4793,7 @@ dependencies = [
  "frame-system",
  "hex",
  "log",
+ "num-traits",
  "pallet-balances",
  "pallet-timestamp",
  "parity-scale-codec",
