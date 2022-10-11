@@ -19,10 +19,10 @@ kvdb-rocksdb = { version = "0.15.2", optional = true }
 parity-db = { version = "0.3.14", optional = true }
 
 # Substrate
-sc-client-db = { version = "0.10.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sp-core = { version = "6.0.0", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sp-database = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sp-runtime = { version = "6.0.0", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sc-client-db = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sp-core = { version = "6.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sp-database = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sp-runtime = { version = "6.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
 
 # Frontier
 fp-storage = { version = "2.0.0-dev", path = "../../primitives/storage" }

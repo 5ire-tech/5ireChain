@@ -20,57 +20,57 @@ rand = "0.8"
 jsonrpsee = { version = "0.14.0", features = ["server"] }
 hex = { version = "0.4", default-features = false }
 futures = "0.3.21"
-sc-cli = { version = "0.10.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master", features = ["wasmtime"] }
-sp-core = { version = "6.0.0", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sc-executor = { version = "0.10.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master", features = ["wasmtime"]  }
-sc-service = { version = "0.10.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master", features = ["wasmtime"]  }
-sc-telemetry = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sc-keystore = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sp-keystore = { version = "0.12.0", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sc-transaction-pool = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sc-transaction-pool-api = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sc-consensus-babe = { version = "0.10.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sc-consensus-slots = { version = "0.10.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sp-consensus-babe = { version = "0.10.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sc-consensus-uncles = { version = "0.10.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sp-consensus = { version = "0.10.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sc-consensus = { version = "0.10.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sc-consensus-epochs = { version = "0.10.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sc-finality-grandpa = { version = "0.10.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sp-finality-grandpa = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sc-client-api = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sc-chain-spec = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sc-network = { version = "0.10.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sp-runtime = { version = "6.0.0", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sp-timestamp = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sp-authorship = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sp-inherents = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sp-keyring = { version = "6.0.0", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sp-transaction-storage-proof = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sp-authority-discovery = { version = "4.0.0-dev", default-features = false, git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sc-cli = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", features = ["wasmtime"] }
+sp-core = { version = "6.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sc-executor = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", features = ["wasmtime"]  }
+sc-service = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", features = ["wasmtime"]  }
+sc-telemetry = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sc-keystore = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sp-keystore = { version = "0.12.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sc-transaction-pool = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sc-transaction-pool-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sc-consensus-babe = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sc-consensus-slots = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sp-consensus-babe = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sc-consensus-uncles = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sp-consensus = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sc-consensus = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sc-consensus-epochs = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sc-finality-grandpa = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sp-finality-grandpa = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sc-client-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sc-chain-spec = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sc-network = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sp-runtime = { version = "6.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sp-timestamp = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sp-authorship = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sp-inherents = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sp-keyring = { version = "6.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sp-transaction-storage-proof = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sp-authority-discovery = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
 
 # These dependencies are used for the node template's RPCs
 jsonrpc-core = "18.0.0"
-sc-rpc = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sp-api = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sc-rpc-api = { version = "0.10.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sp-blockchain = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sp-block-builder = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sc-basic-authorship = { version = "0.10.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sc-consensus-babe-rpc = { version = "0.10.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sc-finality-grandpa-rpc = { version = "0.10.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-substrate-frame-rpc-system = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-pallet-transaction-payment-rpc = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-pallet-contracts-rpc = { version = "4.0.0-dev",  git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master"  }
+sc-rpc = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sp-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sc-rpc-api = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sp-blockchain = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sp-block-builder = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sc-basic-authorship = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sc-consensus-babe-rpc = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sc-finality-grandpa-rpc = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+substrate-frame-rpc-system = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+pallet-transaction-payment-rpc = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+pallet-contracts-rpc = { version = "4.0.0-dev",  git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master"  }
 
 # These dependencies are used for runtime benchmarking
-frame-benchmarking = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-frame-benchmarking-cli = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+frame-benchmarking = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+frame-benchmarking-cli = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
 
 # frame dependencies
-pallet-im-online = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-frame-system = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-pallet-transaction-payment = { version = "4.0.0-dev", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+pallet-im-online = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+frame-system = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+pallet-transaction-payment = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
 
 #frontier
 # Frontier
@@ -91,7 +91,7 @@ node-template-runtime = { version = "4.0.0-dev", path = "../runtime" }
 node-primitives = { version = "2.0.0", default-features = false, path = "../primitives/node-primitives" }
 
 [build-dependencies]
-substrate-build-script-utils = { version = "3.0.0", git = "https://github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+substrate-build-script-utils = { version = "3.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
 
 
 
