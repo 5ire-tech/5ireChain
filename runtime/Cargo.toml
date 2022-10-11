@@ -52,6 +52,10 @@ pallet-contracts-rpc-runtime-api = { version = "4.0.0-dev", default-features = f
 
 pallet-authority-discovery = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master"}
 
+
+pallet-esg = { version = "1.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", optional = true }
+
+
 # primitives
 node-primitives = { version = "2.0.0", default-features = false, path = "../primitives/node-primitives" }
 sp-api = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
@@ -157,6 +161,8 @@ std = [
 	"pallet-election-provider-multi-phase/std",
 	"pallet-utility/std",
 	"pallet-im-online/std",
+	"pallet-esg/std",
+
 	"sp-api/std",
 	"sp-block-builder/std",
 	"sp-consensus-babe/std",
@@ -189,6 +195,7 @@ runtime-benchmarks = [
 	"frame-system/runtime-benchmarks",
 	"hex-literal",
 	"pallet-authority-discovery/try-runtime",
+	
 	"pallet-session-benchmarking",
 	"pallet-nomination-pools-benchmarking",
 	"pallet-balances/runtime-benchmarks",
@@ -209,11 +216,13 @@ runtime-benchmarks = [
 	"pallet-preimage/runtime-benchmarks",
 	'pallet-ethereum/runtime-benchmarks',
     'pallet-evm/runtime-benchmarks',
+	'pallet-esg/runtime-benchmarks',
 	"pallet-hotfix-sufficients/runtime-benchmarks",
 ]
 
 try-runtime = [
 "pallet-contracts/try-runtime",
+"pallet-esg/try-runtime",
 ]
 
 # Make contract callable functions marked as __unstable__ available. Do not enable

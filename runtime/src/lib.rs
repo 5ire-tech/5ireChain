@@ -16,7 +16,8 @@ pub fn wasm_binary_unwrap() -> &'static [u8] {
 	)
 }
 
-use frame_support::traits::Nothing;
+pub use pallet_esg;
+use frame_support::traits::{Nothing};
 use codec::{Decode, Encode};
 use pallet_evm::FeeCalculator;
 
@@ -230,6 +231,11 @@ impl OnUnbalanced<NegativeImbalance> for Author {
 			Balances::resolve_creating(&author, amount);
 		}
 	}
+}
+
+
+impl pallet_esg::Config for Runtime {
+	type Event = Event;
 }
 
 /// The version information used to identify this runtime when compiled natively.
@@ -835,6 +841,7 @@ impl pallet_staking::Config for Runtime {
 	type OnStakerSlash = NominationPools;
 	type WeightInfo = pallet_staking::weights::SubstrateWeight<Runtime>;
 	type BenchmarkingConfig = StakingBenchmarkingConfig;
+	type ScoreEsg = EsgScore;
 }
 
 parameter_types! {
@@ -1225,6 +1232,7 @@ construct_runtime!(
 		DynamicFee: pallet_dynamic_fee,
 		BaseFee: pallet_base_fee,
 	    HotfixSufficients: pallet_hotfix_sufficients,
+		EsgScore: pallet_esg,
 	}
 );
 
@@ -1374,6 +1382,7 @@ mod benches {
 		[pallet_election_provider_support_benchmarking, EPSBench::<Runtime>]
 		[pallet_template, TemplateModule]
 		[pallet_evm, EVM]
+		[pallet_esg, EsgScore]
 	);
 }
 
