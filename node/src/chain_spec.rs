@@ -14,6 +14,7 @@ use sp_consensus_babe::AuthorityId as BabeId;
 use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public,H160, U256};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
+use serde_json;
 
 use std::str::FromStr;
 
@@ -86,6 +87,7 @@ pub fn authority_keys_from_seed(s: &str) -> (AccountId, AccountId, BabeId, Grand
 
 pub fn development_config() -> Result<ChainSpec, String> {
 
+	
 	Ok(ChainSpec::from_genesis(
 		// Name
 		"Development",
@@ -116,7 +118,12 @@ pub fn development_config() -> Result<ChainSpec, String> {
 		None,
 		None,
 		// Properties
-		None,
+		Some(
+			serde_json::from_str(
+				"{\"tokenDecimals\": 18, \"tokenSymbol\": \"FIRE\"}",
+			)
+			.expect("Provided valid json map"),
+		),
 		// Extensions
 		None,
 	))

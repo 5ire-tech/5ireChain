@@ -64,7 +64,6 @@ pub mod runner;
 mod tests;
 
 use frame_support::{
-	log,
 	dispatch::DispatchResultWithPostInfo,
 	traits::{
 		tokens::fungible::Inspect, Currency, ExistenceRequirement, FindAuthor, Get, Imbalance,
@@ -165,17 +164,21 @@ pub mod pallet {
 		) -> DispatchResult {
 			let destination = T::WithdrawOrigin::ensure_address_origin(&address, origin)?;
 			let address_account_id = T::AddressMapping::into_account_id(address);
-			let evm_value= value.saturating_mul(10u64.pow(18u32).unique_saturated_into());
-			let native_value= value.saturating_mul(10u64.pow(12u32).unique_saturated_into());
+
+			// info!("Here evm balance {:?}",T::Currency::total_balance(&address_account_id));
+			// info!("Here withdraw balance {:?}",value);
+
+			// let evm_value= value.saturating_mul(10u64.pow(18u32).unique_saturated_into());
+			// let native_value= value.saturating_mul(10u64.pow(12u32).unique_saturated_into());
 
 			T::Currency::transfer(
 				&address_account_id,
 				&destination,
-				native_value,
+				value,
 				ExistenceRequirement::AllowDeath,
 			)?;
-			let slashed_value= evm_value.saturating_sub(native_value);
-			T::Currency::slash(&address_account_id,slashed_value);
+			// let slashed_value= evm_value.saturating_sub(native_value);
+			// T::Currency::slash(&address_account_id,slashed_value);
 			Ok(())
 		}
 
@@ -190,17 +193,17 @@ pub mod pallet {
 		) -> DispatchResult {
 			let destination = ensure_signed(origin.clone())?;
 			let address_account_id = T::AddressMapping::into_account_id(address);
-			let evm_value= value.saturating_mul(10u64.pow(18u32).unique_saturated_into());
-			let native_value= value.saturating_mul(10u64.pow(12u32).unique_saturated_into());
-			let mint_value= evm_value.saturating_sub(native_value);
+			// let evm_value= value.saturating_mul(10u64.pow(18u32).unique_saturated_into());
+			// let native_value= value.saturating_mul(10u64.pow(12u32).unique_saturated_into());
+			// let mint_value= evm_value.saturating_sub(native_value);
 
 			T::Currency::transfer(
 				&destination,
 				&address_account_id,
-				native_value,
+				value,
 				ExistenceRequirement::AllowDeath,
 			)?;
-			T::Currency::deposit_creating(&address_account_id,mint_value);
+			// T::Currency::deposit_creating(&address_account_id,mint_value);
 			Ok(())
 		}
 
