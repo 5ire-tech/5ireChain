@@ -132,9 +132,9 @@ pub fn development_config() -> Result<ChainSpec, String> {
 pub fn local_testnet_config() -> Result<ChainSpec, String> {
 	Ok(ChainSpec::from_genesis(
 		// Name
-		"Local Testnet",
+		"firechain Local Testnet",
 		// ID
-		"local_testnet",
+		"firechain_testnet",
 		ChainType::Local,
 		move || {
 			testnet_genesis(
@@ -224,8 +224,8 @@ pub fn staging_network_config() -> ChainSpec {
 	let boot_nodes = vec![];
 
 	ChainSpec::from_genesis(
-		"Substrate Stencil",
-		"stencil_network",
+		"Firechain Staging",
+		"firechain_staging_network",
 		ChainType::Live,
 		staging_network_config_genesis,
 		boot_nodes,

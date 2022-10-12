@@ -93,7 +93,7 @@ frame-system-benchmarking = { version = "4.0.0-dev", default-features = false, g
 hex-literal = { version = "0.3.4", optional = true }
 
 # Local Dependencies
-pallet-template = { version = "4.0.0-dev", default-features = false, path = "../pallets/template" }
+# pallet-template = { version = "4.0.0-dev", default-features = false, path = "../pallets/template" }
 
 # Frontier
 fp-rpc = { path = "../primitives/rpc", default-features = false }
@@ -149,7 +149,7 @@ std = [
 	"pallet-democracy/std",
 	"pallet-elections-phragmen/std",
 	"pallet-preimage/std",
-	"pallet-template/std",
+	# "pallet-template/std",
 	"pallet-timestamp/std",
 	"pallet-transaction-payment-rpc-runtime-api/std",
 	"pallet-transaction-payment/std",
@@ -199,7 +199,7 @@ runtime-benchmarks = [
 	"pallet-session-benchmarking",
 	"pallet-nomination-pools-benchmarking",
 	"pallet-balances/runtime-benchmarks",
-	"pallet-template/runtime-benchmarks",
+	# "pallet-template/runtime-benchmarks",
 	"pallet-timestamp/runtime-benchmarks",
 	"pallet-utility/runtime-benchmarks",
 	"pallet-im-online/runtime-benchmarks",

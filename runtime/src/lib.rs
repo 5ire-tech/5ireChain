@@ -105,8 +105,6 @@ use constants::currency::*;
 
 mod voter_bags;
 
-/// Import the template pallet.
-pub use pallet_template;
 
 /// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
 /// the specifics of the runtime. They can then be made to be agnostic over specific formats
@@ -945,10 +943,6 @@ impl pallet_im_online::Config for Runtime {
 	type MaxPeerDataEncodingSize = MaxPeerDataEncodingSize;
 }
 
-/// Configure the pallet-template in pallets/template.
-impl pallet_template::Config for Runtime {
-	type Event = Event;
-}
 
 parameter_types! {
 	pub const ProposalBond: Permill = Permill::from_percent(5);
@@ -1224,8 +1218,7 @@ construct_runtime!(
 		Preimage: pallet_preimage,
 		Sudo: pallet_sudo,
 
-		// Include the custom logic from the pallet-template in the runtime.
-		TemplateModule: pallet_template,
+
 		//EVM
 		Ethereum: pallet_ethereum,
 		EVM: pallet_evm,
@@ -1380,7 +1373,6 @@ mod benches {
 		[pallet_preimage, Preimage]
 		[pallet_session, SessionBench::<Runtime>]
 		[pallet_election_provider_support_benchmarking, EPSBench::<Runtime>]
-		[pallet_template, TemplateModule]
 		[pallet_evm, EVM]
 		[pallet_esg, EsgScore]
 	);
