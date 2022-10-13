@@ -1,20 +1,20 @@
 use hex_literal::hex;
 use node_primitives::*;
 use node_template_runtime::{
-	constants::currency::*, opaque::SessionKeys,AuthorityDiscoveryConfig, BabeConfig, BalancesConfig, CouncilConfig,
-	DemocracyConfig, ElectionsConfig, GenesisConfig, GrandpaConfig, ImOnlineConfig, MaxNominations,
-	SessionConfig, StakerStatus, StakingConfig, SudoConfig, SystemConfig, TechnicalCommitteeConfig,
-	NominationPoolsConfig,EVMConfig,EthereumConfig,
-	BABE_GENESIS_EPOCH_CONFIG, wasm_binary_unwrap,
+	constants::currency::*, opaque::SessionKeys, wasm_binary_unwrap, AuthorityDiscoveryConfig,
+	BabeConfig, BalancesConfig, CouncilConfig, DemocracyConfig, EVMConfig, ElectionsConfig,
+	EthereumConfig, GenesisConfig, GrandpaConfig, ImOnlineConfig, MaxNominations,
+	NominationPoolsConfig, SessionConfig, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
+	TechnicalCommitteeConfig, BABE_GENESIS_EPOCH_CONFIG,
 };
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sc_service::ChainType;
 use sc_telemetry::TelemetryEndpoints;
-use sp_consensus_babe::AuthorityId as BabeId;
-use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public,H160, U256};
-use sp_finality_grandpa::AuthorityId as GrandpaId;
-use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use serde_json;
+use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
+use sp_consensus_babe::AuthorityId as BabeId;
+use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public, H160, U256};
+use sp_finality_grandpa::AuthorityId as GrandpaId;
 
 use std::str::FromStr;
 
@@ -22,7 +22,7 @@ use sp_runtime::{
 	traits::{IdentifyAccount, Verify},
 	Perbill,
 };
-use std::{collections::BTreeMap};
+use std::collections::BTreeMap;
 
 // The URL for the telemetry server.
 // const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
@@ -41,8 +41,13 @@ type AccountPublic = <Signature as Verify>::Signer;
 
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 
-fn session_keys(babe: BabeId, grandpa: GrandpaId, im_online: ImOnlineId,authority_discovery: AuthorityDiscoveryId,) -> SessionKeys {
-	SessionKeys { babe, grandpa, im_online,authority_discovery }
+fn session_keys(
+	babe: BabeId,
+	grandpa: GrandpaId,
+	im_online: ImOnlineId,
+	authority_discovery: AuthorityDiscoveryId,
+) -> SessionKeys {
+	SessionKeys { babe, grandpa, im_online, authority_discovery }
 }
 
 /// Transfer slice into unchecked evm address
@@ -74,7 +79,9 @@ where
 }
 
 /// Helper function to generate stash, controller and session key from seed
-pub fn authority_keys_from_seed(s: &str) -> (AccountId, AccountId, BabeId, GrandpaId, ImOnlineId,AuthorityDiscoveryId) {
+pub fn authority_keys_from_seed(
+	s: &str,
+) -> (AccountId, AccountId, BabeId, GrandpaId, ImOnlineId, AuthorityDiscoveryId) {
 	(
 		get_account_id_from_seed::<sr25519::Public>(&format!("{}//stash", s)),
 		get_account_id_from_seed::<sr25519::Public>(s),
@@ -86,8 +93,6 @@ pub fn authority_keys_from_seed(s: &str) -> (AccountId, AccountId, BabeId, Grand
 }
 
 pub fn development_config() -> Result<ChainSpec, String> {
-
-	
 	Ok(ChainSpec::from_genesis(
 		// Name
 		"Development",
@@ -119,10 +124,8 @@ pub fn development_config() -> Result<ChainSpec, String> {
 		None,
 		// Properties
 		Some(
-			serde_json::from_str(
-				"{\"tokenDecimals\": 18, \"tokenSymbol\": \"FIRE\"}",
-			)
-			.expect("Provided valid json map"),
+			serde_json::from_str("{\"tokenDecimals\": 18, \"tokenSymbol\": \"FIRE\"}")
+				.expect("Provided valid json map"),
 		),
 		// Extensions
 		None,
@@ -173,7 +176,6 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 		None,
 	))
 }
-
 
 pub fn my_testnet_config() -> Result<ChainSpec, String> {
 	Ok(ChainSpec::from_genesis(
@@ -245,49 +247,68 @@ fn staging_network_config_genesis() -> GenesisConfig {
 	// for i in 1 2 3 4; do for j in babe; do subkey --sr25519 inspect "$SECRET//$i//$j"; done; done
 	// for i in 1 2 3 4; do for j in grandpa; do subkey --ed25519 inspect "$SECRET//$i//$j"; done; done
 	// for i in 1 2 3 4; do for j in im_online; do subkey --sr25519 inspect "$SECRET//$i//$j"; done; done
-	let initial_authorities: Vec<(AccountId, AccountId, BabeId, GrandpaId, ImOnlineId,AuthorityDiscoveryId,)> = vec![
+	let initial_authorities: Vec<(
+		AccountId,
+		AccountId,
+		BabeId,
+		GrandpaId,
+		ImOnlineId,
+		AuthorityDiscoveryId,
+	)> = vec![
 		(
 			//5FNCTJVDxfFnmUYKHqbJHjUi7UFbZ6pzC39sL6E5RVpB4vc9
 			hex!["920c238572e2b31c2efd19dad1a5674c8188388d9a30d0d01847759a5dc64069"].into(),
 			//5GgaLpTUcgbCTGnwVkCjSSzZ5jTaEPuxtWGRDhi8M1BP1hTs
 			hex!["cc4c78c7f22298f17e0e2dcefb7cff85b30e19dc1699cb9d1de00e5ea65a433d"].into(),
 			//5Fm7Lc3XDxxbH4LBKxn1tf44P1R5M5cm2vmuLZbUnPFLfu5p
-			hex!["a3859016b0b17b7ed6a5b2efcb4ce0e2b6b56ec8594d416c0ea3685929f0a15c"].unchecked_into(),
+			hex!["a3859016b0b17b7ed6a5b2efcb4ce0e2b6b56ec8594d416c0ea3685929f0a15c"]
+				.unchecked_into(),
 			//5CyLUbfTe941tZDvQQ5AYPXZ6zzqwS987DTwFGnZ3yPFX5wB
-			hex!["2824087e4d670acc6f2ac4251736b7fb581b5bff414437b6abc88dc118ea8d5c"].unchecked_into(),
+			hex!["2824087e4d670acc6f2ac4251736b7fb581b5bff414437b6abc88dc118ea8d5c"]
+				.unchecked_into(),
 			//5CahSqUXepwzCkbC7KNUSghUcuJxPDPKiQ4ow144Gb9qBPsX
-			hex!["16dffa9a82c7bb62f0f9929407223bf156458a4e7970ec4007ab2da7fb389f7d"].unchecked_into(),
+			hex!["16dffa9a82c7bb62f0f9929407223bf156458a4e7970ec4007ab2da7fb389f7d"]
+				.unchecked_into(),
 			//5CahSqUXepwzCkbC7KNUSghUcuJxPDPKiQ4ow144Gb9qBPsX
-			hex!["16dffa9a82c7bb62f0f9929407223bf156458a4e7970ec4007ab2da7fb389f7d"].unchecked_into(),
-			),
-			(
+			hex!["16dffa9a82c7bb62f0f9929407223bf156458a4e7970ec4007ab2da7fb389f7d"]
+				.unchecked_into(),
+		),
+		(
 			//5DP3mCevjzqrYhJgPpQFkpoERKg55K422u5KiRGPQaoJEgRH
 			hex!["3a39a8d0654e0f52b2ee8202ed3488e7a82650dde0daadaddbc8ea825e408d13"].into(),
 			//5HeTTicL5u17JCkDhAwcAHUXMGEzXbDLjPYmNC5ahKhwaLgt
 			hex!["f6eb0cff5244d7437ed659ac34e6ea66daa857f3d1c580f452b8512ae7fdba0f"].into(),
 			//5FKFid7kAaVFkfbpShH8dzw3wJipiuGPruTzc6WB2WKMviUX
-			hex!["8fcd640390db86812092a0b2b244aac9d8375be2c0a3434eb9062b58643c60fb"].unchecked_into(),
+			hex!["8fcd640390db86812092a0b2b244aac9d8375be2c0a3434eb9062b58643c60fb"]
+				.unchecked_into(),
 			//5G4AdD8rQ6MHp2K1L7vF1E43eX69JMZDQ1vknonsALwGQMwW
-			hex!["b087cc20818f98e543c55989afccd3ec28c57e425dae970d9dd63cad806c1f6d"].unchecked_into(),
+			hex!["b087cc20818f98e543c55989afccd3ec28c57e425dae970d9dd63cad806c1f6d"]
+				.unchecked_into(),
 			//5DknzWSQVCpo7bNf2NnBsjb529K2WVpvGv6Q3kn9RgcFgoeQ
-			hex!["4acf560d0aa80158ee06971c0ebbf4e6a1a407e6de2df16a003a765b73e63d7b"].unchecked_into(),
+			hex!["4acf560d0aa80158ee06971c0ebbf4e6a1a407e6de2df16a003a765b73e63d7b"]
+				.unchecked_into(),
 			//5CahSqUXepwzCkbC7KNUSghUcuJxPDPKiQ4ow144Gb9qBPsX
-			hex!["16dffa9a82c7bb62f0f9929407223bf156458a4e7970ec4007ab2da7fb389f7d"].unchecked_into(),
-			),
-			(
+			hex!["16dffa9a82c7bb62f0f9929407223bf156458a4e7970ec4007ab2da7fb389f7d"]
+				.unchecked_into(),
+		),
+		(
 			//5DJQ1NXeThmu2N5yQHZUsY64Lmgm95nnchpRWi1nSBU2rgod
 			hex!["36ad94b252606800bc80869baf453663ac2e9276e83f0401107384c053552f3e"].into(),
 			//5EWQq4ns7miu8B8ArsspZ9KBHX6gwjJXptJq5dbLgQucZvdc
 			hex!["6c1386fd76e4eec0365a439db0decae0d5d715e33db934bc44be28f73df50674"].into(),
 			//5EUsrdaXAAJ87Y7yCRdrYKeyHdTYbSr9tJFCYEy12CNap2v2
-			hex!["6ae80477725a1e4f3194fac59286662ea491c9461cb54909432228351be3474a"].unchecked_into(),
+			hex!["6ae80477725a1e4f3194fac59286662ea491c9461cb54909432228351be3474a"]
+				.unchecked_into(),
 			//5FHCHVMPD9VfpzMcGVyL7gqkq2Rd9NomkHFHP8BzP8isUBnh
-			hex!["8e3b579b007999dce44a28bb266f73b54e6f7ec219c495ae23fe0dc3c101e158"].unchecked_into(),
+			hex!["8e3b579b007999dce44a28bb266f73b54e6f7ec219c495ae23fe0dc3c101e158"]
+				.unchecked_into(),
 			//5GRarw8oivnRh5ViPC9kH6ztbPNiyrfb61BitYz2YzhoqS4L
-			hex!["c0dd89e234665e119ac8396af69c37d1956ffbf4a0173c21ee5872fea2366026"].unchecked_into(),
+			hex!["c0dd89e234665e119ac8396af69c37d1956ffbf4a0173c21ee5872fea2366026"]
+				.unchecked_into(),
 			//5CahSqUXepwzCkbC7KNUSghUcuJxPDPKiQ4ow144Gb9qBPsX
-			hex!["16dffa9a82c7bb62f0f9929407223bf156458a4e7970ec4007ab2da7fb389f7d"].unchecked_into(),
-			),
+			hex!["16dffa9a82c7bb62f0f9929407223bf156458a4e7970ec4007ab2da7fb389f7d"]
+				.unchecked_into(),
+		),
 	];
 
 	// generated with secret: subkey inspect "$secret"/fir
@@ -299,17 +320,19 @@ fn staging_network_config_genesis() -> GenesisConfig {
 
 	let endowed_accounts: Vec<AccountId> = vec![root_key.clone()];
 
-	testnet_genesis(
-		initial_authorities,
-		vec![],
-		root_key,
-		endowed_accounts
-	)
+	testnet_genesis(initial_authorities, vec![], root_key, endowed_accounts)
 }
 
 /// Configure initial storage state for FRAME modules.
 fn testnet_genesis(
-	initial_authorities: Vec<(AccountId, AccountId, BabeId, GrandpaId, ImOnlineId,AuthorityDiscoveryId)>,
+	initial_authorities: Vec<(
+		AccountId,
+		AccountId,
+		BabeId,
+		GrandpaId,
+		ImOnlineId,
+		AuthorityDiscoveryId,
+	)>,
 	initial_nominators: Vec<AccountId>,
 	root_key: AccountId,
 	mut endowed_accounts: Vec<AccountId>,
@@ -361,7 +384,11 @@ fn testnet_genesis(
 			keys: initial_authorities
 				.iter()
 				.map(|x| {
-					(x.0.clone(), x.0.clone(), session_keys(x.2.clone(), x.3.clone(), x.4.clone(),x.5.clone()))
+					(
+						x.0.clone(),
+						x.0.clone(),
+						session_keys(x.2.clone(), x.3.clone(), x.4.clone(), x.5.clone()),
+					)
 				})
 				.collect::<Vec<_>>(),
 		},
@@ -433,8 +460,7 @@ fn testnet_genesis(
 					H160::from_str("482E579993cA638c96Dd4D20df60836a2Fd7DcBe")
 						.expect("internal H160 is valid; qed"),
 					fp_evm::GenesisAccount {
-						balance: U256::from_str("0xfffff")
-							.expect("internal U256 is valid; qed"),
+						balance: U256::from_str("0xfffff").expect("internal U256 is valid; qed"),
 						code: Default::default(),
 						nonce: Default::default(),
 						storage: Default::default(),

@@ -63,21 +63,6 @@ pub mod runner;
 #[cfg(test)]
 mod tests;
 
-use frame_support::{
-	dispatch::DispatchResultWithPostInfo,
-	traits::{
-		tokens::fungible::Inspect, Currency, ExistenceRequirement, FindAuthor, Get, Imbalance,
-		OnUnbalanced, SignedImbalance, WithdrawReasons
-	},
-	weights::{Pays, PostDispatchInfo, Weight},
-};
-use frame_system::RawOrigin;
-use sp_core::{Hasher, H160, H256, U256};
-use sp_runtime::{
-	traits::{BadOrigin, Saturating, UniqueSaturatedInto, Zero},
-	AccountId32, DispatchErrorWithPostInfo,
-};
-use sp_std::{cmp::min, vec::Vec};
 pub use evm::{
 	Config as EvmConfig, Context, ExitError, ExitFatal, ExitReason, ExitRevert, ExitSucceed,
 };
@@ -88,6 +73,21 @@ pub use fp_evm::{
 	LinearCostPrecompile, Log, Precompile, PrecompileFailure, PrecompileHandle, PrecompileOutput,
 	PrecompileResult, PrecompileSet, Vicinity,
 };
+use frame_support::{
+	dispatch::DispatchResultWithPostInfo,
+	traits::{
+		tokens::fungible::Inspect, Currency, ExistenceRequirement, FindAuthor, Get, Imbalance,
+		OnUnbalanced, SignedImbalance, WithdrawReasons,
+	},
+	weights::{DispatchClass, Pays, PostDispatchInfo, Weight},
+};
+use frame_system::RawOrigin;
+use sp_core::{Hasher, H160, H256, U256};
+use sp_runtime::{
+	traits::{BadOrigin, Saturating, UniqueSaturatedInto, Zero},
+	AccountId32, DispatchErrorWithPostInfo,
+};
+use sp_std::{cmp::min, vec::Vec};
 
 pub use self::{
 	pallet::*,
@@ -120,7 +120,6 @@ pub mod pallet {
 		type CallOrigin: EnsureAddressOrigin<Self::Origin>;
 		/// Allow the origin to withdraw on behalf of given address.
 		type WithdrawOrigin: EnsureAddressOrigin<Self::Origin, Success = Self::AccountId>;
-		
 
 		/// Mapping from address to account id.
 		type AddressMapping: AddressMapping<Self::AccountId>;
@@ -152,11 +151,12 @@ pub mod pallet {
 			&LONDON_CONFIG
 		}
 	}
-	
+
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
 		/// Withdraw balance from EVM into currency/balances pallet.
-		#[pallet::weight(0)]
+		// #[pallet::weight(0)]
+		#[pallet::weight((0, DispatchClass::Normal,Pays::No))]
 		pub fn withdraw(
 			origin: OriginFor<T>,
 			address: H160,
@@ -182,15 +182,9 @@ pub mod pallet {
 			Ok(())
 		}
 
-
-
 		/// Deposit balance from EVM into currency/balances pallet.
 		#[pallet::weight(0)]
-		pub fn deposit(
-			origin: OriginFor<T>,
-			address: H160,
-			value: BalanceOf<T>,
-		) -> DispatchResult {
+		pub fn deposit(origin: OriginFor<T>, address: H160, value: BalanceOf<T>) -> DispatchResult {
 			let destination = ensure_signed(origin.clone())?;
 			let address_account_id = T::AddressMapping::into_account_id(address);
 			// let evm_value= value.saturating_mul(10u64.pow(18u32).unique_saturated_into());
@@ -207,7 +201,6 @@ pub mod pallet {
 			Ok(())
 		}
 
-		
 		/// Issue an EVM call operation. This is similar to a message call transaction in Ethereum.
 		#[pallet::weight(T::GasWeightMapping::gas_to_weight(*gas_limit))]
 		pub fn call(
@@ -526,7 +519,6 @@ pub trait EnsureAddressOrigin<OuterOrigin> {
 	) -> Result<Self::Success, OuterOrigin>;
 }
 
-
 /// Ensure that the EVM address is the same as the Substrate address. This only works if the account
 /// ID is `H160`.
 pub struct EnsureAddressSame;
@@ -543,9 +535,6 @@ where
 		})
 	}
 }
-
-
-
 
 /// Ensure that the origin is root.
 pub struct EnsureAddressRoot<AccountId>(sp_std::marker::PhantomData<AccountId>);
@@ -564,9 +553,6 @@ where
 	}
 }
 
-
-
-
 /// Ensure that the origin never happens.
 pub struct EnsureAddressNever<AccountId>(sp_std::marker::PhantomData<AccountId>);
 
@@ -577,8 +563,6 @@ impl<OuterOrigin, AccountId> EnsureAddressOrigin<OuterOrigin> for EnsureAddressN
 		Err(origin)
 	}
 }
-
-
 
 /// Ensure that the address is truncated hash of the origin. Only works if the account id is
 /// `AccountId32`.
@@ -599,8 +583,6 @@ where
 		})
 	}
 }
-
-
 
 pub trait AddressMapping<A> {
 	fn into_account_id(address: H160) -> A;
