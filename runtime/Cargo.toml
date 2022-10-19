@@ -199,7 +199,6 @@ runtime-benchmarks = [
 	"pallet-session-benchmarking",
 	"pallet-nomination-pools-benchmarking",
 	"pallet-balances/runtime-benchmarks",
-	# "pallet-template/runtime-benchmarks",
 	"pallet-timestamp/runtime-benchmarks",
 	"pallet-utility/runtime-benchmarks",
 	"pallet-im-online/runtime-benchmarks",

@@ -120,7 +120,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
 		// Properties
 		Some(
 			serde_json::from_str(
-				"{\"tokenDecimals\": 18, \"tokenSymbol\": \"FIRE\"}",
+				"{\"tokenDecimals\": 18, \"tokenSymbol\": \"5IRE\"}",
 			)
 			.expect("Provided valid json map"),
 		),
@@ -446,5 +446,6 @@ fn testnet_genesis(
 		ethereum: EthereumConfig {},
 		dynamic_fee: Default::default(),
 		base_fee: Default::default(),
+
 	}
 }
