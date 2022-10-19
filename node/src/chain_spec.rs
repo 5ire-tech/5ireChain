@@ -124,15 +124,8 @@ pub fn development_config() -> Result<ChainSpec, String> {
 		None,
 		// Properties
 		Some(
-<<<<<<< HEAD
-			serde_json::from_str(
-				"{\"tokenDecimals\": 18, \"tokenSymbol\": \"5IRE\"}",
-			)
-			.expect("Provided valid json map"),
-=======
-			serde_json::from_str("{\"tokenDecimals\": 18, \"tokenSymbol\": \"FIRE\"}")
+			serde_json::from_str("{\"tokenDecimals\": 18, \"tokenSymbol\": \"5IRE\"}")
 				.expect("Provided valid json map"),
->>>>>>> 23f9940989aa4012d2ae7f74e0682b2124f75c27
 		),
 		// Extensions
 		None,
