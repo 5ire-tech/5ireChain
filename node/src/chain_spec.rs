@@ -171,7 +171,10 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 		None,
 		// Properties
 		None,
-		None,
+		Some(
+			serde_json::from_str("{\"tokenDecimals\": 18, \"tokenSymbol\": \"5IRE\"}")
+				.expect("Provided valid json map"),
+		),
 		// Extensions
 		None,
 	))
@@ -197,14 +200,7 @@ pub fn my_testnet_config() -> Result<ChainSpec, String> {
 					get_account_id_from_seed::<sr25519::Public>("merit decrease drift aunt bottom pear lunch fetch board ready solve need"),
 					get_account_id_from_seed::<sr25519::Public>("office acid pave always cliff meat carpet wool robust upgrade lava recycle"),
 					get_account_id_from_seed::<sr25519::Public>("govern admit judge actor fine during business flip lumber impact arena tiger"),
-					// get_account_id_from_seed::<sr25519::Public>("Eve"),
-					// get_account_id_from_seed::<sr25519::Public>("Ferdie"),
-					// get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
-					// get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
-					// get_account_id_from_seed::<sr25519::Public>("Charlie//stash"),
-					// get_account_id_from_seed::<sr25519::Public>("Dave//stash"),
-					// get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
-					// get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
+					
 				],
 			)
 		},
@@ -237,8 +233,11 @@ pub fn staging_network_config() -> ChainSpec {
 		),
 		None,
 		None,
+		Some(
+			serde_json::from_str("{\"tokenDecimals\": 18, \"tokenSymbol\": \"5IRE\"}")
+				.expect("Provided valid json map"),
+		),
 		None,
-		Default::default(),
 	)
 }
 

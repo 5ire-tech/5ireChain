@@ -1,6 +1,10 @@
 {
   "name": "Firechain Staging",
   "id": "firechain_staging_network",
+  "properties": {
+		"tokenDecimals": 18,
+		"tokenSymbol": "5IRE"
+	},
   "chainType": "Live",
   "bootNodes": [],
   "telemetryEndpoints": [
@@ -10,7 +14,6 @@
     ]
   ],
   "protocolId": null,
-  "properties": null,
   "codeSubstitutes": {},
   "genesis": {
     "runtime": {
@@ -24,15 +27,15 @@
         "balances": [
           [
             "5E6JZ9PMnTwvvLeWwwmC4UZhD7mcXn891yJUJAtud2aBiPUm",
-            1000000000000000000000
+            100000000000000000000
           ],
           [
             "5Dkjj2ZtJ9iJ7ywUHpPgURPN2n9KrrMFxomaxiCSdWkZkd5g",
-            1000000000000000000000
+            100000000000000000000
           ],
           [
             "5GNpgGp1SEcDuGnMia6aTUKuF49HE8qEwzwkp6mZWb324KGA",
-            1000000000000000000000
+            100000000000000000000
           ],
           [
             "5EFQAvUn4oor3o2JVCHtA34jCsBidGxXBbLqYeKjadUyCRA3",
@@ -76,19 +79,19 @@
           [
             "5E6JZ9PMnTwvvLeWwwmC4UZhD7mcXn891yJUJAtud2aBiPUm",
             "5E6JZ9PMnTwvvLeWwwmC4UZhD7mcXn891yJUJAtud2aBiPUm",
-            1000000000000000000,
+            10000000000,
             "Validator"
           ],
           [
             "5Dkjj2ZtJ9iJ7ywUHpPgURPN2n9KrrMFxomaxiCSdWkZkd5g",
             "5Dkjj2ZtJ9iJ7ywUHpPgURPN2n9KrrMFxomaxiCSdWkZkd5g",
-            1000000000000000000,
+            10000000000,
             "Validator"
           ],
           [
             "5GNpgGp1SEcDuGnMia6aTUKuF49HE8qEwzwkp6mZWb324KGA",
             "5GNpgGp1SEcDuGnMia6aTUKuF49HE8qEwzwkp6mZWb324KGA",
-            1000000000000000000,
+            10000000000,
             "Validator"
           ]
         ],
