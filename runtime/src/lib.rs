@@ -141,7 +141,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 100,
+	spec_version: 101,
 	impl_version: 1,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 1,
@@ -154,7 +154,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 /// up by `pallet_babe` to implement `fn slot_duration()`.
 ///
 /// Change this to adjust the block time.
-pub const MILLISECS_PER_BLOCK: u64 = 6000;
+pub const MILLISECS_PER_BLOCK: u64 = 3000;
 
 // NOTE: Currently it is not possible to change the slot duration after the chain has started.
 //       Attempting to do so will brick block production.
@@ -547,8 +547,8 @@ impl pallet_hotfix_sufficients::Config for Runtime {
 
 parameter_types! {
 	pub const TransactionByteFee: Balance = 1 * MILLICENTS;
-	pub const OperationalFeeMultiplier: u8 = 2;
-	pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(5);
+	pub const OperationalFeeMultiplier: u8 = 1;
+	pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(1);
 	pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(1, 100);
 	pub MinimumMultiplier: Multiplier = Multiplier::saturating_from_rational(1, 1_000u32);
 }
