@@ -53,13 +53,12 @@ use sp_runtime::{
 };
 
 use crate::sp_api_hidden_includes_construct_runtime::hidden_include::dispatch::Dispatchable;
-
-use sp_std::prelude::*;
+use sp_std::{marker::PhantomData, prelude::*};
+// use sp_std::prelude::*;
 #[cfg(feature = "std")]
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 use static_assertions::const_assert;
-
 // A few exports that help ease life for downstream crates.
 pub use frame_support::{
 	construct_runtime,
@@ -444,19 +443,19 @@ impl pallet_balances::Config for Runtime {
 	type WeightInfo = pallet_balances::weights::SubstrateWeight<Runtime>;
 }
 
-// pub struct FindAuthorTruncated<F>(PhantomData<F>);
-// impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
-// 	fn find_author<'a, I>(digests: I) -> Option<H160>
-// 	where
-// 		I: 'a + IntoIterator<Item = (ConsensusEngineId, &'a [u8])>,
-// 	{
-// 		if let Some(author_index) = F::find_author(digests) {
-// 			let authority_id = Aura::authorities()[author_index as usize].clone();
-// 			return Some(H160::from_slice(&authority_id.to_raw_vec()[4..24]));
-// 		}
-// 		None
-// 	}
-// }
+pub struct FindAuthorTruncated<F>(PhantomData<F>);
+impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
+    fn find_author<'a, I>(digests: I) -> Option<H160>
+    where
+        I: 'a + IntoIterator<Item = (ConsensusEngineId, &'a [u8])>,
+    {
+        if let Some(author_index) = F::find_author(digests) {
+            let authority_id = Babe::authorities()[author_index as usize].clone().0;
+            return Some(H160::from_slice(&sp_core::crypto::ByteArray::to_raw_vec(&authority_id)[4..24]));
+        }
+        None
+    }
+}
 
 pub struct FixedGasWeightMapping;
 impl GasWeightMapping for FixedGasWeightMapping {
@@ -499,7 +498,8 @@ impl pallet_evm::Config for Runtime {
 	type ChainId = ChainId;
 	type BlockGasLimit = BlockGasLimit;
 	type OnChargeTransaction = pallet_evm::EVMCurrencyAdapter<Balances, DealWithFees>;
-	type FindAuthor = (); //FindAuthorTruncated<Aura>;
+	// type FindAuthor = (); //FindAuthorTruncated<Aura>;
+	type FindAuthor = FindAuthorTruncated<Babe>;
 }
 
 impl pallet_ethereum::Config for Runtime {
