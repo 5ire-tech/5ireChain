@@ -166,7 +166,7 @@ pub const DAYS: BlockNumber = HOURS * 24;
 
 // NOTE: Currently it is not possible to change the epoch duration after the chain has started.
 //       Attempting to do so will brick block production.
-pub const EPOCH_DURATION_IN_BLOCKS: BlockNumber = 2 * MINUTES;
+pub const EPOCH_DURATION_IN_BLOCKS: BlockNumber = 10 * MINUTES;
 pub const EPOCH_DURATION_IN_SLOTS: u64 = {
 	const SLOT_FILL_RATE: f64 = MILLISECS_PER_BLOCK as f64 / SLOT_DURATION as f64;
 
@@ -438,7 +438,7 @@ impl pallet_balances::Config for Runtime {
 	/// The ubiquitous event type.
 	type Event = Event;
 	type DustRemoval = ();
-	type ExistentialDeposit = ConstU128<500>;
+	type ExistentialDeposit = ConstU128<0>;
 	type AccountStore = System;
 	type WeightInfo = pallet_balances::weights::SubstrateWeight<Runtime>;
 }
@@ -476,7 +476,7 @@ impl GasWeightMapping for FixedGasWeightMapping {
 // }
 
 parameter_types! {
-	pub const ChainId: u64 = 999;
+	pub const ChainId: u64 = 997;
 	// pub BlockGasLimit: U256 = U256::from(u32::max_value());
 	pub BlockGasLimit: U256 = U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT / WEIGHT_PER_GAS);
 	pub PrecompilesValue: FrontierPrecompiles<Runtime> = FrontierPrecompiles::<_>::new();
@@ -792,7 +792,7 @@ impl pallet_staking::BenchmarkingConfig for StakingBenchmarkingConfig {
 
 parameter_types! {
 	pub MaxNominations: u32 = <NposSolution16 as frame_election_provider_support::NposSolution>::LIMIT as u32;
-	pub const SessionsPerEra: sp_staking::SessionIndex = 1;
+	pub const SessionsPerEra: sp_staking::SessionIndex = 12;
 	pub const BondingDuration: sp_staking::EraIndex = 24 * 28;
 	pub const SlashDeferDuration: sp_staking::EraIndex = 24 * 7; // 1/4 the bonding duration.
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
