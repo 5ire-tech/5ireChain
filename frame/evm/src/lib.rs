@@ -182,7 +182,7 @@ pub mod pallet {
 			Ok(())
 		}
 
-		/// Deposit balance from EVM into currency/balances pallet.
+		/// Deposit balance from  currency/balances pallet into EVM .
 		#[pallet::weight(0)]
 		pub fn deposit(origin: OriginFor<T>, address: H160, value: BalanceOf<T>) -> DispatchResult {
 			let destination = ensure_signed(origin.clone())?;

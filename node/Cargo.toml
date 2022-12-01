@@ -2,7 +2,7 @@
 name = "firechain-node"
 version = "4.0.0-dev"
 description = "A fresh FRAME-based 5irechain node, ready for hacking."
-authors = ["Antier Solutions"]
+authors = ["5ireChain"]
 edition = "2021"
 publish = false
 build = "build.rs"
