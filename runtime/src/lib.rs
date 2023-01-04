@@ -517,7 +517,7 @@ impl pallet_dynamic_fee::Config for Runtime {
 
 frame_support::parameter_types! {
 	pub IsActive: bool = true;
-	pub DefaultBaseFeePerGas: U256 = U256::from(45_000_000_000_00_0u128);//1_000_000_000
+	pub DefaultBaseFeePerGas: U256 = U256::from(45_000_000_000_000_00u128);//1_000_000_000
 }
 
 pub struct BaseFeeThreshold;
