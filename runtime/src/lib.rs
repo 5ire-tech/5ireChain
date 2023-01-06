@@ -466,6 +466,14 @@ impl GasWeightMapping for FixedGasWeightMapping {
 		weight.wrapping_div(WEIGHT_PER_GAS)
 	}
 }
+// struct for Fixed gas price for evm_transaction
+pub struct FixedGasPrice;
+impl FeeCalculator for FixedGasPrice {
+	fn min_gas_price() -> (U256, Weight) {
+		// Return some meaningful gas price and weight
+		(1_000_000_000_000u128.into(), 0u64)
+	}
+}
 
 // pub struct IntoAddressMapping;
 
@@ -483,7 +491,9 @@ parameter_types! {
 }
 
 impl pallet_evm::Config for Runtime {
-	type FeeCalculator = BaseFee;
+	// type FeeCalculator = BaseFee;
+	// To set min gas price for Every evm trasfer.
+	type FeeCalculator = FixedGasPrice;
 	type GasWeightMapping = FixedGasWeightMapping;
 	type BlockHashMapping = pallet_ethereum::EthereumBlockHashMapping<Self>;
 	type CallOrigin = EnsureAddressTruncated;
@@ -517,7 +527,7 @@ impl pallet_dynamic_fee::Config for Runtime {
 
 frame_support::parameter_types! {
 	pub IsActive: bool = true;
-	pub DefaultBaseFeePerGas: U256 = U256::from(45_000_000_000_000_00u128);//1_000_000_000
+	pub DefaultBaseFeePerGas: U256 = U256::from(1_000_000_000_000_00u128);//1_000_000_000
 }
 
 pub struct BaseFeeThreshold;
