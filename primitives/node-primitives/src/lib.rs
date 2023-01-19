@@ -3,6 +3,8 @@
 #![warn(missing_docs)]
 #![cfg_attr(not(feature = "std"), no_std)]
 
+// use core::num::dec2flt::float;
+
 use sp_runtime::{
 	traits::{IdentifyAccount, Verify},
 	MultiSignature,
