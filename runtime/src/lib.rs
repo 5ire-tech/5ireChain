@@ -557,10 +557,10 @@ impl pallet_hotfix_sufficients::Config for Runtime {
 
 parameter_types! {
 	pub const TransactionByteFee: Balance = 1 * MILLICENTS;
-	pub const OperationalFeeMultiplier: u8 = 1;
-	pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(1);
-	pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(1, 100);
-	pub MinimumMultiplier: Multiplier = Multiplier::saturating_from_rational(1, 1_000u32);
+	pub const OperationalFeeMultiplier: u8 = 10;
+	pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(25);
+	pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(1, 100_000);
+	pub MinimumMultiplier: Multiplier = Multiplier::saturating_from_rational(1, 1_000_000_000u128);
 }
 
 impl pallet_transaction_payment::Config for Runtime {
