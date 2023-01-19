@@ -140,7 +140,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 105,
+	spec_version: 101,
 	impl_version: 1,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 1,
@@ -166,7 +166,7 @@ pub const DAYS: BlockNumber = HOURS * 24;
 
 // NOTE: Currently it is not possible to change the epoch duration after the chain has started.
 //       Attempting to do so will brick block production.
-pub const EPOCH_DURATION_IN_BLOCKS: BlockNumber = 2 * MINUTES;
+pub const EPOCH_DURATION_IN_BLOCKS: BlockNumber = 10 * MINUTES;
 pub const EPOCH_DURATION_IN_SLOTS: u64 = {
 	const SLOT_FILL_RATE: f64 = MILLISECS_PER_BLOCK as f64 / SLOT_DURATION as f64;
 
@@ -556,13 +556,11 @@ impl pallet_hotfix_sufficients::Config for Runtime {
 }
 
 parameter_types! {
-	// pub const TransactionByteFee: Balance = 1 * MILLICENTS;
-	pub const TransactionByteFee: Balance = 1 * MICROCENTS;
-
-	pub const OperationalFeeMultiplier: u8 = 10;
-	pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(25);
-	pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(1, 100_000);
-	pub MinimumMultiplier: Multiplier = Multiplier::saturating_from_rational(1, 1_000_000_000u128);
+	pub const TransactionByteFee: Balance = 1 * MILLICENTS;
+	pub const OperationalFeeMultiplier: u8 = 1;
+	pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(1);
+	pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(1, 100);
+	pub MinimumMultiplier: Multiplier = Multiplier::saturating_from_rational(1, 1_000u32);
 }
 
 impl pallet_transaction_payment::Config for Runtime {
@@ -804,7 +802,7 @@ impl pallet_staking::BenchmarkingConfig for StakingBenchmarkingConfig {
 
 parameter_types! {
 	pub MaxNominations: u32 = <NposSolution16 as frame_election_provider_support::NposSolution>::LIMIT as u32;
-	pub const SessionsPerEra: sp_staking::SessionIndex = 1;
+	pub const SessionsPerEra: sp_staking::SessionIndex = 12;
 	pub const BondingDuration: sp_staking::EraIndex = 24 * 28;
 	pub const SlashDeferDuration: sp_staking::EraIndex = 24 * 7; // 1/4 the bonding duration.
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
