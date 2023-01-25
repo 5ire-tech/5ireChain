@@ -10,6 +10,8 @@ pub mod currency {
 
 	pub const MICROCENTS: Balance = MILLICENTS / 1_0;
 
+	pub const GASFEE:Balance = MICROCENTS/1_000_00;
+
 	pub const fn deposit(items: u32, bytes: u32) -> Balance {
 		items as Balance * 15 * CENTS + (bytes as Balance) * 6 * CENTS
 	}

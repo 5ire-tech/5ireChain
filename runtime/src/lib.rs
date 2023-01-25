@@ -471,7 +471,8 @@ pub struct FixedGasPrice;
 impl FeeCalculator for FixedGasPrice {
 	fn min_gas_price() -> (U256, Weight) {
 		// Return some meaningful gas price and weight
-		(1_000_000_000_000u128.into(), 0u64)
+		// (1_000_000_000_000u128.into(), 0u64)
+		((1 * GASFEE).into(), 0u64)
 	}
 }
 
@@ -527,7 +528,7 @@ impl pallet_dynamic_fee::Config for Runtime {
 
 frame_support::parameter_types! {
 	pub IsActive: bool = true;
-	pub DefaultBaseFeePerGas: U256 = U256::from(1_000_000_000_000_00u128);//1_000_000_000
+	pub DefaultBaseFeePerGas: U256 = U256::from(1_000_000_000u128);//1_000_000_000
 }
 
 pub struct BaseFeeThreshold;
