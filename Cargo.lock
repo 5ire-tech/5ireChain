@@ -1644,7 +1644,7 @@ dependencies = [
  "fp-rpc",
  "fp-storage",
  "futures",
- "node-template-runtime",
+ "node-5ire-runtime",
  "parity-scale-codec",
  "sc-block-builder",
  "sc-cli",
@@ -1728,7 +1728,7 @@ dependencies = [
  "libsecp256k1",
  "log",
  "lru",
- "node-template-runtime",
+ "node-5ire-runtime",
  "parity-scale-codec",
  "prometheus",
  "rand 0.8.5",
@@ -1855,8 +1855,8 @@ dependencies = [
  "hex-literal",
  "jsonrpc-core",
  "jsonrpsee",
+ "node-5ire-runtime",
  "node-primitives",
- "node-template-runtime",
  "pallet-contracts-rpc",
  "pallet-im-online",
  "pallet-transaction-payment",
@@ -4297,16 +4297,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "node-primitives"
-version = "2.0.0"
-dependencies = [
- "parity-scale-codec",
- "sp-core",
- "sp-runtime",
-]
-
-[[package]]
-name = "node-template-runtime"
+name = "node-5ire-runtime"
 version = "4.0.0-dev"
 dependencies = [
  "fp-rpc",
@@ -4384,6 +4375,15 @@ dependencies = [
  "sp-version",
  "static_assertions",
  "substrate-wasm-builder",
+]
+
+[[package]]
+name = "node-primitives"
+version = "2.0.0"
+dependencies = [
+ "parity-scale-codec",
+ "sp-core",
+ "sp-runtime",
 ]
 
 [[package]]

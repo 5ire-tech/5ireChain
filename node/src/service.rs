@@ -2,7 +2,7 @@
 
 use crate::rpc::{create_full, BabeDeps, FullDeps, GrandpaDeps};
 use fc_db::Backend as FrontierBackend;
-use node_template_runtime::{self, opaque::Block, RuntimeApi};
+use node_5ire_runtime::{self, opaque::Block, RuntimeApi};
 use sc_client_api::{BlockBackend, ExecutorProvider};
 use sc_consensus_babe::SlotProportion;
 pub use sc_executor::NativeElseWasmExecutor;
@@ -36,11 +36,11 @@ impl sc_executor::NativeExecutionDispatch for ExecutorDispatch {
 	type ExtendHostFunctions = ();
 
 	fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
-		node_template_runtime::api::dispatch(method, data)
+		node_5ire_runtime::api::dispatch(method, data)
 	}
 
 	fn native_version() -> sc_executor::NativeVersion {
-		node_template_runtime::native_version()
+		node_5ire_runtime::native_version()
 	}
 }
 

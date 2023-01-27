@@ -1,6 +1,6 @@
 use hex_literal::hex;
 use node_primitives::*;
-use node_template_runtime::{
+use node_5ire_runtime::{
 	constants::currency::*, opaque::SessionKeys, wasm_binary_unwrap, AuthorityDiscoveryConfig,
 	BabeConfig, BalancesConfig, CouncilConfig, DemocracyConfig, EVMConfig, ElectionsConfig,
 	EthereumConfig, GenesisConfig, GrandpaConfig, ImOnlineConfig, MaxNominations,

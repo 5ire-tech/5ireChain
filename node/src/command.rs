@@ -5,7 +5,7 @@ use crate::{
 	command_helper::{inherent_benchmark_data, BenchmarkExtrinsicBuilder},
 };
 use fc_db::frontier_database_dir;
-use node_template_runtime::Block;
+use node_5ire_runtime::Block;
 use sc_cli::{ChainSpec, RuntimeVersion, SubstrateCli};
 use sc_service::{DatabaseSource, PartialComponents};
 use frame_benchmarking_cli::{BenchmarkCmd, SUBSTRATE_REFERENCE_HARDWARE};
@@ -49,7 +49,7 @@ impl SubstrateCli for Cli {
 	}
 
 	fn native_runtime_version(_: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
-		&node_template_runtime::VERSION
+		&node_5ire_runtime::VERSION
 	}
 }
 
@@ -199,7 +199,7 @@ pub fn run() -> sc_cli::Result<()> {
 			runner.sync_run(|config| {
 				let PartialComponents { client, other, .. } = service::new_partial(&config)?;
 				let frontier_backend = other.2;
-				cmd.run::<_, node_template_runtime::opaque::Block>(client, frontier_backend)
+				cmd.run::<_, node_5ire_runtime::opaque::Block>(client, frontier_backend)
 			})
 		}
 	}

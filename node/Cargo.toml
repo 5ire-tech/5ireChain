@@ -1,7 +1,7 @@
 [package]
 name = "firechain-node"
 version = "4.0.0-dev"
-description = "A fresh FRAME-based 5irechain node, ready for hacking."
+description = "Client node"
 authors = ["5ireChain"]
 edition = "2021"
 publish = false
@@ -89,7 +89,7 @@ fp-rpc = { path = "../primitives/rpc" }
 fp-storage = { path = "../primitives/storage" }
 
 # Local Dependencies
-node-template-runtime = { version = "4.0.0-dev", path = "../runtime" }
+node-5ire-runtime = { version = "4.0.0-dev", path = "../runtime" }
 node-primitives = { version = "2.0.0", default-features = false, path = "../primitives/node-primitives" }
 
 [build-dependencies]
@@ -101,7 +101,7 @@ substrate-build-script-utils = { version = "3.0.0", git = "ssh://git@github.com/
 [features]
 default = []
 rpc_binary_search_estimate = ["fc-rpc/rpc_binary_search_estimate"]
-runtime-benchmarks = ["node-template-runtime/runtime-benchmarks"]
+runtime-benchmarks = ["node-5ire-runtime/runtime-benchmarks"]
 
 
 

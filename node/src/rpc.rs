@@ -8,7 +8,7 @@
 use std::{collections::BTreeMap, sync::Arc};
 
 use jsonrpsee::RpcModule;
-use node_template_runtime::{opaque::Block};
+use node_5ire_runtime::{opaque::Block};
 pub use sc_rpc_api::DenyUnsafe;
 use sc_transaction_pool_api::TransactionPool;
 use sp_api::ProvideRuntimeApi;
@@ -252,7 +252,7 @@ let  pbp=pool.clone();
 			client.clone(),
 			pp,
 			graph,
-			Some(node_template_runtime::TransactionConverter),
+			Some(node_5ire_runtime::TransactionConverter),
 			network.clone(),
 			signers,
 			overrides.clone(),
