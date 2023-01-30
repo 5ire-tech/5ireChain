@@ -30,7 +30,7 @@ impl SubstrateCli for Cli {
 	}
 
 	fn support_url() -> String {
-		"support.anonymous.an".into()
+		"https://github.com/5ire-tech".into()
 	}
 
 	fn copyright_start_year() -> i32 {

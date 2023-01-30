@@ -20,9 +20,9 @@ use sp_runtime::{
 	Perbill,
 };
 
+const DEFAULT_PROTOCOL_ID: &str = "5ire";
 
-// The URL for the telemetry server.
-// const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
+
 
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig>;
@@ -46,26 +46,6 @@ fn session_keys(
 ) -> SessionKeys {
 	SessionKeys { babe, grandpa, im_online, authority_discovery }
 }
-
-/// Transfer slice into unchecked evm address
-// pub fn transfer_evm_uncheck(raw_account: &[u8]) -> Option<H160> {
-//     let data = if raw_account.len() == 20 {
-//         raw_account.to_vec()
-//     } else if raw_account.len() == 40 {
-//         hex::decode(raw_account).ok()?
-//     } else if raw_account.len() == 42 {
-//         let mut key = [0u8; 40];
-//         // remove 0x prefix
-//         key.copy_from_slice(&raw_account[2..42]);
-//         hex::decode(key).ok()?
-//     } else {
-//         return None;
-//     };
-
-//     let mut key = [0u8; 20];
-//     key.copy_from_slice(&data);
-//     H160::try_from(key).ok()
-// }
 
 /// Generate an account ID from seed.
 pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
@@ -228,7 +208,7 @@ pub fn staging_network_config() -> ChainSpec {
 			TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
 				.expect("Staging telemetry url is valid; qed"),
 		),
-		None,
+		Some(DEFAULT_PROTOCOL_ID),
 		None,
 		Some(
 			serde_json::from_str("{\"tokenDecimals\": 18, \"tokenSymbol\": \"5IRE\"}")
