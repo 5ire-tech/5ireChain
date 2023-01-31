@@ -1,9 +1,8 @@
 use hex_literal::hex;
 use node_primitives::*;
-use node_template_runtime::{
+use node_5ire_runtime::{
 	constants::currency::*, opaque::SessionKeys, wasm_binary_unwrap, AuthorityDiscoveryConfig,
-	BabeConfig, BalancesConfig, CouncilConfig, DemocracyConfig, EVMConfig, ElectionsConfig,
-	EthereumConfig, GenesisConfig, GrandpaConfig, ImOnlineConfig, MaxNominations,
+	BabeConfig, BalancesConfig, CouncilConfig, DemocracyConfig, ElectionsConfig,GenesisConfig, GrandpaConfig, ImOnlineConfig, MaxNominations,
 	NominationPoolsConfig, SessionConfig, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
 	TechnicalCommitteeConfig, BABE_GENESIS_EPOCH_CONFIG,
 };
@@ -13,19 +12,17 @@ use sc_telemetry::TelemetryEndpoints;
 use serde_json;
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
-use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public, H160, U256};
+use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
-
-use std::str::FromStr;
 
 use sp_runtime::{
 	traits::{IdentifyAccount, Verify},
 	Perbill,
 };
-use std::collections::BTreeMap;
 
-// The URL for the telemetry server.
-// const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
+const DEFAULT_PROTOCOL_ID: &str = "5ire";
+
+
 
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig>;
@@ -49,26 +46,6 @@ fn session_keys(
 ) -> SessionKeys {
 	SessionKeys { babe, grandpa, im_online, authority_discovery }
 }
-
-/// Transfer slice into unchecked evm address
-// pub fn transfer_evm_uncheck(raw_account: &[u8]) -> Option<H160> {
-//     let data = if raw_account.len() == 20 {
-//         raw_account.to_vec()
-//     } else if raw_account.len() == 40 {
-//         hex::decode(raw_account).ok()?
-//     } else if raw_account.len() == 42 {
-//         let mut key = [0u8; 40];
-//         // remove 0x prefix
-//         key.copy_from_slice(&raw_account[2..42]);
-//         hex::decode(key).ok()?
-//     } else {
-//         return None;
-//     };
-
-//     let mut key = [0u8; 20];
-//     key.copy_from_slice(&data);
-//     H160::try_from(key).ok()
-// }
 
 /// Generate an account ID from seed.
 pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
@@ -231,7 +208,7 @@ pub fn staging_network_config() -> ChainSpec {
 			TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
 				.expect("Staging telemetry url is valid; qed"),
 		),
-		None,
+		Some(DEFAULT_PROTOCOL_ID),
 		None,
 		Some(
 			serde_json::from_str("{\"tokenDecimals\": 18, \"tokenSymbol\": \"5IRE\"}")
@@ -435,40 +412,8 @@ fn testnet_genesis(
 			..Default::default()
 		},
 
-		evm: EVMConfig {
-			accounts: {
-				let mut map = BTreeMap::new();
-				map.insert(
-					// H160 address of Alice dev account
-					// Derived from SS58 (42 prefix) address
-					// SS58: 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
-					// hex: 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d
-					// Using the full hex key, truncating to the first 20 bytes (the first 40 hex chars)
-					H160::from_str("43e318e18f4C61460B5fb9E1c0bf26A1502044BD")
-						.expect("internal H160 is valid; qed"),
-					fp_evm::GenesisAccount {
-						balance: U256::from_str("0x00000000")
-							.expect("internal U256 is valid; qed"),
-						code: Default::default(),
-						nonce: Default::default(),
-						storage: Default::default(),
-					},
-				);
-				map.insert(
-					// H160 address of CI test runner account
-					H160::from_str("482E579993cA638c96Dd4D20df60836a2Fd7DcBe")
-						.expect("internal H160 is valid; qed"),
-					fp_evm::GenesisAccount {
-						balance: U256::from_str("0x00000").expect("internal U256 is valid; qed"),
-						code: Default::default(),
-						nonce: Default::default(),
-						storage: Default::default(),
-					},
-				);
-				map
-			},
-		},
-		ethereum: EthereumConfig {},
+		evm: Default::default(),
+		ethereum: Default::default(),
 		dynamic_fee: Default::default(),
 		base_fee: Default::default(),
 
