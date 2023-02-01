@@ -226,8 +226,12 @@ pub fn native_version() -> NativeVersion {
 }
 
 parameter_types! {
-	pub const DepositPerItem: Balance = deposit(1, 0);
-	pub const DepositPerByte: Balance = deposit(0, 1);
+	// pub const DepositPerItem: Balance = deposit(1, 0);
+	// pub const DepositPerByte: Balance = deposit(0, 1);
+
+	pub const DepositPerItem: Balance = itemdeposit(1, 0);
+	pub const DepositPerByte: Balance = itemdeposit(0, 1);
+	
 	pub const MaxValueSize: u32 = 16 * 1024;
 	// The lazy deletion runs inside on_initialize.
 	pub DeletionWeightLimit: Weight = RuntimeBlockWeights::get()

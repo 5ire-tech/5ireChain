@@ -15,4 +15,8 @@ pub mod currency {
 	pub const fn deposit(items: u32, bytes: u32) -> Balance {
 		items as Balance * 15 * CENTS + (bytes as Balance) * 6 * CENTS
 	}
+
+	pub const fn itemdeposit(items: u32, bytes: u32) -> Balance {
+		(items as Balance * 10 * CENTS/10 + (bytes as Balance) * (15 * MICROCENTS)) / 5
+	}
 }
