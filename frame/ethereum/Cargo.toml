@@ -1,34 +1,30 @@
 [package]
 name = "pallet-ethereum"
 version = "4.0.0-dev"
-authors = ["Parity Technologies <admin@parity.io>"]
-edition = "2021"
 license = "Apache-2.0"
+edition = "2021"
 description = "Ethereum compatibility full block processing emulation pallet for Substrate."
-repository = "https://github.com/paritytech/frontier/"
-
+ 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
-ethereum = { version = "0.12.0", default-features = false, features = ["with-codec"] }
-evm = { git = "https://github.com/rust-blockchain/evm", rev = "01bcbd2205a212c34451d3b4fabc962793b057d3", features = ["with-codec"], default-features = false }
-serde = { version = "1.0.139", optional = true }
-
-# Parity
-codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false }
-ethereum-types = { version = "0.13.1", default-features = false }
+ethereum = { version = "0.14.0", default-features = false }
+ethereum-types = { version = "0.14.1", default-features = false }
+evm = { version = "0.37.0", default-features = false }
 rlp = { version = "0.5", default-features = false }
-scale-info = { version = "2.1.2", default-features = false, features = ["derive"] }
+scale-codec = { package = "parity-scale-codec", version = "3.2.1", default-features = false, features = ["derive"] }
+scale-info = { version = "2.3.1", default-features = false, features = ["derive"] }
 
 # Substrate
-sp-io = { version = "6.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
-sp-runtime = { version = "6.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
-sp-std = { version = "4.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
+sp-io = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false }
+sp-runtime = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false }
+sp-std = { version = "5.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false }
 # Substrate FRAME
-frame-support = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
-frame-system = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
-pallet-timestamp = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
+frame-support = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false }
+frame-system = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false }
+
+pallet-timestamp = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false }
 
 # Frontier
 fp-consensus = { version = "2.0.0-dev", path = "../../primitives/consensus", default-features = false }
@@ -41,32 +37,27 @@ pallet-evm = { version = "6.0.0-dev", path = "../evm", default-features = false 
 
 [dev-dependencies]
 hex = "0.4.3"
-# Parity
-libsecp256k1 = { version = "0.7", features = ["static-context", "hmac"] }
+libsecp256k1 = { version = "0.7.1", features = ["static-context", "hmac"] }
 # Substrate
-sp-core = { version = "6.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+sp-core = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false }
 # Substrate FRAME
-pallet-balances = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-
+pallet-balances = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false }
 [features]
 default = ["std"]
 std = [
 	"ethereum/std",
 	"evm/std",
-	"serde",
-	# Parity
-	"codec/std",
 	"ethereum-types/std",
 	"rlp/std",
+	"scale-codec/std",
 	"scale-info/std",
 	# Substrate
-	"sp-io/std",
-	"sp-runtime/std",
-	"sp-std/std",
-	# Substrate FRAME
 	"frame-support/std",
 	"frame-system/std",
 	"pallet-timestamp/std",
+	"sp-io/std",
+	"sp-runtime/std",
+	"sp-std/std",
 	# Frontier
 	"fp-consensus/std",
 	"fp-ethereum/std",
@@ -75,6 +66,7 @@ std = [
 	"fp-self-contained/std",
 	"fp-storage/std",
 	"pallet-evm/std",
+	"pallet-balances/std",
 ]
 runtime-benchmarks = [
 	"frame-support/runtime-benchmarks",
@@ -82,4 +74,10 @@ runtime-benchmarks = [
 	"pallet-timestamp/runtime-benchmarks",
 	"pallet-evm/runtime-benchmarks",
 ]
-try-runtime = ["frame-support/try-runtime"]
+try-runtime = [
+	"frame-support/try-runtime",
+	"frame-system/try-runtime",
+	"pallet-timestamp/try-runtime",
+	"pallet-evm/try-runtime",
+]
+forbid-evm-reentrancy = ["pallet-evm/forbid-evm-reentrancy"]

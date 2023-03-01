@@ -53,6 +53,7 @@
 // Ensure we're `no_std` when compiling for Wasm.
 #![cfg_attr(not(feature = "std"), no_std)]
 #![allow(clippy::too_many_arguments)]
+#![cfg_attr(test, feature(assert_matches))]
 
 #[cfg(feature = "runtime-benchmarks")]
 pub mod benchmarking;
@@ -62,6 +63,22 @@ mod mock;
 pub mod runner;
 #[cfg(test)]
 mod tests;
+
+use frame_support::{
+	dispatch::{DispatchResultWithPostInfo, Pays, PostDispatchInfo},
+	traits::{
+		tokens::fungible::Inspect, Currency, ExistenceRequirement, FindAuthor, Get, Imbalance,
+		OnUnbalanced, SignedImbalance, WithdrawReasons,
+	},
+	weights::Weight,
+};
+use frame_system::RawOrigin;
+use sp_core::{Hasher, H160, H256, U256};
+use sp_runtime::{
+	traits::{BadOrigin, Saturating, UniqueSaturatedInto, Zero},
+	AccountId32, DispatchErrorWithPostInfo,
+};
+use sp_std::{cmp::min, vec::Vec};
 
 pub use evm::{
 	Config as EvmConfig, Context, ExitError, ExitFatal, ExitReason, ExitRevert, ExitSucceed,
@@ -73,21 +90,6 @@ pub use fp_evm::{
 	LinearCostPrecompile, Log, Precompile, PrecompileFailure, PrecompileHandle, PrecompileOutput,
 	PrecompileResult, PrecompileSet, Vicinity,
 };
-use frame_support::{
-	dispatch::DispatchResultWithPostInfo,
-	traits::{
-		tokens::fungible::Inspect, Currency, ExistenceRequirement, FindAuthor, Get, Imbalance,
-		OnUnbalanced, SignedImbalance, WithdrawReasons,
-	},
-	weights::{DispatchClass, Pays, PostDispatchInfo, Weight},
-};
-use frame_system::RawOrigin;
-use sp_core::{Hasher, H160, H256, U256};
-use sp_runtime::{
-	traits::{BadOrigin, Saturating, UniqueSaturatedInto, Zero},
-	AccountId32, DispatchErrorWithPostInfo,
-};
-use sp_std::{cmp::min, vec::Vec};
 
 pub use self::{
 	pallet::*,
@@ -113,13 +115,16 @@ pub mod pallet {
 		/// Maps Ethereum gas to Substrate weight.
 		type GasWeightMapping: GasWeightMapping;
 
+		/// Weight corresponding to a gas unit.
+		type WeightPerGas: Get<Weight>;
+
 		/// Block number to block hash.
 		type BlockHashMapping: BlockHashMapping;
 
 		/// Allow the origin to call on behalf of given address.
-		type CallOrigin: EnsureAddressOrigin<Self::Origin>;
+		type CallOrigin: EnsureAddressOrigin<Self::RuntimeOrigin>;
 		/// Allow the origin to withdraw on behalf of given address.
-		type WithdrawOrigin: EnsureAddressOrigin<Self::Origin, Success = Self::AccountId>;
+		type WithdrawOrigin: EnsureAddressOrigin<Self::RuntimeOrigin, Success = Self::AccountId>;
 
 		/// Mapping from address to account id.
 		type AddressMapping: AddressMapping<Self::AccountId>;
@@ -127,7 +132,7 @@ pub mod pallet {
 		type Currency: Currency<Self::AccountId> + Inspect<Self::AccountId>;
 
 		/// The overarching event type.
-		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
+		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 		/// Precompiles associated with this EVM engine.
 		type PrecompilesType: PrecompileSet;
 		type PrecompilesValue: Get<Self::PrecompilesType>;
@@ -155,8 +160,8 @@ pub mod pallet {
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
 		/// Withdraw balance from EVM into currency/balances pallet.
-		// #[pallet::weight(0)]
-		#[pallet::weight((0, DispatchClass::Normal,Pays::No))]
+		#[pallet::call_index(0)]
+		#[pallet::weight(0)]
 		pub fn withdraw(
 			origin: OriginFor<T>,
 			address: H160,
@@ -165,24 +170,19 @@ pub mod pallet {
 			let destination = T::WithdrawOrigin::ensure_address_origin(&address, origin)?;
 			let address_account_id = T::AddressMapping::into_account_id(address);
 
-			// info!("Here evm balance {:?}",T::Currency::total_balance(&address_account_id));
-			// info!("Here withdraw balance {:?}",value);
-
-			// let evm_value= value.saturating_mul(10u64.pow(18u32).unique_saturated_into());
-			// let native_value= value.saturating_mul(10u64.pow(12u32).unique_saturated_into());
-
 			T::Currency::transfer(
 				&address_account_id,
 				&destination,
 				value,
 				ExistenceRequirement::AllowDeath,
 			)?;
-			// let slashed_value= evm_value.saturating_sub(native_value);
-			// T::Currency::slash(&address_account_id,slashed_value);
+
 			Ok(())
 		}
 
-		/// Deposit balance from  currency/balances pallet into EVM .
+
+		/// Deposit balance from EVM into currency/balances pallet.
+		#[pallet::call_index(4)]
 		#[pallet::weight(0)]
 		pub fn deposit(origin: OriginFor<T>, address: H160, value: BalanceOf<T>) -> DispatchResult {
 			let destination = ensure_signed(origin.clone())?;
@@ -191,6 +191,7 @@ pub mod pallet {
 			// let native_value= value.saturating_mul(10u64.pow(12u32).unique_saturated_into());
 			// let mint_value= evm_value.saturating_sub(native_value);
 
+			// info!("Here deposit balance {:?}",value);
 			T::Currency::transfer(
 				&destination,
 				&address_account_id,
@@ -202,7 +203,11 @@ pub mod pallet {
 		}
 
 		/// Issue an EVM call operation. This is similar to a message call transaction in Ethereum.
-		#[pallet::weight(T::GasWeightMapping::gas_to_weight(*gas_limit))]
+		#[pallet::call_index(1)]
+		#[pallet::weight({
+			let without_base_extrinsic_weight = true;
+			T::GasWeightMapping::gas_to_weight(*gas_limit, without_base_extrinsic_weight)
+		})]
 		pub fn call(
 			origin: OriginFor<T>,
 			source: H160,
@@ -242,21 +247,22 @@ pub mod pallet {
 						},
 						error: e.error.into(),
 					})
-				},
+				}
 			};
 
 			match info.exit_reason {
 				ExitReason::Succeed(_) => {
 					Pallet::<T>::deposit_event(Event::<T>::Executed { address: target });
-				},
+				}
 				_ => {
 					Pallet::<T>::deposit_event(Event::<T>::ExecutedFailed { address: target });
-				},
+				}
 			};
 
 			Ok(PostDispatchInfo {
 				actual_weight: Some(T::GasWeightMapping::gas_to_weight(
 					info.used_gas.unique_saturated_into(),
+					true,
 				)),
 				pays_fee: Pays::No,
 			})
@@ -264,7 +270,11 @@ pub mod pallet {
 
 		/// Issue an EVM create operation. This is similar to a contract creation transaction in
 		/// Ethereum.
-		#[pallet::weight(T::GasWeightMapping::gas_to_weight(*gas_limit))]
+		#[pallet::call_index(2)]
+		#[pallet::weight({
+			let without_base_extrinsic_weight = true;
+			T::GasWeightMapping::gas_to_weight(*gas_limit, without_base_extrinsic_weight)
+		})]
 		pub fn create(
 			origin: OriginFor<T>,
 			source: H160,
@@ -302,32 +312,45 @@ pub mod pallet {
 						},
 						error: e.error.into(),
 					})
-				},
+				}
 			};
 
 			match info {
 				CreateInfo {
-					exit_reason: ExitReason::Succeed(_), value: create_address, ..
+					exit_reason: ExitReason::Succeed(_),
+					value: create_address,
+					..
 				} => {
-					Pallet::<T>::deposit_event(Event::<T>::Created { address: create_address });
-				},
-				CreateInfo { exit_reason: _, value: create_address, .. } => {
+					Pallet::<T>::deposit_event(Event::<T>::Created {
+						address: create_address,
+					});
+				}
+				CreateInfo {
+					exit_reason: _,
+					value: create_address,
+					..
+				} => {
 					Pallet::<T>::deposit_event(Event::<T>::CreatedFailed {
 						address: create_address,
 					});
-				},
+				}
 			}
 
 			Ok(PostDispatchInfo {
 				actual_weight: Some(T::GasWeightMapping::gas_to_weight(
 					info.used_gas.unique_saturated_into(),
+					true,
 				)),
 				pays_fee: Pays::No,
 			})
 		}
 
 		/// Issue an EVM create2 operation.
-		#[pallet::weight(T::GasWeightMapping::gas_to_weight(*gas_limit))]
+		#[pallet::call_index(3)]
+		#[pallet::weight({
+			let without_base_extrinsic_weight = true;
+			T::GasWeightMapping::gas_to_weight(*gas_limit, without_base_extrinsic_weight)
+		})]
 		pub fn create2(
 			origin: OriginFor<T>,
 			source: H160,
@@ -367,25 +390,34 @@ pub mod pallet {
 						},
 						error: e.error.into(),
 					})
-				},
+				}
 			};
 
 			match info {
 				CreateInfo {
-					exit_reason: ExitReason::Succeed(_), value: create_address, ..
+					exit_reason: ExitReason::Succeed(_),
+					value: create_address,
+					..
 				} => {
-					Pallet::<T>::deposit_event(Event::<T>::Created { address: create_address });
-				},
-				CreateInfo { exit_reason: _, value: create_address, .. } => {
+					Pallet::<T>::deposit_event(Event::<T>::Created {
+						address: create_address,
+					});
+				}
+				CreateInfo {
+					exit_reason: _,
+					value: create_address,
+					..
+				} => {
 					Pallet::<T>::deposit_event(Event::<T>::CreatedFailed {
 						address: create_address,
 					});
-				},
+				}
 			}
 
 			Ok(PostDispatchInfo {
 				actual_weight: Some(T::GasWeightMapping::gas_to_weight(
 					info.used_gas.unique_saturated_into(),
+					true,
 				)),
 				pays_fee: Pays::No,
 			})
@@ -427,6 +459,10 @@ pub mod pallet {
 		GasLimitTooHigh,
 		/// Undefined error.
 		Undefined,
+		/// EVM reentrancy
+		Reentrancy,
+		/// EIP-3607,
+		TransactionMustComeFromEOA,
 	}
 
 	impl<T> From<InvalidEvmTransactionError> for Error<T> {
@@ -528,6 +564,7 @@ where
 	OuterOrigin: Into<Result<RawOrigin<H160>, OuterOrigin>> + From<RawOrigin<H160>>,
 {
 	type Success = H160;
+
 	fn try_address_origin(address: &H160, origin: OuterOrigin) -> Result<H160, OuterOrigin> {
 		origin.into().and_then(|o| match o {
 			RawOrigin::Signed(who) if &who == address => Ok(who),
@@ -578,7 +615,7 @@ where
 		origin.into().and_then(|o| match o {
 			RawOrigin::Signed(who) if AsRef::<[u8; 32]>::as_ref(&who)[0..20] == address[0..20] => {
 				Ok(who)
-			},
+			}
 			r => Err(OuterOrigin::from(r)),
 		})
 	}
@@ -627,16 +664,25 @@ impl<T: Config> BlockHashMapping for SubstrateBlockHashMapping<T> {
 
 /// A mapping function that converts Ethereum gas to Substrate weight
 pub trait GasWeightMapping {
-	fn gas_to_weight(gas: u64) -> Weight;
+	fn gas_to_weight(gas: u64, without_base_weight: bool) -> Weight;
 	fn weight_to_gas(weight: Weight) -> u64;
 }
 
-impl GasWeightMapping for () {
-	fn gas_to_weight(gas: u64) -> Weight {
-		gas as Weight
+pub struct FixedGasWeightMapping<T>(sp_std::marker::PhantomData<T>);
+impl<T: Config> GasWeightMapping for FixedGasWeightMapping<T> {
+	fn gas_to_weight(gas: u64, without_base_weight: bool) -> Weight {
+		let mut weight = T::WeightPerGas::get().saturating_mul(gas);
+		if without_base_weight {
+			weight = weight.saturating_sub(
+				T::BlockWeights::get()
+					.get(frame_support::dispatch::DispatchClass::Normal)
+					.base_extrinsic,
+			);
+		}
+		weight
 	}
 	fn weight_to_gas(weight: Weight) -> u64 {
-		weight as u64
+		weight.div(T::WeightPerGas::get().ref_time()).ref_time()
 	}
 }
 
@@ -676,7 +722,7 @@ impl<T: Config> Pallet<T> {
 			return;
 		}
 
-		if !<AccountCodes<T>>::contains_key(&address) {
+		if !<AccountCodes<T>>::contains_key(address) {
 			let account_id = T::AddressMapping::into_account_id(address);
 			let _ = frame_system::Pallet::<T>::inc_sufficients(&account_id);
 		}
@@ -784,7 +830,9 @@ where
 			let account_id = T::AddressMapping::into_account_id(*who);
 
 			// Calculate how much refund we should return
-			let refund_amount = paid.peek().saturating_sub(corrected_fee.unique_saturated_into());
+			let refund_amount = paid
+				.peek()
+				.saturating_sub(corrected_fee.unique_saturated_into());
 			// refund to the account that paid the fees. If this fails, the
 			// account might have dropped below the existential balance. In
 			// that case we don't refund anything.

@@ -1,54 +1,51 @@
 [package]
 name = "pallet-dynamic-fee"
 version = "4.0.0-dev"
-edition = "2021"
 license = "Apache-2.0"
+edition = "2021"
 description = "Dynamic fee handling for EVM."
-
+ 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
-async-trait = "0.1"
-serde = { version = "1.0.139", optional = true }
-
-# Parity
-codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false }
-scale-info = { version = "2.1.2", default-features = false, features = ["derive"] }
-
+scale-codec = { package = "parity-scale-codec", version = "3.2.1", default-features = false, features = ["derive"] }
+scale-info = { version = "2.3.1", default-features = false, features = ["derive"] }
 # Substrate
-sp-core = { version = "6.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
-sp-inherents = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
-sp-runtime = { version = "6.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
-sp-std = { version = "4.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
+sp-core = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false }
+sp-inherents = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false  }
+sp-runtime = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false  }
+sp-std = { version = "5.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false }
 # Substrate FRAME
-frame-support = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
-frame-system = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
-
+frame-support = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false }
+frame-system = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false }
 # Frontier
 fp-dynamic-fee = { version = "1.0.0", path = "../../primitives/dynamic-fee", default-features = false }
 fp-evm = { version = "3.0.0-dev", path = "../../primitives/evm", default-features = false }
 
 [dev-dependencies]
-pallet-timestamp = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
-sp-io = { version = "6.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+# Substrate
+pallet-timestamp = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false  }
+sp-io = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false }
 
 [features]
 default = ["std"]
 std = [
-	"serde",
-	# Parity
-	"codec/std",
+	"scale-codec/std",
 	"scale-info/std",
 	# Substrate
 	"sp-core/std",
 	"sp-inherents/std",
 	"sp-runtime/std",
 	"sp-std/std",
-	# Substrate FRAME
+	# Substrate
 	"frame-system/std",
 	"frame-support/std",
 	# Frontier
 	"fp-dynamic-fee/std",
 	"fp-evm/std",
+]
+try-runtime = [
+	"frame-support/try-runtime",
+	"frame-system/try-runtime",
 ]

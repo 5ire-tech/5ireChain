@@ -17,14 +17,27 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use codec::{Decode, Encode};
 pub use ethereum::{
 	AccessListItem, BlockV2 as Block, LegacyTransactionMessage, Log, ReceiptV3 as Receipt,
 	TransactionAction, TransactionV2 as Transaction,
 };
 use ethereum_types::{H160, H256, U256};
 use fp_evm::CheckEvmTransactionInput;
+use scale_codec::{Decode, Encode};
 use sp_std::vec::Vec;
+
+#[repr(u8)]
+#[derive(num_enum::FromPrimitive, num_enum::IntoPrimitive)]
+pub enum TransactionValidationError {
+	#[allow(dead_code)]
+	#[num_enum(default)]
+	UnknownError,
+	InvalidChainId,
+	InvalidSignature,
+	GasLimitTooLow,
+	GasLimitTooHigh,
+	MaxFeePerGasTooLow,
+}
 
 pub trait ValidatedTransaction {
 	fn apply(
@@ -33,7 +46,7 @@ pub trait ValidatedTransaction {
 	) -> frame_support::dispatch::DispatchResultWithPostInfo;
 }
 
-#[derive(Clone, Debug, Encode, Decode, PartialEq, Eq)]
+#[derive(Clone, Debug, Eq, PartialEq, Encode, Decode)]
 pub struct TransactionData {
 	pub action: TransactionAction,
 	pub input: Vec<u8>,

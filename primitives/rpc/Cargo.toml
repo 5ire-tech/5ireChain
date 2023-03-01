@@ -1,44 +1,36 @@
 [package]
 name = "fp-rpc"
 version = "3.0.0-dev"
-authors = ["Parity Technologies <admin@parity.io"]
+license = "Apache-2.0"
 edition = "2021"
 description = "Runtime primitives for Ethereum RPC (web3) compatibility layer for Substrate."
-license = "Apache-2.0"
-
+ 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
-ethereum = { version = "0.12.0", default-features = false, features = ["with-codec"] }
-
-# Parity
-codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false }
-ethereum-types = { version = "0.13.1", default-features = false }
-scale-info = { version = "2.1.2", default-features = false, features = ["derive"] }
-
+ethereum = { version = "0.14.0", default-features = false }
+ethereum-types = { version = "0.14.1", default-features = false }
+scale-codec = { package = "parity-scale-codec", version = "3.2.1", default-features = false, features = ["derive"] }
+scale-info = { version = "2.3.1", default-features = false, features = ["derive"] }
 # Substrate
-sp-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
-sp-core = { version = "6.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
-sp-io = { version = "6.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
-sp-runtime = { version = "6.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
-sp-std = { version = "4.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
-
+sp-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false }
+sp-core = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false  }
+sp-runtime = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false  }
+sp-std = { version = "5.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false  }
 # Frontier
-fp-evm = { version = "3.0.0-dev", path = "../../primitives/evm", default-features = false }
+fp-evm = { version = "3.0.0-dev", path = "../evm", default-features = false }
 
 [features]
 default = ["std"]
 std = [
 	"ethereum/std",
-	# Parity
-	"codec/std",
 	"ethereum-types/std",
+	"scale-codec/std",
 	"scale-info/std",
 	# Substrate
 	"sp-api/std",
 	"sp-core/std",
-	"sp-io/std",
 	"sp-runtime/std",
 	"sp-std/std",
 	# Frontier

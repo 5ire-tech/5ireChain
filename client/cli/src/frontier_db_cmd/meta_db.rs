@@ -16,17 +16,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use ethereum_types::H256;
-use serde::Deserialize;
 use std::{
 	collections::HashMap,
 	str::{self, FromStr},
 	sync::Arc,
 };
 
-use super::{utils::FrontierDbMessage, FrontierDbCmd, Operation};
-
+use ethereum_types::H256;
+use serde::Deserialize;
+// Substrate
 use sp_runtime::traits::Block as BlockT;
+
+use super::{utils::FrontierDbMessage, FrontierDbCmd, Operation};
 
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
@@ -72,8 +73,7 @@ impl<'a, B: BlockT> MetaDb<'a, B> {
 				// Insert data to the meta column, static tips key.
 				(MetaKey::Tips, Some(MetaValue::Tips(hashes))) => {
 					if self.backend.meta().current_syncing_tips()?.is_empty() {
-						let _ = self
-							.backend
+						self.backend
 							.meta()
 							.write_current_syncing_tips(hashes.clone())?;
 					} else {
@@ -83,11 +83,11 @@ impl<'a, B: BlockT> MetaDb<'a, B> {
 				// Insert data to the meta column, static schema cache key.
 				(MetaKey::Schema, Some(MetaValue::Schema(schema_map))) => {
 					if self.backend.meta().ethereum_schema()?.is_none() {
-						let data = schema_map
+						let data:Vec<(fp_storage::EthereumStorageSchema, H256)> = schema_map
 							.iter()
 							.map(|(key, value)| (*value, *key))
 							.collect::<Vec<(fp_storage::EthereumStorageSchema, H256)>>();
-						let _ = self.backend.meta().write_ethereum_schema(data)?;
+						self.backend.meta().write_ethereum_schema(data)?;
 					} else {
 						return Err(self.key_not_empty_error(key));
 					}
@@ -111,8 +111,7 @@ impl<'a, B: BlockT> MetaDb<'a, B> {
 				(MetaKey::Tips, Some(MetaValue::Tips(new_value))) => {
 					let value = self.backend.meta().current_syncing_tips()?;
 					self.confirmation_prompt(&self.cmd.operation, key, &value, new_value)?;
-					let _ = self
-						.backend
+					self.backend
 						.meta()
 						.write_current_syncing_tips(new_value.clone())?;
 				}
@@ -129,7 +128,7 @@ impl<'a, B: BlockT> MetaDb<'a, B> {
 						&value,
 						&Some(new_value.clone()),
 					)?;
-					let _ = self.backend.meta().write_ethereum_schema(new_value)?;
+					self.backend.meta().write_ethereum_schema(new_value)?;
 				}
 				_ => return Err(self.key_value_error(key, value)),
 			},
@@ -138,13 +137,13 @@ impl<'a, B: BlockT> MetaDb<'a, B> {
 				MetaKey::Tips => {
 					let value = self.backend.meta().current_syncing_tips()?;
 					self.confirmation_prompt(&self.cmd.operation, key, &value, &vec![])?;
-					let _ = self.backend.meta().write_current_syncing_tips(vec![])?;
+					self.backend.meta().write_current_syncing_tips(vec![])?;
 				}
 				// Deletes the static schema cache key's value.
 				MetaKey::Schema => {
 					let value = self.backend.meta().ethereum_schema()?;
 					self.confirmation_prompt(&self.cmd.operation, key, &value, &Some(vec![]))?;
-					let _ = self.backend.meta().write_ethereum_schema(vec![])?;
+					self.backend.meta().write_ethereum_schema(vec![])?;
 				}
 			},
 		}

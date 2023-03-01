@@ -21,9 +21,9 @@ use std::sync::Arc;
 use ethereum_types::{H256, U256};
 use evm::{ExitError, ExitReason};
 use jsonrpsee::core::RpcResult as Result;
-
+// Substrate
 use sc_client_api::backend::{Backend, StateBackend, StorageProvider};
-use sc_network::ExHashT;
+use sc_network_common::ExHashT;
 use sc_transaction_pool::ChainApi;
 use sp_api::{ApiExt, ProvideRuntimeApi};
 use sp_block_builder::BlockBuilder as BlockBuilderApi;
@@ -31,10 +31,11 @@ use sp_blockchain::{BlockStatus, HeaderBackend};
 use sp_runtime::{
 	generic::BlockId,
 	traits::{BlakeTwo256, Block as BlockT},
+	SaturatedConversion,
 };
-
-use fc_rpc_core::types::*;
 use fp_rpc::EthereumRuntimeRPCApi;
+// Frontier
+use fc_rpc_core::types::*;
 
 use crate::{
 	eth::{pending_runtime_api, Eth},
@@ -44,7 +45,25 @@ use crate::{
 /// Default JSONRPC error code return by geth
 pub const JSON_RPC_ERROR_DEFAULT: i32 = -32000;
 
-impl<B, C, P, CT, BE, H: ExHashT, A: ChainApi> Eth<B, C, P, CT, BE, H, A>
+/// Allow to adapt a request for `estimate_gas`.
+/// Can be used to estimate gas of some contracts using a different function
+/// in the case the normal gas estimation doesn't work.
+///
+/// Exemple: a precompile that tries to do a subcall but succeeds regardless of the
+/// success of the subcall. The gas estimation will thus optimize the gas limit down
+/// to the minimum, while we want to estimate a gas limit that will allow the subcall to
+/// have enough gas to succeed.
+pub trait EstimateGasAdapter {
+	fn adapt_request(request: CallRequest) -> CallRequest;
+}
+
+impl EstimateGasAdapter for () {
+	fn adapt_request(request: CallRequest) -> CallRequest {
+		request
+	}
+}
+
+impl<B, C, P, CT, BE, H: ExHashT, A: ChainApi, EGA> Eth<B, C, P, CT, BE, H, A, EGA>
 where
 	B: BlockT<Hash = H256> + Send + Sync + 'static,
 	C: ProvideRuntimeApi<B> + StorageProvider<B, BE>,
@@ -53,6 +72,7 @@ where
 	BE: Backend<B> + 'static,
 	BE::State: StateBackend<BlakeTwo256>,
 	A: ChainApi<Block = B> + 'static,
+	EGA: EstimateGasAdapter,
 {
 	pub fn call(&self, request: CallRequest, number: Option<BlockNumber>) -> Result<Bytes> {
 		let CallRequest {
@@ -102,27 +122,43 @@ where
 			} else {
 				return Err(internal_err("failed to retrieve Runtime Api version"));
 			};
+
+		let block = if api_version > 1 {
+			api.current_block(&id)
+				.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?
+		} else {
+			#[allow(deprecated)]
+			let legacy_block = api
+				.current_block_before_version_2(&id)
+				.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?;
+			legacy_block.map(|block| block.into())
+		};
+
+		let block_gas_limit = block
+			.ok_or_else(|| internal_err("block unavailable, cannot query gas limit"))?
+			.header
+			.gas_limit;
+		let max_gas_limit = block_gas_limit * self.execute_gas_limit_multiplier;
+
 		// use given gas limit or query current block's limit
 		let gas_limit = match gas {
-			Some(amount) => amount,
-			None => {
-				let block = if api_version > 1 {
-					api.current_block(&id)
-						.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?
-				} else {
-					#[allow(deprecated)]
-					let legacy_block = api.current_block_before_version_2(&id)
-						.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?;
-					legacy_block.map(|block| block.into())
-				};
-
-				if let Some(block) = block {
-					block.header.gas_limit
-				} else {
-					return Err(internal_err("block unavailable, cannot query gas limit"));
+			Some(amount) => {
+				if amount > max_gas_limit {
+					return Err(internal_err(format!(
+						"provided gas limit is too high (can be up to {}x the block gas limit)",
+						self.execute_gas_limit_multiplier
+					)));
 				}
+				amount
 			}
+			// If gas limit is not specified in the request we either use the multiplier if supported
+			// or fallback to the block gas limit.
+			None => match api.gas_limit_multiplier_support(&id) {
+				Ok(_) => max_gas_limit,
+				_ => block_gas_limit,
+			},
 		};
+
 		let data = data.map(|d| d.0).unwrap_or_default();
 		match to {
 			Some(to) => {
@@ -289,6 +325,9 @@ where
 		// Get best hash (TODO missing support for estimating gas historically)
 		let best_hash = client.info().best_hash;
 
+		// Adapt request for gas estimation.
+		let request = EGA::adapt_request(request);
+
 		// For simple transfer to simple account, return MIN_GAS_PER_TX directly
 		let is_simple_transfer = match &request.data {
 			None => true,
@@ -319,28 +358,40 @@ where
 			)
 		};
 
-		let get_current_block_gas_limit = || async {
+		let block_gas_limit = {
 			let substrate_hash = client.info().best_hash;
 			let id = BlockId::Hash(substrate_hash);
 			let schema = frontier_backend_client::onchain_storage_schema::<B, C, BE>(&client, id);
 			let block = block_data_cache.current_block(schema, substrate_hash).await;
-			if let Some(block) = block {
-				Ok(block.header.gas_limit)
-			} else {
-				Err(internal_err("block unavailable, cannot query gas limit"))
-			}
+
+			block
+				.ok_or_else(|| internal_err("block unavailable, cannot query gas limit"))?
+				.header
+				.gas_limit
 		};
+
+		let max_gas_limit = block_gas_limit * self.execute_gas_limit_multiplier;
+
+		let api = client.runtime_api();
 
 		// Determine the highest possible gas limits
 		let mut highest = match request.gas {
-			Some(gas) => gas,
-			None => {
-				// query current block's gas limit
-				get_current_block_gas_limit().await?
+			Some(amount) => {
+				if amount > max_gas_limit {
+					return Err(internal_err(format!(
+						"provided gas limit is too high (can be up to {}x the block gas limit)",
+						self.execute_gas_limit_multiplier
+					)));
+				}
+				amount
 			}
+			// If gas limit is not specified in the request we either use the multiplier if supported
+			// or fallback to the block gas limit.
+			None => match api.gas_limit_multiplier_support(&BlockId::Hash(best_hash)) {
+				Ok(_) => max_gas_limit,
+				_ => block_gas_limit,
+			},
 		};
-
-		let api = client.runtime_api();
 
 		// Recap the highest gas allowance with account's balance.
 		if let Some(from) = request.from {
@@ -548,7 +599,7 @@ where
 
 		// Verify that the transaction succeed with highest capacity
 		let cap = highest;
-		let estimate_mode = !cfg!(feature = "rpc_binary_search_estimate");
+		let estimate_mode = !cfg!(feature = "rpc-binary-search-estimate");
 		let ExecutableResult {
 			data,
 			exit_reason,
@@ -582,7 +633,7 @@ where
 						used_gas: _,
 					} = executable(
 						request.clone(),
-						get_current_block_gas_limit().await?,
+						max_gas_limit,
 						api_version,
 						client.runtime_api(),
 						estimate_mode,
@@ -605,11 +656,11 @@ where
 			other => error_on_execution_failure(&other, &data)?,
 		};
 
-		#[cfg(not(feature = "rpc_binary_search_estimate"))]
+		#[cfg(not(feature = "rpc-binary-search-estimate"))]
 		{
 			Ok(used_gas)
 		}
-		#[cfg(feature = "rpc_binary_search_estimate")]
+		#[cfg(feature = "rpc-binary-search-estimate")]
 		{
 			// On binary search, evm estimate mode is disabled
 			let estimate_mode = false;
@@ -643,7 +694,9 @@ where
 						}
 						previous_highest = highest;
 					}
-					ExitReason::Revert(_) | ExitReason::Error(ExitError::OutOfGas) => {
+					ExitReason::Revert(_)
+					| ExitReason::Error(ExitError::OutOfGas)
+					| ExitReason::Error(ExitError::InvalidCode(_)) => {
 						lowest = mid;
 					}
 					other => error_on_execution_failure(&other, &data)?,
@@ -670,13 +723,19 @@ pub fn error_on_execution_failure(reason: &ExitReason, data: &[u8]) -> Result<()
 			))
 		}
 		ExitReason::Revert(_) => {
+			const LEN_START: usize = 36;
+			const MESSAGE_START: usize = 68;
+
 			let mut message = "VM Exception while processing transaction: revert".to_string();
 			// A minimum size of error function selector (4) + offset (32) + string length (32)
 			// should contain a utf-8 encoded revert reason.
-			if data.len() > 68 {
-				let message_len = data[36..68].iter().sum::<u8>();
-				if data.len() >= 68 + message_len as usize {
-					let body: &[u8] = &data[68..68 + message_len as usize];
+			if data.len() > MESSAGE_START {
+				let message_len =
+					U256::from(&data[LEN_START..MESSAGE_START]).saturated_into::<usize>();
+				let message_end = MESSAGE_START.saturating_add(message_len);
+
+				if data.len() >= message_end {
+					let body: &[u8] = &data[MESSAGE_START..message_end];
 					if let Ok(reason) = std::str::from_utf8(body) {
 						message = format!("{} {}", message, reason);
 					}
