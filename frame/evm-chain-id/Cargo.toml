@@ -12,8 +12,8 @@ targets = ["x86_64-unknown-linux-gnu"]
 scale-codec = { package = "parity-scale-codec", version = "3.2.1", default-features = false, features = ["derive"] }
 scale-info = { version = "2.3.1", default-features = false, features = ["derive"] }
 # Substrate
-frame-support = { version = "4.0.0-dev", path = "../../frame/support" , default-features = false }
-frame-system = { version = "4.0.0-dev", path = "../../frame/system", default-features = false }
+frame-support = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" , default-features = false }
+frame-system = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false }
 
 [features]
 default = ["std"]

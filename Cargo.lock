@@ -729,30 +729,13 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "3.2.23"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71655c45cb9845d3270c9d6df84ebe72b4dad3c2ba3f7023ad47c144e4e473a5"
-dependencies = [
- "atty",
- "bitflags",
- "clap_derive 3.2.18",
- "clap_lex 0.2.4",
- "indexmap",
- "once_cell",
- "strsim",
- "termcolor",
- "textwrap",
-]
-
-[[package]]
-name = "clap"
 version = "4.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ec0b0588d44d4d63a87dbd75c136c166bbfd9a86a31cb89e09906521c7d3f5e3"
 dependencies = [
  "bitflags",
- "clap_derive 4.1.0",
- "clap_lex 0.3.2",
+ "clap_derive",
+ "clap_lex",
  "is-terminal",
  "once_cell",
  "strsim",
@@ -760,16 +743,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "clap_derive"
-version = "3.2.18"
+name = "clap_complete"
+version = "4.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea0c8bce528c4be4da13ea6fead8965e95b6073585a2f05204bd8f4119f82a65"
+checksum = "501ff0a401473ea1d4c3b125ff95506b62c5bc5768d818634195fbb7c4ad5ff4"
 dependencies = [
- "heck",
- "proc-macro-error",
- "proc-macro2",
- "quote",
- "syn",
+ "clap",
 ]
 
 [[package]]
@@ -783,15 +762,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "clap_lex"
-version = "0.2.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2850f2f5a82cbf437dd5af4d49848fbdfc27c157c3d010345776f952765261c5"
-dependencies = [
- "os_str_bytes",
 ]
 
 [[package]]
@@ -1465,6 +1435,19 @@ dependencies = [
 
 [[package]]
 name = "env_logger"
+version = "0.9.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a12e6657c4c97ebab115a42dcee77225f7f482cdd841cf7088c657a42e9e00e7"
+dependencies = [
+ "atty",
+ "humantime",
+ "log",
+ "regex",
+ "termcolor",
+]
+
+[[package]]
+name = "env_logger"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "85cdab6a89accf66733ad5a1693a4dcced6aeff64602b634530dd73c1f3ee9f0"
@@ -1650,13 +1633,13 @@ dependencies = [
 name = "fc-cli"
 version = "1.0.0-dev"
 dependencies = [
- "clap 4.1.6",
+ "clap",
  "ethereum-types",
  "fc-db",
- "fp-rpc 3.0.0-dev",
- "fp-storage 2.0.0",
+ "fp-rpc",
+ "fp-storage",
  "futures",
- "kitchensink-runtime",
+ "node-5ire-runtime",
  "parity-scale-codec",
  "sc-block-builder",
  "sc-cli",
@@ -1678,9 +1661,9 @@ version = "2.0.0-dev"
 dependencies = [
  "async-trait",
  "fc-db",
- "fp-consensus 2.0.0-dev",
- "fp-rpc 3.0.0-dev",
- "fp-storage 2.0.0",
+ "fp-consensus",
+ "fp-rpc",
+ "fp-storage",
  "sc-client-api",
  "sc-consensus",
  "sp-api",
@@ -1695,7 +1678,7 @@ dependencies = [
 name = "fc-db"
 version = "2.0.0-dev"
 dependencies = [
- "fp-storage 2.0.0",
+ "fp-storage",
  "futures",
  "kvdb-rocksdb",
  "log",
@@ -1719,8 +1702,8 @@ name = "fc-mapping-sync"
 version = "2.0.0-dev"
 dependencies = [
  "fc-db",
- "fp-consensus 2.0.0-dev",
- "fp-rpc 3.0.0-dev",
+ "fp-consensus",
+ "fp-rpc",
  "futures",
  "futures-timer",
  "log",
@@ -1739,12 +1722,12 @@ dependencies = [
  "evm",
  "fc-db",
  "fc-rpc-core",
- "fp-ethereum 1.0.0-dev",
- "fp-rpc 3.0.0-dev",
- "fp-storage 2.0.0",
+ "fp-ethereum",
+ "fp-rpc",
+ "fp-storage",
  "futures",
  "hex",
- "jsonrpsee 0.16.2",
+ "jsonrpsee",
  "libsecp256k1",
  "log",
  "lru",
@@ -1781,7 +1764,7 @@ version = "1.1.0-dev"
 dependencies = [
  "ethereum",
  "ethereum-types",
- "jsonrpsee 0.16.2",
+ "jsonrpsee",
  "rustc-hex",
  "serde",
  "serde_json",
@@ -1818,7 +1801,7 @@ version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "84f2e425d9790201ba4af4630191feac6dcc98765b118d4d18e91d23c2353866"
 dependencies = [
- "env_logger",
+ "env_logger 0.10.0",
  "log",
 ]
 
@@ -1854,32 +1837,39 @@ dependencies = [
 name = "firechain-node"
 version = "4.0.0-dev"
 dependencies = [
- "clap 3.2.23",
+ "array-bytes",
+ "clap",
+ "clap_complete",
  "fc-cli",
  "fc-consensus",
  "fc-db",
  "fc-mapping-sync",
  "fc-rpc",
  "fc-rpc-core",
- "fp-consensus 2.0.0-dev",
- "fp-dynamic-fee 1.0.0",
+ "fp-consensus",
+ "fp-dynamic-fee",
  "fp-evm 3.0.0-dev",
- "fp-rpc 3.0.0-dev",
- "fp-storage 2.0.0",
+ "fp-rpc",
+ "fp-storage",
  "frame-benchmarking",
  "frame-benchmarking-cli",
  "frame-system",
+ "frame-system-rpc-runtime-api",
  "futures",
  "hex",
  "hex-literal",
  "jsonrpc-core",
- "jsonrpsee 0.14.0",
+ "jsonrpsee",
+ "log",
  "node-5ire-runtime",
  "node-primitives",
+ "pallet-assets",
  "pallet-im-online",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc",
+ "parity-scale-codec",
  "rand 0.8.5",
+ "sc-authority-discovery",
  "sc-basic-authorship",
  "sc-chain-spec",
  "sc-cli",
@@ -1895,12 +1885,16 @@ dependencies = [
  "sc-finality-grandpa-rpc",
  "sc-keystore",
  "sc-network",
+ "sc-network-common",
  "sc-rpc",
  "sc-rpc-api",
  "sc-service",
+ "sc-sync-state-rpc",
+ "sc-sysinfo",
  "sc-telemetry",
  "sc-transaction-pool",
  "sc-transaction-pool-api",
+ "serde",
  "serde_json",
  "sp-api",
  "sp-authority-discovery",
@@ -1918,7 +1912,10 @@ dependencies = [
  "sp-timestamp",
  "sp-transaction-storage-proof",
  "substrate-build-script-utils",
+ "substrate-frame-cli",
  "substrate-frame-rpc-system",
+ "substrate-state-trie-migration-rpc",
+ "try-runtime-cli",
 ]
 
 [[package]]
@@ -1994,30 +1991,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "fp-consensus"
-version = "2.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
-dependencies = [
- "ethereum",
- "parity-scale-codec",
- "sp-core",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "fp-dynamic-fee"
 version = "1.0.0"
-dependencies = [
- "async-trait",
- "sp-core",
- "sp-inherents",
-]
-
-[[package]]
-name = "fp-dynamic-fee"
-version = "1.0.0"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
 dependencies = [
  "async-trait",
  "sp-core",
@@ -2031,20 +2006,6 @@ dependencies = [
  "ethereum",
  "ethereum-types",
  "fp-evm 3.0.0-dev",
- "frame-support",
- "num_enum",
- "parity-scale-codec",
- "sp-std",
-]
-
-[[package]]
-name = "fp-ethereum"
-version = "1.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
-dependencies = [
- "ethereum",
- "ethereum-types",
- "fp-evm 3.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
  "frame-support",
  "num_enum",
  "parity-scale-codec",
@@ -2091,22 +2052,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "fp-rpc"
-version = "3.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
-dependencies = [
- "ethereum",
- "ethereum-types",
- "fp-evm 3.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "parity-scale-codec",
- "scale-info",
- "sp-api",
- "sp-core",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "fp-self-contained"
 version = "1.0.0-dev"
 dependencies = [
@@ -2118,30 +2063,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "fp-self-contained"
-version = "1.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
-dependencies = [
- "frame-support",
- "parity-scale-codec",
- "scale-info",
- "sp-runtime",
-]
-
-[[package]]
 name = "fp-storage"
 version = "2.0.0"
 dependencies = [
  "parity-scale-codec",
  "serde",
-]
-
-[[package]]
-name = "fp-storage"
-version = "2.0.0"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
-dependencies = [
- "parity-scale-codec",
 ]
 
 [[package]]
@@ -2181,7 +2107,7 @@ dependencies = [
  "Inflector",
  "array-bytes",
  "chrono",
- "clap 4.1.6",
+ "clap",
  "comfy-table",
  "frame-benchmarking",
  "frame-support",
@@ -2280,6 +2206,25 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
+]
+
+[[package]]
+name = "frame-remote-externalities"
+version = "0.10.0-dev"
+source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
+dependencies = [
+ "env_logger 0.9.3",
+ "futures",
+ "log",
+ "parity-scale-codec",
+ "serde",
+ "serde_json",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-version",
+ "substrate-rpc-client",
+ "tokio",
 ]
 
 [[package]]
@@ -3144,55 +3089,37 @@ dependencies = [
 
 [[package]]
 name = "jsonrpsee"
-version = "0.14.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "11e017217fcd18da0a25296d3693153dd19c8a6aadab330b3595285d075385d1"
-dependencies = [
- "jsonrpsee-core 0.14.0",
- "jsonrpsee-http-server",
- "jsonrpsee-types 0.14.0",
- "jsonrpsee-ws-server",
-]
-
-[[package]]
-name = "jsonrpsee"
 version = "0.16.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7d291e3a5818a2384645fd9756362e6d89cf0541b0b916fa7702ea4a9833608e"
 dependencies = [
- "jsonrpsee-core 0.16.2",
+ "jsonrpsee-core",
  "jsonrpsee-proc-macros",
  "jsonrpsee-server",
- "jsonrpsee-types 0.16.2",
+ "jsonrpsee-types",
+ "jsonrpsee-ws-client",
  "tracing",
 ]
 
 [[package]]
-name = "jsonrpsee-core"
-version = "0.14.0"
+name = "jsonrpsee-client-transport"
+version = "0.16.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "16efcd4477de857d4a2195a45769b2fe9ebb54f3ef5a4221d3b014a4fe33ec0b"
+checksum = "965de52763f2004bc91ac5bcec504192440f0b568a5d621c59d9dbd6f886c3fb"
 dependencies = [
- "anyhow",
- "arrayvec 0.7.2",
- "async-trait",
- "beef",
- "futures-channel",
  "futures-util",
- "globset",
- "hyper",
- "jsonrpsee-types 0.14.0",
- "lazy_static",
- "parking_lot 0.12.1",
- "rand 0.8.5",
- "rustc-hash",
- "serde",
- "serde_json",
+ "http",
+ "jsonrpsee-core",
+ "jsonrpsee-types",
+ "pin-project",
+ "rustls-native-certs",
  "soketto",
  "thiserror",
  "tokio",
+ "tokio-rustls",
+ "tokio-util",
  "tracing",
- "unicase",
+ "webpki-roots",
 ]
 
 [[package]]
@@ -3203,13 +3130,15 @@ checksum = "a4e70b4439a751a5de7dd5ed55eacff78ebf4ffe0fc009cb1ebb11417f5b536b"
 dependencies = [
  "anyhow",
  "arrayvec 0.7.2",
+ "async-lock",
  "async-trait",
  "beef",
  "futures-channel",
+ "futures-timer",
  "futures-util",
  "globset",
  "hyper",
- "jsonrpsee-types 0.16.2",
+ "jsonrpsee-types",
  "parking_lot 0.12.1",
  "rand 0.8.5",
  "rustc-hash",
@@ -3217,23 +3146,6 @@ dependencies = [
  "serde_json",
  "soketto",
  "thiserror",
- "tokio",
- "tracing",
-]
-
-[[package]]
-name = "jsonrpsee-http-server"
-version = "0.14.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bdd69efeb3ce2cba767f126872f4eeb4624038a29098e75d77608b2b4345ad03"
-dependencies = [
- "futures-channel",
- "futures-util",
- "hyper",
- "jsonrpsee-core 0.14.0",
- "jsonrpsee-types 0.14.0",
- "serde",
- "serde_json",
  "tokio",
  "tracing",
 ]
@@ -3261,8 +3173,8 @@ dependencies = [
  "futures-util",
  "http",
  "hyper",
- "jsonrpsee-core 0.16.2",
- "jsonrpsee-types 0.16.2",
+ "jsonrpsee-core",
+ "jsonrpsee-types",
  "serde",
  "serde_json",
  "soketto",
@@ -3270,20 +3182,6 @@ dependencies = [
  "tokio-stream",
  "tokio-util",
  "tower",
- "tracing",
-]
-
-[[package]]
-name = "jsonrpsee-types"
-version = "0.14.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3bcf76cd316f5d3ad48138085af1f45e2c58c98e02f0779783dbb034d43f7c86"
-dependencies = [
- "anyhow",
- "beef",
- "serde",
- "serde_json",
- "thiserror",
  "tracing",
 ]
 
@@ -3302,21 +3200,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "jsonrpsee-ws-server"
-version = "0.14.0"
+name = "jsonrpsee-ws-client"
+version = "0.16.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2bd2e4d266774a671f8def3794255b28eddd09b18d76e0b913fa439f34588c0a"
+checksum = "0b83daeecfc6517cfe210df24e570fb06213533dfb990318fae781f4c7119dd9"
 dependencies = [
- "futures-channel",
- "futures-util",
- "jsonrpsee-core 0.14.0",
- "jsonrpsee-types 0.14.0",
- "serde_json",
- "soketto",
- "tokio",
- "tokio-stream",
- "tokio-util",
- "tracing",
+ "http",
+ "jsonrpsee-client-transport",
+ "jsonrpsee-core",
+ "jsonrpsee-types",
 ]
 
 [[package]]
@@ -3338,106 +3230,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3afef3b6eff9ce9d8ff9b3601125eec7f0c8cbac7abd14f355d053fa56c98768"
 dependencies = [
  "cpufeatures",
-]
-
-[[package]]
-name = "kitchensink-runtime"
-version = "3.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
-dependencies = [
- "fp-rpc 3.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "fp-self-contained 1.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "frame-election-provider-support",
- "frame-executive",
- "frame-support",
- "frame-system",
- "frame-system-rpc-runtime-api",
- "log",
- "node-primitives",
- "pallet-alliance",
- "pallet-asset-tx-payment",
- "pallet-assets",
- "pallet-authority-discovery",
- "pallet-authorship",
- "pallet-babe",
- "pallet-bags-list",
- "pallet-balances",
- "pallet-base-fee 1.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "pallet-bounties",
- "pallet-child-bounties",
- "pallet-collective",
- "pallet-contracts",
- "pallet-contracts-primitives",
- "pallet-conviction-voting",
- "pallet-democracy",
- "pallet-dynamic-fee 4.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "pallet-election-provider-multi-phase",
- "pallet-elections-phragmen",
- "pallet-esg",
- "pallet-ethereum 4.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "pallet-evm 6.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "pallet-evm-chain-id",
- "pallet-evm-precompile-modexp 2.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "pallet-evm-precompile-sha3fips 2.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "pallet-evm-precompile-simple 2.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "pallet-fast-unstake",
- "pallet-grandpa",
- "pallet-hotfix-sufficients 1.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "pallet-identity",
- "pallet-im-online",
- "pallet-indices",
- "pallet-lottery",
- "pallet-membership",
- "pallet-message-queue",
- "pallet-mmr",
- "pallet-multisig",
- "pallet-nis",
- "pallet-nomination-pools",
- "pallet-nomination-pools-runtime-api",
- "pallet-offences",
- "pallet-preimage",
- "pallet-proxy",
- "pallet-randomness-collective-flip",
- "pallet-ranked-collective",
- "pallet-recovery",
- "pallet-referenda",
- "pallet-remark",
- "pallet-root-testing",
- "pallet-scheduler",
- "pallet-session",
- "pallet-society",
- "pallet-staking",
- "pallet-staking-reward-curve",
- "pallet-state-trie-migration",
- "pallet-sudo",
- "pallet-timestamp",
- "pallet-tips",
- "pallet-transaction-payment",
- "pallet-transaction-payment-rpc-runtime-api",
- "pallet-transaction-storage",
- "pallet-treasury",
- "pallet-uniques",
- "pallet-utility",
- "pallet-vesting",
- "pallet-whitelist",
- "parity-scale-codec",
- "scale-info",
- "sp-api",
- "sp-authority-discovery",
- "sp-block-builder",
- "sp-consensus-babe",
- "sp-core",
- "sp-inherents",
- "sp-io",
- "sp-offchain",
- "sp-runtime",
- "sp-session",
- "sp-staking",
- "sp-std",
- "sp-transaction-pool",
- "sp-version",
- "static_assertions",
- "substrate-wasm-builder",
 ]
 
 [[package]]
@@ -4384,8 +4176,8 @@ dependencies = [
 name = "node-5ire-runtime"
 version = "4.0.0-dev"
 dependencies = [
- "fp-rpc 3.0.0-dev",
- "fp-self-contained 1.0.0-dev",
+ "fp-rpc",
+ "fp-self-contained",
  "frame-benchmarking",
  "frame-election-provider-support",
  "frame-executive",
@@ -4394,39 +4186,46 @@ dependencies = [
  "frame-system-benchmarking",
  "frame-system-rpc-runtime-api",
  "frame-try-runtime",
- "hex-literal",
  "log",
  "node-primitives",
  "pallet-alliance",
+ "pallet-asset-tx-payment",
+ "pallet-assets",
  "pallet-authority-discovery",
  "pallet-authorship",
  "pallet-babe",
  "pallet-bags-list",
  "pallet-balances",
- "pallet-base-fee 1.0.0",
+ "pallet-base-fee",
+ "pallet-bounties",
+ "pallet-child-bounties",
  "pallet-collective",
  "pallet-contracts",
  "pallet-contracts-primitives",
  "pallet-conviction-voting",
  "pallet-democracy",
- "pallet-dynamic-fee 4.0.0-dev",
+ "pallet-dynamic-fee",
  "pallet-election-provider-multi-phase",
  "pallet-election-provider-support-benchmarking",
  "pallet-elections-phragmen",
  "pallet-esg",
- "pallet-ethereum 4.0.0-dev",
- "pallet-evm 6.0.0-dev",
- "pallet-evm-precompile-modexp 2.0.0-dev",
- "pallet-evm-precompile-sha3fips 2.0.0-dev",
+ "pallet-ethereum",
+ "pallet-evm",
+ "pallet-evm-precompile-modexp",
+ "pallet-evm-precompile-sha3fips",
  "pallet-evm-precompile-simple 2.0.0-dev",
  "pallet-fast-unstake",
  "pallet-grandpa",
- "pallet-hotfix-sufficients 1.0.0",
+ "pallet-hotfix-sufficients",
  "pallet-identity",
  "pallet-im-online",
  "pallet-indices",
+ "pallet-lottery",
  "pallet-membership",
  "pallet-message-queue",
+ "pallet-mmr",
+ "pallet-multisig",
+ "pallet-nis",
  "pallet-nomination-pools",
  "pallet-nomination-pools-benchmarking",
  "pallet-nomination-pools-runtime-api",
@@ -4436,22 +4235,30 @@ dependencies = [
  "pallet-proxy",
  "pallet-randomness-collective-flip",
  "pallet-ranked-collective",
+ "pallet-recovery",
  "pallet-referenda",
+ "pallet-remark",
+ "pallet-root-testing",
  "pallet-scheduler",
  "pallet-session",
  "pallet-session-benchmarking",
+ "pallet-society",
  "pallet-staking",
  "pallet-staking-reward-curve",
+ "pallet-state-trie-migration",
  "pallet-sudo",
  "pallet-timestamp",
  "pallet-tips",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc-runtime-api",
+ "pallet-transaction-storage",
  "pallet-treasury",
+ "pallet-uniques",
  "pallet-utility",
+ "pallet-vesting",
+ "pallet-whitelist",
  "parity-scale-codec",
  "scale-info",
- "serde",
  "sp-api",
  "sp-authority-discovery",
  "sp-block-builder",
@@ -4459,7 +4266,6 @@ dependencies = [
  "sp-core",
  "sp-inherents",
  "sp-io",
- "sp-npos-elections",
  "sp-offchain",
  "sp-runtime",
  "sp-session",
@@ -4711,11 +4517,13 @@ name = "pallet-asset-tx-payment"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "pallet-transaction-payment",
  "parity-scale-codec",
  "scale-info",
+ "serde",
  "sp-core",
  "sp-io",
  "sp-runtime",
@@ -4727,6 +4535,7 @@ name = "pallet-assets"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
@@ -4841,24 +4650,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-base-fee"
-version = "1.0.0"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
-dependencies = [
- "fp-evm 3.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "scale-info",
- "sp-core",
- "sp-runtime",
-]
-
-[[package]]
 name = "pallet-bounties"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "log",
@@ -4876,6 +4672,7 @@ name = "pallet-child-bounties"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "log",
@@ -4996,7 +4793,7 @@ dependencies = [
 name = "pallet-dynamic-fee"
 version = "4.0.0-dev"
 dependencies = [
- "fp-dynamic-fee 1.0.0",
+ "fp-dynamic-fee",
  "fp-evm 3.0.0-dev",
  "frame-support",
  "frame-system",
@@ -5006,23 +4803,6 @@ dependencies = [
  "sp-core",
  "sp-inherents",
  "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-dynamic-fee"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
-dependencies = [
- "fp-dynamic-fee 1.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "fp-evm 3.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "scale-info",
- "sp-core",
- "sp-inherents",
  "sp-runtime",
  "sp-std",
 ]
@@ -5109,49 +4889,23 @@ dependencies = [
  "ethereum",
  "ethereum-types",
  "evm",
- "fp-consensus 2.0.0-dev",
- "fp-ethereum 1.0.0-dev",
+ "fp-consensus",
+ "fp-ethereum",
  "fp-evm 3.0.0-dev",
- "fp-rpc 3.0.0-dev",
- "fp-self-contained 1.0.0-dev",
- "fp-storage 2.0.0",
+ "fp-rpc",
+ "fp-self-contained",
+ "fp-storage",
  "frame-support",
  "frame-system",
  "hex",
  "libsecp256k1",
  "pallet-balances",
- "pallet-evm 6.0.0-dev",
+ "pallet-evm",
  "pallet-timestamp",
  "parity-scale-codec",
  "rlp",
  "scale-info",
  "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-ethereum"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
-dependencies = [
- "ethereum",
- "ethereum-types",
- "evm",
- "fp-consensus 2.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "fp-ethereum 1.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "fp-evm 3.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "fp-rpc 3.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "fp-self-contained 1.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "fp-storage 2.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "frame-support",
- "frame-system",
- "pallet-evm 6.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "pallet-timestamp",
- "parity-scale-codec",
- "rlp",
- "scale-info",
  "sp-io",
  "sp-runtime",
  "sp-std",
@@ -5182,38 +4936,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-evm"
-version = "6.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
-dependencies = [
- "evm",
- "fp-evm 3.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "frame-support",
- "frame-system",
- "hex",
- "log",
- "pallet-timestamp",
- "parity-scale-codec",
- "rlp",
- "scale-info",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-evm-chain-id"
-version = "1.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
-dependencies = [
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "scale-info",
-]
-
-[[package]]
 name = "pallet-evm-precompile-modexp"
 version = "2.0.0-dev"
 dependencies = [
@@ -5224,28 +4946,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-evm-precompile-modexp"
-version = "2.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
-dependencies = [
- "fp-evm 3.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "num",
-]
-
-[[package]]
 name = "pallet-evm-precompile-sha3fips"
 version = "2.0.0-dev"
 dependencies = [
  "fp-evm 3.0.0-dev",
- "tiny-keccak",
-]
-
-[[package]]
-name = "pallet-evm-precompile-sha3fips"
-version = "2.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
-dependencies = [
- "fp-evm 3.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
  "tiny-keccak",
 ]
 
@@ -5330,26 +5034,11 @@ dependencies = [
  "frame-benchmarking",
  "frame-support",
  "frame-system",
- "pallet-evm 6.0.0-dev",
+ "pallet-evm",
  "parity-scale-codec",
  "scale-info",
  "sp-core",
  "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-hotfix-sufficients"
-version = "1.0.0"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
-dependencies = [
- "frame-support",
- "frame-system",
- "pallet-evm 6.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
- "parity-scale-codec",
- "scale-info",
- "sp-core",
  "sp-runtime",
  "sp-std",
 ]
@@ -5412,6 +5101,7 @@ name = "pallet-lottery"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
@@ -5461,6 +5151,7 @@ name = "pallet-mmr"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
@@ -5477,6 +5168,7 @@ name = "pallet-multisig"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "log",
@@ -5492,6 +5184,7 @@ name = "pallet-nis"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
@@ -5658,6 +5351,7 @@ name = "pallet-recovery"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
@@ -5691,10 +5385,12 @@ name = "pallet-remark"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
  "scale-info",
+ "serde",
  "sp-core",
  "sp-io",
  "sp-runtime",
@@ -5823,6 +5519,7 @@ name = "pallet-state-trie-migration"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "log",
@@ -5906,7 +5603,7 @@ name = "pallet-transaction-payment-rpc"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
 dependencies = [
- "jsonrpsee 0.16.2",
+ "jsonrpsee",
  "pallet-transaction-payment-rpc-runtime-api",
  "parity-scale-codec",
  "sp-api",
@@ -5934,12 +5631,15 @@ name = "pallet-transaction-storage"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
 dependencies = [
+ "array-bytes",
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "log",
  "pallet-balances",
  "parity-scale-codec",
  "scale-info",
+ "serde",
  "sp-inherents",
  "sp-io",
  "sp-runtime",
@@ -5969,6 +5669,7 @@ name = "pallet-uniques"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "log",
@@ -5999,6 +5700,7 @@ name = "pallet-vesting"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "log",
@@ -6013,6 +5715,7 @@ name = "pallet-whitelist"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
@@ -7044,6 +6747,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "sc-authority-discovery"
+version = "0.10.0-dev"
+source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
+dependencies = [
+ "async-trait",
+ "futures",
+ "futures-timer",
+ "ip_network",
+ "libp2p",
+ "log",
+ "parity-scale-codec",
+ "prost",
+ "prost-build",
+ "rand 0.7.3",
+ "sc-client-api",
+ "sc-network-common",
+ "sp-api",
+ "sp-authority-discovery",
+ "sp-blockchain",
+ "sp-core",
+ "sp-keystore",
+ "sp-runtime",
+ "substrate-prometheus-endpoint 0.10.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
+ "thiserror",
+]
+
+[[package]]
 name = "sc-basic-authorship"
 version = "0.10.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
@@ -7117,7 +6847,7 @@ source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_r
 dependencies = [
  "array-bytes",
  "chrono",
- "clap 4.1.6",
+ "clap",
  "fdlimit",
  "futures",
  "libp2p",
@@ -7275,7 +7005,7 @@ version = "0.10.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
 dependencies = [
  "futures",
- "jsonrpsee 0.16.2",
+ "jsonrpsee",
  "sc-consensus-babe",
  "sc-consensus-epochs",
  "sc-rpc-api",
@@ -7454,7 +7184,7 @@ source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_r
 dependencies = [
  "finality-grandpa",
  "futures",
- "jsonrpsee 0.16.2",
+ "jsonrpsee",
  "log",
  "parity-scale-codec",
  "sc-client-api",
@@ -7741,7 +7471,7 @@ source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_r
 dependencies = [
  "futures",
  "hash-db",
- "jsonrpsee 0.16.2",
+ "jsonrpsee",
  "log",
  "parity-scale-codec",
  "parking_lot 0.12.1",
@@ -7770,7 +7500,7 @@ version = "0.10.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
 dependencies = [
  "futures",
- "jsonrpsee 0.16.2",
+ "jsonrpsee",
  "log",
  "parity-scale-codec",
  "parking_lot 0.12.1",
@@ -7794,7 +7524,7 @@ source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_r
 dependencies = [
  "futures",
  "http",
- "jsonrpsee 0.16.2",
+ "jsonrpsee",
  "log",
  "serde_json",
  "substrate-prometheus-endpoint 0.10.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc)",
@@ -7810,7 +7540,7 @@ source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_r
 dependencies = [
  "futures",
  "hex",
- "jsonrpsee 0.16.2",
+ "jsonrpsee",
  "parity-scale-codec",
  "sc-chain-spec",
  "sc-transaction-pool-api",
@@ -7833,7 +7563,7 @@ dependencies = [
  "futures",
  "futures-timer",
  "hash-db",
- "jsonrpsee 0.16.2",
+ "jsonrpsee",
  "log",
  "parity-scale-codec",
  "parking_lot 0.12.1",
@@ -7902,6 +7632,25 @@ dependencies = [
  "parking_lot 0.12.1",
  "sc-client-api",
  "sp-core",
+]
+
+[[package]]
+name = "sc-sync-state-rpc"
+version = "0.10.0-dev"
+source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
+dependencies = [
+ "jsonrpsee",
+ "parity-scale-codec",
+ "sc-chain-spec",
+ "sc-client-api",
+ "sc-consensus-babe",
+ "sc-consensus-epochs",
+ "sc-finality-grandpa",
+ "serde",
+ "serde_json",
+ "sp-blockchain",
+ "sp-runtime",
+ "thiserror",
 ]
 
 [[package]]
@@ -9290,13 +9039,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "substrate-frame-cli"
+version = "4.0.0-dev"
+source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
+dependencies = [
+ "clap",
+ "frame-support",
+ "frame-system",
+ "sc-cli",
+ "sp-core",
+ "sp-runtime",
+]
+
+[[package]]
 name = "substrate-frame-rpc-system"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
 dependencies = [
  "frame-system-rpc-runtime-api",
  "futures",
- "jsonrpsee 0.16.2",
+ "jsonrpsee",
  "log",
  "parity-scale-codec",
  "sc-client-api",
@@ -9334,6 +9096,40 @@ dependencies = [
  "prometheus",
  "thiserror",
  "tokio",
+]
+
+[[package]]
+name = "substrate-rpc-client"
+version = "0.10.0-dev"
+source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
+dependencies = [
+ "async-trait",
+ "jsonrpsee",
+ "log",
+ "sc-rpc-api",
+ "serde",
+ "sp-runtime",
+]
+
+[[package]]
+name = "substrate-state-trie-migration-rpc"
+version = "4.0.0-dev"
+source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
+dependencies = [
+ "jsonrpsee",
+ "log",
+ "parity-scale-codec",
+ "sc-client-api",
+ "sc-rpc-api",
+ "scale-info",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-state-machine",
+ "sp-std",
+ "sp-trie",
+ "trie-db",
 ]
 
 [[package]]
@@ -9530,12 +9326,6 @@ name = "termtree"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "95059e91184749cb66be6dc994f67f182b6d897cb3df74a5bf66b5e709295fd8"
-
-[[package]]
-name = "textwrap"
-version = "0.16.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "222a222a5bfe1bba4a77b45ec488a741b3cb8872e5e499451fd7d0129c9c7c3d"
 
 [[package]]
 name = "thiserror"
@@ -9936,6 +9726,36 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3528ecfd12c466c6f163363caf2d02a71161dd5e1cc6ae7b34207ea2d42d81ed"
 
 [[package]]
+name = "try-runtime-cli"
+version = "0.10.0-dev"
+source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=new_Evm_rpc#76ec2fe2022d02610bf283991d2d8fd0cac90670"
+dependencies = [
+ "clap",
+ "frame-remote-externalities",
+ "hex",
+ "log",
+ "parity-scale-codec",
+ "sc-chain-spec",
+ "sc-cli",
+ "sc-executor",
+ "sc-service",
+ "serde",
+ "sp-api",
+ "sp-core",
+ "sp-debug-derive",
+ "sp-externalities",
+ "sp-io",
+ "sp-keystore",
+ "sp-rpc",
+ "sp-runtime",
+ "sp-state-machine",
+ "sp-version",
+ "sp-weights",
+ "substrate-rpc-client",
+ "zstd",
+]
+
+[[package]]
 name = "tt-call"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9975,15 +9795,6 @@ dependencies = [
  "crunchy",
  "hex",
  "static_assertions",
-]
-
-[[package]]
-name = "unicase"
-version = "2.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "50f37be617794602aabbeee0be4f259dc1778fabe05e2d67ee8f79326d5cb4f6"
-dependencies = [
- "version_check",
 ]
 
 [[package]]

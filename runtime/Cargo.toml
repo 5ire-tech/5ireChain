@@ -12,196 +12,223 @@ repository = ""
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
-codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = ["derive"] }
-scale-info = { version = "2.0.1", default-features = false, features = ["derive"] }
+# codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = ["derive"] }
+# scale-info = { version = "2.0.1", default-features = false, features = ["derive"] }
+# static_assertions = "1.1.0"
+# log = { version = "0.4.14", default-features = false }
+
+# third-party dependencies
+codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = [
+	"derive",
+	"max-encoded-len",
+] }
+scale-info = { version = "2.1.1", default-features = false, features = ["derive"] }
 static_assertions = "1.1.0"
-log = { version = "0.4.14", default-features = false }
-
-pallet-authorship = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-babe = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-balances = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-frame-support = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-grandpa = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-randomness-collective-flip = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-sudo = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-frame-system = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-frame-try-runtime = { version = "0.10.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-timestamp = { version = "4.0.0-dev", default-features = false, optional = true, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-transaction-payment = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-bags-list = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-session = { version = "4.0.0-dev", default-features = false, features = [ "historical" ], git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-nomination-pools = { version = "1.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-nomination-pools-benchmarking = { version = "1.0.0", default-features = false, optional = true, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-staking = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-staking-reward-curve = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-election-provider-multi-phase = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-frame-election-provider-support = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-frame-executive = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-utility = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-offences = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-offences-benchmarking = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", optional = true }
-pallet-im-online = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-session-benchmarking = { version = "4.0.0-dev",  git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false, optional = true }
-pallet-election-provider-support-benchmarking = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", optional = true }
-pallet-identity = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-
-pallet-contracts = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-contracts-primitives = { version = "7.0.0", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
-#pallet-contracts-rpc-runtime-api = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-
-pallet-authority-discovery = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
-pallet-nomination-pools-runtime-api = { version = "1.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
-
-pallet-esg = { version = "1.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", optional = true }
-pallet-alliance = { version = "4.0.0-dev",default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-tips = { version = "4.0.0-dev",default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-referenda = { version = "4.0.0-dev",default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-
+log = { version = "0.4.17", default-features = false }
 
 # primitives
-node-primitives = { version = "2.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false }
-sp-api = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-sp-block-builder = {  version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+sp-authority-discovery = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
 sp-consensus-babe = { version = "0.10.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-sp-core = { version = "7.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+sp-block-builder = { git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false, version = "4.0.0-dev" }
 sp-inherents = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+node-primitives = { version = "2.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
 sp-offchain = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-sp-runtime = { version = "7.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-sp-io = { version = "7.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+sp-core = { version = "7.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+sp-std = { version = "5.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+sp-api = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+sp-runtime = { version = "7.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
 sp-staking = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-sp-npos-elections = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-sp-session = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-sp-std = { version = "5.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+sp-session = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
 sp-transaction-pool = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-sp-version = { version = "5.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-sp-authority-discovery = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-indices = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-ranked-collective = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-conviction-voting = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+sp-version = { version = "5.0.0", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+sp-io = { version = "7.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
 
-
-# governance pallets
-pallet-scheduler = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-treasury = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-collective = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-membership = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-democracy = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-preimage = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-elections-phragmen = { version = "5.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-proxy = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-# Used for the node template's RPCs
-frame-system-rpc-runtime-api = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-transaction-payment-rpc-runtime-api = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-
-# Used for runtime benchmarking
+# frame dependencies
+frame-executive = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
 frame-benchmarking = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", optional = true }
+frame-support = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+frame-system = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
 frame-system-benchmarking = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", optional = true }
-hex-literal = { version = "0.3.4", optional = true }
+frame-election-provider-support = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+frame-system-rpc-runtime-api = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+frame-try-runtime = { version = "0.10.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", optional = true }
+pallet-alliance = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-assets = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-authority-discovery = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-authorship = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-babe = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-bags-list = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-balances = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-bounties = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-child-bounties = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-collective = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-contracts = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-contracts-primitives = { version = "7.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-conviction-voting = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-democracy = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-election-provider-multi-phase = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-election-provider-support-benchmarking = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", optional = true }
+pallet-elections-phragmen = { version = "5.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-fast-unstake = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-nis = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-grandpa = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-im-online = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-indices = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-identity = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-lottery = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-membership = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-message-queue = { version = "7.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-mmr = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-multisig = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-nomination-pools = { version = "1.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-nomination-pools-benchmarking = { version = "1.0.0", default-features = false, optional = true, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-nomination-pools-runtime-api = { version = "1.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-offences = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-offences-benchmarking = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false, optional = true }
+pallet-preimage = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-proxy = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-randomness-collective-flip = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-ranked-collective = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-recovery = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-referenda = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-remark = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-root-testing = { version = "1.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-session = { version = "4.0.0-dev", features = [ "historical" ],git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false }
+pallet-session-benchmarking = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false, optional = true }
+pallet-staking = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-staking-reward-curve = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-state-trie-migration = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-scheduler = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-society = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-sudo = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-timestamp = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-tips = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-treasury = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-utility = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-transaction-payment = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-transaction-payment-rpc-runtime-api = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-asset-tx-payment = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
+pallet-transaction-storage = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-uniques = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-vesting = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-whitelist = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc"}
+pallet-esg = {version = "1.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
 
-# Local Dependencies
+# pallet-evm = { version="6.0.0-dev", path = "../../../evm-frame/evm", default-features = false }
+
 
 # Frontier
-fp-rpc = { path = "../primitives/rpc", default-features = false }
-fp-self-contained = { path = "../primitives/self-contained", default-features = false }
+fp-rpc = {version="3.0.0-dev", path = "../primitives/rpc", default-features = false }
+fp-self-contained = {version="1.0.0-dev", path = "../primitives/self-contained", default-features = false }
+
+
 # Frontier FRAME
-pallet-base-fee = { path = "../frame/base-fee", default-features = false }
-pallet-dynamic-fee = { path = "../frame/dynamic-fee", default-features = false }
-pallet-ethereum = { path = "../frame/ethereum", default-features = false }
-pallet-evm = { path = "../frame/evm", default-features = false }
-pallet-evm-precompile-modexp = { path = "../frame/evm/precompile/modexp", default-features = false }
-pallet-evm-precompile-sha3fips = { path = "../frame/evm/precompile/sha3fips", default-features = false }
-pallet-evm-precompile-simple = { path = "../frame/evm/precompile/simple", default-features = false }
-pallet-hotfix-sufficients = { path = "../frame/hotfix-sufficients", default-features = false }
-pallet-message-queue = { version = "7.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-pallet-fast-unstake = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-
-
-
-
+pallet-base-fee = {version="1.0.0", path = "../frame/base-fee", default-features = false }
+pallet-dynamic-fee = {version = "4.0.0-dev", path = "../frame/dynamic-fee", default-features = false }
+pallet-ethereum = {version = "4.0.0-dev", path = "../frame/ethereum", default-features = false }
+pallet-evm = { version="6.0.0-dev", path = "../frame/evm", default-features = false }
+pallet-evm-precompile-modexp = {version = "2.0.0-dev", path = "../frame/evm/precompile/modexp", default-features = false }
+pallet-evm-precompile-sha3fips = {version = "2.0.0-dev", path = "../frame/evm/precompile/sha3fips", default-features = false }
+pallet-evm-precompile-simple = {version = "2.0.0-dev", path = "../frame/evm/precompile/simple", default-features = false }
+pallet-hotfix-sufficients = {version = "1.0.0", path = "../frame/hotfix-sufficients", default-features = false }
+# pallet-evm-chain-id = { version = "1.0.0-dev", path = "../frame/evm-chain-id", default-features = false }
 [build-dependencies]
 substrate-wasm-builder = { version = "5.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc" }
-
-
-#Frontier
-[dependencies.serde]
-features = ['derive']
-optional = true
-version = '1.0.101'
-
-
 
 [features]
 default = ["std"]
 with-tracing = ["frame-executive/with-tracing"]
 std = [
-	"sp-authority-discovery/std",
-	"codec/std",
-	"scale-info/std",
-	"log/std",
-	"frame-executive/std",
-	"frame-support/std",
-	"frame-system-rpc-runtime-api/std",
-	"frame-system/std",
-	"frame-benchmarking?/std",
+	"pallet-whitelist/std",
+	"pallet-offences-benchmarking?/std",
 	"pallet-election-provider-support-benchmarking?/std",
-	"frame-try-runtime/std",
+	"pallet-asset-tx-payment/std",
+	"frame-system-benchmarking?/std",
+	"frame-election-provider-support/std",
+	"sp-authority-discovery/std",
+	"pallet-assets/std",
 	"pallet-authority-discovery/std",
 	"pallet-authorship/std",
-	"pallet-alliance/std",
+	"sp-consensus-babe/std",
 	"pallet-babe/std",
+	"pallet-bags-list/std",
 	"pallet-balances/std",
-	"pallet-grandpa/std",
-	"pallet-randomness-collective-flip/std",
-	"pallet-sudo/std",
-	"pallet-scheduler/std",
-	"pallet-treasury/std",
+	"pallet-bounties/std",
+	"sp-block-builder/std",
+	"codec/std",
+	"scale-info/std",
 	"pallet-collective/std",
 	"pallet-contracts/std",
 	"pallet-contracts-primitives/std",
-	#"pallet-contracts-rpc-runtime-api/std",
-	"pallet-ranked-collective/std",
-	"pallet-tips/std",
-	"pallet-referenda/std",
 	"pallet-conviction-voting/std",
-
-	"pallet-membership/std",
 	"pallet-democracy/std",
-	"pallet-indices/std",
 	"pallet-elections-phragmen/std",
+	"pallet-fast-unstake/std",
+	"frame-executive/std",
+	"pallet-nis/std",
+	"pallet-grandpa/std",
+	"pallet-im-online/std",
+	"pallet-indices/std",
+	"sp-inherents/std",
+	"pallet-lottery/std",
+	"pallet-membership/std",
+	"pallet-message-queue/std",
+	"pallet-mmr/std",
+	"pallet-multisig/std",
+	"pallet-nomination-pools/std",
+	"pallet-nomination-pools-runtime-api/std",
+	"pallet-nomination-pools-benchmarking?/std",
+	"pallet-identity/std",
+	"pallet-scheduler/std",
+	"node-primitives/std",
+	"sp-offchain/std",
+	"pallet-offences/std",
 	"pallet-preimage/std",
-	"pallet-timestamp/std",
-	"pallet-transaction-payment-rpc-runtime-api/std",
-	"pallet-transaction-payment/std",
-	"pallet-bags-list/std",
+	"pallet-proxy/std",
+	"sp-core/std",
+	"pallet-randomness-collective-flip/std",
+	"sp-std/std",
 	"pallet-session/std",
 	"pallet-session-benchmarking?/std",
-	"pallet-proxy/std",
-	"pallet-nomination-pools/std",
-	"pallet-staking/std",
-	"pallet-offences/std",
-	"pallet-election-provider-multi-phase/std",
-	"pallet-utility/std",
-	"pallet-im-online/std",
-	"pallet-esg/std",
-	"pallet-identity/std",
-	"pallet-message-queue/std",
-	"pallet-fast-unstake/std",
 	"sp-api/std",
-	"sp-block-builder/std",
-	"sp-consensus-babe/std",
-	"sp-core/std",
-	"sp-inherents/std",
-	"sp-offchain/std",
 	"sp-runtime/std",
-	"sp-session/std",
 	"sp-staking/std",
-	"sp-npos-elections/std",
-	"sp-std/std",
+	"pallet-staking/std",
+	"pallet-state-trie-migration/std",
+	"sp-session/std",
+	"pallet-sudo/std",
+	"frame-support/std",
+	"frame-benchmarking?/std",
+	"frame-system-rpc-runtime-api/std",
+	"frame-system/std",
+	"pallet-election-provider-multi-phase/std",
+	"pallet-timestamp/std",
+	"pallet-tips/std",
+	"pallet-transaction-payment-rpc-runtime-api/std",
+	"pallet-transaction-payment/std",
+	"pallet-transaction-storage/std",
+	"pallet-treasury/std",
 	"sp-transaction-pool/std",
+	"pallet-utility/std",
 	"sp-version/std",
-	"node-primitives/std",
+	"pallet-society/std",
+	"pallet-ranked-collective/std",
+	"pallet-referenda/std",
+	"pallet-remark/std",
+	"pallet-root-testing/std",
+	"pallet-recovery/std",
+	"pallet-uniques/std",
+	"pallet-vesting/std",
+	"log/std",
+	"frame-try-runtime?/std",
+	"sp-io/std",
+	"pallet-child-bounties/std",
+	"pallet-alliance/std",
+	"pallet-esg/std",
+	
+
 	#frontier
-	 'fp-rpc/std',
+	'fp-rpc/std',
     'fp-self-contained/std',
     'pallet-base-fee/std',
     'pallet-dynamic-fee/std',
@@ -210,99 +237,124 @@ std = [
     'pallet-evm-precompile-simple/std',
     'pallet-evm-precompile-sha3fips/std',
 	"pallet-evm-precompile-simple/std",
-	"pallet-nomination-pools-runtime-api/std",
-	"pallet-nomination-pools-benchmarking?/std",
+
 ]
 runtime-benchmarks = [
 	"frame-benchmarking/runtime-benchmarks",
 	"frame-support/runtime-benchmarks",
-	"frame-system-benchmarking/runtime-benchmarks",
-	"hex-literal",
-	"pallet-authority-discovery/try-runtime",
-	"pallet-alliance/runtime-benchmarks",
-	"pallet-indices/runtime-benchmarks",
-	"pallet-session-benchmarking/runtime-benchmarks",
-	"pallet-babe/runtime-benchmarks",
-	"pallet-election-provider-multi-phase/runtime-benchmarks",
-	"pallet-proxy/runtime-benchmarks",
-	"pallet-ranked-collective/runtime-benchmarks",
-	"pallet-staking/runtime-benchmarks",
-	"pallet-balances/runtime-benchmarks",
-	"pallet-timestamp/runtime-benchmarks",
-	"pallet-utility/runtime-benchmarks",
-	"pallet-im-online/runtime-benchmarks",
-	"pallet-offences-benchmarking",
+	"frame-system/runtime-benchmarks",
 	"sp-runtime/runtime-benchmarks",
-	"pallet-scheduler/runtime-benchmarks",
-	"pallet-treasury/runtime-benchmarks",
+	"pallet-alliance/runtime-benchmarks",
+	"pallet-assets/runtime-benchmarks",
+	"pallet-babe/runtime-benchmarks",
+	"pallet-bags-list/runtime-benchmarks",
+	"pallet-balances/runtime-benchmarks",
+	"pallet-bounties/runtime-benchmarks",
+	"pallet-child-bounties/runtime-benchmarks",
 	"pallet-collective/runtime-benchmarks",
 	"pallet-contracts/runtime-benchmarks",
-	"pallet-membership/runtime-benchmarks",
+	"pallet-conviction-voting/runtime-benchmarks",
 	"pallet-democracy/runtime-benchmarks",
-	"pallet-elections-phragmen/runtime-benchmarks",
+	"pallet-election-provider-multi-phase/runtime-benchmarks",
 	"pallet-election-provider-support-benchmarking/runtime-benchmarks",
+	"pallet-elections-phragmen/runtime-benchmarks",
+	"pallet-fast-unstake/runtime-benchmarks",
+	"pallet-nis/runtime-benchmarks",
+	"pallet-grandpa/runtime-benchmarks",
+	"pallet-identity/runtime-benchmarks",
+	"pallet-im-online/runtime-benchmarks",
+	"pallet-indices/runtime-benchmarks",
+	"pallet-lottery/runtime-benchmarks",
+	"pallet-membership/runtime-benchmarks",
+	"pallet-message-queue/runtime-benchmarks",
+	"pallet-mmr/runtime-benchmarks",
+	"pallet-multisig/runtime-benchmarks",
+	"pallet-nomination-pools-benchmarking/runtime-benchmarks",
+	"pallet-offences-benchmarking/runtime-benchmarks",
 	"pallet-preimage/runtime-benchmarks",
+	"pallet-proxy/runtime-benchmarks",
+	"pallet-scheduler/runtime-benchmarks",
+	"pallet-ranked-collective/runtime-benchmarks",
+	"pallet-referenda/runtime-benchmarks",
+	"pallet-recovery/runtime-benchmarks",
+	"pallet-remark/runtime-benchmarks",
+	"pallet-session-benchmarking/runtime-benchmarks",
+	"pallet-society/runtime-benchmarks",
+	"pallet-staking/runtime-benchmarks",
+	"pallet-state-trie-migration/runtime-benchmarks",
+	"pallet-timestamp/runtime-benchmarks",
+	"pallet-tips/runtime-benchmarks",
+	"pallet-transaction-storage/runtime-benchmarks",
+	"pallet-treasury/runtime-benchmarks",
+	"pallet-utility/runtime-benchmarks",
+	"pallet-uniques/runtime-benchmarks",
+	"pallet-vesting/runtime-benchmarks",
+	"pallet-whitelist/runtime-benchmarks",
+	"frame-system-benchmarking/runtime-benchmarks",
+	"pallet-esg/runtime-benchmarks",
+
+	'pallet-evm/runtime-benchmarks',
 	'pallet-ethereum/runtime-benchmarks',
     'pallet-evm/runtime-benchmarks',
-	'pallet-esg/runtime-benchmarks',
-	"pallet-grandpa/runtime-benchmarks",
-	"pallet-fast-unstake/runtime-benchmarks",
 	"pallet-hotfix-sufficients/runtime-benchmarks",
-	"pallet-bags-list/runtime-benchmarks",
-	"pallet-identity/runtime-benchmarks",
-	"pallet-nomination-pools-benchmarking/runtime-benchmarks",
-	"pallet-message-queue/runtime-benchmarks",
-	"pallet-offences-benchmarking/runtime-benchmarks",
-	"pallet-tips/runtime-benchmarks",
-	"pallet-referenda/runtime-benchmarks",
-		"pallet-conviction-voting/runtime-benchmarks",
-
 
 ]
-
 try-runtime = [
-"pallet-contracts/try-runtime",
-"pallet-esg/try-runtime",
-"pallet-authorship/try-runtime",
-"pallet-balances/try-runtime",
-"pallet-babe/try-runtime",
-"pallet-election-provider-multi-phase/try-runtime",
-"pallet-alliance/try-runtime",
-"pallet-indices/try-runtime",
-"pallet-collective/try-runtime",
-"pallet-elections-phragmen/try-runtime",
-"pallet-bags-list/try-runtime",
-"pallet-identity/try-runtime",
-"pallet-democracy/try-runtime",
-"pallet-nomination-pools/try-runtime",
-"pallet-message-queue/try-runtime",
-"pallet-fast-unstake/try-runtime",
-"frame-try-runtime/try-runtime",
-"frame-executive/try-runtime",
-"frame-system/try-runtime",
-"frame-support/try-runtime",
-"pallet-grandpa/try-runtime",
-"pallet-im-online/try-runtime",
-"pallet-membership/try-runtime",
-"pallet-preimage/try-runtime",
-"pallet-proxy/try-runtime",
-"pallet-randomness-collective-flip/try-runtime",
-"pallet-ranked-collective/try-runtime",
-"pallet-session/try-runtime",
-"pallet-staking/try-runtime",
-"pallet-scheduler/try-runtime",
-"pallet-sudo/try-runtime",
-"pallet-timestamp/try-runtime",
-"pallet-tips/try-runtime",
-"pallet-treasury/try-runtime",
-"pallet-utility/try-runtime",
-"pallet-transaction-payment/try-runtime",
-"pallet-referenda/try-runtime",
+	"frame-try-runtime/try-runtime",
+	"frame-executive/try-runtime",
+	"frame-system/try-runtime",
+	"frame-support/try-runtime",
+	"pallet-alliance/try-runtime",
+	"pallet-assets/try-runtime",
+	"pallet-authority-discovery/try-runtime",
+	"pallet-authorship/try-runtime",
+	"pallet-babe/try-runtime",
+	"pallet-bags-list/try-runtime",
+	"pallet-balances/try-runtime",
+	"pallet-bounties/try-runtime",
+	"pallet-child-bounties/try-runtime",
+	"pallet-collective/try-runtime",
+	"pallet-contracts/try-runtime",
 	"pallet-conviction-voting/try-runtime",
-
-
+	"pallet-democracy/try-runtime",
+	"pallet-election-provider-multi-phase/try-runtime",
+	"pallet-elections-phragmen/try-runtime",
+	"pallet-fast-unstake/try-runtime",
+	"pallet-nis/try-runtime",
+	"pallet-grandpa/try-runtime",
+	"pallet-im-online/try-runtime",
+	"pallet-indices/try-runtime",
+	"pallet-identity/try-runtime",
+	"pallet-lottery/try-runtime",
+	"pallet-membership/try-runtime",
+	"pallet-message-queue/try-runtime",
+	"pallet-mmr/try-runtime",
+	"pallet-multisig/try-runtime",
+	"pallet-nomination-pools/try-runtime",
+	"pallet-offences/try-runtime",
+	"pallet-preimage/try-runtime",
+	"pallet-proxy/try-runtime",
+	"pallet-randomness-collective-flip/try-runtime",
+	"pallet-ranked-collective/try-runtime",
+	"pallet-recovery/try-runtime",
+	"pallet-referenda/try-runtime",
+	"pallet-remark/try-runtime",
+	"pallet-root-testing/try-runtime",
+	"pallet-session/try-runtime",
+	"pallet-staking/try-runtime",
+	"pallet-state-trie-migration/try-runtime",
+	"pallet-scheduler/try-runtime",
+	"pallet-society/try-runtime",
+	"pallet-sudo/try-runtime",
+	"pallet-timestamp/try-runtime",
+	"pallet-tips/try-runtime",
+	"pallet-treasury/try-runtime",
+	"pallet-utility/try-runtime",
+	"pallet-transaction-payment/try-runtime",
+	"pallet-asset-tx-payment/try-runtime",
+	"pallet-transaction-storage/try-runtime",
+	"pallet-uniques/try-runtime",
+	"pallet-vesting/try-runtime",
+	"pallet-whitelist/try-runtime",
+	"pallet-esg/try-runtime",
 ]
-
-# Make contract callable functions marked as __unstable__ available. Do not enable
-# on live chains as those are subject to change.
-#contracts-unstable-interface = ["pallet-contracts/unstable-interface"]
