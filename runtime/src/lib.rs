@@ -145,15 +145,15 @@ pub fn wasm_binary_unwrap() -> &'static [u8] {
 /// Runtime version.
 #[sp_version::runtime_version]
 pub const VERSION: RuntimeVersion = RuntimeVersion {
-	spec_name: create_runtime_str!("node"),
-	impl_name: create_runtime_str!("substrate-node"),
-	authoring_version: 10,
+	spec_name: create_runtime_str!("5ire"),
+	impl_name: create_runtime_str!("5ire"),
+	authoring_version: 1,
 	// Per convention: if the runtime behavior changes, increment spec_version
 	// and set impl_version to 0. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 268,
-	impl_version: 0,
+	spec_version: 107,
+	impl_version: 1,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
 	state_version: 1,
@@ -295,20 +295,16 @@ pub struct FixedGasPrice;
 impl FeeCalculator for FixedGasPrice {
 	fn min_gas_price() -> (U256, Weight) {
 		// Return some meaningful gas price and weight
-		// (1_000_000u128.into(), 0u64)
-		(1_000_000_000u128.into(), Weight::from_ref_time(7u64))
+		// (1_000_000_000u128.into(), Weight::from_ref_time(7u64))
 
-		// ((1 * GASFEE).into(), 0u64)
+		((1 * GASFEE).into(), Weight::from_ref_time(7u64))
 	}
 }
 
 
-// const WEIGHT_PER_GAS: u64 = 20_000;
 
 parameter_types! {
-	pub const ChainId: u64 = 999;
-	// pub BlockGasLimit: U256 = U256::from(u32::max_value());
-	// pub BlockGasLimit: U256 = U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT / WEIGHT_PER_GAS);
+	pub const ChainId: u64 = 997;
 	pub BlockGasLimit: U256 = U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT.ref_time() / WEIGHT_PER_GAS);
 	pub PrecompilesValue: FrontierPrecompiles<Runtime> = FrontierPrecompiles::<_>::new();
 	pub WeightPerGas: Weight = Weight::from_ref_time(WEIGHT_PER_GAS);
@@ -317,7 +313,6 @@ parameter_types! {
 impl pallet_evm::Config for Runtime {
 	// type FeeCalculator = BaseFee;
 	type FeeCalculator = FixedGasPrice;
-	// type GasWeightMapping = FixedGasWeightMapping;
 	type GasWeightMapping = pallet_evm::FixedGasWeightMapping<Self>;
 	type WeightPerGas = WeightPerGas;
 	type BlockHashMapping = pallet_ethereum::EthereumBlockHashMapping<Self>;
@@ -326,7 +321,6 @@ impl pallet_evm::Config for Runtime {
 	type AddressMapping = HashedAddressMapping<BlakeTwo256>;
 	// type AddressMapping = IntoAddressMapping;
 	type Currency = Balances;
-	// type Event = Event;
 	type RuntimeEvent = RuntimeEvent;
 	type Runner = pallet_evm::runner::stack::Runner<Self>;
 	type PrecompilesType = FrontierPrecompiles<Self>;
@@ -334,8 +328,6 @@ impl pallet_evm::Config for Runtime {
 	type ChainId = ChainId;
 	type BlockGasLimit = BlockGasLimit;
 	type OnChargeTransaction = pallet_evm::EVMCurrencyAdapter<Balances, DealWithFees>;
-	// type FindAuthor = (); //FindAuthorTruncated<Aura>;
-
 	type FindAuthor = FindAuthorTruncated<Babe>;
 }
 
@@ -360,7 +352,6 @@ impl pallet_dynamic_fee::Config for Runtime {
 
 frame_support::parameter_types! {
 	pub IsActive: bool = true;
-	// pub DefaultBaseFeePerGas: U256 = U256::from(1_000_000_000u128);//1_000_000_000
 }
 
 pub struct BaseFeeThreshold;
@@ -612,7 +603,7 @@ impl pallet_balances::Config for Runtime {
 }
 
 parameter_types! {
-	pub const TransactionByteFee: Balance = 10 * MILLICENTS;
+	pub const TransactionByteFee: Balance = 1 * MICROCENTS;
 	pub const OperationalFeeMultiplier: u8 = 5;
 	pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(25);
 	pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(1, 100_000);
@@ -719,7 +710,7 @@ pallet_staking_reward_curve::build! {
 }
 
 parameter_types! {
-	pub const SessionsPerEra: sp_staking::SessionIndex = 6;
+	pub const SessionsPerEra: sp_staking::SessionIndex = 12;
 	pub const BondingDuration: sp_staking::EraIndex = 24 * 28;
 	pub const SlashDeferDuration: sp_staking::EraIndex = 24 * 7; // 1/4 the bonding duration.
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;

@@ -24,7 +24,7 @@ use node_5ire_runtime::{
 	BalancesConfig, Block, CouncilConfig, DemocracyConfig, ElectionsConfig, GrandpaConfig,
 	ImOnlineConfig, IndicesConfig, MaxNominations, NominationPoolsConfig, SessionConfig,
 	SessionKeys, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
-	TechnicalCommitteeConfig,EVMConfig,EthereumConfig,
+	TechnicalCommitteeConfig,/*EVMConfig,*/ EthereumConfig,
 };
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sc_chain_spec::ChainSpecExtension;
@@ -33,14 +33,14 @@ use sc_telemetry::TelemetryEndpoints;
 use serde::{Deserialize, Serialize};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
-use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public,H160, U256};
+use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public,/*H160, U256*/};
 use sp_runtime::{
 	traits::{IdentifyAccount, Verify},
 	Perbill,
 };
 
-use std::str::FromStr;
-use std::collections::BTreeMap;
+// use std::str::FromStr;
+// use std::collections::BTreeMap;
 
 pub use node_5ire_runtime::GenesisConfig;
 pub use node_primitives::{AccountId, Balance, Signature};
@@ -187,8 +187,8 @@ fn staging_testnet_config_genesis() -> GenesisConfig {
 pub fn staging_testnet_config() -> ChainSpec {
 	let boot_nodes = vec![];
 	ChainSpec::from_genesis(
-		"Staging Testnet",
-		"staging_testnet",
+		"Fire_Testnet",
+		"fire_testnet",
 		ChainType::Live,
 		staging_testnet_config_genesis,
 		boot_nodes,
@@ -198,7 +198,10 @@ pub fn staging_testnet_config() -> ChainSpec {
 		),
 		None,
 		None,
-		None,
+		Some(
+			serde_json::from_str("{\"tokenDecimals\": 18, \"tokenSymbol\": \"5IRE\"}")
+				.expect("Provided valid json map"),
+		),
 		Default::default(),
 	)
 }
@@ -245,7 +248,7 @@ pub fn testnet_genesis(
 	initial_nominators: Vec<AccountId>,
 	root_key: AccountId,
 	endowed_accounts: Option<Vec<AccountId>>,
-	chain_id: u64,
+	_chain_id: u64,
 ) -> GenesisConfig {
 	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
 		vec![
@@ -372,40 +375,8 @@ pub fn testnet_genesis(
 
 	// EVM compatibility
 
-		// evm_chain_id: EVMChainIdConfig { chain_id },
-		evm: EVMConfig {
-			accounts: {
-				let mut map = BTreeMap::new();
-				map.insert(
-					// H160 address of Alice dev account
-					// Derived from SS58 (42 prefix) address
-					// SS58: 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
-					// hex: 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d
-					// Using the full hex key, truncating to the first 20 bytes (the first 40 hex chars)
-					H160::from_str("d43593c715fdd31c61141abd04a99fd6822c8558")
-						.expect("internal H160 is valid; qed"),
-					fp_evm::GenesisAccount {
-						balance: U256::from_str("0xfffffffffffffffffffff")
-							.expect("internal U256 is valid; qed"),
-						code: Default::default(),
-						nonce: Default::default(),
-						storage: Default::default(),
-					},
-				);
-				map.insert(
-					// H160 address of CI test runner account
-					H160::from_str("cb90cAD4fafD23Eb939c028263520156AA078831")
-						.expect("internal H160 is valid; qed"),
-					fp_evm::GenesisAccount {
-						balance: U256::from_str("0xfffffffffffffff").expect("internal U256 is valid; qed"),
-						code: Default::default(),
-						nonce: Default::default(),
-						storage: Default::default(),
-					},
-				);
-				map
-			},
-		},
+		
+		evm:Default::default(),
 		ethereum: EthereumConfig {},
 		dynamic_fee: Default::default(),
 		base_fee: Default::default(),
@@ -436,7 +407,10 @@ pub fn development_config() -> ChainSpec {
 		None,
 		None,
 		None,
-		None,
+		Some(
+			serde_json::from_str("{\"tokenDecimals\": 18, \"tokenSymbol\": \"5IRE\"}")
+				.expect("Provided valid json map"),
+		),
 		Default::default(),
 	)
 }
@@ -454,15 +428,18 @@ fn local_testnet_genesis() -> GenesisConfig {
 /// Local testnet config (multivalidator Alice + Bob)
 pub fn local_testnet_config() -> ChainSpec {
 	ChainSpec::from_genesis(
-		"Local Testnet",
-		"local_testnet",
+		"firechain Local Testnet",
+		"firechain_testnet",
 		ChainType::Local,
 		local_testnet_genesis,
 		vec![],
 		None,
 		None,
 		None,
-		None,
+		Some(
+			serde_json::from_str("{\"tokenDecimals\": 18, \"tokenSymbol\": \"5IRE\"}")
+				.expect("Provided valid json map"),
+		),
 		Default::default(),
 	)
 }

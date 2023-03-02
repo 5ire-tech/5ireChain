@@ -35,7 +35,7 @@ use std::sync::Arc;
 
 impl SubstrateCli for Cli {
 	fn impl_name() -> String {
-		"Substrate Node".into()
+		"Firechain Node".into()
 	}
 
 	fn impl_version() -> String {
