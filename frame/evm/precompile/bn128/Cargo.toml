@@ -8,14 +8,14 @@ description = "BN128 precompiles for EVM pallet."
 [dependencies]
 bn = { package = "substrate-bn", version = "0.6", default-features = false }
 # Substrate
-sp-core = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false }
+sp-core = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1", default-features = false }
 
 # Frontier
 fp-evm = { version = "3.0.0-dev", path = "../../../../primitives/evm", default-features = false }
 
 [dev-dependencies]
 # Frontier
-pallet-evm-test-vector-support = { version = "1.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "new_Evm_rpc", default-features = false }
+pallet-evm-test-vector-support = { version = "1.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1", default-features = false }
 
 [features]
 default = ["std"]
