@@ -134,7 +134,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("5ire"),
 	impl_name: create_runtime_str!("5ire"),
 	authoring_version: 1,
-	spec_version: 106,
+	spec_version: 107,
 	impl_version: 1,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 1,
@@ -226,12 +226,8 @@ pub fn native_version() -> NativeVersion {
 }
 
 parameter_types! {
-	// pub const DepositPerItem: Balance = deposit(1, 0);
-	// pub const DepositPerByte: Balance = deposit(0, 1);
-
-	pub const DepositPerItem: Balance = itemdeposit(1, 0);
-	pub const DepositPerByte: Balance = itemdeposit(0, 1);
-	
+	pub const DepositPerItem: Balance = CENTS/1_000_000;
+	pub const DepositPerByte: Balance = CENTS/1_000_000;
 	pub const MaxValueSize: u32 = 16 * 1024;
 	// The lazy deletion runs inside on_initialize.
 	pub DeletionWeightLimit: Weight = RuntimeBlockWeights::get()
@@ -277,16 +273,29 @@ impl pallet_contracts::Config for Runtime {
 }
 
 const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
-/// We allow for 2 seconds of compute with a 6 second average block time.
-pub const MAXIMUM_BLOCK_WEIGHT: Weight = 2 * WEIGHT_PER_SECOND;
-const WEIGHT_PER_GAS: u64 = 20_000;
+
+/// We allow for 1 seconds of compute with a 6 second average block time.
+pub const MAXIMUM_BLOCK_WEIGHT: Weight = 1 * WEIGHT_PER_SECOND;
+
+
+
+/// Current approximation of the gas/s consumption considering
+/// EVM execution over compiled WASM (on 4.4Ghz CPU).
+/// Given the 500ms Weight, from which 75% only are used for transactions,
+/// the total EVM execution gas limit is: GAS_PER_SECOND * 0.500 * 0.75 ~= 15_000_000.
+pub const GAS_PER_SECOND: u64 = 40_000_000;
+
+
+/// Approximate ratio of the amount of Weight per Gas.
+/// u64 works for approximations because Weight is a very small unit compared to gas.
+pub const WEIGHT_PER_GAS: u64 = WEIGHT_PER_SECOND / GAS_PER_SECOND;
 
 parameter_types! {
 	pub const Version: RuntimeVersion = VERSION;
 	pub const BlockHashCount: BlockNumber = 2400;
 	/// We allow for 2 seconds of compute with a 6 second average block time.
 	pub RuntimeBlockWeights: frame_system::limits::BlockWeights = frame_system::limits::BlockWeights
-		::with_sensible_defaults(2 * WEIGHT_PER_SECOND, NORMAL_DISPATCH_RATIO);
+		::with_sensible_defaults(1 * WEIGHT_PER_SECOND, NORMAL_DISPATCH_RATIO);
 	pub RuntimeBlockLength: frame_system::limits::BlockLength = frame_system::limits::BlockLength
 		::max_with_normal_ratio(5 * 1024 * 1024, NORMAL_DISPATCH_RATIO);
 	pub const SS58Prefix: u8 = 42;
@@ -464,8 +473,8 @@ pub struct FixedGasPrice;
 impl FeeCalculator for FixedGasPrice {
 	fn min_gas_price() -> (U256, Weight) {
 		// Return some meaningful gas price and weight
-		// (1_000_000_000_000u128.into(), 0u64)
-		((1 * GASFEE).into(), 0u64) 
+		(1_000_000_000u128.into(), <Runtime as frame_system::Config>::DbWeight::get().reads(1))
+		//((1 * GASFEE).into(), 0u64) 
 	}
 }
 
@@ -479,7 +488,7 @@ impl FeeCalculator for FixedGasPrice {
 
 parameter_types! {
 	pub const ChainId: u64 = 997;
-	// pub BlockGasLimit: U256 = U256::from(u32::max_value());
+	//pub BlockGasLimit: U256 = U256::from(u32::max_value());
 	pub BlockGasLimit: U256 = U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT / WEIGHT_PER_GAS);
 	pub PrecompilesValue: FrontierPrecompiles<Runtime> = FrontierPrecompiles::<_>::new();
 }
@@ -549,14 +558,17 @@ impl pallet_hotfix_sufficients::Config for Runtime {
 	type WeightInfo = pallet_hotfix_sufficients::weights::SubstrateWeight<Runtime>;
 }
 
-parameter_types! {
-	// pub const TransactionByteFee: Balance = 1 * MILLICENTS;
 
-	pub const TransactionByteFee: Balance = 1 * MICROCENTS;
-	pub const OperationalFeeMultiplier: u8 = 10;
+
+
+parameter_types! {
+	pub const TransactionByteFee: Balance = MILLICENTS/10;
+
+	//pub const TransactionByteFee: Balance = 1 * MICROCENTS;
+	pub const OperationalFeeMultiplier: u8 = 5;
 	pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(25);
-	pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(1, 100_000);
-	pub MinimumMultiplier: Multiplier = Multiplier::saturating_from_rational(1, 1_000_000_000u128);
+	pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(3, 100_000);
+	pub MinimumMultiplier: Multiplier = Multiplier::saturating_from_rational(1, 1_000_000u128);
 }
 
 
