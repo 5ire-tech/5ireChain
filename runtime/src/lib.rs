@@ -148,10 +148,6 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("5ire"),
 	impl_name: create_runtime_str!("5ire"),
 	authoring_version: 1,
-	// Per convention: if the runtime behavior changes, increment spec_version
-	// and set impl_version to 0. If only runtime
-	// implementation changes and behavior does not, then leave spec_version as
-	// is and increment impl_version.
 	spec_version: 107,
 	impl_version: 1,
 	apis: RUNTIME_API_VERSIONS,
@@ -208,9 +204,8 @@ const AVERAGE_ON_INITIALIZE_RATIO: Perbill = Perbill::from_percent(10);
 const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
 /// We allow for 2 seconds of compute with a 6 second average block time, with maximum proof size.
 const MAXIMUM_BLOCK_WEIGHT: Weight =
-	Weight::from_parts(WEIGHT_REF_TIME_PER_SECOND.saturating_mul(2), u64::MAX);
+	Weight::from_parts(WEIGHT_REF_TIME_PER_SECOND.saturating_div(2), u64::MAX);
 
-	const WEIGHT_PER_GAS: u64 = 20_000;
 
 parameter_types! {
 	pub const BlockHashCount: BlockNumber = 2400;
@@ -291,16 +286,15 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 	}
 }
 
+// struct for Fixed gas price for evm_transaction
 pub struct FixedGasPrice;
 impl FeeCalculator for FixedGasPrice {
 	fn min_gas_price() -> (U256, Weight) {
 		// Return some meaningful gas price and weight
-		// (1_000_000_000u128.into(), Weight::from_ref_time(7u64))
-
-		((1 * GASFEE).into(), Weight::from_ref_time(7u64))
+		// (1_000_000_000_000u128.into(), 0u64)
+		(1_000_000_000u128.into(), <Runtime as frame_system::Config>::DbWeight::get().reads(1))
 	}
 }
-
 
 
 parameter_types! {
@@ -486,6 +480,16 @@ impl pallet_proxy::Config for Runtime {
 	type AnnouncementDepositFactor = AnnouncementDepositFactor;
 }
 
+/// Current approximation of the gas/s consumption considering
+/// EVM execution over compiled WASM (on 4.4Ghz CPU).
+/// Given the 500ms Weight, from which 75% only are used for transactions,
+/// the total EVM execution gas limit is: GAS_PER_SECOND * 0.500 * 0.75 ~= 15_000_000.
+pub const GAS_PER_SECOND: u64 = 40_000_000;
+
+/// Approximate ratio of the amount of Weight per Gas.
+/// u64 works for approximations because Weight is a very small unit compared to gas.
+pub const WEIGHT_PER_GAS: u64 = WEIGHT_REF_TIME_PER_SECOND / GAS_PER_SECOND;
+
 parameter_types! {
 	pub MaximumSchedulerWeight: Weight = Perbill::from_percent(80) *
 		RuntimeBlockWeights::get().max_block;
@@ -595,12 +599,18 @@ impl pallet_balances::Config for Runtime {
 	type Balance = Balance;
 	type DustRemoval = ();
 	type RuntimeEvent = RuntimeEvent;
-	// type ExistentialDeposit = ExistentialDeposit;
-	type ExistentialDeposit =ConstU128<500>;
-	// type AccountStore = frame_system::Pallet<Runtime>;
+	type ExistentialDeposit = ConstU128<{ 1*DOLLARS }>;
 	type AccountStore = System;
 	type WeightInfo = pallet_balances::weights::SubstrateWeight<Runtime>;
 }
+
+// pub struct IntoAddressMapping;
+
+// impl<T: From<H160>> pallet_evm::AddressMapping<T> for IntoAddressMapping {
+// 	fn into_account_id(address: H160) -> T {
+// 		address.into()
+// 	}
+// }
 
 parameter_types! {
 	pub const TransactionByteFee: Balance = 1 * MICROCENTS;
@@ -609,6 +619,7 @@ parameter_types! {
 	pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(1, 100_000);
 	pub MinimumMultiplier: Multiplier = Multiplier::saturating_from_rational(1, 1_000_000_000u128);
 	pub MaximumMultiplier: Multiplier = Bounded::max_value();
+
 }
 
 impl pallet_transaction_payment::Config for Runtime {
@@ -1355,8 +1366,8 @@ impl pallet_tips::Config for Runtime {
 parameter_types! {
 	// pub const DepositPerItem: Balance = deposit(1, 0);
 	// pub const DepositPerByte: Balance = deposit(0, 1);
-	pub const DepositPerItem: Balance = itemdeposit(1, 0);
-	pub const DepositPerByte: Balance = itemdeposit(0, 1);
+	pub const DepositPerItem: Balance = CENTS/1_000_000;
+	pub const DepositPerByte: Balance = CENTS/1_000_000;
 	pub const MaxValueSize: u32 = 16 * 1024;
 	pub const DeletionQueueDepth: u32 = 128;
 	// The lazy deletion runs inside on_initialize.
