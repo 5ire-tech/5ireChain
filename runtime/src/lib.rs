@@ -594,7 +594,7 @@ impl pallet_balances::Config for Runtime {
 // }
 
 parameter_types! {
-	pub const TransactionByteFee: Balance = MILLICENTS/10;
+	pub const TransactionByteFee: Balance = CENTS/10;
 	pub const OperationalFeeMultiplier: u8 = 5;
 	pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(25);
 	pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(1, 100_000);
