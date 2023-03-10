@@ -273,7 +273,7 @@ impl FeeCalculator for FixedGasPrice {
 	fn min_gas_price() -> (U256, Weight) {
 		// Return some meaningful gas price and weight
 		// (1_000_000_000_000u128.into(), 0u64)
-		(1_000_000_000u128.into(), <Runtime as frame_system::Config>::DbWeight::get().reads(1))
+		(100_000_000_000u128.into(), <Runtime as frame_system::Config>::DbWeight::get().reads(1))
 	}
 }
 
