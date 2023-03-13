@@ -161,7 +161,7 @@ pub mod pallet {
 	impl<T: Config> Pallet<T> {
 		/// Withdraw balance from EVM into currency/balances pallet.
 		#[pallet::call_index(0)]
-		#[pallet::weight(0)]
+		#[pallet::weight((0, DispatchClass::Normal,Pays::No))]
 		pub fn withdraw(
 			origin: OriginFor<T>,
 			address: H160,
@@ -736,7 +736,7 @@ impl<T: Config> Pallet<T> {
 
 		let nonce = frame_system::Pallet::<T>::account_nonce(&account_id);
 		// keepalive `true` takes into account ExistentialDeposit as part of what's considered liquid balance.
-		let balance = T::Currency::reducible_balance(&account_id, true);
+		let balance = T::Currency::reducible_balance(&account_id, false);
 
 		(
 			Account {
