@@ -167,7 +167,7 @@ export function start5ireChainNode(
     .execSync('git rev-parse --show-toplevel')
     .toString()
     .trim();
-  const nodePath = `${gitRoot}/target/release/5ire-evm-base`;
+  const nodePath = `${gitRoot}/target/release/firechain-node`;
   const ports = {
     alice: { ws: 9944, http: 9933, p2p: 30333 },
     bob: { ws: 9945, http: 9934, p2p: 30334 },
@@ -284,25 +284,6 @@ export async function waitForEvent(
 
       await sleep(2000);
     }
-  });
-}
-
-/**
- * Wait until the DKG Public Key is available and return it uncompressed without the `04` prefix byte.
- * @param api the current connected api.
- */
-export async function waitUntilDKGPublicKeyStoredOnChain(
-  api: ApiPromise
-): Promise<`0x${string}`> {
-  return new Promise(async (resolve, _reject) => {
-    const unsubscribe = await api.rpc.chain.subscribeNewHeads(() => {
-      fetchDkgPublicKey(api).then((value) => {
-        if (value) {
-          unsubscribe();
-          resolve(value);
-        }
-      });
-    });
   });
 }
 
