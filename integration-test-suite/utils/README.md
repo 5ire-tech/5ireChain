@@ -1,5 +1,7 @@
 ## Test Preparation:
+You must have build the node and gotten a firechain-node binary before you attempt the following commands:
 
-1. Run `cd integration-test-suite`
-2. Run `yarn install`
-3. Install [ts-node](https://typestrong.org/ts-node/)
+1. Navigate `cd integration-test-suite`
+2. Run `yarn install` to install dependencies
+3. Run `yarn test` to run the integration tests in the suite
+
