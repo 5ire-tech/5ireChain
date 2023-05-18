@@ -5,6 +5,7 @@ import child from 'child_process';
 import { ECPair } from 'ecpair';
 import { ethers } from 'ethers';
 
+export const endpoint = 'ws://127.0.0.1:9944';
 export const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
 
 export async function sleep(ms: number) {
@@ -255,8 +256,11 @@ export async function waitForEvent(
       // Loop through the Vec<EventRecord>
       for (var event of eventsValue) {
         console.log("Checking event: ", event);
+        // @ts-ignore
         const section = event.event.section;
+        // @ts-ignore
         const method = event.event.method;
+        // @ts-ignore
         const data = event.event.data;
         console.log("Event section = ", section, ", method = ", method);
         console.log("Event musteq  = ", pallet, ", method = ", eventVariant);
