@@ -1,3 +1,6 @@
+## Test Suite:
+The integration tests are contained in the `tests` directory
+
 ## Test Preparation:
 You must have build the node and gotten a firechain-node binary before you attempt the following commands:
 
