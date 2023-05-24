@@ -4928,6 +4928,7 @@ dependencies = [
  "frame-system",
  "hex",
  "libsecp256k1",
+ "log",
  "pallet-balances",
  "pallet-evm",
  "pallet-timestamp",

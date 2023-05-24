@@ -4,6 +4,8 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import child from 'child_process';
 import { ECPair } from 'ecpair';
 import { ethers } from 'ethers';
+import {polkadotApi} from "./util";
+import {mnemonicGenerate} from "@polkadot/util-crypto";
 
 export const endpoint = 'ws://127.0.0.1:9944';
 export const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
@@ -295,16 +297,91 @@ export async function sudoTx(
   api: ApiPromise,
   call: SubmittableExtrinsic<'promise'>
 ): Promise<void> {
-  const keyring = new Keyring({ type: 'sr25519' });
-  const alice = keyring.addFromUri('//Alice');
+  /*const keyring = new Keyring({ type: 'sr25519' });
+  const alice = keyring.addFromUri('//Alice');*/
+
+  const keyring = new Keyring({ type: 'ethereum' });
+  const signer = keyring.addFromUri('');
+
+
+  /*const mnemonic = mnemonicGenerate();
+  const keyring = new Keyring({type: 'ethereum'});
+  const signer = keyring.addFromUri(mnemonic, { name: 'first pair' }, 'ethereum');*/
+
   return new Promise(async (resolve, _reject) => {
     const unsub = await api.tx.sudo
       .sudo(call.method.toHex())
-      .signAndSend(alice, ({ status }) => {
+      .signAndSend(signer.address, ({ status, events, dispatchError }) => {
         console.log("Status: ", status);
         if (status.isFinalized) {
+          console.log("status is finalized" + JSON.stringify(status.toJSON()));
           unsub();
           resolve();
+        }
+
+        if (dispatchError) {
+          if (dispatchError.isModule) {
+            // for module errors, we have the section indexed, lookup
+            const decoded = api.registry.findMetaError(dispatchError.asModule);
+            const { docs, name, section } = decoded;
+
+            console.log(`Module error here ${section}.${name}: ${docs.join(' ')}`);
+          } else {
+            // Other, CannotLookup, BadOrigin, no extra info
+            console.log("Some other error " + dispatchError.toString());
+          }
+        }
+
+        if(events) {
+          console.log(`events here ${events}`);
+        } else {
+          console.log(`no events`);
+        }
+      });
+  });
+}
+
+function u8aToHex(u8a: Uint8Array): string {
+  return Array.from(u8a)
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+export async function sudoTx2(
+  alice: string,
+  api: ApiPromise,
+  call: SubmittableExtrinsic<'promise'>
+): Promise<void> {
+  const keyring = new Keyring({ type: 'sr25519' });
+ // const alice = keyring.addFromUri('//Alice');
+  return new Promise(async (resolve, _reject) => {
+    const unsub = await api.tx.sudo
+      .sudo(call.method.toHex())
+      .signAndSend(alice, ({ status, events, dispatchError }) => {
+        console.log("Status: ", status);
+        if (status.isFinalized) {
+          console.log("status is finalized" + JSON.stringify(status.toJSON()));
+          unsub();
+          resolve();
+        }
+
+        if (dispatchError) {
+          if (dispatchError.isModule) {
+            // for module errors, we have the section indexed, lookup
+            const decoded = api.registry.findMetaError(dispatchError.asModule);
+            const { docs, name, section } = decoded;
+
+            console.log(`Module error here ${section}.${name}: ${docs.join(' ')}`);
+          } else {
+            // Other, CannotLookup, BadOrigin, no extra info
+            console.log("Some other error " + dispatchError.toString());
+          }
+        }
+
+        if(events) {
+          console.log(`events here ${events}`);
+        } else {
+          console.log(`no events`);
         }
       });
   });
