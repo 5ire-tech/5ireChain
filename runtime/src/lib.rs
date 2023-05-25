@@ -356,6 +356,8 @@ impl pallet_hotfix_sufficients::Config for Runtime {
 
 impl pallet_esg::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
+	type MaxFileSize = ConstU32<1024000>;
+	type WeightInfo = pallet_esg::weights::SubstrateWeight<Runtime>;
 }
 
 // impl pallet_evm_chain_id::Config for Runtime {}
@@ -681,7 +683,10 @@ impl pallet_session::Config for Runtime {
 	type NextSessionRotation = Babe;
 	type SessionManager = pallet_session::historical::NoteHistoricalRoot<Self, Staking>;
 	type SessionHandler = <SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
+	type AllSessionHandler = <SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
 	type Keys = SessionKeys;
+	type DataProvider = Staking;
+	type TargetsBound = MaxOnChainElectableTargets;
 	type WeightInfo = pallet_session::weights::SubstrateWeight<Runtime>;
 }
 
@@ -751,7 +756,8 @@ impl pallet_staking::Config for Runtime {
 	type OnStakerSlash = NominationPools;
 	type WeightInfo = pallet_staking::weights::SubstrateWeight<Runtime>;
 	type BenchmarkingConfig = StakingBenchmarkingConfig;
-	type ScoreEsg = EsgScore;
+	type ESG = EsgScore;
+	type Reliability = ImOnline;
 }
 
 impl pallet_fast_unstake::Config for Runtime {
@@ -1472,6 +1478,8 @@ impl pallet_im_online::Config for Runtime {
 	type MaxKeys = MaxKeys;
 	type MaxPeerInHeartbeats = MaxPeerInHeartbeats;
 	type MaxPeerDataEncodingSize = MaxPeerDataEncodingSize;
+	type DataProvider = Staking;
+	type TargetsBound = MaxElectableTargets;
 }
 
 impl pallet_offences::Config for Runtime {
