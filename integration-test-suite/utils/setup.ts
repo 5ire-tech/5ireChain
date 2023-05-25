@@ -255,15 +255,15 @@ export async function waitForEvent(
       const eventsValue = api.registry.createType("Vec<EventRecord>", events.toU8a());
       // Loop through the Vec<EventRecord>
       for (var event of eventsValue) {
-        console.log("Checking event: ", event);
+        //console.log("Checking event: ", event);
         // @ts-ignore
         const section = event.event.section;
         // @ts-ignore
         const method = event.event.method;
         // @ts-ignore
         const data = event.event.data;
-        console.log("Event section = ", section, ", method = ", method);
-        console.log("Event musteq  = ", pallet, ", method = ", eventVariant);
+        //console.log("Event section = ", section, ", method = ", method);
+        //console.log("Event musteq  = ", pallet, ", method = ", eventVariant);
         if (section === pallet && method === eventVariant) {
           console.log(
             `Event ($section}.${method}) =>`,
