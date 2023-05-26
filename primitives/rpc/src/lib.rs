@@ -18,15 +18,16 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![allow(clippy::too_many_arguments)]
 
-use codec::{Decode, Encode};
 use ethereum::Log;
 use ethereum_types::Bloom;
+use scale_codec::{Decode, Encode};
 use scale_info::TypeInfo;
+// Substrate
 use sp_core::{H160, H256, U256};
 use sp_runtime::{traits::Block as BlockT, Permill, RuntimeDebug};
 use sp_std::vec::Vec;
 
-#[derive(Eq, PartialEq, Clone, Default, RuntimeDebug, Encode, Decode, TypeInfo)]
+#[derive(Clone, Eq, PartialEq, Default, RuntimeDebug, Encode, Decode, TypeInfo)]
 pub struct TransactionStatus {
 	pub transaction_hash: H256,
 	pub transaction_index: u32,
@@ -164,6 +165,9 @@ sp_api::decl_runtime_apis! {
 		) -> Vec<ethereum::TransactionV2>;
 		/// Return the elasticity multiplier.
 		fn elasticity() -> Option<Permill>;
+		/// Used to determine if gas limit multiplier for non-transactional calls (eth_call/estimateGas)
+		/// is supported.
+		fn gas_limit_multiplier_support();
 	}
 
 	#[api_version(2)]
