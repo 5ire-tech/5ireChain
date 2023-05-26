@@ -116,23 +116,18 @@ impl<'config, E: From<InvalidEvmTransactionError>> CheckEvmTransaction<'config, 
 
 	pub fn with_balance_for(&self, who: &Account) -> Result<&Self, E> {
 		// Get fee data from either a legacy or typed transaction input.
-		let (_, effective_gas_price) = self.transaction_fee_input()?;
+		let (max_fee_per_gas, _) = self.transaction_fee_input()?;
 
 		// Account has enough funds to pay for the transaction.
 		// Check is skipped on non-transactional calls that don't provide
 		// a gas price input.
 		//
-		// Fee for EIP-1559 transaction **with** tip is calculated using
-		// the effective gas price.
-		//
-		// Fee for EIP-1559 transaction **without** tip is calculated using
-		// the base fee.
+		// Validation for EIP-1559 is done using the max_fee_per_gas, which is
+		// the most a txn could possibly pay.
 		//
 		// Fee for Legacy or EIP-2930 transaction is calculated using
 		// the provided `gas_price`.
-		let fee = effective_gas_price
-			.unwrap_or_default()
-			.saturating_mul(self.transaction.gas_limit);
+		let fee = max_fee_per_gas.saturating_mul(self.transaction.gas_limit);
 		if self.config.is_transactional || fee > U256::zero() {
 			let total_payment = self.transaction.value.saturating_add(fee);
 			if who.balance < total_payment {
@@ -142,6 +137,9 @@ impl<'config, E: From<InvalidEvmTransactionError>> CheckEvmTransaction<'config, 
 		Ok(self)
 	}
 
+	// Returns the max_fee_per_gas (or gas_price for legacy txns) as well as an optional
+	// effective_gas_price for EIP-1559 transactions. effective_gas_price represents
+	// the total (fee + tip) that would be paid given the current base_fee.
 	fn transaction_fee_input(&self) -> Result<(U256, Option<U256>), E> {
 		match (
 			self.transaction.gas_price,
@@ -178,31 +176,34 @@ impl<'config, E: From<InvalidEvmTransactionError>> CheckEvmTransaction<'config, 
 		}
 	}
 
-	fn validate_common(&self) -> Result<&Self, E> {
-		// We must ensure a transaction can pay the cost of its data bytes.
-		// If it can't it should not be included in a block.
-		let mut gasometer = evm::gasometer::Gasometer::new(
-			self.transaction.gas_limit.unique_saturated_into(),
-			self.config.evm_config,
-		);
-		let transaction_cost = if self.transaction.to.is_some() {
-			evm::gasometer::call_transaction_cost(
-				&self.transaction.input,
-				&self.transaction.access_list,
-			)
-		} else {
-			evm::gasometer::create_transaction_cost(
-				&self.transaction.input,
-				&self.transaction.access_list,
-			)
-		};
-		if gasometer.record_transaction(transaction_cost).is_err() {
-			return Err(InvalidEvmTransactionError::GasLimitTooLow.into());
-		}
+	pub fn validate_common(&self) -> Result<&Self, E> {
+		if self.config.is_transactional {
+			// We must ensure a transaction can pay the cost of its data bytes.
+			// If it can't it should not be included in a block.
+			let mut gasometer = evm::gasometer::Gasometer::new(
+				self.transaction.gas_limit.unique_saturated_into(),
+				self.config.evm_config,
+			);
+			let transaction_cost = if self.transaction.to.is_some() {
+				evm::gasometer::call_transaction_cost(
+					&self.transaction.input,
+					&self.transaction.access_list,
+				)
+			} else {
+				evm::gasometer::create_transaction_cost(
+					&self.transaction.input,
+					&self.transaction.access_list,
+				)
+			};
 
-		// Transaction gas limit is within the upper bound block gas limit.
-		if self.transaction.gas_limit > self.config.block_gas_limit {
-			return Err(InvalidEvmTransactionError::GasLimitTooHigh.into());
+			if gasometer.record_transaction(transaction_cost).is_err() {
+				return Err(InvalidEvmTransactionError::GasLimitTooLow.into());
+			}
+
+			// Transaction gas limit is within the upper bound block gas limit.
+			if self.transaction.gas_limit > self.config.block_gas_limit {
+				return Err(InvalidEvmTransactionError::GasLimitTooHigh.into());
+			}
 		}
 
 		Ok(self)
@@ -322,9 +323,12 @@ mod tests {
 		test_env(input)
 	}
 
-	fn transaction_gas_limit_low<'config>() -> CheckEvmTransaction<'config, TestError> {
+	fn transaction_gas_limit_low<'config>(
+		is_transactional: bool,
+	) -> CheckEvmTransaction<'config, TestError> {
 		let mut input = TestCase::default();
 		input.gas_limit = U256::from(1u8);
+		input.is_transactional = is_transactional;
 		test_env(input)
 	}
 
@@ -461,13 +465,14 @@ mod tests {
 	}
 
 	#[test]
-	// Gas limit too low fails in pool and in block.
-	fn validate_in_pool_and_block_fails_gas_limit_too_low() {
+	// Gas limit too low transactional fails in pool and in block.
+	fn validate_in_pool_and_block_transactional_fails_gas_limit_too_low() {
 		let who = Account {
 			balance: U256::from(1_000_000u128),
 			nonce: U256::zero(),
 		};
-		let test = transaction_gas_limit_low();
+		let is_transactional = true;
+		let test = transaction_gas_limit_low(is_transactional);
 		// Pool
 		let res = test.validate_in_pool_for(&who);
 		assert!(res.is_err());
@@ -476,6 +481,23 @@ mod tests {
 		let res = test.validate_in_block_for(&who);
 		assert!(res.is_err());
 		assert_eq!(res.unwrap_err(), TestError::GasLimitTooLow);
+	}
+
+	#[test]
+	// Gas limit too low non-transactional succeeds in pool and in block.
+	fn validate_in_pool_and_block_non_transactional_succeeds_gas_limit_too_low() {
+		let who = Account {
+			balance: U256::from(1_000_000u128),
+			nonce: U256::zero(),
+		};
+		let is_transactional = false;
+		let test = transaction_gas_limit_low(is_transactional);
+		// Pool
+		let res = test.validate_in_pool_for(&who);
+		assert!(res.is_ok());
+		// Block
+		let res = test.validate_in_block_for(&who);
+		assert!(res.is_ok());
 	}
 
 	#[test]
@@ -635,29 +657,31 @@ mod tests {
 	}
 
 	#[test]
-	// Account balance is matched against the base fee without tip.
-	fn validate_balance_using_base_fee() {
+	// Account balance is matched against max_fee_per_gas (without txn tip)
+	fn validate_balance_regardless_of_base_fee() {
 		let who = Account {
+			// sufficient for base_fee, but not for max_fee_per_gas
 			balance: U256::from(21_000_000_000_001u128),
 			nonce: U256::zero(),
 		};
 		let with_tip = false;
 		let test = transaction_max_fee_high(with_tip);
 		let res = test.with_balance_for(&who);
-		assert!(res.is_ok());
+		assert!(res.is_err());
 	}
 
 	#[test]
-	// Account balance is matched against the effective gas price with tip.
-	fn validate_balance_using_effective_gas_price() {
+	// Account balance is matched against max_fee_per_gas (with txn tip)
+	fn validate_balance_regardless_of_effective_gas_price() {
 		let who = Account {
+			// sufficient for (base_fee + tip), but not for max_fee_per_gas
 			balance: U256::from(42_000_000_000_001u128),
 			nonce: U256::zero(),
 		};
 		let with_tip = true;
 		let test = transaction_max_fee_high(with_tip);
 		let res = test.with_balance_for(&who);
-		assert!(res.is_ok());
+		assert!(res.is_err());
 	}
 
 	#[test]

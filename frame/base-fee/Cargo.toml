@@ -1,48 +1,43 @@
 [package]
 name = "pallet-base-fee"
 version = "1.0.0"
-authors = ["Parity Technologies <admin@parity.io>"]
-edition = "2021"
 license = "Apache-2.0"
-description = "EIP-1559 fee utils"
-repository = "https://github.com/paritytech/frontier/"
-
+edition = "2021"
+description = "EIP-1559 fee utils."
+ 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
-serde = { version = "1.0.139", optional = true }
-
-# Parity
-codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false }
-scale-info = { version = "2.1.2", default-features = false, features = ["derive"] }
-
+scale-codec = { package = "parity-scale-codec", version = "3.2.1", default-features = false, features = ["derive"] }
+scale-info = { version = "2.3.1", default-features = false, features = ["derive"] }
 # Substrate
-sp-core = { version = "6.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
-sp-runtime = { version = "6.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
+sp-core = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1", default-features = false }
+sp-runtime = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1", default-features = false }
 # Substrate FRAME
-frame-support = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
-frame-system = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
-
+frame-support = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1", default-features = false }
+frame-system = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1", default-features = false }
 # Frontier
 fp-evm = { version = "3.0.0-dev", path = "../../primitives/evm", default-features = false }
 
 [dev-dependencies]
-sp-io = { version = "6.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master" }
+# Substrate
+sp-io = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1", default-features = false }
 
 [features]
 default = ["std"]
 std = [
-	"serde",
-	# Parity
-	"codec/std",
+	"scale-codec/std",
 	"scale-info/std",
 	# Substrate
-	"sp-core/std",
-	"sp-runtime/std",
-	# Substrate FRAME
 	"frame-support/std",
 	"frame-system/std",
+	"sp-core/std",
+	"sp-runtime/std",
 	# Frontier
 	"fp-evm/std",
+]
+try-runtime = [
+	"frame-support/try-runtime",
+	"frame-system/try-runtime",
 ]
