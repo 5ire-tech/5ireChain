@@ -21,7 +21,7 @@ use std::{marker::PhantomData, sync::Arc, time};
 use ethereum::BlockV2 as EthereumBlock;
 use ethereum_types::{H256, U256};
 use jsonrpsee::core::{async_trait, RpcResult as Result};
-
+// Substrate
 use sc_client_api::backend::{Backend, StateBackend, StorageProvider};
 use sp_api::ProvideRuntimeApi;
 use sp_blockchain::HeaderBackend;
@@ -30,10 +30,10 @@ use sp_runtime::{
 	generic::BlockId,
 	traits::{BlakeTwo256, Block as BlockT, NumberFor, One, Saturating, UniqueSaturatedInto},
 };
-
+// Frontier
 use fc_rpc_core::{types::*, EthFilterApiServer};
-use fp_rpc::{EthereumRuntimeRPCApi, TransactionStatus};
-
+use fp_rpc::{TransactionStatus};
+use fp_rpc::EthereumRuntimeRPCApi;
 use crate::{eth::cache::EthBlockDataCacheTask, frontier_backend_client, internal_err};
 
 pub struct EthFilter<B: BlockT, C, BE> {
@@ -83,7 +83,10 @@ where
 					self.max_stored_filters
 				)));
 			}
-			let last_key = match locked.iter().next_back() {
+			let last_key = match {
+				let mut iter = locked.iter();
+				iter.next_back()
+			} {
 				Some((k, _)) => *k,
 				None => U256::zero(),
 			};
@@ -363,8 +366,12 @@ where
 
 		let mut ret: Vec<Log> = Vec::new();
 		if let Some(hash) = filter.block_hash {
-			let id = match frontier_backend_client::load_hash::<B>(backend.as_ref(), hash)
-				.map_err(|err| internal_err(format!("{:?}", err)))?
+			let id = match frontier_backend_client::load_hash::<B, C>(
+				client.as_ref(),
+				backend.as_ref(),
+				hash,
+			)
+			.map_err(|err| internal_err(format!("{:?}", err)))?
 			{
 				Some(hash) => hash,
 				_ => return Ok(Vec::new()),

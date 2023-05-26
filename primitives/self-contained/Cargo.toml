@@ -1,40 +1,31 @@
 [package]
 name = "fp-self-contained"
 version = "1.0.0-dev"
-authors = ["Parity Technologies <admin@parity.io>"]
-edition = "2021"
 license = "Apache-2.0"
+edition = "2021"
 description = "Primitive Ethereum abstractions for Substrate."
-repository = "https://github.com/paritytech/frontier/"
-
+ 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
-ethereum = { version = "0.12.0", default-features = false, features = ["with-codec"] }
-serde = { version = "1.0.139", features = ["derive"], optional = true }
-
-# Parity
-codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false }
-parity-util-mem = { version = "0.11", optional = true }
-scale-info = { version = "2.1.2", default-features = false, features = ["derive"] }
-
+scale-codec = { package = "parity-scale-codec", version = "3.2.1", default-features = false, features = ["derive"] }
+scale-info = { version = "2.3.1", default-features = false, features = ["derive"] }
+ serde = { version = "1.0",optional = true, features = ["derive"] }
 # Substrate
-sp-runtime = { version = "6.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
-# Substrate FRAME
-frame-support = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "master", default-features = false }
+frame-support = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1", default-features = false  }
+sp-runtime = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1", default-features = false }
 
 [features]
 default = ["std"]
 std = [
-	"ethereum/std",
-	"serde",
-	# Parity
-	"codec/std",
-	"parity-util-mem",
+	"scale-codec/std",
 	"scale-info/std",
+	"serde",
 	# Substrate
-	"sp-runtime/std",
-	# Substrate FRAME
 	"frame-support/std",
+	"sp-runtime/std",
+]
+try-runtime = [
+	"sp-runtime/try-runtime",
 ]
