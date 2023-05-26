@@ -4,8 +4,6 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import child from 'child_process';
 import { ECPair } from 'ecpair';
 import { ethers } from 'ethers';
-import {polkadotApi} from "./util";
-import {mnemonicGenerate} from "@polkadot/util-crypto";
 
 export const endpoint = 'ws://127.0.0.1:9944';
 export const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
