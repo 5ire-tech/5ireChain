@@ -20,7 +20,7 @@ describe.skip('Setup for test', function () {
     const currentBlockStr = await polkadotApi.query.ethereum.currentBlock();
     const currentBlock = currentBlockStr.toJSON();
     // @ts-ignore
-    expect(currentBlock.header.parentHash).not.null;//.to.equal(`0x519d59019ad3c0ef857f716d0393623e26c0b9bf89268bff01e4d6137b42a788`);
+    expect(currentBlock.header.parentHash).not.null;
   });
 
   after(async () => {

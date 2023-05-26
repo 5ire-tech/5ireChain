@@ -8,23 +8,32 @@ import {ApiPromise, Keyring, WsProvider} from "@polkadot/api";
 import abi from './contracts/psp22_token.json';
 import {sleep, waitForEvent} from "../utils/setup";
 
-describe('Setup for test', function () {
+describe('Wasm test', function () {
   this.timeout(300 * BLOCK_TIME);
   // 4 session.
   this.slow(40 * BLOCK_TIME);
 
   before(async () => {
-    await spawnNodes()
+    //await spawnNodes()
+    await sleep(5000);
   });
 
-  it('Should deploy a contract to 5ire chain', async () => {
-    console.log("Beginning first test");
-   // deploy contract
-   await deployContract(polkadotApi, JSON.stringify(abi));
+  it('Should deploy a wasm contract to 5ire chain', async () => {
+    console.log("Beginning deploying wasm contract");
+    const wsProvider = new WsProvider('ws://127.0.0.1:9944');
+    const api = await ApiPromise.create({ provider: wsProvider });
+    await deployContract(api, JSON.stringify(abi));
+
+
+    // deploy contract
+   //await deployContract(polkadotApi, JSON.stringify(abi));
+
+   // wait for instantiated event
+  // await waitForEvent(polkadotApi, 'contracts', 'Instantiated')
   });
 
   after(async () => {
-    await killNodes();
+    //await killNodes();
   });
 });
 
@@ -47,17 +56,30 @@ const deployContract = async (api: ApiPromise, abi: string) => {
     tokenSymbol,
     tokenDecimal);
 
+  let address;
+
   const unsub = await tx.signAndSend(
     alice,
     // @ts-ignore
     ({ contract, status,  dispatchError }) => {
+      new Promise((resolve) => setTimeout(resolve, 10000));
+      if(contract) {
+        address = contract.address
+        console.log(`In block, address is ${address}`);
+        console.log(`contract is ${contract}`);
+      }
+      console.log(`status is ${status}`);
       if (status.isInBlock || status.isFinalized) {
+        console.log(`In block`);
+        address = contract.address.toString();
         unsub();
       }
 
       if(dispatchError) {
         console.log(`error occurred ${dispatchError}`);
       }
+
+      //console.log(`In block, address is ${address}`);
     }
   );
 };
