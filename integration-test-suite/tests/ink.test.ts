@@ -1,10 +1,8 @@
 import { expect } from 'chai';
 import { BLOCK_TIME } from '../utils/constants';
 import {killNodes, polkadotApi, spawnNodes} from "../utils/util";
-import {CodePromise, ContractPromise} from "@polkadot/api-contract";
-import child from "child_process";
-import {ApiPromise, Keyring, WsProvider} from "@polkadot/api";
-//import { web3FromSource } from "@polkadot/extension-dapp";
+import {CodePromise} from "@polkadot/api-contract";
+import {ApiPromise, Keyring} from "@polkadot/api";
 import abi from './contracts/psp22_token.json';
 import {sleep, waitForEvent} from "../utils/setup";
 
@@ -14,26 +12,21 @@ describe('Wasm test', function () {
   this.slow(40 * BLOCK_TIME);
 
   before(async () => {
-    //await spawnNodes()
-    await sleep(5000);
+    await spawnNodes()
   });
 
   it('Should deploy a wasm contract to 5ire chain', async () => {
     console.log("Beginning deploying wasm contract");
-    const wsProvider = new WsProvider('ws://127.0.0.1:9944');
-    const api = await ApiPromise.create({ provider: wsProvider });
-    await deployContract(api, JSON.stringify(abi));
-
 
     // deploy contract
-   //await deployContract(polkadotApi, JSON.stringify(abi));
+    await deployContract(polkadotApi, JSON.stringify(abi));
 
    // wait for instantiated event
-  // await waitForEvent(polkadotApi, 'contracts', 'Instantiated')
+    await waitForEvent(polkadotApi, 'contracts', 'Instantiated');
   });
 
   after(async () => {
-    //await killNodes();
+    await killNodes();
   });
 });
 
@@ -56,21 +49,13 @@ const deployContract = async (api: ApiPromise, abi: string) => {
     tokenSymbol,
     tokenDecimal);
 
-  let address;
+  let address:string;
 
   const unsub = await tx.signAndSend(
     alice,
     // @ts-ignore
     ({ contract, status,  dispatchError }) => {
-      new Promise((resolve) => setTimeout(resolve, 10000));
-      if(contract) {
-        address = contract.address
-        console.log(`In block, address is ${address}`);
-        console.log(`contract is ${contract}`);
-      }
-      console.log(`status is ${status}`);
       if (status.isInBlock || status.isFinalized) {
-        console.log(`In block`);
         address = contract.address.toString();
         unsub();
       }
@@ -79,7 +64,8 @@ const deployContract = async (api: ApiPromise, abi: string) => {
         console.log(`error occurred ${dispatchError}`);
       }
 
-      //console.log(`In block, address is ${address}`);
+      expect(address).not.null;
     }
   );
+
 };
