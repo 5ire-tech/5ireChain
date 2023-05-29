@@ -13,11 +13,9 @@
   },
   "dependencies": {
     "@polkadot/api": "^10.4.1",
-    "@polkadot/util": "^10.1.5",
     "@types/chai": "^4.3.0",
     "@types/mocha": "^9.1.0",
-    "@polkadot/extension-dapp": "^0.46.3",
-    "@polkadot/api-contract": "^10.7.2",
+    "@polkadot/api-contract": "^10.4.1",
     "chai": "^4.3.6",
     "ecpair": "^1.0.0",
     "ethers": "^5.5.4",
