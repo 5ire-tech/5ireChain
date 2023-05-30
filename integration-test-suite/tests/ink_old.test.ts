@@ -7,7 +7,7 @@ import abiFile from './contracts/psp22_token.json';
 
 import {sleep, waitForEvent} from "../utils/setup";
 
-describe('Wasm test', function () {
+describe('Wasm test with erc20 token old ink! version 3', function () {
   this.timeout(300 * BLOCK_TIME);
   // 4 session.
   this.slow(40 * BLOCK_TIME);
@@ -16,7 +16,7 @@ describe('Wasm test', function () {
     await spawnNodes()
   });
 
-  it('Should deploy a wasm contract to 5ire chain', async () => {
+  it('Should deploy a erc20 token contract to 5ire chain', async () => {
     console.log("Beginning deploying wasm contract");
 
     let abi: string  = JSON.stringify(abiFile);
