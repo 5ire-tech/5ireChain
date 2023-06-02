@@ -126,11 +126,11 @@ pub fn wasm_binary_unwrap() -> &'static [u8] {
 /// Runtime version.
 #[sp_version::runtime_version]
 pub const VERSION: RuntimeVersion = RuntimeVersion {
-	spec_name: create_runtime_str!("5ire"),
+	spec_name: create_runtime_str!("node-template"),
 	impl_name: create_runtime_str!("5ire"),
 	authoring_version: 1,
-	spec_version: 108,
-	impl_version: 1,
+	spec_version: 113,
+	impl_version: 0,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
 	state_version: 1,
@@ -185,7 +185,17 @@ const AVERAGE_ON_INITIALIZE_RATIO: Perbill = Perbill::from_percent(10);
 const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
 /// We allow for 2 seconds of compute with a 6 second average block time, with maximum proof size.
 const MAXIMUM_BLOCK_WEIGHT: Weight =
-	Weight::from_parts(WEIGHT_REF_TIME_PER_SECOND.saturating_div(2), u64::MAX);
+	Weight::from_parts(WEIGHT_REF_TIME_PER_SECOND.saturating_mul(1), u64::MAX);
+
+/// Current approximation of the gas/s consumption considering
+/// EVM execution over compiled WASM (on 4.4Ghz CPU).
+/// Given the 500ms Weight, from which 75% only are used for transactions,
+/// the total EVM execution gas limit is: GAS_PER_SECOND * 0.500 * 0.75 ~= 15_000_000.
+pub const GAS_PER_SECOND: u64 = 40_000_000;
+
+/// Approximate ratio of the amount of Weight per Gas.
+/// u64 works for approximations because Weight is a very small unit compared to gas.
+pub const WEIGHT_PER_GAS: u64 = WEIGHT_REF_TIME_PER_SECOND / GAS_PER_SECOND;
 
 
 parameter_types! {
@@ -273,7 +283,8 @@ impl FeeCalculator for FixedGasPrice {
 	fn min_gas_price() -> (U256, Weight) {
 		// Return some meaningful gas price and weight
 		// (1_000_000_000_000u128.into(), 0u64)
-		(100_000_000_000u128.into(), <Runtime as frame_system::Config>::DbWeight::get().reads(1))
+		// (1_000_000_000_000u128.into(), <Runtime as frame_system::Config>::DbWeight::get().reads(1))
+		(1_000_000_000_000u128.into(), Weight::from_ref_time(1u64))	
 	}
 }
 
@@ -463,15 +474,7 @@ impl pallet_proxy::Config for Runtime {
 	type AnnouncementDepositFactor = AnnouncementDepositFactor;
 }
 
-/// Current approximation of the gas/s consumption considering
-/// EVM execution over compiled WASM (on 4.4Ghz CPU).
-/// Given the 500ms Weight, from which 75% only are used for transactions,
-/// the total EVM execution gas limit is: GAS_PER_SECOND * 0.500 * 0.75 ~= 15_000_000.
-pub const GAS_PER_SECOND: u64 = 40_000_000;
 
-/// Approximate ratio of the amount of Weight per Gas.
-/// u64 works for approximations because Weight is a very small unit compared to gas.
-pub const WEIGHT_PER_GAS: u64 = WEIGHT_REF_TIME_PER_SECOND / GAS_PER_SECOND;
 
 parameter_types! {
 	pub MaximumSchedulerWeight: Weight = Perbill::from_percent(80) *
@@ -582,7 +585,7 @@ impl pallet_balances::Config for Runtime {
 	type Balance = Balance;
 	type DustRemoval = ();
 	type RuntimeEvent = RuntimeEvent;
-	type ExistentialDeposit = ConstU128<{ 1*DOLLARS }>;
+	type ExistentialDeposit = ExistentialDeposit;
 	type AccountStore = System;
 	type WeightInfo = pallet_balances::weights::SubstrateWeight<Runtime>;
 }
@@ -596,11 +599,12 @@ impl pallet_balances::Config for Runtime {
 // }
 
 parameter_types! {
-	pub const TransactionByteFee: Balance = CENTS/10;
+	// pub const TransactionByteFee: Balance = CENTS/10;
+	pub const TransactionByteFee:Balance = 1 * MICROCENTS;
 	pub const OperationalFeeMultiplier: u8 = 5;
 	pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(25);
-	pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(1, 100_000);
-	pub MinimumMultiplier: Multiplier = Multiplier::saturating_from_rational(1, 1_000_000_000u128);
+	pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(3, 100_000);
+	pub MinimumMultiplier: Multiplier = Multiplier::saturating_from_rational(1, 1_000_000u128);
 	pub MaximumMultiplier: Multiplier = Bounded::max_value();
 
 }
@@ -707,8 +711,8 @@ pallet_staking_reward_curve::build! {
 }
 
 parameter_types! {
-	pub const SessionsPerEra: sp_staking::SessionIndex = 12;
-	pub const BondingDuration: sp_staking::EraIndex = 24 * 28;
+	pub const SessionsPerEra: sp_staking::SessionIndex = 1;
+	pub const BondingDuration: sp_staking::EraIndex = 1;
 	pub const SlashDeferDuration: sp_staking::EraIndex = 24 * 7; // 1/4 the bonding duration.
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
 	pub const MaxNominatorRewardedPerValidator: u32 = 256;
@@ -1353,8 +1357,8 @@ impl pallet_tips::Config for Runtime {
 parameter_types! {
 	// pub const DepositPerItem: Balance = deposit(1, 0);
 	// pub const DepositPerByte: Balance = deposit(0, 1);
-	pub const DepositPerItem: Balance = CENTS/1_000_000;
-	pub const DepositPerByte: Balance = CENTS/1_000_000;
+	pub const DepositPerItem: Balance = CENTS/1_000;
+	pub const DepositPerByte: Balance = CENTS/1_000_0;
 	pub const MaxValueSize: u32 = 16 * 1024;
 	pub const DeletionQueueDepth: u32 = 128;
 	// The lazy deletion runs inside on_initialize.
@@ -1438,7 +1442,7 @@ where
 			frame_system::CheckEra::<Runtime>::from(era),
 			frame_system::CheckNonce::<Runtime>::from(nonce),
 			frame_system::CheckWeight::<Runtime>::new(),
-			// pallet_asset_tx_payment::ChargeAssetTxPayment::<Runtime>::from(tip, None),
+			// pallet_asset_tx_payment::ChargeAssetTxPayment::<Runtime>::from(tip, Some(9)),
 			pallet_transaction_payment::ChargeTransactionPayment::<Runtime>::from(tip),
 		);
 		let raw_payload = SignedPayload::new(call, extra)
@@ -1479,7 +1483,8 @@ impl pallet_im_online::Config for Runtime {
 	type MaxPeerInHeartbeats = MaxPeerInHeartbeats;
 	type MaxPeerDataEncodingSize = MaxPeerDataEncodingSize;
 	type DataProvider = Staking;
-	type TargetsBound = MaxElectableTargets;
+	// type TargetsBound = MaxElectableTargets;
+	type TargetsBound = MaxOnChainElectableTargets;
 }
 
 impl pallet_offences::Config for Runtime {
