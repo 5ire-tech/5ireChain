@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { BLOCK_TIME } from '../utils/constants';
 import {killNodes, polkadotApi, spawnNodes} from "../utils/util";
-import {createType, U256, u8} from "@polkadot/types";
-import {H160, H256} from "@polkadot/types/interfaces";
+import {createType, GenericEthereumAccountId, U256, u8} from "@polkadot/types";
+import {AccountId, AccountId20, H160, H256} from "@polkadot/types/interfaces";
 import {keccak_256} from "js-sha3";
 /*import { SecretKey } from 'secp256k1';
 import { randomBytes, createPublicKey, createPrivateKey, privateToPublic } from 'crypto';
@@ -10,14 +10,25 @@ import { ec  } from 'elliptic';*/
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 import RLP from 'rlp'
-import {hexToBytes, sudoTx, sudoTx2} from "../utils/setup";
+import {hexToBytes, sudoTx} from "../utils/setup";
 import * as fs from "fs";
 import child from "child_process";
-import {u8aToHex} from "@polkadot/util";
-import {Keyring} from "@polkadot/api";
-import {SignerPayloadRaw, Signer} from "@polkadot/types/types/extrinsic";
-import {mnemonicGenerate} from "@polkadot/util-crypto";
+import {hexToU8a, u8aToHex} from "@polkadot/util";
+import {ApiPromise, Keyring, WsProvider} from "@polkadot/api";
+import {SignerPayloadRaw, Signer, SignatureOptions} from "@polkadot/types/types/extrinsic";
+import {addressToEvm, evmToAddress, mnemonicGenerate} from "@polkadot/util-crypto";
 import {KeypairType} from "@polkadot/util-crypto/types";
+import {SignerPayloadRawBase} from "@polkadot/types/types";
+import * as web3Utils from 'web3-utils';
+import * as crypto from '@polkadot/util-crypto';
+import { KeyringPair } from '@polkadot/keyring/types';
+
+let wsProvider: WsProvider;
+// Keyring needed to sign using Alice account
+const keyring = new Keyring({ type: 'sr25519' });
+
+// ByteCode of our ERC20 exemple: copied from ./truffle/contracts/MyToken.json
+const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
 
 describe('EVM related tests', function () {
   this.timeout(300 * BLOCK_TIME);
@@ -25,141 +36,16 @@ describe('EVM related tests', function () {
   this.slow(40 * BLOCK_TIME);
 
   before(async () => {
-    await spawnNodes()
+    await spawnNodes();
+    wsProvider = new WsProvider('ws://127.0.0.1:9944');
   });
 
-  // This test executes EVM contract transaction
-  it('Should execute EVM contract', async () => {
-    console.log("Executing EVM contract test");
+  // Should init and create contracts
+  it('Should init and create contracts', async () => {
+    const { api, alice, bob, aliceEthAccount } = await init();
 
-    const alice = addressBuild(1);
-
-    const nonce = polkadotApi.registry.createType("U256", "1");
-    const max_priority_fee_per_gas = polkadotApi.registry.createType("U256", "1");
-    const max_fee_per_gas = polkadotApi.registry.createType("U256", "1");
-    const gas_limit = polkadotApi.registry.createType("U256", "0x100000");
-    const value = polkadotApi.registry.createType("U256", "0");
-
-    const gitRoot = child
-      .execSync('git rev-parse --show-toplevel')
-      .toString()
-      .trim();
-    const contractPath = `${gitRoot}/integration-test-suite/tests/contracts/erc20_contract_bytecode.txt`;
-    // Read the file synchronously
-    const erc20ContractBytecode = fs.readFileSync(contractPath, 'utf8');
-
-    const EIP2930UnsignedTransactionMsgObj: EIP2930UnsignedTransactionMsg = {
-      chain_id: 999,
-      nonce: nonce,
-      gas_price: max_fee_per_gas,
-      gas_limit: gas_limit,
-      action: 'TransactionAction::Create',
-      value: value,
-      input: Uint8Array.from(hexToBytes(erc20ContractBytecode.trimEnd())),
-      access_list: new Uint8Array()
-    };
-
-    const hashedTransaction = hashTransaction(EIP2930UnsignedTransactionMsgObj);
-    const signature = ec.sign(hashedTransaction, alice.private_key);
-
-
-    const EIP2930Transaction = polkadotApi.createType(
-      'EIP2930Transaction',
-      {
-        chain_id: 999,
-        nonce: nonce,
-        gas_price: max_fee_per_gas,
-        gas_limit: gas_limit,
-        action: 'Create',
-        value: value,
-        input: Uint8Array.from(hexToBytes(erc20ContractBytecode.trimEnd())),
-        access_list: [],
-        odd_y_parity: signature.recoveryParam != 0,
-        r: signature.r.toArray(32),
-        s: signature.s.toArray(32)
-      }
-    );
-
-    const EIP2930TransactionType = polkadotApi.createType(
-      'TransactionV2',
-      {
-        EIP2930: {
-          chain_id: 999,
-          nonce: nonce,
-          gas_price: max_fee_per_gas,
-          gas_limit: gas_limit,
-          action: 'Create',
-          value: value,
-          input: Uint8Array.from(hexToBytes(erc20ContractBytecode.trimEnd())),
-          access_list: [],
-          odd_y_parity: signature.recoveryParam != 0,
-          r: signature.r.toArray(32),
-          s: signature.s.toArray(32)
-        },
-      }
-    );
-
-    const ethCall =
-      polkadotApi.tx.ethereum.transact(
-       EIP2930TransactionType
-      );
-
-    //await sudoTx2(u8aToHex(alice.address), polkadotApi, ethCall);
-    await sudoTx(polkadotApi, ethCall);
-
-
-    /*const mnemonic = mnemonicGenerate();
-    const keyring = new Keyring({type: 'ed25519'});
-    const signer = keyring.addFromUri(mnemonic);*/
-
-   /* await polkadotApi.tx.sudo
-      .sudo(ethCall)*/
-
-   const keyring = new Keyring({ type: 'ethereum' });
-
-    const sender = keyring.addFromUri('hello ethereum know');
-
-
-    /*const txHash = await ethCall
-      .signAndSend(sender);*/
-
-    /*await polkadotApi.tx.ethereum
-      .transact(EIP2930TransactionType)
-      .signAndSend(signer, ({ status, events, dispatchError }) => {
-        // status would still be set, but in the case of error we can shortcut
-        // to just check it (so an error would indicate InBlock or Finalized)
-        console.log("Status: ", status);
-        if (status.isFinalized) {
-          console.log("status is finalized" + JSON.stringify(status.toJSON()));
-          //unsub();
-       //   resolve();
-        }
-
-        if (dispatchError) {
-          if (dispatchError.isModule) {
-            // for module errors, we have the section indexed, lookup
-            const decoded = polkadotApi.registry.findMetaError(dispatchError.asModule);
-            const { docs, name, section } = decoded;
-
-            console.log(`Module error here ${section}.${name}: ${docs.join(' ')}`);
-          } else {
-            // Other, CannotLookup, BadOrigin, no extra info
-            console.log("Some other error " + dispatchError.toString());
-          }
-        }
-
-        if(events) {
-          console.log(`events here ${events}`);
-        } else {
-          console.log(`no events`);
-        }
-      });*/
-
-    //Gets the pending ethereum block
-    const currentBlockStr = await polkadotApi.query.ethereum.pending();
-    const currentBlock = currentBlockStr.toJSON();
-    console.log(currentBlock)
-
+    // step 1: Creating the contract from ALICE
+    const contractAccount = await step1(aliceEthAccount, api, alice)
   });
 
   after(async () => {
@@ -276,6 +162,26 @@ interface EIP2930Transaction {
   s: Uint8Array; //32 bytes
 }
 
+function padZeroes(numberArray: number[]): number[] {
+  const targetLength = 33;
+  const currentLength = numberArray.length;
+
+  if (currentLength >= targetLength) {
+    return numberArray;
+  }
+
+  const diff = targetLength - currentLength;
+  const paddedZeroes = Array(diff).fill(0);
+  return paddedZeroes.concat(numberArray);
+}
+
+
+function bytesToHex(bytes: Uint8Array | number[]): string {
+  return Array.from(bytes)
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
+
 
 /*const myTransaction = createType('TransactionAction', TransactionAction.Create);
 
@@ -283,3 +189,120 @@ enum TransactionAction {
   Call,
   Create,
 }*/
+
+// Setup the API and Alice Account
+async function init() {
+  console.log(`Initiating the API (ignore message "Unable to resolve type B..." and "Unknown types found...")`);
+
+  // Initiate the polkadot API.
+  const api = await ApiPromise.create({
+    provider: wsProvider,
+    types: {
+      // mapping the actual specified address format
+      Address: "AccountId",
+      // mapping the lookup
+      LookupSource: "AccountId",
+      Account: {
+        nonce: "U256",
+        balance: "U256"
+      },
+      Transaction: {
+        nonce: "U256",
+        action: "String",
+        gas_price: "u64",
+        gas_limit: "u64",
+        value: "U256",
+        input: "Vec<u8>",
+        signature: "Signature"
+      },
+      Signature: {
+        v: "u64",
+        r: "H256",
+        s: "H256"
+      }
+    }
+  });
+  console.log(`Initialiation done`);
+  console.log(`Genesis at block: ${api.genesisHash.toHex()}`);
+
+  const alice = keyring.addFromUri('//Alice', { name: 'Alice default' });
+  const bob = keyring.addFromUri('//Bob', { name: 'Bob default' });
+
+  // @ts-ignore
+  const { nonce, data: balance } = await api.query.system.account(alice.address);
+  console.log(`Alice Substrate Account: ${alice.address} ${alice.addressRaw} ${hexToU8a(alice.address)}`);
+  console.log(`Alice Substrate Account (nonce: ${nonce}) balance, free: ${balance.free.toHuman()}`);
+
+  const aliceEvmAccount = `0x${crypto.blake2AsHex(crypto.decodeAddress(alice.addressRaw), 256).substring(26)}`;
+  const aliceEthAccount = addressToEvm(alice.addressRaw);
+  console.log(`Alice EVM Account: ${aliceEvmAccount} ${hexToU8a(aliceEvmAccount)}`);
+  console.log(`Alice ETH Account: ${aliceEthAccount}`);
+  const aliceSubstrate= evmToAddress(aliceEthAccount, 0, 'keccak');
+  console.log(`Alice Account: ${aliceSubstrate} ${hexToU8a(aliceSubstrate)}`);
+  console.log(`Alice Account 2: ${evmToAddress(aliceEthAccount)} ${hexToU8a(evmToAddress(aliceEthAccount))}`);
+  const evmData = (await api.query.evm.accountCodes(aliceEthAccount)) as any;
+  console.log(`Alice EVM Account (data: ${evmData})`);
+
+
+  // Create a extrinsic, transferring 12345 units to Bob
+  const transfer = api.tx.balances.transfer(aliceEthAccount, 40000000000000);
+
+  // Sign and send the transaction using our account
+  const hash = await transfer.signAndSend(alice, {tip: 100, nonce: -1});
+
+  console.log('Transfer sent with hash', hash.toHex());
+
+  // Create a extrinsic, transferring 12345 units to Bob
+ /* const transfer2 = api.tx.balances.transfer(evmToAddress(aliceEthAccount, 0, 'keccak'), 12345000000);
+
+  // Sign and send the transaction using our account
+  const hash2 = await transfer2.signAndSend(alice);
+
+  console.log('Transfer sent with hash', hash2.toHex());*/
+  return { api, alice, bob, aliceEthAccount };
+}
+
+// Create the ERC20 contract from ALICE
+async function step1(evmAddress:any, api: ApiPromise, alice: KeyringPair) {
+
+  console.log(`\nStep 1: Creating Smart Contract`);
+
+  // params: [bytecode, initialBalance, gasLimit, gasPrice],
+  // tx: api.tx.evm.create
+  const gitRoot = child
+    .execSync('git rev-parse --show-toplevel')
+    .toString()
+    .trim();
+  const contractPath = `${gitRoot}/integration-test-suite/tests/contracts/erc20_contract_bytecode.txt`;
+  // Read the file synchronously
+  const erc20ContractBytecode = fs.readFileSync(contractPath, 'utf8');
+  const erc20ContractBytes = Uint8Array.from(hexToBytes(erc20ContractBytecode.trimEnd()))
+
+  const transaction = await api.tx.evm.create(evmAddress, erc20ContractBytes, 100, 10000000, 10000000, 1000000, 0, null);
+
+  const contract = new Promise<{ block: string, address: string }>(async (resolve, reject) => {
+    const unsub = await transaction.signAndSend(alice, {tip: 200, nonce: -1}, (result) => {
+      console.log(`Contract creation is ${result.status}`);
+      if (result.status.isInBlock) {
+        console.log(`Contract included at blockHash ${result.status.asInBlock}`);
+        console.log(`Waiting for finalization... (can take a minute)`);
+      } else if (result.status.isFinalized) {
+        console.log( `events are ${result.events}`)
+        const contractAddress = (
+          result.events?.find(
+            event => event?.event?.index.toHex() == "0x0500"
+          )?.event.data[0] as any
+        ).address as string;
+        console.log(`Contract finalized at blockHash ${result.status.asFinalized}`);
+        console.log(`Contract address: ${contractAddress}`);
+        unsub();
+        resolve({
+          block: result.status.asFinalized.toString(),
+          address: contractAddress
+        });
+      }
+    });
+  });
+  return contract;
+}
+

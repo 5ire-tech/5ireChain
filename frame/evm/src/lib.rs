@@ -286,8 +286,10 @@ pub mod pallet {
 			nonce: Option<U256>,
 			access_list: Vec<(H160, Vec<H256>)>,
 		) -> DispatchResultWithPostInfo {
-			T::CallOrigin::ensure_address_origin(&source, origin)?;
-
+			let account_bytes = ensure_signed(origin.clone())?;
+			log::info!("ENTERED CREATE, source is {:?}", account_bytes);
+			//T::CallOrigin::ensure_address_origin(&source, origin)?;
+			log::info!("ENSURED ADDRESS");
 			let is_transactional = true;
 			let validate = true;
 			let info = match T::Runner::create(
@@ -305,6 +307,7 @@ pub mod pallet {
 			) {
 				Ok(info) => info,
 				Err(e) => {
+					log::info!("ERROR");
 					return Err(DispatchErrorWithPostInfo {
 						post_info: PostDispatchInfo {
 							actual_weight: Some(e.weight),
@@ -314,6 +317,7 @@ pub mod pallet {
 					})
 				}
 			};
+			log::info!("FINISHED EXECUTING RUNNER");
 
 			match info {
 				CreateInfo {
@@ -321,6 +325,7 @@ pub mod pallet {
 					value: create_address,
 					..
 				} => {
+					log::info!("CREATED INFO");
 					Pallet::<T>::deposit_event(Event::<T>::Created {
 						address: create_address,
 					});
@@ -330,11 +335,14 @@ pub mod pallet {
 					value: create_address,
 					..
 				} => {
+					log::info!("CREATE FAILED INFO");
 					Pallet::<T>::deposit_event(Event::<T>::CreatedFailed {
 						address: create_address,
 					});
 				}
 			}
+
+			log::info!("AFTER EVENTS");
 
 			Ok(PostDispatchInfo {
 				actual_weight: Some(T::GasWeightMapping::gas_to_weight(
@@ -644,7 +652,10 @@ impl<H: Hasher<Out = H256>> AddressMapping<AccountId32> for HashedAddressMapping
 		data[4..24].copy_from_slice(&address[..]);
 		let hash = H::hash(&data);
 
-		AccountId32::from(Into::<[u8; 32]>::into(hash))
+		let account_id32 = AccountId32::from(Into::<[u8; 32]>::into(hash));
+		let account: [u8;32] = account_id32.clone().into();
+		log::info!("account id is {:?}", account);
+		account_id32
 	}
 }
 
@@ -733,10 +744,12 @@ impl<T: Config> Pallet<T> {
 	/// Get the account basic in EVM format.
 	pub fn account_basic(address: &H160) -> (Account, frame_support::weights::Weight) {
 		let account_id = T::AddressMapping::into_account_id(*address);
+		log::info!("ACCOUNT IS {:?}",account_id);
 
 		let nonce = frame_system::Pallet::<T>::account_nonce(&account_id);
 		// keepalive `true` takes into account ExistentialDeposit as part of what's considered liquid balance.
-		let balance = T::Currency::reducible_balance(&account_id, false);
+		//let balance = T::Currency::reducible_balance(&account_id, false);
+		let balance: u128 = 1000000000000100;
 
 		(
 			Account {

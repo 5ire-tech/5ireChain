@@ -1,5 +1,5 @@
 import { SECONDS } from './constants';
-import { ApiPromise } from '@polkadot/api';
+import {ApiPromise, WsProvider} from '@polkadot/api';
 import { ChildProcess, execSync } from 'child_process';
 import fs from 'fs';
 import {
@@ -30,6 +30,9 @@ export const spawnNodes = async () => {
   console.log('started alice, bob, charlie nodes');
 
   polkadotApi = await ApiPromise.create();
+
+  /*const wsProvider = new WsProvider('ws://127.0.0.1:9944');
+  polkadotApi = await ApiPromise.create({ provider: wsProvider });*/
   return true;
 };
 

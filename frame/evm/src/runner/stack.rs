@@ -74,10 +74,12 @@ where
 			>,
 		) -> (ExitReason, R),
 	{
+		log::info!("IN EXECUTE");
 		let (base_fee, weight) = T::FeeCalculator::min_gas_price();
 
 		#[cfg(feature = "forbid-evm-reentrancy")]
 		if IN_EVM.with(|in_evm| in_evm.replace(true)) {
+			log::info!("REENTRANCY ERROR");
 			return Err(RunnerError {
 				error: Error::<T>::Reentrancy,
 				weight,
@@ -130,6 +132,7 @@ where
 			>,
 		) -> (ExitReason, R),
 	{
+		log::info!("IN EXECUTE INNER");
 		// EIP-3607: https://eips.ethereum.org/EIPS/eip-3607
 		// Do not allow transactions for which `tx.sender` has any code deployed.
 		//
@@ -138,12 +141,14 @@ where
 		// projects using Frontier can have stateful precompiles that can manage funds or
 		// which calls other contracts that expects this precompile address to be trustworthy.
 		if !<AccountCodes<T>>::get(source).is_empty() || precompiles.is_precompile(source) {
+			log::info!("PRECOMPILE ERROR");
 			return Err(RunnerError {
 				error: Error::<T>::TransactionMustComeFromEOA,
 				weight,
 			});
 		}
 
+		log::info!("GAS CALC");
 		let (total_fee_per_gas, _actual_priority_fee_per_gas) =
 			match (max_fee_per_gas, max_priority_fee_per_gas, is_transactional) {
 				// Zero max_fee_per_gas for validated transactional calls exist in XCM -> EVM
@@ -167,6 +172,7 @@ where
 				(None, _, false) => (Default::default(), U256::zero()),
 				// Unreachable, previously validated. Handle gracefully.
 				_ => {
+					log::info!("GAS ERROR");
 					return Err(RunnerError {
 						error: Error::<T>::GasPriceTooLow,
 						weight,
@@ -174,6 +180,7 @@ where
 				}
 			};
 
+		log::info!("FEE CALC");
 		// After eip-1559 we make sure the account can pay both the evm execution and priority fees.
 		let total_fee =
 			total_fee_per_gas
@@ -183,9 +190,12 @@ where
 					weight,
 				})?;
 
+		log::info!("FEE DEDUCTION {:?}", total_fee);
 		// Deduct fee from the `source` account. Returns `None` if `total_fee` is Zero.
 		let fee = T::OnChargeTransaction::withdraw_fee(&source, total_fee)
 			.map_err(|e| RunnerError { error: e, weight })?;
+
+		//let fee:u128 = 10;
 
 		// Execute the EVM call.
 		let vicinity = Vicinity {
@@ -193,6 +203,7 @@ where
 			origin: source,
 		};
 
+		log::info!("BEFORE EXECUTOR");
 		let metadata = StackSubstateMetadata::new(gas_limit, config);
 		let state = SubstrateStackState::new(&vicinity, metadata);
 		let mut executor = StackExecutor::new_with_precompiles(state, config, precompiles);
@@ -302,10 +313,14 @@ where
 		is_transactional: bool,
 		evm_config: &evm::Config,
 	) -> Result<(), RunnerError<Self::Error>> {
+		log::info!("IN VALIDATE");
 		let (base_fee, mut weight) = T::FeeCalculator::min_gas_price();
+		log::info!("GOTTEN BASE FEE");
 		let (source_account, inner_weight) = Pallet::<T>::account_basic(&source);
+		log::info!("GOTTEN SOURCE ACCOUNT");
 		weight = weight.saturating_add(inner_weight);
 
+		log::info!("BEFORE VALIDATING");
 		let _ = fp_evm::CheckEvmTransaction::<Self::Error>::new(
 			fp_evm::CheckEvmTransactionConfig {
 				evm_config,
@@ -331,6 +346,8 @@ where
 		.and_then(|v| v.with_base_fee())
 		.and_then(|v| v.with_balance_for(&source_account))
 		.map_err(|error| RunnerError { error, weight })?;
+
+		log::info!("AFTER VALIDATING");
 		Ok(())
 	}
 
