@@ -20,11 +20,12 @@ export const spawnNodes = async () => {
   const gitRoot = execSync('git rev-parse --show-toplevel').toString().trim();
   const tmpDir = `${gitRoot}/tmp`;
   if (fs.existsSync(tmpDir)) {
+    // @ts-ignore
     fs.rmSync(tmpDir, { recursive: true });
   }
-  aliceNode = start5ireChainNode('alice', { tmp: true, printLogs: true });
-  bobNode = start5ireChainNode('bob', { tmp: true, printLogs: true });
-  charlieNode = start5ireChainNode('charlie', { tmp: true, printLogs: true });
+  aliceNode = start5ireChainNode('alice', { tmp: true, printLogs: false });
+  bobNode = start5ireChainNode('bob', { tmp: true, printLogs: false });
+  charlieNode = start5ireChainNode('charlie', { tmp: true, printLogs: false });
 
   console.log('started alice, bob, charlie nodes');
 
