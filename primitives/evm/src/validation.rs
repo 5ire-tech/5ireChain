@@ -17,7 +17,6 @@
 #![allow(clippy::comparison_chain)]
 
 pub use evm::backend::Basic as Account;
-use evm::gasometer::TransactionCost;
 use frame_support::sp_runtime::traits::UniqueSaturatedInto;
 use sp_core::{H160, H256, U256};
 use sp_std::vec::Vec;
@@ -86,10 +85,8 @@ impl<'config, E: From<InvalidEvmTransactionError>> CheckEvmTransaction<'config, 
 
 	pub fn validate_in_block_for(&self, who: &Account) -> Result<&Self, E> {
 		if self.transaction.nonce > who.nonce {
-			log::info!("TRANSACTION NONCE GREATER {:?},  {:?}", &self.transaction.nonce, &who.nonce);
 			return Err(InvalidEvmTransactionError::TxNonceTooHigh.into());
 		} else if self.transaction.nonce < who.nonce {
-			log::info!("TRANSACTION NONCE LESSER{:?},  {:?}", &self.transaction.nonce, &who.nonce);
 			return Err(InvalidEvmTransactionError::TxNonceTooLow.into());
 		}
 		self.validate_common()
@@ -111,7 +108,6 @@ impl<'config, E: From<InvalidEvmTransactionError>> CheckEvmTransaction<'config, 
 		if self.config.is_transactional || gas_price > U256::zero() {
 			// Transaction max fee is at least the current base fee.
 			if gas_price < self.config.base_fee {
-				log::info!("GAS PRICE TOO LOW {:?} {:?}", &gas_price, &self.config.base_fee);
 				return Err(InvalidEvmTransactionError::GasPriceTooLow.into());
 			}
 		}
@@ -135,10 +131,7 @@ impl<'config, E: From<InvalidEvmTransactionError>> CheckEvmTransaction<'config, 
 		if self.config.is_transactional || fee > U256::zero() {
 			let total_payment = self.transaction.value.saturating_add(fee);
 			if who.balance < total_payment {
-				log::info!("BALANCE TOO LOW {:?} {:?}", &who.balance, &total_payment);
 				return Err(InvalidEvmTransactionError::BalanceTooLow.into());
-			} else {
-				log::info!("BALANCE IS NOT TOO LOW FOR {:?} {:?} {:?}", &who.balance, &total_payment, &who);
 			}
 		}
 		Ok(self)
@@ -187,7 +180,6 @@ impl<'config, E: From<InvalidEvmTransactionError>> CheckEvmTransaction<'config, 
 		if self.config.is_transactional {
 			// We must ensure a transaction can pay the cost of its data bytes.
 			// If it can't it should not be included in a block.
-			log::info!("GAS LIMIT IS {:?}", self.transaction.gas_limit.clone());
 			let mut gasometer = evm::gasometer::Gasometer::new(
 				self.transaction.gas_limit.unique_saturated_into(),
 				self.config.evm_config,
@@ -204,47 +196,15 @@ impl<'config, E: From<InvalidEvmTransactionError>> CheckEvmTransaction<'config, 
 				)
 			};
 
-			log::info!("TRYING TO RECORD TRANSACTION");
 			if gasometer.record_transaction(transaction_cost).is_err() {
-
-				let gas_cost = match transaction_cost.clone() {
-					TransactionCost::Call {
-						zero_data_len,
-						non_zero_data_len,
-						access_list_address_len,
-						access_list_storage_len,
-					} => {
-						&gasometer.config().gas_transaction_call
-							+ zero_data_len as u64 * &gasometer.config().gas_transaction_zero_data
-							+ non_zero_data_len as u64 * &gasometer.config().gas_transaction_non_zero_data
-							+ access_list_address_len as u64 * &gasometer.config().gas_access_list_address
-							+ access_list_storage_len as u64 * &gasometer.config().gas_access_list_storage_key
-					}
-					TransactionCost::Create {
-						zero_data_len,
-						non_zero_data_len,
-						access_list_address_len,
-						access_list_storage_len,
-					} => {
-						&gasometer.config().gas_transaction_create
-							+ zero_data_len as u64 * &gasometer.config().gas_transaction_zero_data
-							+ non_zero_data_len as u64 * &gasometer.config().gas_transaction_non_zero_data
-							+ access_list_address_len as u64 * &gasometer.config().gas_access_list_address
-							+ access_list_storage_len as u64 * &gasometer.config().gas_access_list_storage_key
-					}
-				};
-				log::info!("GAS LIMIT TOO LOW {:?}, {:?} {:?}", &transaction_cost, &gasometer.gas(), gas_cost);
 				return Err(InvalidEvmTransactionError::GasLimitTooLow.into());
 			}
 
 			// Transaction gas limit is within the upper bound block gas limit.
 			if self.transaction.gas_limit > self.config.block_gas_limit {
-				log::info!("GAS LIMIT TOO HIGH {:?}, {:?}", &self.transaction.gas_limit, &self.config.block_gas_limit);
 				return Err(InvalidEvmTransactionError::GasLimitTooHigh.into());
 			}
 		}
-
-		log::info!("FINISHED VALIDATING");
 
 		Ok(self)
 	}
