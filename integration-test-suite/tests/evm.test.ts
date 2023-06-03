@@ -10,7 +10,7 @@ import { ec  } from 'elliptic';*/
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 import RLP from 'rlp'
-import {hexToBytes, sudoTx} from "../utils/setup";
+import {hexToBytes, sudoTx, waitForEvent} from "../utils/setup";
 import * as fs from "fs";
 import child from "child_process";
 import {hexToU8a, u8aToHex} from "@polkadot/util";
@@ -49,7 +49,7 @@ describe('EVM related tests', function () {
   });
 
   after(async () => {
-    await killNodes();
+   await killNodes();
   });
 });
 
@@ -245,7 +245,7 @@ async function init() {
 
 
   // Create a extrinsic, transferring 12345 units to Bob
-  const transfer = api.tx.balances.transfer(aliceEthAccount, 40000000000000);
+  const transfer = api.tx.balances.transfer(aliceEthAccount, 800000000000000);
 
   // Sign and send the transaction using our account
   const hash = await transfer.signAndSend(alice, {tip: 100, nonce: -1});
@@ -267,18 +267,7 @@ async function step1(evmAddress:any, api: ApiPromise, alice: KeyringPair) {
 
   console.log(`\nStep 1: Creating Smart Contract`);
 
-  // params: [bytecode, initialBalance, gasLimit, gasPrice],
-  // tx: api.tx.evm.create
-  const gitRoot = child
-    .execSync('git rev-parse --show-toplevel')
-    .toString()
-    .trim();
-  const contractPath = `${gitRoot}/integration-test-suite/tests/contracts/erc20_contract_bytecode.txt`;
-  // Read the file synchronously
-  const erc20ContractBytecode = fs.readFileSync(contractPath, 'utf8');
-  const erc20ContractBytes = Uint8Array.from(hexToBytes(erc20ContractBytecode.trimEnd()))
-
-  const transaction = await api.tx.evm.create(evmAddress, erc20ContractBytes, 100, 10000000, 10000000, 1000000, 0, null);
+  const transaction = await api.tx.evm.create(evmAddress, ERC20_BYTECODES, 0, 10000000, 10000000, 1000000, 0, null);
 
   const contract = new Promise<{ block: string, address: string }>(async (resolve, reject) => {
     const unsub = await transaction.signAndSend(alice, {tip: 200, nonce: -1}, (result) => {
@@ -287,12 +276,16 @@ async function step1(evmAddress:any, api: ApiPromise, alice: KeyringPair) {
         console.log(`Contract included at blockHash ${result.status.asInBlock}`);
         console.log(`Waiting for finalization... (can take a minute)`);
       } else if (result.status.isFinalized) {
-        console.log( `events are ${result.events}`)
-        const contractAddress = (
-          result.events?.find(
-            event => event?.event?.index.toHex() == "0x0500"
-          )?.event.data[0] as any
-        ).address as string;
+        const data = JSON.stringify(result.events);
+        console.log(data);
+
+        const dataStr = JSON.parse(data);
+
+        const filteredData = dataStr.filter((item: any) => item.event.index === "0x3a01");
+        const contractAddress = filteredData[0].event.data[0];
+        console.log(`contract address from filter ${contractAddress}`);
+        expect(contractAddress).not.undefined;
+
         console.log(`Contract finalized at blockHash ${result.status.asFinalized}`);
         console.log(`Contract address: ${contractAddress}`);
         unsub();
@@ -302,6 +295,9 @@ async function step1(evmAddress:any, api: ApiPromise, alice: KeyringPair) {
         });
       }
     });
+
+    //await waitForEvent(polkadotApi, 'evm', 'Created')
+
   });
   return contract;
 }

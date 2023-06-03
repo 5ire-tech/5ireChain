@@ -83,6 +83,7 @@ use sp_std::{cmp::min, vec::Vec};
 pub use evm::{
 	Config as EvmConfig, Context, ExitError, ExitFatal, ExitReason, ExitRevert, ExitSucceed,
 };
+use scale_codec::Decode;
 #[cfg(feature = "std")]
 use fp_evm::GenesisAccount;
 pub use fp_evm::{
@@ -288,7 +289,7 @@ pub mod pallet {
 		) -> DispatchResultWithPostInfo {
 			let account_bytes = ensure_signed(origin.clone())?;
 			log::info!("ENTERED CREATE, source is {:?}", account_bytes);
-			//T::CallOrigin::ensure_address_origin(&source, origin)?;
+			T::CallOrigin::ensure_address_origin(&source, origin)?;
 			log::info!("ENSURED ADDRESS");
 			let is_transactional = true;
 			let validate = true;
@@ -744,12 +745,21 @@ impl<T: Config> Pallet<T> {
 	/// Get the account basic in EVM format.
 	pub fn account_basic(address: &H160) -> (Account, frame_support::weights::Weight) {
 		let account_id = T::AddressMapping::into_account_id(*address);
-		log::info!("ACCOUNT IS {:?}",account_id);
+		log::info!("ACCOUNT BASIC IS {:?}",account_id);
 
 		let nonce = frame_system::Pallet::<T>::account_nonce(&account_id);
 		// keepalive `true` takes into account ExistentialDeposit as part of what's considered liquid balance.
-		//let balance = T::Currency::reducible_balance(&account_id, false);
-		let balance: u128 = 1000000000000100;
+		let balance = T::Currency::reducible_balance(&account_id, false);
+		log::info!("BALANCE BASIC IS {:?}",&balance);
+
+		let balance = T::Currency::reducible_balance(&account_id, false);
+		log::info!("BALANCE IS {:?}",&balance);
+		//let balance: u128 = u128::MAX;
+
+		let alice: [u8; 32] = [212,53,147,199,21,253,211,28,97,20,26,189,4,169,159,214,130,44,133,88,133,76,205,227,154,86,132,231,165,109,162,125];
+		let alice_account = T::AccountId::decode(&mut &alice[..]).unwrap();
+		let alice_balance = T::Currency::reducible_balance(&alice_account, false);
+		log::info!("ALICE BALANCE IS {:?}",&alice_balance);
 
 		(
 			Account {

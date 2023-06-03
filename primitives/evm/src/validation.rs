@@ -137,6 +137,8 @@ impl<'config, E: From<InvalidEvmTransactionError>> CheckEvmTransaction<'config, 
 			if who.balance < total_payment {
 				log::info!("BALANCE TOO LOW {:?} {:?}", &who.balance, &total_payment);
 				return Err(InvalidEvmTransactionError::BalanceTooLow.into());
+			} else {
+				log::info!("BALANCE IS NOT TOO LOW FOR {:?} {:?} {:?}", &who.balance, &total_payment, &who);
 			}
 		}
 		Ok(self)

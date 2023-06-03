@@ -99,11 +99,13 @@ where
 			base_fee,
 			weight,
 		);
-
+		log::info!("AFTER EXECUTE INNER");
 		// Set IN_EVM to false
 		// We should make sure that this line is executed whatever the execution path.
 		#[cfg(feature = "forbid-evm-reentrancy")]
 		let _ = IN_EVM.with(|in_evm| in_evm.take());
+
+		log::info!("AFTER FORBID");
 
 		res
 	}
@@ -195,7 +197,7 @@ where
 		let fee = T::OnChargeTransaction::withdraw_fee(&source, total_fee)
 			.map_err(|e| RunnerError { error: e, weight })?;
 
-		//let fee:u128 = 10;
+		//let fee = 10.into();
 
 		// Execute the EVM call.
 		let vicinity = Vicinity {
@@ -433,9 +435,13 @@ where
 			&precompiles,
 			is_transactional,
 			|executor| {
+				log::info!("TRYING TO CREATE ADDRESS");
 				let address = executor.create_address(evm::CreateScheme::Legacy { caller: source });
+				log::info!("CREATED ADDRESS");
 				let (reason, _) =
 					executor.transact_create(source, value, init, gas_limit, access_list);
+				log::info!("AFTER ADRRESS CREATION");
+				log::info!("REASON IS {:?}", &reason);
 				(reason, address)
 			},
 		)
