@@ -153,7 +153,7 @@ const incTransaction = async (
 
     }
   );
-  console.log("here");
+  
 };
 
 const queryTransaction = async (
