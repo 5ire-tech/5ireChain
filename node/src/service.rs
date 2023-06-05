@@ -143,8 +143,8 @@ pub fn create_extrinsic(
 		)),
 		frame_system::CheckNonce::<node_5ire_runtime::Runtime>::from(nonce),
 		frame_system::CheckWeight::<node_5ire_runtime::Runtime>::new(),
-		// pallet_asset_tx_payment::ChargeAssetTxPayment::<node_5ire_runtime::Runtime>::from(tip,None),
-		pallet_transaction_payment::ChargeTransactionPayment::<node_5ire_runtime::Runtime>::from(tip),
+		pallet_asset_tx_payment::ChargeAssetTxPayment::<node_5ire_runtime::Runtime>::from(tip,None),
+		// pallet_transaction_payment::ChargeTransactionPayment::<node_5ire_runtime::Runtime>::from(tip),
 	);
 
 	let raw_payload = node_5ire_runtime::SignedPayload::from_raw(

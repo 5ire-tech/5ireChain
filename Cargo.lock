@@ -1949,6 +1949,7 @@ dependencies = [
  "log",
  "node-5ire-runtime",
  "node-primitives",
+ "pallet-asset-tx-payment",
  "pallet-assets",
  "pallet-im-online",
  "pallet-transaction-payment",
