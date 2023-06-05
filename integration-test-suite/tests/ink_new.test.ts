@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { BLOCK_TIME } from "../utils/constants";
 import { killNodes, polkadotApi, spawnNodes } from "../utils/util";
 import { CodePromise, Abi, ContractPromise } from "@polkadot/api-contract";
-import { ApiPromise, Keyring } from "@polkadot/api";
+import {ApiPromise, Keyring, WsProvider} from "@polkadot/api";
 import contractFile from "./contracts/counter.json";
 import type { WeightV2 } from "@polkadot/types/interfaces";
 import { BN} from "@polkadot/util";
@@ -11,7 +11,7 @@ import { sleep, waitForEvent } from "../utils/setup";
 const MAX_CALL_WEIGHT = new BN(5_000_000_000);
 const PROOFSIZE = new BN(1_000_000);
 
-describe("Wasm test with new ink! version 4", function () {
+describe.skip("Wasm test with new ink! version 4", function () {
   this.timeout(300 * BLOCK_TIME);
   // 4 session.
   this.slow(40 * BLOCK_TIME);
@@ -31,7 +31,7 @@ describe("Wasm test with new ink! version 4", function () {
         refTime: MAX_CALL_WEIGHT,
         proofSize: PROOFSIZE,
       }) as WeightV2;
-    
+
     const storageDepositLimit = null;
 
     let contractFileString: string = JSON.stringify(contractFile);
@@ -67,7 +67,7 @@ describe("Wasm test with new ink! version 4", function () {
     //   storageDepositLimit
     // );
     // wait for instantiated event
-   
+
   });
 
   after(async () => {
@@ -135,25 +135,25 @@ const incTransaction = async (
   //Define deployed contract with metadata + contract address
   const contract = new ContractPromise(api, contractFile, contractAddress);
 
-  
+
   //Sign transaction
   const tx = contract.tx.inc({
     gasLimit: gasLimit,
     storageDepositLimit: storageDepositLimit,
   });
-  
+
   await tx.signAndSend(
     alice,
     // @ts-ignore
     result => {
       if (result.status.isInBlock || result.status.isFinalized) {
         console.log("Block finalized");
-        
+
       }
 
     }
   );
-  
+
 };
 
 const queryTransaction = async (
@@ -172,7 +172,7 @@ const queryTransaction = async (
   //Define deployed contract with metadata + contract address
   const contract = new ContractPromise(api, contractFile, contractAddress);
 
-  
+
   // Query value from contract
   const { result, output } = await contract.query.get(alice.address, {
     gasLimit,

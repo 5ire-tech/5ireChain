@@ -24,8 +24,8 @@ export const spawnNodes = async () => {
     fs.rmSync(tmpDir, { recursive: true });
   }
   aliceNode = start5ireChainNode('alice', { tmp: true, printLogs: true });
-  bobNode = start5ireChainNode('bob', { tmp: true, printLogs: true });
-  charlieNode = start5ireChainNode('charlie', { tmp: true, printLogs: true });
+  bobNode = start5ireChainNode('bob', { tmp: true, printLogs: false });
+  charlieNode = start5ireChainNode('charlie', { tmp: true, printLogs: false });
 
   console.log('started alice, bob, charlie nodes');
 

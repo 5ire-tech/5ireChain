@@ -2,11 +2,12 @@ import { assert, expect } from "chai";
 import { BLOCK_TIME } from "../utils/constants";
 import { killNodes, polkadotApi, spawnNodes } from "../utils/util";
 import { CodePromise, Abi, ContractPromise } from "@polkadot/api-contract";
-import { ApiPromise, Keyring } from "@polkadot/api";
+import {ApiPromise, Keyring, WsProvider} from "@polkadot/api";
 import abiFile from "./contracts/psp22_token.json";
 import {WeightV2} from "@polkadot/types/interfaces";
 import { sleep, waitForEvent } from "../utils/setup";
 import {BN, BN_ONE} from "@polkadot/util";
+
 describe("Wasm test with erc20 token old ink! version 3", function () {
   this.timeout(300 * BLOCK_TIME);
   // 4 session.
@@ -73,6 +74,7 @@ const deployContract = async (
   address = await new Promise(async (resolve, reject) => {
     await tx.signAndSend(
       alice,
+      {tip: 100, nonce: -1},
       // @ts-ignore
       ({ contract, status, dispatchError }) => {
         if (status.isInBlock || status.isFinalized) {
@@ -88,6 +90,7 @@ const deployContract = async (
     );
   });
 
+  console.log(`address is ${address}`);
   expect(address).not.null;
 
   // Query balanceOf  with Bob account
@@ -99,15 +102,14 @@ const deployContract = async (
   const transfer = contract.tx["psp22::transfer"]({
     gasLimit: gasLimit,
     storageDepositLimit: storageDepositLimit,
-  },bob.address, '100',[]);
-  
+  },bob.address, '10',[]);
+
   await transfer.signAndSend(
     alice,
     // @ts-ignore
     result => {
       if (result.status.isInBlock || result.status.isFinalized) {
         console.log("Block finalized");
-        
       }
 
     }
