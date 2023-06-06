@@ -4,8 +4,6 @@ import {killNodes, polkadotApi, spawnNodes} from "../utils/util";
 
 describe('Setup for test', function () {
   this.timeout(300 * BLOCK_TIME);
-  // 4 session.
-  this.slow(40 * BLOCK_TIME);
 
   before(async () => {
     await spawnNodes()
