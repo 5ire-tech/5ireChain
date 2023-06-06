@@ -1,12 +1,9 @@
 import { expect } from 'chai';
 import { BLOCK_TIME } from '../utils/constants';
 import {killNodes, polkadotApi, spawnNodes} from "../utils/util";
-import {ApiPromise, WsProvider} from "@polkadot/api";
 
 describe('Setup for test', function () {
   this.timeout(300 * BLOCK_TIME);
-  // 4 session.
-  this.slow(40 * BLOCK_TIME);
 
   before(async () => {
     await spawnNodes()

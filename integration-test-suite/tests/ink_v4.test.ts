@@ -1,17 +1,15 @@
-import { expect, assert } from "chai";
+import { expect } from "chai";
 import { BLOCK_TIME } from "../utils/constants";
 import { killNodes, polkadotApi, spawnNodes } from "../utils/util";
-import { CodePromise, Abi, ContractPromise } from "@polkadot/api-contract";
-import { ApiPromise, Keyring, WsProvider } from "@polkadot/api";
+import { CodePromise, ContractPromise } from "@polkadot/api-contract";
+import { ApiPromise, Keyring } from "@polkadot/api";
 import contractFile from "./contracts/counter.json";
 import type { WeightV2 } from "@polkadot/types/interfaces";
 import { BN } from "@polkadot/util";
-import { sleep, waitForEvent } from "../utils/setup";
+import { waitForEvent } from "../utils/setup";
 
 describe("Wasm test with new ink! version 4", function () {
   this.timeout(300 * BLOCK_TIME);
-  // 4 session.
-  this.slow(40 * BLOCK_TIME);
 
   before(async () => {
     await spawnNodes();
