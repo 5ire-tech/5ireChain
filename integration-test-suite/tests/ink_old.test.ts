@@ -23,7 +23,7 @@ describe("Wasm test with psp22 token old ink! version 3", function () {
 
     let wasm = abiFile.source.wasm;
     // deploy contract
-    await deployContract(polkadotApi, abi, wasm);
+    await deployAndExecuteContract(polkadotApi, abi, wasm);
   });
 
   after(async () => {
@@ -31,7 +31,7 @@ describe("Wasm test with psp22 token old ink! version 3", function () {
   });
 });
 
-const deployContract = async (
+const deployAndExecuteContract = async (
   api: ApiPromise,
   contractFile: string,
   contractWasm: string
