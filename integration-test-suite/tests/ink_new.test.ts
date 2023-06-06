@@ -11,7 +11,7 @@ import { sleep, waitForEvent } from "../utils/setup";
 const MAX_CALL_WEIGHT = new BN(5_000_000_000);
 const PROOFSIZE = new BN(1_000_000);
 
-describe.skip("Wasm test with new ink! version 4", function () {
+describe("Wasm test with new ink! version 4", function () {
   this.timeout(300 * BLOCK_TIME);
   // 4 session.
   this.slow(40 * BLOCK_TIME);

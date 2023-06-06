@@ -8,16 +8,15 @@ import {WeightV2} from "@polkadot/types/interfaces";
 import { sleep, waitForEvent } from "../utils/setup";
 import {BN, BN_ONE} from "@polkadot/util";
 
-describe("Wasm test with erc20 token old ink! version 3", function () {
+
+describe("Wasm test with psp22 token old ink! version 3", function () {
   this.timeout(300 * BLOCK_TIME);
-  // 4 session.
-  this.slow(40 * BLOCK_TIME);
 
   before(async () => {
     await spawnNodes();
   });
 
-  it("Should deploy a erc20 token contract to 5ire chain", async () => {
+  it("Should deploy a psp22 token contract to 5ire chain", async () => {
     console.log("Beginning deploying wasm contract");
 
     let abi: string = JSON.stringify(abiFile);
@@ -25,9 +24,6 @@ describe("Wasm test with erc20 token old ink! version 3", function () {
     let wasm = abiFile.source.wasm;
     // deploy contract
     await deployContract(polkadotApi, abi, wasm);
-
-    // wait for instantiated event
-    await waitForEvent(polkadotApi, "contracts", "Instantiated");
   });
 
   after(async () => {
@@ -63,8 +59,8 @@ const deployContract = async (
   const alice = keyring.addFromUri("//Alice");
   const tx = code.tx.new(
     { gasLimit: gasLimit, storageDepositLimit: storageDepositLimit },
-    tokenName,
     tokenSupply,
+    tokenName,
     tokenSymbol,
     tokenDecimal
   );
@@ -93,16 +89,32 @@ const deployContract = async (
   console.log(`address is ${address}`);
   expect(address).not.null;
 
-  // Query balanceOf  with Bob account
+  // wait for instantiated event
+  await waitForEvent(polkadotApi, "contracts", "Instantiated");
+
   const bob = keyring.addFromUri("//Bob");
   const contract = new ContractPromise(api, contractAbi, address);
 
-  // Sign transaction
+  const gasLimitForCallAndQuery = polkadotApi.registry.createType('WeightV2', {
+    refTime: 5908108255,
+    proofSize: new BN(131072),
+  }) as WeightV2;
+  const storageDepositLimitForCallAndQuery = 17000000000;
 
+  const { output:initialBobBalance } = await contract.query["psp22::balanceOf"](
+    alice.address,
+    {
+      gasLimit: gasLimitForCallAndQuery,
+      storageDepositLimit: storageDepositLimitForCallAndQuery,
+    },
+    bob.address,
+  );
+
+  // Sign transaction
   const transfer = contract.tx["psp22::transfer"]({
-    gasLimit: gasLimit,
-    storageDepositLimit: storageDepositLimit,
-  },bob.address, '10',[]);
+    gasLimit: gasLimitForCallAndQuery,
+    storageDepositLimit: storageDepositLimitForCallAndQuery,
+  },bob.address, '400',[]);
 
   await transfer.signAndSend(
     alice,
@@ -115,21 +127,19 @@ const deployContract = async (
     }
   );
 
-  const { result, output } = await contract.query["psp22::balanceOf"](
+  // wait for contract called event
+  await waitForEvent(polkadotApi, 'contracts', 'Called')
+
+  const { output:finalBobBalance } = await contract.query["psp22::balanceOf"](
     alice.address,
     {
-      gasLimit: gasLimit,
-      storageDepositLimit: null,
+      gasLimit: gasLimitForCallAndQuery,
+      storageDepositLimit: storageDepositLimitForCallAndQuery,
     },
-    bob.address
+    bob.address,
   );
-  // check if the call was successful
-  if (result.isOk) {
-    // output the return value
-    console.log("Success in old smart contract -> Value:", output?.toHuman());
-  } else {
-    console.error("Error", result.asErr);
-  }
 
-
+  // Expect Bobs balance to have increased
+  // @ts-ignore
+  expect(finalBobBalance?.toHuman() > initialBobBalance?.toHuman()).true
 };
