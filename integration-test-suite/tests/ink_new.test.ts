@@ -1,15 +1,12 @@
-import { expect } from "chai";
+import { expect, assert } from "chai";
 import { BLOCK_TIME } from "../utils/constants";
 import { killNodes, polkadotApi, spawnNodes } from "../utils/util";
 import { CodePromise, Abi, ContractPromise } from "@polkadot/api-contract";
-import {ApiPromise, Keyring, WsProvider} from "@polkadot/api";
+import { ApiPromise, Keyring, WsProvider } from "@polkadot/api";
 import contractFile from "./contracts/counter.json";
 import type { WeightV2 } from "@polkadot/types/interfaces";
-import { BN} from "@polkadot/util";
+import { BN } from "@polkadot/util";
 import { sleep, waitForEvent } from "../utils/setup";
-
-const MAX_CALL_WEIGHT = new BN(5_000_000_000);
-const PROOFSIZE = new BN(1_000_000);
 
 describe("Wasm test with new ink! version 4", function () {
   this.timeout(300 * BLOCK_TIME);
@@ -26,11 +23,10 @@ describe("Wasm test with new ink! version 4", function () {
     const keyring = new Keyring({ type: "sr25519" });
     const alice = keyring.addFromUri("//Alice");
 
-    //const gasLimit = 100000n * 1000000n;
-    const gasLimit = polkadotApi.registry.createType('WeightV2', {
-        refTime: MAX_CALL_WEIGHT,
-        proofSize: PROOFSIZE,
-      }) as WeightV2;
+    const gasLimit = polkadotApi.registry.createType("WeightV2", {
+      refTime: 5908108255,
+      proofSize: new BN(131072),
+    }) as WeightV2;
 
     const storageDepositLimit = null;
 
@@ -48,6 +44,24 @@ describe("Wasm test with new ink! version 4", function () {
     );
     console.log("Address:", contractAddress);
     await waitForEvent(polkadotApi, "contracts", "Instantiated");
+
+    // query transaction
+    let countBefore = await queryTransaction(
+      alice,
+      polkadotApi,
+      contractFileString,
+      contractAddress,
+      gasLimit,
+      storageDepositLimit
+    );
+    // Before trigger inc function
+    // count should be 0
+
+    const actualBefore = { Ok: "0".toString() };
+
+    // @ts-ignore
+    expect(countBefore).to.deep.equal(actualBefore);
+
     // interact contract with inc transaction
     await incTransaction(
       alice,
@@ -57,17 +71,24 @@ describe("Wasm test with new ink! version 4", function () {
       gasLimit,
       storageDepositLimit
     );
-    // query transaction
-    // await queryTransaction(
-    //   alice,
-    //   polkadotApi,
-    //   contractFileString,
-    //   contractAddress,
-    //   gasLimit,
-    //   storageDepositLimit
-    // );
-    // wait for instantiated event
 
+    // wait for contract called event
+    await waitForEvent(polkadotApi, "contracts", "Called");
+
+    // query transaction
+    let countAfter = await queryTransaction(
+      alice,
+      polkadotApi,
+      contractFileString,
+      contractAddress,
+      gasLimit,
+      storageDepositLimit
+    );
+    // After trigger inc function
+    // count should be 1
+    const actualAfter = { Ok: "1".toString() };
+    // @ts-ignore
+    expect(countAfter).to.deep.equal(actualAfter);
   });
 
   after(async () => {
@@ -128,13 +149,10 @@ const incTransaction = async (
   gasLimit: WeightV2,
   storageDepositLimit: any
 ) => {
-  console.log("Begin signing transaction smart contract");
+  console.log("Begin triggering inc transaction smart contract");
   // convert contract json file into usable contract ABI
-  //let contractAbi = new Abi(contractFile, api?.registry?.getChainProperties());
-  //console.log("Metadata:",contractAbi.json);
   //Define deployed contract with metadata + contract address
   const contract = new ContractPromise(api, contractFile, contractAddress);
-
 
   //Sign transaction
   const tx = contract.tx.inc({
@@ -145,15 +163,12 @@ const incTransaction = async (
   await tx.signAndSend(
     alice,
     // @ts-ignore
-    result => {
+    (result) => {
       if (result.status.isInBlock || result.status.isFinalized) {
         console.log("Block finalized");
-
       }
-
     }
   );
-
 };
 
 const queryTransaction = async (
@@ -164,14 +179,10 @@ const queryTransaction = async (
   gasLimit: WeightV2,
   storageDepositLimit: any
 ) => {
-
   console.log("Begin querying smart contract");
 
-  // convert contract json file into usable contract ABI
-  //let contractAbi = new Abi(contractFile, api?.registry?.getChainProperties());
   //Define deployed contract with metadata + contract address
   const contract = new ContractPromise(api, contractFile, contractAddress);
-
 
   // Query value from contract
   const { result, output } = await contract.query.get(alice.address, {
@@ -179,10 +190,9 @@ const queryTransaction = async (
     storageDepositLimit,
   });
   // check if the call was successful
-  if (result.isOk) {
-    // output the return value
-    console.log("Success -> Value:", output?.toHuman());
-  } else {
-    console.error("Error", result.asErr);
-  }
+  expect(result.isOk).to.equal(true);
+
+  let value = output?.toHuman();
+
+  return value;
 };
