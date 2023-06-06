@@ -160,13 +160,13 @@ fn staging_testnet_config_genesis() -> GenesisConfig {
 			// 5DMa31Hd5u1dwoRKgC4uvqyrdK45RHv3CpwvpUC1EzuwDit4
 			array_bytes::hex2array_unchecked("3919132b851ef0fd2dae42a7e734fe547af5a6b809006100f48944d7fae8e8ef")
 				.unchecked_into(),
-			// 5C4vDQxA8LTck2xJEy4Yg1hM9qjDt4LvTQaMo4Y8ne43aU6x
+			// 5C4vDQxA8LTck2xJEy4Yg1hM9qjDt4LvTUATMo4Y8ne43aU6x
 			array_bytes::hex2array_unchecked("00299981a2b92f878baaf5dbeba5c18d4e70f2a1fcd9c61b32ea18daf38f4378")
 				.unchecked_into(),
-			// 5C4vDQxA8LTck2xJEy4Yg1hM9qjDt4LvTQaMo4Y8ne43aU6x
+			// 5C4vDQxA8LTck2xJEy4Yg1hM9qjDt4LvTUATMo4Y8ne43aU6x
 			array_bytes::hex2array_unchecked("00299981a2b92f878baaf5dbeba5c18d4e70f2a1fcd9c61b32ea18daf38f4378")
 				.unchecked_into(),
-			// 5C4vDQxA8LTck2xJEy4Yg1hM9qjDt4LvTQaMo4Y8ne43aU6x
+			// 5C4vDQxA8LTck2xJEy4Yg1hM9qjDt4LvTUATMo4Y8ne43aU6x
 			array_bytes::hex2array_unchecked("00299981a2b92f878baaf5dbeba5c18d4e70f2a1fcd9c61b32ea18daf38f4378")
 				.unchecked_into(),
 		),

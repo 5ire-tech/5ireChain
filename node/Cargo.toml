@@ -29,68 +29,68 @@ log = "0.4.17"
 
 
 futures = "0.3.21"
-sc-cli = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sp-core = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-executor = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-service = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-telemetry = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-keystore = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sp-keystore = { version = "0.13.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-transaction-pool = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-transaction-pool-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-consensus-babe = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-consensus-slots = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sp-consensus-babe = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-consensus-uncles = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sp-consensus = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-consensus = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-consensus-epochs = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-# sc-finality-grandpa = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-grandpa = { version = "0.10.0-dev", package = "sc-finality-grandpa",  git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"  }
-# sp-finality-grandpa = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-client-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-chain-spec = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-network = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-network-common = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sp-runtime = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sp-timestamp = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sp-authorship = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sp-inherents = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sp-keyring = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sp-transaction-storage-proof = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sp-authority-discovery = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-sync-state-rpc = { version = "0.10.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-sysinfo = { version = "6.0.0-dev",  git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-grandpa-primitives = { version = "4.0.0-dev", package = "sp-finality-grandpa", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
+sc-cli = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sp-core = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-executor = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-service = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-telemetry = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-keystore = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sp-keystore = { version = "0.13.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-transaction-pool = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-transaction-pool-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-consensus-babe = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-consensus-slots = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sp-consensus-babe = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-consensus-uncles = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sp-consensus = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-consensus = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-consensus-epochs = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+# sc-finality-grandpa = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+grandpa = { version = "0.10.0-dev", package = "sc-finality-grandpa",  git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"  }
+# sp-finality-grandpa = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-client-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-chain-spec = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-network = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-network-common = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sp-runtime = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sp-timestamp = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sp-authorship = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sp-inherents = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sp-keyring = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sp-transaction-storage-proof = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sp-authority-discovery = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-sync-state-rpc = { version = "0.10.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-sysinfo = { version = "6.0.0-dev",  git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+grandpa-primitives = { version = "4.0.0-dev", package = "sp-finality-grandpa", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
 # These dependencies are used for the node template's RPCs
 jsonrpc-core = "18.0.0"
-sc-rpc = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sp-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-rpc-api = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sp-blockchain = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sp-block-builder = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-basic-authorship = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-consensus-babe-rpc = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-finality-grandpa-rpc = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-substrate-frame-rpc-system = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-transaction-payment-rpc = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-#pallet-contracts-rpc = { version = "4.0.0-dev",  git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"  }
-substrate-state-trie-migration-rpc = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"  }
-sc-authority-discovery = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"  }
-pallet-assets = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-asset-tx-payment = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
+sc-rpc = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sp-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-rpc-api = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sp-blockchain = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sp-block-builder = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-basic-authorship = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-consensus-babe-rpc = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-finality-grandpa-rpc = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+substrate-frame-rpc-system = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-transaction-payment-rpc = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+#pallet-contracts-rpc = { version = "4.0.0-dev",  git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"  }
+substrate-state-trie-migration-rpc = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"  }
+sc-authority-discovery = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"  }
+pallet-assets = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-asset-tx-payment = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
 
 # These dependencies are used for runtime benchmarking
-frame-benchmarking = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-frame-benchmarking-cli = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
+frame-benchmarking = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+frame-benchmarking-cli = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
 
 # frame dependencies
-pallet-im-online = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-frame-system = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-transaction-payment = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-frame-system-rpc-runtime-api = { version = "4.0.0-dev",  git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
+pallet-im-online = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+frame-system = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-transaction-payment = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+frame-system-rpc-runtime-api = { version = "4.0.0-dev",  git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
 
-# node-executor = { version = "3.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"  }
+# node-executor = { version = "3.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"  }
 #frontier
 # Frontier
 fc-cli = { path = "../client/cli" }
@@ -107,20 +107,20 @@ fp-storage = { path = "../primitives/storage" }
 
 # Local Dependencies
 node-5ire-runtime = { version = "4.0.0-dev", path = "../runtime" }
-node-primitives = { version = "2.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
+node-primitives = { version = "2.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false  }
 
 [build-dependencies]
-substrate-build-script-utils = { version = "3.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" ,optional = true }
+substrate-build-script-utils = { version = "3.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" ,optional = true }
 
 
 
 clap = { version = "4.0.9", optional = true }
 clap_complete = { version = "4.0.2", optional = true }
-# node-inspect = { version = "0.9.0-dev", optional = true,  git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-frame-benchmarking-cli = { version = "4.0.0-dev", optional = true, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-substrate-frame-cli = { version = "4.0.0-dev", optional = true, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-try-runtime-cli = { version = "0.10.0-dev", optional = true, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sc-cli = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", optional = true }
+# node-inspect = { version = "0.9.0-dev", optional = true,  git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+frame-benchmarking-cli = { version = "4.0.0-dev", optional = true, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+substrate-frame-cli = { version = "4.0.0-dev", optional = true, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+try-runtime-cli = { version = "0.10.0-dev", optional = true, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sc-cli = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", optional = true }
 
 
 [features]

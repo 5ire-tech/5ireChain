@@ -14,10 +14,10 @@ ethereum-types = { version = "0.14.1", default-features = false }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 # Substrate
-sc-cli = { version = "0.10.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-sp-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sp-blockchain = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sp-runtime = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
+sc-cli = { version = "0.10.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+sp-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false }
+sp-blockchain = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false }
+sp-runtime = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false }
 # Frontier
 fc-db = { path = "../db" }
 fp-rpc = { version = "3.0.0-dev", path = "../../primitives/rpc" }
@@ -28,11 +28,11 @@ futures = "0.3.21"
 scale-codec = { package = "parity-scale-codec", version = "3.2.1", default-features = false, features = ["derive"] }
 tempfile = "3.3.0"
 # Substrate
-sc-block-builder = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sc-client-db = { version = "0.10.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA",default-features = false  }
-sp-consensus = { version = "0.10.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sp-io = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-substrate-test-runtime-client = { version = "2.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
+sc-block-builder = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false }
+sc-client-db = { version = "0.10.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT",default-features = false  }
+sp-consensus = { version = "0.10.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false }
+sp-io = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false }
+substrate-test-runtime-client = { version = "2.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false  }
 # Frontier
 
 node-5ire-runtime = { path = "../../runtime" }

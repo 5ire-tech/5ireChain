@@ -19,23 +19,23 @@ scale-codec = { package = "parity-scale-codec", version = "3.2.1", default-featu
 scale-info = { version = "2.3.1", default-features = false, features = ["derive"] }
 
 # Substrate
-sp-core = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sp-io = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sp-runtime = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
-sp-std = { version = "5.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
+sp-core = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false }
+sp-io = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false }
+sp-runtime = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false  }
+sp-std = { version = "5.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false }
 # Substrate FRAME
-frame-benchmarking = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false,  optional = true }
-frame-support = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
-frame-system = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-pallet-timestamp = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
+frame-benchmarking = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false,  optional = true }
+frame-support = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false  }
+frame-system = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false }
+pallet-timestamp = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false  }
 
 # Frontier
 fp-evm = { version = "3.0.0-dev", path = "../../primitives/evm", default-features = false }
 
 [dev-dependencies]
 # Substrate
-pallet-balances = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
-pallet-evm-precompile-simple = { version = "2.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
+pallet-balances = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false  }
+pallet-evm-precompile-simple = { version = "2.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false  }
 
 [features]
 default = ["std"]

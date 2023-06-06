@@ -129,7 +129,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("node-template"),
 	impl_name: create_runtime_str!("5ire"),
 	authoring_version: 1,
-	spec_version: 114,
+	spec_version: 110,
 	impl_version: 0,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
@@ -712,7 +712,7 @@ pallet_staking_reward_curve::build! {
 
 parameter_types! {
 	pub const SessionsPerEra: sp_staking::SessionIndex = 1;
-	pub const BondingDuration: sp_staking::EraIndex = 1;
+	pub const BondingDuration: sp_staking::EraIndex = 24 * 28;
 	pub const SlashDeferDuration: sp_staking::EraIndex = 24 * 7; // 1/4 the bonding duration.
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
 	pub const MaxNominatorRewardedPerValidator: u32 = 256;

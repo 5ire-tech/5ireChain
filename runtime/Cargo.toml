@@ -27,92 +27,92 @@ static_assertions = "1.1.0"
 log = { version = "0.4.17", default-features = false }
 
 # primitives
-sp-authority-discovery = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-sp-consensus-babe = { version = "0.10.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sp-block-builder = { git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false, version = "4.0.0-dev" }
-sp-inherents = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-node-primitives = { version = "2.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-sp-offchain = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sp-core = { version = "7.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sp-std = { version = "5.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sp-api = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-sp-runtime = { version = "7.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-sp-staking = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sp-session = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-sp-transaction-pool = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-sp-version = { version = "5.0.0", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-sp-io = { version = "7.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
+sp-authority-discovery = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+sp-consensus-babe = { version = "0.10.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sp-block-builder = { git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false, version = "4.0.0-dev" }
+sp-inherents = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+node-primitives = { version = "2.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+sp-offchain = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sp-core = { version = "7.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sp-std = { version = "5.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sp-api = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+sp-runtime = { version = "7.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+sp-staking = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sp-session = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+sp-transaction-pool = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+sp-version = { version = "5.0.0", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+sp-io = { version = "7.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
 
 # frame dependencies
-frame-executive = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-frame-benchmarking = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", optional = true }
-frame-support = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-frame-system = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-frame-system-benchmarking = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", optional = true }
-frame-election-provider-support = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-frame-system-rpc-runtime-api = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-frame-try-runtime = { version = "0.10.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", optional = true }
-pallet-alliance = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-assets = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-authority-discovery = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-authorship = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-babe = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-bags-list = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-balances = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-bounties = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-child-bounties = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-collective = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-contracts = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-contracts-primitives = { version = "7.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-conviction-voting = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-democracy = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-election-provider-multi-phase = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-election-provider-support-benchmarking = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", optional = true }
-pallet-elections-phragmen = { version = "5.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-fast-unstake = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-nis = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-grandpa = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-im-online = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-indices = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-identity = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-lottery = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-membership = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-message-queue = { version = "7.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-mmr = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-multisig = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-nomination-pools = { version = "1.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-nomination-pools-benchmarking = { version = "1.0.0", default-features = false, optional = true, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-nomination-pools-runtime-api = { version = "1.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-offences = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-offences-benchmarking = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false, optional = true }
-pallet-preimage = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-proxy = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-randomness-collective-flip = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-ranked-collective = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-recovery = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-referenda = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-remark = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-root-testing = { version = "1.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-session = { version = "4.0.0-dev", features = [ "historical" ],git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-pallet-session-benchmarking = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false, optional = true }
-pallet-staking = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-staking-reward-curve = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-state-trie-migration = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-scheduler = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-society = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-sudo = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-timestamp = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-tips = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-treasury = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-utility = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-transaction-payment = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-transaction-payment-rpc-runtime-api = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-asset-tx-payment = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
-pallet-transaction-storage = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-uniques = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-vesting = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-whitelist = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA"}
-pallet-esg = {version = "1.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
+frame-executive = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+frame-benchmarking = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", optional = true }
+frame-support = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+frame-system = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+frame-system-benchmarking = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", optional = true }
+frame-election-provider-support = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+frame-system-rpc-runtime-api = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+frame-try-runtime = { version = "0.10.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", optional = true }
+pallet-alliance = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-assets = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-authority-discovery = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-authorship = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-babe = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-bags-list = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-balances = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-bounties = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-child-bounties = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-collective = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-contracts = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-contracts-primitives = { version = "7.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-conviction-voting = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-democracy = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-election-provider-multi-phase = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-election-provider-support-benchmarking = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", optional = true }
+pallet-elections-phragmen = { version = "5.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-fast-unstake = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-nis = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-grandpa = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-im-online = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-indices = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-identity = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-lottery = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-membership = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-message-queue = { version = "7.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-mmr = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-multisig = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-nomination-pools = { version = "1.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-nomination-pools-benchmarking = { version = "1.0.0", default-features = false, optional = true, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-nomination-pools-runtime-api = { version = "1.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-offences = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-offences-benchmarking = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false, optional = true }
+pallet-preimage = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-proxy = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-randomness-collective-flip = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-ranked-collective = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-recovery = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-referenda = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-remark = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-root-testing = { version = "1.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-session = { version = "4.0.0-dev", features = [ "historical" ],git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false }
+pallet-session-benchmarking = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false, optional = true }
+pallet-staking = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-staking-reward-curve = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-state-trie-migration = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-scheduler = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-society = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-sudo = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-timestamp = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-tips = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-treasury = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-utility = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-transaction-payment = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-transaction-payment-rpc-runtime-api = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-asset-tx-payment = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
+pallet-transaction-storage = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-uniques = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-vesting = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-whitelist = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT"}
+pallet-esg = {version = "1.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
 
 # pallet-evm = { version="6.0.0-dev", path = "../../../evm-frame/evm", default-features = false }
 
@@ -133,7 +133,7 @@ pallet-evm-precompile-simple = {version = "2.0.0-dev", path = "../frame/evm/prec
 pallet-hotfix-sufficients = {version = "1.0.0", path = "../frame/hotfix-sufficients", default-features = false }
 # pallet-evm-chain-id = { version = "1.0.0-dev", path = "../frame/evm-chain-id", default-features = false }
 [build-dependencies]
-substrate-wasm-builder = { version = "5.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
+substrate-wasm-builder = { version = "5.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT" }
 
 [features]
 default = ["std"]

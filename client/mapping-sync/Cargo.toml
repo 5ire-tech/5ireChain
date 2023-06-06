@@ -13,10 +13,10 @@ futures = "0.3.25"
 futures-timer = "3.0.1"
 log = "0.4.17"
 # Substrate
-sc-client-api = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sp-api = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sp-blockchain = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
-sp-runtime = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
+sc-client-api = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false }
+sp-api = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false }
+sp-blockchain = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false  }
+sp-runtime = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false }
 # Frontier
 fc-db = { path = "../db" }
 fp-consensus = { version = "2.0.0-dev", path = "../../primitives/consensus" }

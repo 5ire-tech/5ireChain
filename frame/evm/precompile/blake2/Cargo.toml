@@ -10,7 +10,7 @@ description = "BLAKE2 precompiles for EVM pallet."
 fp-evm = { version = "3.0.0-dev", path = "../../../../primitives/evm", default-features = false }
 
 [dev-dependencies]
-pallet-evm-test-vector-support = { version = "1.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
+pallet-evm-test-vector-support = { version = "1.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false }
 
 [features]
 default = ["std"]

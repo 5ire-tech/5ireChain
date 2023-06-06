@@ -11,7 +11,7 @@ hex = "0.4.3"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 # Substrate
-sp-core = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
+sp-core = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "UAT", default-features = false  }
 # Frontier
 fp-evm = { version = "3.0.0-dev", path = "../../../primitives/evm", default-features = false }
 
