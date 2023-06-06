@@ -16,11 +16,11 @@ parking_lot = "0.12.1"
 scale-codec = { package = "parity-scale-codec", version = "3.2.1", default-features = false, features = ["derive"] }
 smallvec = "1.10"
 # Substrate
-sp-blockchain = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git" , branch = "upgrade/5irechain-V0.1", default-features = false}
-sc-client-db = { version = "0.10.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1",default-features = false  }
-sp-core = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git" , branch = "upgrade/5irechain-V0.1", default-features = false}
-sp-database = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1", default-features = false }
-sp-runtime = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git" , branch = "upgrade/5irechain-V0.1", default-features = false}
+sp-blockchain = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git" , branch = "QA", default-features = false}
+sc-client-db = { version = "0.10.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA",default-features = false  }
+sp-core = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git" , branch = "QA", default-features = false}
+sp-database = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
+sp-runtime = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git" , branch = "QA", default-features = false}
 # Frontier
 fp-storage = { version = "2.0.0", path = "../../primitives/storage" }
 
@@ -31,6 +31,6 @@ default = ["kvdb-rocksdb", "parity-db"]
 futures = "0.3.25"
 tempfile = "3.3.0"
 # Substrate
-sp-block-builder = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1", default-features = false }
-sp-consensus = { version = "0.10.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1", default-features = false }
-substrate-test-runtime-client = { version = "2.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1", default-features = false  }
+sp-block-builder = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
+sp-consensus = { version = "0.10.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
+substrate-test-runtime-client = { version = "2.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }

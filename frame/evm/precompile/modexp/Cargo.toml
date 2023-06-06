@@ -13,7 +13,7 @@ fp-evm = { version = "3.0.0-dev", path = "../../../../primitives/evm", default-f
 [dev-dependencies]
 hex = "0.4.3"
 # Frontier
-pallet-evm-test-vector-support = { version = "1.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1", default-features = false  }
+pallet-evm-test-vector-support = { version = "1.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
 
 [features]
 default = ["std"]

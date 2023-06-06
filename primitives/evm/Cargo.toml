@@ -14,9 +14,9 @@ evm = { version = "0.37.0",default-features = false, features = ["with-codec"] }
 scale-codec = { package = "parity-scale-codec", version = "3.2.1", default-features = false, features = ["derive"] }
 serde = { version = "1.0",optional = true, features = ["derive"] }
 # Substrate
-frame-support = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1", default-features = false }
-sp-core = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1", default-features = false  }
-sp-std = { version = "5.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1", default-features = false }
+frame-support = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
+sp-core = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
+sp-std = { version = "5.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
 
 [features]
 default = ["std"]
