@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { BLOCK_TIME } from '../utils/constants';
 import {killNodes, polkadotApi as api, spawnNodes} from "../utils/util";
-import {ApiPromise, Keyring, WsProvider} from "@polkadot/api";
+import {Keyring, WsProvider} from "@polkadot/api";
 import {addressToEvm} from "@polkadot/util-crypto";
 import { KeyringPair } from '@polkadot/keyring/types';
 import {waitForEvent} from "../utils/setup";
@@ -10,7 +10,6 @@ let wsProvider: WsProvider;
 // Keyring needed to sign using Alice account
 const keyring = new Keyring({ type: 'sr25519' });
 
-// ByteCode of our ERC20 exemple: copied from ./truffle/contracts/MyToken.json
 const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
 
 describe('EVM related tests', function () {
@@ -23,7 +22,7 @@ describe('EVM related tests', function () {
 
   // Should init and create contracts
   it('Should init and create contracts', async () => {
-    const {  alice, bob, aliceEthAccount } = await init();
+    const {  alice, aliceEthAccount } = await init();
 
     await createContract(aliceEthAccount, alice)
   });
@@ -35,44 +34,11 @@ describe('EVM related tests', function () {
 
 // Setup the API and Alice Account
 async function init() {
-  console.log(`Initiating the API (ignore message "Unable to resolve type B..." and "Unknown types found...")`);
-
-  // Initiate the polkadot API.
-  const api = await ApiPromise.create({
-    provider: wsProvider,
-    types: {
-      // mapping the actual specified address format
-      Address: "AccountId",
-      // mapping the lookup
-      LookupSource: "AccountId",
-      Account: {
-        nonce: "U256",
-        balance: "U256"
-      },
-      Transaction: {
-        nonce: "U256",
-        action: "String",
-        gas_price: "u64",
-        gas_limit: "u64",
-        value: "U256",
-        input: "Vec<u8>",
-        signature: "Signature"
-      },
-      Signature: {
-        v: "u64",
-        r: "H256",
-        s: "H256"
-      }
-    }
-  });
-  console.log(`Initialiation done`);
-  console.log(`Genesis at block: ${api.genesisHash.toHex()}`);
-
   const alice = keyring.addFromUri('//Alice', { name: 'Alice default' });
   const bob = keyring.addFromUri('//Bob', { name: 'Bob default' });
 
   const aliceEthAccount = addressToEvm(alice.addressRaw);
-  return { api, alice, bob, aliceEthAccount };
+  return { alice, bob, aliceEthAccount };
 }
 
 // Create the ERC20 contract from ALICE
