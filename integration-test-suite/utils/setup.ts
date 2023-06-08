@@ -183,7 +183,7 @@ export function start5ireChainNode(
       `--${authority}`,
       options.printLogs ? '-linfo' : '-lerror',
       options.tmp ? '--tmp' : '',
-      `--chain=${options.chain}`,
+      `--dev`,
       `--ws-port=${ports[authority].ws}`,
       `--rpc-port=${ports[authority].http}`,
       `--port=${ports[authority].p2p}`,
@@ -300,12 +300,13 @@ export async function sudoTx(
   return new Promise(async (resolve, _reject) => {
     const unsub = await api.tx.sudo
       .sudo(call.method.toHex())
-      .signAndSend(alice, ({ status }) => {
-        console.log("Status: ", status);
+      .signAndSend(alice, {tip: 2000, nonce: -1}, ({ status }) => {
+        //console.log("Status: ", status);
         if (status.isFinalized) {
           unsub();
           resolve();
         }
+
       });
   });
 }
