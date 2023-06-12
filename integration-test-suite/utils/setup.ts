@@ -155,7 +155,7 @@ const defaultOptions: StartOption = {
 /**
  * Start 5ire chain node with different authorities and ports
  */
-export function start5ireChainNode(
+export function   start5ireChainNode(
   authority: 'alice' | 'bob' | 'charlie' | 'dave' | 'eve' | 'ferdie',
   options: StartOption = defaultOptions
 ): child.ChildProcess {
