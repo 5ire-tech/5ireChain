@@ -183,7 +183,6 @@ export function start5ireChainNode(
     [
       `--${authority}`,
       options.printLogs ? '-linfo' : '-lerror',
-      options.tmp ? '--tmp' : '',
       `--dev`,
       `--ws-port=${ports[authority].ws}`,
       `--rpc-port=${ports[authority].http}`,
