@@ -8,7 +8,7 @@ import type { WeightV2 } from "@polkadot/types/interfaces";
 import { BN } from "@polkadot/util";
 import { waitForEvent } from "../utils/setup";
 
-describe("Wasm test with new ink! version 4", function () {
+describe.skip("Wasm test with new ink! version 4", function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {

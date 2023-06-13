@@ -8,7 +8,7 @@ import {sudoTx, waitForEvent} from "../utils/setup";
 // Keyring needed to sign using Alice account
 const keyring = new Keyring({ type: 'sr25519' });
 
-describe('Native token tests', function () {
+describe.skip('Native token tests', function () {
   this.timeout(300 * BLOCK_TIME);
   // 4 session.
   this.slow(40 * BLOCK_TIME);

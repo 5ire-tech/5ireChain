@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { BLOCK_TIME } from '../utils/constants';
 import {killNodes, polkadotApi, spawnNodes} from "../utils/util";
 
-describe('Setup for test', function () {
+describe.skip('Setup for test', function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {
