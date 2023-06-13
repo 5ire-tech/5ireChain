@@ -1944,6 +1944,7 @@ dependencies = [
  "node-5ire-runtime",
  "node-primitives",
  "pallet-assets",
+ "pallet-evm",
  "pallet-im-online",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc",

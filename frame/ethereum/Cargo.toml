@@ -4,7 +4,7 @@ version = "4.0.0-dev"
 license = "Apache-2.0"
 edition = "2021"
 description = "Ethereum compatibility full block processing emulation pallet for Substrate."
- 
+
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
 

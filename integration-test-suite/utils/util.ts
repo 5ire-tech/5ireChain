@@ -1,5 +1,5 @@
 import { SECONDS } from './constants';
-import { ApiPromise } from '@polkadot/api';
+import {ApiPromise} from '@polkadot/api';
 import { ChildProcess, execSync } from 'child_process';
 import fs from 'fs';
 import {

@@ -225,7 +225,7 @@ std = [
 	"pallet-child-bounties/std",
 	"pallet-alliance/std",
 	"pallet-esg/std",
-	
+
 
 	#frontier
 	'fp-rpc/std',
