@@ -8,24 +8,24 @@ import {waitForEvent} from "../utils/setup";
 import {bytesToHex} from "web3-utils";
 // Keyring needed to sign using Alice account
 const keyring = new Keyring({ type: 'sr25519' });
+
 const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
 
-describe.skip('EVM related tests', function () {
+describe('EVM related tests', function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {
     await spawnNodes();
   });
 
-  // Should init and create contracts
-  it('Should init and create contracts', async () => {
-    const {alice, aliceEthAccount} = await init();
-
-    await createContract(aliceEthAccount, alice)
+  // Should do evm deposit
+  it('Should do evm deposit', async () => {
+    const {alice, bob, aliceEthAccount} = await init();
+    await depositInEVM(aliceEthAccount, alice, bob);
   });
 
   after(async () => {
-    //await killNodes();
+    await killNodes();
   });
 
   // Setup the API and Alice Account
@@ -47,27 +47,22 @@ describe.skip('EVM related tests', function () {
     return {alice, bob, aliceEthAccount};
   }
 
-  // Create the ERC20 contract from ALICE
-  async function createContract(evmAddress: any, alice: KeyringPair) {
+  // Deposit into evm
+  async function depositInEVM(aliceEthAccount: Uint8Array, alice: KeyringPair, bob: KeyringPair) {
+    // Retrieve the account balance & nonce for Alice
+    // @ts-ignore
+    const { data: bobInitialBalance } = await api.query.system.account(bob.address);
+    console.log(`bob initial balance is ${bobInitialBalance.free.toHuman()}`);
 
-    console.log(`\n: Creating Smart Contract`);
+    const address = aliceEthAccount;
 
-    const source = evmAddress;
-    const init = ERC20_BYTECODES;
-    const value = 0;
-    const gasLimit = 100_000_00;
-    const maxFeePerGas = 100_000_000_000;
-    const maxPriorityFeePerGas: BigInt = BigInt(100_000_000);
-    const nonce = 0;
-    const accessList = null;
+    const deposit = await api.tx.evm.deposit(address, 7000000);
 
-    const transaction = await api.tx.evm.create(source, init, value, gasLimit, maxFeePerGas, maxPriorityFeePerGas, nonce, accessList);
-
-    const contract = new Promise<{ block: string, address: string }>(async (resolve, reject) => {
-      const unsub = await transaction.signAndSend(alice, {tip: 2000, nonce: -1}, (result) => {
-        console.log(`Contract creation is ${result.status}`);
+    const transaction = new Promise<{}>(async (resolve, reject) => {
+      const unsub = await deposit.signAndSend(bob, {tip: 2000, nonce: -1}, (result) => {
+        console.log(`EVM Deposit is ${result.status}`);
         if (result.status.isInBlock) {
-          console.log(`Contract included at blockHash ${result.status.asInBlock}`);
+          console.log(`EVM Deposit included at blockHash ${result.status.asInBlock}`);
           console.log(`Waiting for finalization... (can take a minute)`);
         } else if (result.status.isFinalized) {
           const data = JSON.stringify(result.events);
@@ -75,23 +70,19 @@ describe.skip('EVM related tests', function () {
 
           const dataStr = JSON.parse(data);
 
-          const filteredData = dataStr.filter((item: any) => item.event.index === "0x3a01");
-          const contractAddress = filteredData[0].event.data[0];
-          expect(contractAddress).not.undefined;
-
-          console.log(`Contract address: ${contractAddress}`);
           unsub();
-          resolve({
-            block: result.status.asFinalized.toString(),
-            address: contractAddress
-          });
+          resolve({});
         }
       });
-
-      await waitForEvent(api, 'evm', 'Created')
-
     });
-    return contract;
-  }
 
+    await waitForEvent(api, 'balances', 'Transfer');
+
+    // Retrieve the account balance for Alice
+    // @ts-ignore
+    const { data: bobBalance} = await api.query.system.account(bob.address);
+    console.log(`bob balance is ${bobBalance.free.toHuman()}`);
+
+    expect(bobBalance.free.toBigInt() < bobInitialBalance.free.toBigInt()).true;
+  }
 });

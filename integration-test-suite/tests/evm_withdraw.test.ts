@@ -8,24 +8,24 @@ import {waitForEvent} from "../utils/setup";
 import {bytesToHex} from "web3-utils";
 // Keyring needed to sign using Alice account
 const keyring = new Keyring({ type: 'sr25519' });
+
 const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
 
-describe.skip('EVM related tests', function () {
+describe('EVM related tests', function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {
     await spawnNodes();
   });
 
-  // Should init and create contracts
-  it('Should init and create contracts', async () => {
-    const {alice, aliceEthAccount} = await init();
-
-    await createContract(aliceEthAccount, alice)
+  // Should do evm deposit
+  it('Should do evm withdrawal', async () => {
+    const {alice, bob, aliceEthAccount} = await init();
+    await withdrawInEVM(aliceEthAccount, alice, bob);
   });
 
   after(async () => {
-    //await killNodes();
+    await killNodes();
   });
 
   // Setup the API and Alice Account
@@ -47,27 +47,25 @@ describe.skip('EVM related tests', function () {
     return {alice, bob, aliceEthAccount};
   }
 
-  // Create the ERC20 contract from ALICE
-  async function createContract(evmAddress: any, alice: KeyringPair) {
+  // Withdraw in evm
+  async function withdrawInEVM(aliceEthAccount: Uint8Array, alice: KeyringPair, bob: KeyringPair) {
+    // Retrieve the account balance & nonce for Alice
+    // @ts-ignore
+    const { data: aliceInitialBalance } = await api.query.system.account(alice.address);
+    console.log(`alice initial balance is ${aliceInitialBalance.free.toHuman()}`);
 
-    console.log(`\n: Creating Smart Contract`);
+    const address = aliceEthAccount;
+    const value = api.createType("Balance", "800000000000000000");
 
-    const source = evmAddress;
-    const init = ERC20_BYTECODES;
-    const value = 0;
-    const gasLimit = 100_000_00;
-    const maxFeePerGas = 100_000_000_000;
-    const maxPriorityFeePerGas: BigInt = BigInt(100_000_000);
-    const nonce = 0;
-    const accessList = null;
+    const bobEthAccount = addressToEvm(bob.addressRaw);
 
-    const transaction = await api.tx.evm.create(source, init, value, gasLimit, maxFeePerGas, maxPriorityFeePerGas, nonce, accessList);
+    const withdraw = await api.tx.evm.withdraw(aliceEthAccount, value);
 
-    const contract = new Promise<{ block: string, address: string }>(async (resolve, reject) => {
-      const unsub = await transaction.signAndSend(alice, {tip: 2000, nonce: -1}, (result) => {
-        console.log(`Contract creation is ${result.status}`);
+    const transaction = new Promise<{}>(async (resolve, reject) => {
+      const unsub = await withdraw.signAndSend(alice, {tip: 200000000, nonce: -1}, (result) => {
+        console.log(`EVM Withdrawal is ${result.status}`);
         if (result.status.isInBlock) {
-          console.log(`Contract included at blockHash ${result.status.asInBlock}`);
+          console.log(`EVM Withdrawal included at blockHash ${result.status.asInBlock}`);
           console.log(`Waiting for finalization... (can take a minute)`);
         } else if (result.status.isFinalized) {
           const data = JSON.stringify(result.events);
@@ -75,23 +73,18 @@ describe.skip('EVM related tests', function () {
 
           const dataStr = JSON.parse(data);
 
-          const filteredData = dataStr.filter((item: any) => item.event.index === "0x3a01");
-          const contractAddress = filteredData[0].event.data[0];
-          expect(contractAddress).not.undefined;
-
-          console.log(`Contract address: ${contractAddress}`);
           unsub();
-          resolve({
-            block: result.status.asFinalized.toString(),
-            address: contractAddress
-          });
+          resolve({});
         }
       });
-
-      await waitForEvent(api, 'evm', 'Created')
-
     });
-    return contract;
-  }
 
+    await waitForEvent(api, 'balances', 'Transfer');
+
+    // Retrieve the account balance for Alice
+    // @ts-ignore
+    const { data: aliceBalance} = await api.query.system.account(alice.address);
+    console.log(`alice balance is ${aliceBalance.free.toHuman()}`);
+    expect(  aliceBalance.free.toBigInt() > aliceInitialBalance.free.toBigInt()).true;
+  }
 });
