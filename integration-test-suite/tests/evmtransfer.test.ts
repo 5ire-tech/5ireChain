@@ -10,7 +10,7 @@ import { Web3 } from "web3";
 // Keyring needed to sign using Alice account
 const keyring = new Keyring({ type: 'sr25519' });
 
-describe('Native token tests', function () {
+describe('EVM token tests', function () {
   this.timeout(300 * BLOCK_TIME);
   // 4 session.
   this.slow(40 * BLOCK_TIME);
@@ -38,21 +38,32 @@ describe('Native token tests', function () {
     //assert that bob initial evm balance is 0
     expect(bobBalance).to.equal(expectationBalance);
 
-    
+
+
 
     //Tranfer between BobEthAccount and AliceEthAccount
 
-    //sending Transaction
-    var result =await web3.eth.sendTransaction({from: AliceaddressString, to: BobaddressString, value: web3.utils.toWei("10", "ether")})
-    .then(function (receipt){
-            console.log("Status is:",receipt.status)
-    });
-    console.log(result);
-    console.log("Balance:",bobBalance);
-    console.log("Alice EVM Balance:", AliceBalance);
+        var originalAmountToSend = '0.01';
+        var amountToSend = web3.utils.toWei(originalAmountToSend, 'ether');
+        var Tx = require('ethereumjs-tx');
+        var privateKey = Buffer.from('e5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a', 'hex')
+        var count= web3.eth.getTransactionCount(AliceaddressString);
+        var rawTx = {
+        from: AliceaddressString,
+        nonce: web3.utils.toHex(count),
+        gasPrice: web3.utils.toHex(5000000000),
+        gasLimit: web3.utils.toHex(220000),
+        to: BobaddressString,
+        value: web3.utils.toHex(amountToSend)
+        }
 
-    //Sign the Transaction
-
+        var tx = new Tx(rawTx);
+        tx.sign(privateKey);
+        var serializedTx = tx.serialize();
+        console.log("SerializedTX",serializedTx.toString('hex'));
+        // 0xf889808609184e72a00082271094000000000000000000000000000000000000000080a47f74657374320000000000000000000000000000000000000000000000000000006000571ca08a8bbf888cfa37bbf0bb965423625641fc956967b81d12e23709cead01446075a01ce999b56a8a88504be365442ea61239198e23d1fce7d00fcfc5cd3b44b7215f
+        var result = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'));
+        console.log("Result", result);
     
 
   });
