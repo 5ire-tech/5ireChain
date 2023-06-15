@@ -34,7 +34,7 @@ describe("Swap token tests", function () {
     );
     const addressString = web3.utils.bytesToHex(bobEthAccount);
     let bobBalance = await web3.eth.getBalance(addressString);
-    console.log("Balance:",bobBalance);
+    console.log("Balance:", bobBalance);
     let expectationBalance = web3.utils.toBigInt(0);
     //assert that bob initial evm balance is 0
     expect(bobBalance).to.equal(expectationBalance);
@@ -42,28 +42,23 @@ describe("Swap token tests", function () {
     //Create a extrinsic, transferring 10 5ire coin to Bob
     const amount = polkadotApi.createType("Balance", "10000000000000000000");
     const transaction = polkadotApi.tx.evm.deposit(bobEthAccount, amount);
-    
+
     const unsub = await transaction.signAndSend(bob, (result) => {
       console.log(`Swap is ${result.status}`);
       if (result.status.isInBlock) {
-        console.log(
-          `Swap included at blockHash ${result.status.asInBlock}`
-        );
+        console.log(`Swap included at blockHash ${result.status.asInBlock}`);
         console.log(`Waiting for finalization... (can take a minute)`);
       } else if (result.status.isFinalized) {
         console.log(`events are ${result.events}`);
-        console.log(
-          `Swap finalized at blockHash ${result.status.asFinalized}`
-        );
+        console.log(`Swap finalized at blockHash ${result.status.asFinalized}`);
         unsub();
       }
     });
 
-    await waitForEvent(polkadotApi, 'transactionPayment', 'TransactionFeePaid');
+    await waitForEvent(polkadotApi, "transactionPayment", "TransactionFeePaid");
     let bobBalanceAfter = await web3.eth.getBalance(addressString);
-    let expectationBalanceAfter = web3.utils.toBigInt("10000000000000000000"); 
+    let expectationBalanceAfter = web3.utils.toBigInt("10000000000000000000");
     expect(bobBalanceAfter).to.equal(expectationBalanceAfter);
-
   });
 
   after(async () => {
