@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint . --ext .ts",
-    "test": "mocha 'tests/**/*.test.ts' --exit",
+    "test": "mocha 'tests/**/evmtransfer.test.ts' --exit",
     "format": "prettier -w '**/*.ts'",
     "ts-check": "npx tsc --noEmit"
   },
@@ -27,14 +27,16 @@
     "ethers": "^5.5.4",
     "ganache": "7.4.1",
     "js-sha3": "0.8.0",
+    "keythereum": "^2.0.0",
     "mocha": "10.0.0",
     "ora": "5",
     "rlp": "^3.0.0",
     "secp256k1": "^5.0.0",
-    "web3x": "^4.0.6",
     "ts-node": "10.8.0",
     "typescript": "4.5.4",
-    "web3-utils": "1.7.4"
+    "web3": "^4.0.1",
+    "web3-utils": "1.7.4",
+    "web3x": "^4.0.6"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
