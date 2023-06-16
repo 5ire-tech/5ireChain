@@ -55,7 +55,7 @@ describe("Swap token tests", function () {
       }
     });
 
-    await waitForEvent(polkadotApi, "transactionPayment", "TransactionFeePaid");
+    await waitForEvent(polkadotApi, "balances", "Transfer");
     let bobBalanceAfter = await web3.eth.getBalance(addressString);
     let expectationBalanceAfter = web3.utils.toBigInt("10000000000000000000");
     expect(bobBalanceAfter).to.equal(expectationBalanceAfter);
