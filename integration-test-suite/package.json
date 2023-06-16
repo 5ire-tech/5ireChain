@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint . --ext .ts",
-    "test": "mocha 'tests/**/evmtransfer.test.ts' --exit",
+    "test": "mocha 'tests/**/*.test.ts' --exit",
     "format": "prettier -w '**/*.ts'",
     "ts-check": "npx tsc --noEmit"
   },
@@ -21,10 +21,7 @@
     "@types/chai": "^4.3.0",
     "@types/mocha": "^9.1.0",
     "chai": "^4.3.6",
-    "crypto-js": "^4.1.1",
     "ecpair": "^1.0.0",
-    "elliptic": "6.5.4",
-    "ethereum-types": "3.7.1",
     "ethers": "^5.5.4",
     "ganache": "7.4.1",
     "js-sha3": "0.8.0",
@@ -41,9 +38,5 @@
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
-  },
-  "devDependencies": {
-    "@types/elliptic": "^6.4.14",
-    "@types/secp256k1": "^4.0.3"
   }
 }

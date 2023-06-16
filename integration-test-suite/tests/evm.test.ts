@@ -5,8 +5,6 @@ import {Keyring, WsProvider} from "@polkadot/api";
 import {addressToEvm} from "@polkadot/util-crypto";
 import { KeyringPair } from '@polkadot/keyring/types';
 import {waitForEvent} from "../utils/setup";
-
-let wsProvider: WsProvider;
 // Keyring needed to sign using Alice account
 const keyring = new Keyring({ type: 'sr25519' });
 
@@ -17,7 +15,6 @@ describe('EVM related tests', function () {
 
   before(async () => {
     await spawnNodes();
-    wsProvider = new WsProvider('ws://127.0.0.1:9944');
   });
 
   // Should init and create contracts
@@ -44,9 +41,18 @@ async function init() {
 // Create the ERC20 contract from ALICE
 async function createContract(evmAddress:any, alice: KeyringPair) {
 
-  console.log(`\nStep 1: Creating Smart Contract`);
+  console.log(`\n: Creating Smart Contract`);
 
-  const transaction = await api.tx.evm.create(evmAddress, ERC20_BYTECODES, 0, 10000000, 10000000, 1000000, 0, null);
+  const source = evmAddress;
+  const init = ERC20_BYTECODES;
+  const value = 0;
+  const gasLimit = 100_000_00;
+  const maxFeePerGas = 100_000_000_000;
+  const maxPriorityFeePerGas: BigInt =  BigInt(100_000_000);
+  const nonce = 0;
+  const accessList = null;
+
+  const transaction = await api.tx.evm.create(source, init, value, gasLimit, maxFeePerGas, maxPriorityFeePerGas, nonce, accessList);
 
   const contract = new Promise<{ block: string, address: string }>(async (resolve, reject) => {
     const unsub = await transaction.signAndSend(alice, {tip: 200, nonce: -1}, (result) => {
