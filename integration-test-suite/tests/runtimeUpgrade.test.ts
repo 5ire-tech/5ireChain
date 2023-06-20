@@ -15,7 +15,7 @@ import {DetectCodec} from "@polkadot/types/types/detect";
 // Keyring needed to sign using Alice account
 const keyring = new Keyring({ type: "sr25519" });
 
-describe.only("Wasm runtime upgrade", function () {
+describe("Wasm runtime upgrade", function () {
   this.timeout(300 * BLOCK_TIME);
   // 4 session.
   this.slow(40 * BLOCK_TIME);
