@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { BLOCK_TIME } from '../utils/constants';
 import {killNodes, polkadotApi as api, spawnNodes} from "../utils/util";
-import {Keyring, WsProvider} from "@polkadot/api";
+import {Keyring} from "@polkadot/api";
 import {addressToEvm} from "@polkadot/util-crypto";
 import { KeyringPair } from '@polkadot/keyring/types';
 import {waitForEvent} from "../utils/setup";
@@ -11,7 +11,7 @@ const keyring = new Keyring({ type: 'sr25519' });
 
 const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
 
-describe.only('EVM related tests', function () {
+describe('EVM related tests', function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {
@@ -19,7 +19,7 @@ describe.only('EVM related tests', function () {
   });
 
   // Should init and create contracts
-  it('Should init and create contracts', async () => {
+  it('Should init, create, and execute contracts', async () => {
     const {  alice, bob, aliceEthAccount, bobEthAccount } = await init();
 
     console.log(`Bob Eth Account is ${bobEthAccount}`);
