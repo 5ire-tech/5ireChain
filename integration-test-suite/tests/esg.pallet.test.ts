@@ -19,21 +19,21 @@ describe("ESG Pallet Integration tests", function () {
   });
 
   // Should init
-  it("Should init and ESG Pallet", async () => {
+  it("Should test ESG Pallet", async () => {
     const { alice, bob, charlie } = await init();
 
-    const esg_data = [
+    const esgData = [
       {
         account: "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
         score: "43",
       },
     ];
 
-    const json_data = JSON.stringify(esg_data);
+    const jsonData = JSON.stringify(esgData);
 
     await registerOracle(alice, bob);
 
-    await insertEsgScores(bob, charlie, json_data);
+    await insertEsgScores(bob, charlie, jsonData);
 
     await deRegisterOracle(alice, bob);
   });
@@ -74,9 +74,9 @@ async function registerOracle(alice: KeyringPair, bob: KeyringPair) {
     });
 
   await waitForEvent(api, "esgScore", "NewOracleRegistered");
-  const oracle_accounts = await api.query.esgScore.sudoOraclesStore();
-  expect(oracle_accounts.toString().includes(bob.address.toString()));
-  console.log(`Account verified in the oracle storage: ${oracle_accounts}`);
+  const oracleAccounts = await api.query.esgScore.sudoOraclesStore();
+  expect(oracleAccounts.toString().includes(bob.address.toString()));
+  console.log(`Account verified in the oracle storage: ${oracleAccounts}`);
 
   return true;
 }
@@ -85,11 +85,11 @@ async function registerOracle(alice: KeyringPair, bob: KeyringPair) {
 async function insertEsgScores(
   bob: KeyringPair,
   user: KeyringPair,
-  json_data: string
+  jsonData: string
 ) {
   console.log(`\n Inserting ESG Score of the user.`);
 
-  const transaction = await api.tx.esgScore.upsertEsgScores(json_data);
+  const transaction = await api.tx.esgScore.upsertEsgScores(jsonData);
 
   const unsub = await transaction.signAndSend(
     bob,
@@ -120,10 +120,10 @@ async function insertEsgScores(
 async function deRegisterOracle(alice: KeyringPair, bob: KeyringPair) {
   console.log(`\n: De-Registering Oracle`);
 
-  const existing_oracle_accounts = await api.query.esgScore.sudoOraclesStore();
-  expect(existing_oracle_accounts.toString().includes(bob.address.toString()));
+  const existingOracleAccounts = await api.query.esgScore.sudoOraclesStore();
+  expect(existingOracleAccounts.toString().includes(bob.address.toString()));
   console.log(
-    `Account verified in the oracle storage: ${existing_oracle_accounts}`
+    `Account verified in the oracle storage: ${existingOracleAccounts}`
   );
 
   const transaction = await api.tx.esgScore.deregisterAnOracle(
@@ -147,9 +147,9 @@ async function deRegisterOracle(alice: KeyringPair, bob: KeyringPair) {
     });
 
   await waitForEvent(api, "esgScore", "OracleDeRegistered");
-  const oracle_accounts = await api.query.esgScore.sudoOraclesStore();
-  expect(!oracle_accounts.toString().includes(bob.address.toString()));
-  console.log(`Account verified in the oracle storage: ${oracle_accounts}`);
+  const oracleAccounts = await api.query.esgScore.sudoOraclesStore();
+  expect(!oracleAccounts.toString().includes(bob.address.toString()));
+  console.log(`Account verified in the oracle storage: ${oracleAccounts}`);
 
   return true;
 }
