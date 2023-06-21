@@ -5,6 +5,9 @@ import child from 'child_process';
 import { ECPair } from 'ecpair';
 import { ethers } from 'ethers';
 import {mnemonicGenerate} from "@polkadot/util-crypto";
+import {BN} from "@polkadot/util";
+import {WeightV2} from "@polkadot/types/interfaces";
+import {DetectCodec} from "@polkadot/types/types/detect";
 
 export const endpoint = 'ws://127.0.0.1:9944';
 export const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
@@ -310,6 +313,27 @@ export async function sudoTx(
           unsub();
         }
       });
+}
+
+export async function uncheckedSudoTx(
+  weight: DetectCodec<any, any>,
+  api: ApiPromise,
+  call: SubmittableExtrinsic<'promise'>
+): Promise<void> {
+  const keyring = new Keyring({ type: 'sr25519' });
+  const alice = keyring.addFromUri('//Alice');
+
+  return new Promise(async (resolve, _reject) => {
+    const unsub = await api.tx.sudo
+      .sudoUncheckedWeight(call, weight)
+      .signAndSend(alice, {tip: 2000, nonce: -1}, ({ status }) => {
+        if (status.isFinalized) {
+          unsub();
+          resolve();
+        }
+
+      });
+  });
 }
 
 

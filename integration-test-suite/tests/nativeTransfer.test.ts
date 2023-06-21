@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { BLOCK_TIME } from '../utils/constants';
-import {killNodes, polkadotApi, spawnNodes} from "../utils/util";
-import {ApiPromise, Keyring, WsProvider} from "@polkadot/api";
-import {sudoTx, waitForEvent} from "../utils/setup";
+import {killNodes, polkadotApi as api, polkadotApi, spawnNodes} from "../utils/util";
+import {Keyring} from "@polkadot/api";
+import {waitForEvent} from "../utils/setup";
 
 
 // Keyring needed to sign using Alice account
@@ -49,7 +49,7 @@ describe('Native token tests', function () {
       });
     });
 
-    await waitForEvent(polkadotApi, 'transactionPayment', 'TransactionFeePaid')
+    await waitForEvent(api, 'balances', 'Transfer');
 
     // @ts-ignore
     const { nonce: aliceNonce, data: aliceBalance } = await polkadotApi.query.system.account(alice.address);
