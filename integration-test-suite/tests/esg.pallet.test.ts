@@ -3,7 +3,7 @@ import { BLOCK_TIME } from "../utils/constants";
 import { killNodes, polkadotApi as api, spawnNodes } from "../utils/util";
 import { Keyring, WsProvider } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
-import { waitForEvent } from "../utils/setup";
+import {sudoTx, waitForEvent} from "../utils/setup";
 
 // Keyring needed to sign using Alice account
 const keyring = new Keyring({ type: "sr25519" });
@@ -11,7 +11,7 @@ const keyring = new Keyring({ type: "sr25519" });
 // This script contains the integration test for the ESG pallet.
 // ESG pallet is the pallet in 5ire-chain which is responsible to add the esg score and related transactions.
 
-describe("ESG Pallet Integration tests", function () {
+describe.only("ESG Pallet Integration tests", function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {
@@ -126,12 +126,12 @@ async function deRegisterOracle(alice: KeyringPair, bob: KeyringPair) {
     `Account verified in the oracle storage: ${existingOracleAccounts}`
   );
 
-  const transaction = await api.tx.esgScore.deregisterAnOracle(
+  const transaction = api.tx.esgScore.deregisterAnOracle(
     bob.address,
     true
   );
 
-  const unsub = await api.tx.sudo
+  /*const unsub = await api.tx.sudo
     .sudo(transaction.method.toHex())
     .signAndSend(alice, { tip: 200, nonce: -1 }, (result) => {
       console.log(`Oracle De-Registration is ${result.status}`);
@@ -144,7 +144,9 @@ async function deRegisterOracle(alice: KeyringPair, bob: KeyringPair) {
         const data = JSON.stringify(result.events);
         console.log(data);
       }
-    });
+    });*/
+
+  await sudoTx(api, transaction);
 
   await waitForEvent(api, "esgScore", "OracleDeRegistered");
   const oracleAccounts = await api.query.esgScore.sudoOraclesStore();
