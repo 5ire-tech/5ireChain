@@ -300,18 +300,19 @@ export async function sudoTx(
 ): Promise<void> {
   const keyring = new Keyring({ type: 'sr25519' });
   const alice = keyring.addFromUri('//Alice');
-  return new Promise(async (resolve, _reject) => {
-    const unsub = await api.tx.sudo
+  const unsub = await api.tx.sudo
       .sudo(call.method.toHex())
-      .signAndSend(alice, {tip: 2000, nonce: -1}, ({ status }) => {
-        //console.log("Status: ", status);
-        if (status.isFinalized) {
+      .signAndSend(alice, {tip: 2000, nonce: -1}, (result ) => {
+        if (result.status.isInBlock) {
+          console.log(`Sudo transaction included at blockHash ${result.status.asInBlock}`);
+          console.log(`Waiting for finalization... (can take a minute)`);
+        } else if (result.status.isFinalized) {
+          // @ts-ignore
+          const data = JSON.stringify(result.events);
+          console.log(data);
           unsub();
-          resolve();
         }
-
       });
-  });
 }
 
 export async function uncheckedSudoTx(
