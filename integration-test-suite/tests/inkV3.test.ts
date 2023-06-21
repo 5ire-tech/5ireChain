@@ -12,7 +12,7 @@ let contractAddress: string;
 let contractAbi: Abi;
 let wasm: string;
 
-describe.skip("Wasm test with psp22 token old ink! version 3", function () {
+describe("Wasm test with psp22 token old ink! version 3", function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {

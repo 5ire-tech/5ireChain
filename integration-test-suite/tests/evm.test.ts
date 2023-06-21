@@ -10,7 +10,7 @@ import {bytesToHex} from "web3-utils";
 const keyring = new Keyring({ type: 'sr25519' });
 const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
 
-describe.skip('EVM related tests', function () {
+describe('EVM related tests', function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {
