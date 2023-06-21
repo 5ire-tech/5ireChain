@@ -11,7 +11,7 @@ const keyring = new Keyring({ type: "sr25519" });
 // This script contains the integration test for the ESG pallet.
 // ESG pallet is the pallet in 5ire-chain which is responsible to add the esg score and related transactions.
 
-describe.only("ESG Pallet Integration tests", function () {
+describe("ESG Pallet Integration tests", function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {
@@ -130,21 +130,6 @@ async function deRegisterOracle(alice: KeyringPair, bob: KeyringPair) {
     bob.address,
     true
   );
-
-  /*const unsub = await api.tx.sudo
-    .sudo(transaction.method.toHex())
-    .signAndSend(alice, { tip: 200, nonce: -1 }, (result) => {
-      console.log(`Oracle De-Registration is ${result.status}`);
-      if (result.status.isInBlock) {
-        console.log(
-          `Oracle De-Registration at blockHash ${result.status.asInBlock}`
-        );
-        console.log(`Waiting for finalization... (can take a minute)`);
-      } else if (result.status.isFinalized) {
-        const data = JSON.stringify(result.events);
-        console.log(data);
-      }
-    });*/
 
   await sudoTx(api, transaction);
 
