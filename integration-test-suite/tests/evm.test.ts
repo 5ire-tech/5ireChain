@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { BLOCK_TIME } from '../utils/constants';
-import {killNodes, polkadotApi as api, spawnNodes} from "../utils/util";
-import {ApiPromise, Keyring, WsProvider} from "@polkadot/api";
+import { polkadotApi as api, spawnNodes} from "../utils/util";
+import {Keyring} from "@polkadot/api";
 import {addressToEvm} from "@polkadot/util-crypto";
 import { KeyringPair } from '@polkadot/keyring/types';
 import {waitForEvent} from "../utils/setup";

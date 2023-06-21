@@ -1,15 +1,13 @@
 import { expect } from 'chai';
 import { BLOCK_TIME } from '../utils/constants';
 import {killNodes, polkadotApi as api, spawnNodes} from "../utils/util";
-import {ApiPromise, Keyring, WsProvider} from "@polkadot/api";
+import {Keyring} from "@polkadot/api";
 import {addressToEvm} from "@polkadot/util-crypto";
 import { KeyringPair } from '@polkadot/keyring/types';
 import {waitForEvent} from "../utils/setup";
 import {bytesToHex} from "web3-utils";
 // Keyring needed to sign using Alice account
 const keyring = new Keyring({ type: 'sr25519' });
-
-const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
 
 describe('EVM withdraw test', function () {
   this.timeout(300 * BLOCK_TIME);

@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { BLOCK_TIME } from '../utils/constants';
 import {killNodes, polkadotApi as api, polkadotApi, spawnNodes} from "../utils/util";
-import {ApiPromise, Keyring, WsProvider} from "@polkadot/api";
-import {sudoTx, waitForEvent} from "../utils/setup";
+import {Keyring} from "@polkadot/api";
+import {waitForEvent} from "../utils/setup";
 
 
 // Keyring needed to sign using Alice account
