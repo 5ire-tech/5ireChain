@@ -17,7 +17,7 @@ async function init() {
 // Keyring needed to sign using Alice account
 const keyring = new Keyring({ type: "sr25519" });
 
-describe("Swap token tests", function () {
+describe("Swap EVM tokens to Native tokens test", function () {
   this.timeout(300 * BLOCK_TIME);
   this.slow(40 * BLOCK_TIME);
 
@@ -34,7 +34,6 @@ describe("Swap token tests", function () {
     const addressString = web3.utils.bytesToHex(aliceEthAccount);
     // @ts-ignore
     let {data: aliceBalanceBefore} =  await polkadotApi.query.system.account(alice.address);
-    //console.log("Balance:", aliceBalanceBefore.toHuman());
    
     //Create a extrinsic, withdraw 10 5ire coin from Alice
     const amount = polkadotApi.createType("Balance", "10000000000000000000");
@@ -55,7 +54,6 @@ describe("Swap token tests", function () {
     await waitForEvent(polkadotApi, "balances", "Transfer");
    // @ts-ignore
     const { data: aliceBalanceAfter} = await polkadotApi.query.system.account(alice.address);
-    //console.log(`alice balance is ${aliceBalanceAfter.free.toHuman()}`);
     expect(  aliceBalanceAfter.free.toBigInt() > aliceBalanceBefore.free.toBigInt()).true;
 
   });
