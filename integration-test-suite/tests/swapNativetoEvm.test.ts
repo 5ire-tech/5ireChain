@@ -27,7 +27,7 @@ describe("Swap token tests", function () {
   });
 
   // Should swap native token to evm token
-  it.only("Swap native tokens to evm tokens ", async () => {
+  it("Swap native tokens to evm tokens ", async () => {
     const { charlie, charlieEthAccount } = await init();
     const web3 = new Web3(
       new Web3.providers.HttpProvider("http://127.0.0.1:9933")
