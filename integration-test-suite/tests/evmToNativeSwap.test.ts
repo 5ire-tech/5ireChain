@@ -34,7 +34,7 @@ describe("Swap EVM tokens to Native tokens test", function () {
     const addressString = web3.utils.bytesToHex(aliceEthAccount);
     // @ts-ignore
     let {data: aliceBalanceBefore} =  await polkadotApi.query.system.account(alice.address);
-   
+
     //Create a extrinsic, withdraw 10 5ire coin from Alice
     const amount = polkadotApi.createType("Balance", "10000000000000000000");
     const transaction = await polkadotApi.tx.evm.withdraw(aliceEthAccount, amount);
