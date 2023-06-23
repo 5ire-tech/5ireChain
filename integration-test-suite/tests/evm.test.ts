@@ -11,7 +11,7 @@ const keyring = new Keyring({ type: 'sr25519' });
 
 const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
 
-describe('EVM related tests', function () {
+describe.only('EVM related tests', function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {
@@ -26,6 +26,9 @@ describe('EVM related tests', function () {
 
     const contract = await createContract(aliceEthAccount, alice);
     await transferToken(bytesToHex(Array.from(aliceEthAccount)), bytesToHex(Array.from(bobEthAccount)), bob, alice, contract.address);
+    //await BalanceOf(bytesToHex(Array.from(bobEthAccount)),bob, contract.address);
+    //await approve(bytesToHex(Array.from(aliceEthAccount)),bytesToHex(Array.from(bobEthAccount)), alice, contract.address);
+
   });
 
   after(async () => {
@@ -127,4 +130,75 @@ async function transferToken(aliceEthAccount: string, bobEthAccount: string, bob
   return data;
 }
 
+//Balance of Bob
+async function BalanceOf(bobEthAccount: string, bob: KeyringPair, contractAddress: string) {
 
+  console.log(`Balance of Bob EVM Account: ${bobEthAccount}`);
+  const BalanceOfFnCode = `70a08231000000000000000000000000`;
+  const inputCode = `0x${BalanceOfFnCode}${bobEthAccount.substring(2)}`;
+  console.log(`Sending call input: ${inputCode}`);
+  const gasLimit = 100_000_00;
+  const maxFeePerGas = 100_000_000_000;
+  const maxPriorityFeePerGas: BigInt =  BigInt(100_000_000);
+  const nonce = 1;
+  const accessList = null;
+  const transaction = await api.tx.evm.call(bobEthAccount, contractAddress, inputCode, 0, gasLimit, maxFeePerGas, maxPriorityFeePerGas, nonce, accessList);
+
+  const data = new Promise<{  }>(async (resolve, reject) => {
+    const unsub = await transaction.signAndSend(bob, (result) => {
+      console.log(`BalanceOf is ${result.status}`);
+      if (result.status.isInBlock) {
+        console.log(`BalanceOf included at blockHash ${result.status.asInBlock}`);
+        console.log(`Waiting for finalization... (can take a minute)`);
+      } else if (result.status.isFinalized) {
+        console.log(`BalanceOf finalized at blockHash ${result.status.asFinalized}`);
+        const data = JSON.stringify(result.events);
+        console.log(data);
+        unsub();
+        resolve({});
+      }
+    });
+  });
+
+  //await waitForEvent(api, 'balance', 'Executed');
+
+  return data;
+}
+
+
+
+// Transfer tokens to Bob
+async function approve(aliceEthAccount: string, bobEthAccount: string, alice: KeyringPair, contractAddress: string) {
+
+  console.log(`Preparing transfer of 0xdd`);
+  const transferFnCode = `daea85c5000000000000000000000000`;
+  const tokensToTransfer = `00000000000000000000000000000000000000000000000000000000000000dd`;
+  const inputCode = `0x${transferFnCode}${bobEthAccount.substring(2)}${tokensToTransfer}`;
+  console.log(`Sending call input: ${inputCode}`);
+  const gasLimit = 100_000_00;
+  const maxFeePerGas = 100_000_000_000;
+  const maxPriorityFeePerGas: BigInt =  BigInt(100_000_000);
+  const nonce = 1;
+  const accessList = null;
+  const transaction = await api.tx.evm.call(aliceEthAccount, contractAddress, inputCode, 0, gasLimit, maxFeePerGas, maxPriorityFeePerGas, nonce, accessList);
+
+  const data = new Promise<{  }>(async (resolve, reject) => {
+    const unsub = await transaction.signAndSend(alice, (result) => {
+      console.log(`approve is ${result.status}`);
+      if (result.status.isInBlock) {
+        console.log(`Apprpve included at blockHash ${result.status.asInBlock}`);
+        console.log(`Waiting for finalization... (can take a minute)`);
+      } else if (result.status.isFinalized) {
+        console.log(`Approve finalized at blockHash ${result.status.asFinalized}`);
+        const data = JSON.stringify(result.events);
+        console.log(data);
+        unsub();
+        resolve({});
+      }
+    });
+  });
+
+  await waitForEvent(api, 'evm', 'Executed');
+
+  return data;
+}
