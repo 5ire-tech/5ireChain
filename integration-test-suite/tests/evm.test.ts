@@ -26,8 +26,9 @@ describe.only('EVM related tests', function () {
 
     const contract = await createContract(aliceEthAccount, alice);
     await transferToken(bytesToHex(Array.from(aliceEthAccount)), bytesToHex(Array.from(bobEthAccount)), bob, alice, contract.address);
-    //await BalanceOf(bytesToHex(Array.from(bobEthAccount)),bob, contract.address);
-    //await approve(bytesToHex(Array.from(aliceEthAccount)),bytesToHex(Array.from(bobEthAccount)), alice, contract.address);
+    await balanceOf(bytesToHex(Array.from(aliceEthAccount)),alice, contract.address);
+    await approve(bytesToHex(Array.from(aliceEthAccount)),bytesToHex(Array.from(bobEthAccount)), alice, contract.address);
+    await totalSupply(bytesToHex(Array.from(bobEthAccount)),bob, contract.address);
 
   });
 
@@ -131,21 +132,21 @@ async function transferToken(aliceEthAccount: string, bobEthAccount: string, bob
 }
 
 //Balance of Bob
-async function BalanceOf(bobEthAccount: string, bob: KeyringPair, contractAddress: string) {
+async function balanceOf(aliceEthAccount: string, alice: KeyringPair, contractAddress: string) {
 
-  console.log(`Balance of Bob EVM Account: ${bobEthAccount}`);
+  console.log(`Balance of Alice EVM Account: ${aliceEthAccount}`);
   const BalanceOfFnCode = `70a08231000000000000000000000000`;
-  const inputCode = `0x${BalanceOfFnCode}${bobEthAccount.substring(2)}`;
+  const inputCode = `0x${BalanceOfFnCode}${aliceEthAccount.substring(2)}`;
   console.log(`Sending call input: ${inputCode}`);
   const gasLimit = 100_000_00;
   const maxFeePerGas = 100_000_000_000;
   const maxPriorityFeePerGas: BigInt =  BigInt(100_000_000);
   const nonce = 1;
   const accessList = null;
-  const transaction = await api.tx.evm.call(bobEthAccount, contractAddress, inputCode, 0, gasLimit, maxFeePerGas, maxPriorityFeePerGas, nonce, accessList);
+  const transaction = await api.tx.evm.call(aliceEthAccount, contractAddress, inputCode, 0, gasLimit, maxFeePerGas, maxPriorityFeePerGas, nonce, accessList);
 
   const data = new Promise<{  }>(async (resolve, reject) => {
-    const unsub = await transaction.signAndSend(bob, (result) => {
+    const unsub = await transaction.signAndSend(alice, (result) => {
       console.log(`BalanceOf is ${result.status}`);
       if (result.status.isInBlock) {
         console.log(`BalanceOf included at blockHash ${result.status.asInBlock}`);
@@ -160,14 +161,45 @@ async function BalanceOf(bobEthAccount: string, bob: KeyringPair, contractAddres
     });
   });
 
-  //await waitForEvent(api, 'balance', 'Executed');
+  return data;
+}
+
+//Total Supply
+async function totalSupply(bobEthAccount: string, bob: KeyringPair, contractAddress: string) {
+
+  
+  const totalSupplyFnCode = `18160ddd`;
+  const inputCode = `0x${totalSupplyFnCode}`;
+  console.log(`Sending call input: ${inputCode}`);
+  const gasLimit = 100_000_00;
+  const maxFeePerGas = 100_000_000_000;
+  const maxPriorityFeePerGas: BigInt =  BigInt(100_000_000);
+  const nonce = 1;
+  const accessList = null;
+  const transaction = await api.tx.evm.call(bobEthAccount, contractAddress, inputCode, 0, gasLimit, maxFeePerGas, maxPriorityFeePerGas, nonce, accessList);
+
+  const data = new Promise<{  }>(async (resolve, reject) => {
+    const unsub = await transaction.signAndSend(bob, (result) => {
+      console.log(`totalSupply is ${result.status}`);
+      if (result.status.isInBlock) {
+        console.log(`totalSupply included at blockHash ${result.status.asInBlock}`);
+        console.log(`Waiting for finalization... (can take a minute)`);
+      } else if (result.status.isFinalized) {
+        console.log(`totalSupply finalized at blockHash ${result.status.asFinalized}`);
+        const data = JSON.stringify(result.events);
+        console.log(data);
+        unsub();
+        resolve({});
+      }
+    });
+  });
 
   return data;
 }
 
 
 
-// Transfer tokens to Bob
+// Approve
 async function approve(aliceEthAccount: string, bobEthAccount: string, alice: KeyringPair, contractAddress: string) {
 
   console.log(`Preparing transfer of 0xdd`);
