@@ -4,6 +4,10 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import child from 'child_process';
 import { ECPair } from 'ecpair';
 import { ethers } from 'ethers';
+import {mnemonicGenerate} from "@polkadot/util-crypto";
+import {BN} from "@polkadot/util";
+import {WeightV2} from "@polkadot/types/interfaces";
+import {DetectCodec} from "@polkadot/types/types/detect";
 
 export const endpoint = 'ws://127.0.0.1:9944';
 export const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
@@ -182,8 +186,7 @@ export function start5ireChainNode(
     [
       `--${authority}`,
       options.printLogs ? '-linfo' : '-lerror',
-      options.tmp ? '--tmp' : '',
-      `--chain=${options.chain}`,
+      `--dev`,
       `--ws-port=${ports[authority].ws}`,
       `--rpc-port=${ports[authority].http}`,
       `--port=${ports[authority].p2p}`,
@@ -255,20 +258,20 @@ export async function waitForEvent(
       const eventsValue = api.registry.createType("Vec<EventRecord>", events.toU8a());
       // Loop through the Vec<EventRecord>
       for (var event of eventsValue) {
-        console.log("Checking event: ", event);
+        //console.log("Checking event: ", event);
         // @ts-ignore
         const section = event.event.section;
         // @ts-ignore
         const method = event.event.method;
         // @ts-ignore
         const data = event.event.data;
-        console.log("Event section = ", section, ", method = ", method);
-        console.log("Event musteq  = ", pallet, ", method = ", eventVariant);
+        //console.log("Event section = ", section, ", method = ", method);
+        //console.log("Event musteq  = ", pallet, ", method = ", eventVariant);
         if (section === pallet && method === eventVariant) {
-          console.log(
-            `Event ($section}.${method}) =>`,
-            data
-          );
+          // console.log(
+          //   `Event ($section}.${method}) =>`,
+          //   data
+          // );
           if (dataQuery) {
             for (const value of data) {
               const jsonData = value.toJSON();
@@ -297,15 +300,38 @@ export async function sudoTx(
 ): Promise<void> {
   const keyring = new Keyring({ type: 'sr25519' });
   const alice = keyring.addFromUri('//Alice');
+  const unsub = await api.tx.sudo
+      .sudo(call.method.toHex())
+      .signAndSend(alice, {tip: 2000, nonce: -1}, (result ) => {
+        if (result.status.isInBlock) {
+          console.log(`Sudo transaction included at blockHash ${result.status.asInBlock}`);
+          console.log(`Waiting for finalization... (can take a minute)`);
+        } else if (result.status.isFinalized) {
+          // @ts-ignore
+          const data = JSON.stringify(result.events);
+          console.log(data);
+          unsub();
+        }
+      });
+}
+
+export async function uncheckedSudoTx(
+  weight: DetectCodec<any, any>,
+  api: ApiPromise,
+  call: SubmittableExtrinsic<'promise'>
+): Promise<void> {
+  const keyring = new Keyring({ type: 'sr25519' });
+  const alice = keyring.addFromUri('//Alice');
+
   return new Promise(async (resolve, _reject) => {
     const unsub = await api.tx.sudo
-      .sudo(call.method.toHex())
-      .signAndSend(alice, ({ status }) => {
-        console.log("Status: ", status);
+      .sudoUncheckedWeight(call, weight)
+      .signAndSend(alice, {tip: 2000, nonce: -1}, ({ status }) => {
         if (status.isFinalized) {
           unsub();
           resolve();
         }
+
       });
   });
 }
