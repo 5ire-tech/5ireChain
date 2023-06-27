@@ -1,9 +1,6 @@
 name: CI
 on: [push]
 
-env:
-  CARGO_REGISTRIES_CRATES_IO_PROTOCOL: git
-
 jobs:
   # 5irechain integration tests
   e2e:
