@@ -1,6 +1,7 @@
 name: CI
 on: [push]
 
+
 jobs:
   # 5irechain integration tests
   e2e:
