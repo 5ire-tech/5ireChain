@@ -53,7 +53,7 @@ jobs:
       - name: Install Packages
         run: cd integration-test-suite && yarn install --frozen-lockfile
 
-      uses: webfactory/ssh-agent@v0.5.4
+      - uses: webfactory/ssh-agent@v0.5.4
         with:
           ssh-private-key: "${{ secrets.READ_DEPLOY_KEY }}"
 
