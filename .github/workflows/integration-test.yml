@@ -53,11 +53,12 @@ jobs:
       - name: Install Packages
         run: cd integration-test-suite && yarn install --frozen-lockfile
 
+      uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: "${{ secrets.READ_DEPLOY_KEY }}"
+
       - name: Build Node for Integration Tests (Release)
         run: cargo build --release
-        uses: webfactory/ssh-agent@v0.5.4
-        with:
-            ssh-private-key: "${{ secrets.READ_DEPLOY_KEY }}"
 
       - name: Run E2E Tests
         run: cd integration-test-suite && yarn test
