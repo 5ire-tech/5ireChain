@@ -103,7 +103,7 @@ const executeContract = async () =>  {
     refTime: 5908108255,
     proofSize: new BN(131072),
   }) as WeightV2;
-  const storageDepositLimitForCallAndQuery = 17000000000;
+  const storageDepositLimitForCallAndQuery = null;
 
   const keyring = new Keyring({ type: "sr25519" });
   const alice = keyring.addFromUri("//Alice");

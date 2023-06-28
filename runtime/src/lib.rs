@@ -284,7 +284,7 @@ impl FeeCalculator for FixedGasPrice {
 		// Return some meaningful gas price and weight
 		// (1_000_000_000_000u128.into(), 0u64)
 		// (1_000_000_000_000u128.into(), <Runtime as frame_system::Config>::DbWeight::get().reads(1))
-		(1_000_000_000_000u128.into(), Weight::from_ref_time(1u64))	
+		(1_000_000_000_000u128.into(), Weight::from_ref_time(1u64))
 	}
 }
 
@@ -676,7 +676,7 @@ pub mod opaque {
 	/// Opaque block identifier type.
 	pub type BlockId = generic::BlockId<Block>;
 
-	
+
 }
 
 impl pallet_session::Config for Runtime {
