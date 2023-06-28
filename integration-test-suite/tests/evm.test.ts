@@ -26,8 +26,8 @@ describe.only('EVM related tests', function () {
 
     const contract = await createContract(aliceEthAccount, alice);
     await transferToken(bytesToHex(Array.from(aliceEthAccount)), bytesToHex(Array.from(bobEthAccount)), bob, alice, contract.address);
-    await balanceOf(bytesToHex(Array.from(aliceEthAccount)),alice, contract.address);
     await approve(bytesToHex(Array.from(aliceEthAccount)),bytesToHex(Array.from(bobEthAccount)), alice, contract.address);
+    await balanceOf(bytesToHex(Array.from(aliceEthAccount)),alice, contract.address);
     await totalSupply(bytesToHex(Array.from(bobEthAccount)),bob, contract.address);
 
   });
@@ -141,7 +141,7 @@ async function balanceOf(aliceEthAccount: string, alice: KeyringPair, contractAd
   const gasLimit = 100_000_00;
   const maxFeePerGas = 100_000_000_000;
   const maxPriorityFeePerGas: BigInt =  BigInt(100_000_000);
-  const nonce = 1;
+  const nonce = 3;
   const accessList = null;
   const transaction = await api.tx.evm.call(aliceEthAccount, contractAddress, inputCode, 0, gasLimit, maxFeePerGas, maxPriorityFeePerGas, nonce, accessList);
 
@@ -174,7 +174,7 @@ async function totalSupply(bobEthAccount: string, bob: KeyringPair, contractAddr
   const gasLimit = 100_000_00;
   const maxFeePerGas = 100_000_000_000;
   const maxPriorityFeePerGas: BigInt =  BigInt(100_000_000);
-  const nonce = 1;
+  const nonce = 3;
   const accessList = null;
   const transaction = await api.tx.evm.call(bobEthAccount, contractAddress, inputCode, 0, gasLimit, maxFeePerGas, maxPriorityFeePerGas, nonce, accessList);
 
@@ -202,15 +202,14 @@ async function totalSupply(bobEthAccount: string, bob: KeyringPair, contractAddr
 // Approve
 async function approve(aliceEthAccount: string, bobEthAccount: string, alice: KeyringPair, contractAddress: string) {
 
-  console.log(`Preparing transfer of 0xdd`);
-  const transferFnCode = `daea85c5000000000000000000000000`;
-  const tokensToTransfer = `00000000000000000000000000000000000000000000000000000000000000dd`;
-  const inputCode = `0x${transferFnCode}${bobEthAccount.substring(2)}${tokensToTransfer}`;
+  const approveFnCode = `daea85c5000000000000000000000000`;
+  const tokensToApprove = `00000000000000000000000000000000000000000000000000000000000000dd`;
+  const inputCode = `0x${approveFnCode}${aliceEthAccount.substring(2)}${tokensToApprove}`;
   console.log(`Sending call input: ${inputCode}`);
   const gasLimit = 100_000_00;
   const maxFeePerGas = 100_000_000_000;
   const maxPriorityFeePerGas: BigInt =  BigInt(100_000_000);
-  const nonce = 1;
+  const nonce = 2;
   const accessList = null;
   const transaction = await api.tx.evm.call(aliceEthAccount, contractAddress, inputCode, 0, gasLimit, maxFeePerGas, maxPriorityFeePerGas, nonce, accessList);
 
@@ -224,8 +223,11 @@ async function approve(aliceEthAccount: string, bobEthAccount: string, alice: Ke
         console.log(`Approve finalized at blockHash ${result.status.asFinalized}`);
         const data = JSON.stringify(result.events);
         console.log(data);
+
         unsub();
+
         resolve({});
+
       }
     });
   });
