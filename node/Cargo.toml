@@ -104,6 +104,7 @@ fp-dynamic-fee = { path = "../primitives/dynamic-fee" }
 fp-evm = { path = "../primitives/evm" }
 fp-rpc = { path = "../primitives/rpc" }
 fp-storage = { path = "../primitives/storage" }
+pallet-evm = { path = "../frame/evm" }
 
 # Local Dependencies
 node-5ire-runtime = { version = "4.0.0-dev", path = "../runtime" }
@@ -145,5 +146,5 @@ cli = [
 
 
 
- 
+
 
