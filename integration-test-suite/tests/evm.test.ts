@@ -11,7 +11,7 @@ const keyring = new Keyring({ type: 'sr25519' });
 
 const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
 
-describe.only('EVM related tests', function () {
+describe('EVM related tests', function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {
@@ -28,7 +28,7 @@ describe.only('EVM related tests', function () {
     await transferToken(bytesToHex(Array.from(aliceEthAccount)), bytesToHex(Array.from(bobEthAccount)), bob, alice, contract.address);
     await approve(bytesToHex(Array.from(aliceEthAccount)),bytesToHex(Array.from(bobEthAccount)), alice, contract.address);
     await balanceOf(bytesToHex(Array.from(aliceEthAccount)),alice, contract.address);
-    await totalSupply(bytesToHex(Array.from(bobEthAccount)),bob, contract.address);
+    await totalSupply(bytesToHex(Array.from(aliceEthAccount)),alice, contract.address);
 
   });
 
@@ -160,12 +160,13 @@ async function balanceOf(aliceEthAccount: string, alice: KeyringPair, contractAd
       }
     });
   });
+  await waitForEvent(api, 'evm', 'Executed');
 
   return data;
 }
 
 //Total Supply
-async function totalSupply(bobEthAccount: string, bob: KeyringPair, contractAddress: string) {
+async function totalSupply(aliceEthAccount: string, alice: KeyringPair, contractAddress: string) {
 
   
   const totalSupplyFnCode = `18160ddd`;
@@ -174,12 +175,12 @@ async function totalSupply(bobEthAccount: string, bob: KeyringPair, contractAddr
   const gasLimit = 100_000_00;
   const maxFeePerGas = 100_000_000_000;
   const maxPriorityFeePerGas: BigInt =  BigInt(100_000_000);
-  const nonce = 3;
+  const nonce = 4;
   const accessList = null;
-  const transaction = await api.tx.evm.call(bobEthAccount, contractAddress, inputCode, 0, gasLimit, maxFeePerGas, maxPriorityFeePerGas, nonce, accessList);
+  const transaction = await api.tx.evm.call(aliceEthAccount, contractAddress, inputCode, 0, gasLimit, maxFeePerGas, maxPriorityFeePerGas, nonce, accessList);
 
   const data = new Promise<{  }>(async (resolve, reject) => {
-    const unsub = await transaction.signAndSend(bob, (result) => {
+    const unsub = await transaction.signAndSend(alice, (result) => {
       console.log(`totalSupply is ${result.status}`);
       if (result.status.isInBlock) {
         console.log(`totalSupply included at blockHash ${result.status.asInBlock}`);
@@ -193,6 +194,7 @@ async function totalSupply(bobEthAccount: string, bob: KeyringPair, contractAddr
       }
     });
   });
+  await waitForEvent(api, 'evm', 'Executed');
 
   return data;
 }
