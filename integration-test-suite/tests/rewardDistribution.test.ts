@@ -6,16 +6,15 @@ import {
   spawnNodes,
   polkadotApi,
 } from "../utils/util";
-import { Keyring, WsProvider } from "@polkadot/api";
+import { Keyring } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
-import { sleep } from "../utils/setup";
-import { sudoTx, waitForEvent, waitNfinalizedBlocks } from "../utils/setup";
+import { waitForEvent, waitNfinalizedBlocks } from "../utils/setup";
 // Keyring needed to sign using Alice account
 const keyring = new Keyring({ type: "sr25519" });
 
 // We should test within 5 eras  ( 200 blocks)
 
-describe.only("Reward Distribution tests", function () {
+describe("Reward Distribution tests", function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {
@@ -26,38 +25,51 @@ describe.only("Reward Distribution tests", function () {
     const { alice, aliceStash } = await init();
     const eraZero = (await getCurrentEra()).toString();
     const reliabilityZero = await getReliabilityScore(aliceStash);
-    console.log("Reliability Zero:", reliabilityZero);
+    console.log("Reliability Score in Era 0 without Esg Score:", reliabilityZero);
     await waitNfinalizedBlocks(polkadotApi, 45, 1000);
     const eraZeroValidatorsReward = await getErasValidatorReward(eraZero);
-    console.log("eraZeroValidatorsReward:", eraZeroValidatorsReward.toHuman());
-
-   
-
+    console.log("Validator Reward in Era 0 without Esg Score:", eraZeroValidatorsReward.toHuman());
 
     const eraOne = (await getCurrentEra()).toString();
     const reliabilityOne = await getReliabilityScore(aliceStash);
-    console.log("Reliability One:", reliabilityOne);
-    
+    console.log("Reliability Score in Era 1 without Esg Score:", reliabilityOne);
+
     await waitNfinalizedBlocks(polkadotApi, 45, 1000);
     const eraOneValidatorsReward = await getErasValidatorReward(eraOne);
 
-    console.log("eraOneValidatorsReward:", eraOneValidatorsReward.toHuman());
+    console.log("Validator Reward in Era 1 without Esg Score:", eraOneValidatorsReward.toHuman());
 
-    expect(BigInt(eraOneValidatorsReward?.toString()) > BigInt(eraZeroValidatorsReward?.toString())).true;
+    expect(
+      BigInt(eraOneValidatorsReward?.toString()) >
+        BigInt(eraZeroValidatorsReward?.toString())
+    ).true;
 
     const eraTwo = (await getCurrentEra()).toString();
     const reliabilityTwo = await getReliabilityScore(aliceStash);
-    console.log("Reliability Two:", reliabilityTwo);
+    console.log("Reliability Score in Era 2 without Esg Score:", reliabilityTwo);
     await waitNfinalizedBlocks(polkadotApi, 45, 1000);
     const eraTwoValidatorsReward = await getErasValidatorReward(eraTwo);
-    console.log("eraTwoValidatorsReward:{}", eraTwoValidatorsReward.toHuman());
+    console.log("Validator Reward in Era 2 without Esg Score:{}", eraTwoValidatorsReward.toHuman());
 
-    expect(BigInt(eraTwoValidatorsReward?.toString()) > BigInt(eraOneValidatorsReward?.toString())).true;
-
+    expect(
+      BigInt(eraTwoValidatorsReward?.toString()) >
+        BigInt(eraOneValidatorsReward?.toString())
+    ).true;
 
     await waitNfinalizedBlocks(polkadotApi, 2, 1000);
   });
 
+  after(async () => {
+    await killNodes();
+  });
+});
+
+describe("Reward Distribution tests with Reliability score and sustainability score", function () {
+  this.timeout(300 * BLOCK_TIME);
+
+  before(async () => {
+    await spawnNodes();
+  });
 
   it("Should test Reward Distribution with Reliability score and sustainability score ", async () => {
     const { alice, aliceStash } = await init();
@@ -75,38 +87,39 @@ describe.only("Reward Distribution tests", function () {
 
     const eraZero = (await getCurrentEra()).toString();
     const reliabilityZero = await getReliabilityScore(aliceStash);
-    console.log("Reliability Zero:", reliabilityZero);
+    console.log("Reliability Score in Era 0 within Esg Score:", reliabilityZero);
     await waitNfinalizedBlocks(polkadotApi, 45, 1000);
     const eraZeroValidatorsReward = await getErasValidatorReward(eraZero);
-    console.log("eraZeroValidatorsReward:", eraZeroValidatorsReward.toHuman());
-
-   
-
+    console.log("Validator Reward in Era 0 within Esg Score:", eraZeroValidatorsReward.toHuman());
 
     const eraOne = (await getCurrentEra()).toString();
     const reliabilityOne = await getReliabilityScore(aliceStash);
-    console.log("Reliability One:", reliabilityOne);
-    
+    console.log("Reliability Score in Era 1 within Esg Score:", reliabilityOne);
+
     await waitNfinalizedBlocks(polkadotApi, 45, 1000);
     const eraOneValidatorsReward = await getErasValidatorReward(eraOne);
 
-    console.log("eraOneValidatorsReward:", eraOneValidatorsReward.toHuman());
+    console.log("Validator Reward in Era 1 within Esg Score:", eraOneValidatorsReward.toHuman());
 
-    expect(BigInt(eraOneValidatorsReward?.toString()) > BigInt(eraZeroValidatorsReward?.toString())).true;
+    expect(
+      BigInt(eraOneValidatorsReward?.toString()) >
+        BigInt(eraZeroValidatorsReward?.toString())
+    ).true;
 
     const eraTwo = (await getCurrentEra()).toString();
     const reliabilityTwo = await getReliabilityScore(aliceStash);
-    console.log("Reliability Two:", reliabilityTwo);
+    console.log("Reliability Score in Era 2 within Esg Score:", reliabilityTwo);
     await waitNfinalizedBlocks(polkadotApi, 45, 1000);
     const eraTwoValidatorsReward = await getErasValidatorReward(eraTwo);
-    console.log("eraTwoValidatorsReward:{}", eraTwoValidatorsReward.toHuman());
+    console.log("Validator Reward in Era 2 within Esg Score:", eraTwoValidatorsReward.toHuman());
 
-    expect(BigInt(eraTwoValidatorsReward?.toString()) > BigInt(eraOneValidatorsReward?.toString())).true;
-
+    expect(
+      BigInt(eraTwoValidatorsReward?.toString()) >
+        BigInt(eraOneValidatorsReward?.toString())
+    ).true;
 
     await waitNfinalizedBlocks(polkadotApi, 2, 1000);
   });
-
 
   after(async () => {
     await killNodes();
@@ -121,10 +134,7 @@ async function init() {
   return { alice, aliceStash };
 }
 
-async function getReliabilityScore(
-  aliceStash: KeyringPair
-) {
-
+async function getReliabilityScore(aliceStash: KeyringPair) {
   const reliabilityScores = await api.query.imOnline.reliabilityScoresMap(
     aliceStash.address
   );
@@ -132,8 +142,6 @@ async function getReliabilityScore(
 }
 
 async function getErasValidatorReward(era: string) {
-  
-
   const reward = await api.query.staking.erasValidatorReward(era);
   return reward;
 }
