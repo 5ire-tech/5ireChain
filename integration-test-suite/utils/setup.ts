@@ -294,6 +294,50 @@ export async function waitForEvent(
   });
 }
 
+export async function waitForError(
+  api: ApiPromise,
+  palletIndex: number,
+  error: string,
+): Promise<void> {
+  return new Promise(async (resolve, _rej) => {
+    while (true) {
+      // Subscribe to system events via storage
+      const events = await api.query.system.events();
+      const eventsJson = events.toJSON();
+      const eventsValue = api.registry.createType("Vec<EventRecord>", events.toU8a());
+      // Loop through the Vec<EventRecord>
+      for (var event of eventsValue) {
+        // @ts-ignore
+        const section = event.event.section;
+        // @ts-ignore
+        const method = event.event.method;
+        // @ts-ignore
+        const data = event.event.data;
+        console.log(
+          `Event in evm(${section.toString()}.${method.toString()}). ${data} =>`
+        );
+        /*console.log(
+          `Event in error(${palletIndex}.${error}). =>`
+        );*/
+
+        if (section.toString() == 'system' /*&& method.toString() == 'ExtrinsicFailed'*/) {
+          console.log(
+            `System Event and ExtrinsicFailed in error(${data[0].module.index}.${data[0].module.error}). =>`
+          );
+          if (data[0].module.index === palletIndex && data[0].module.error === error) {
+            console.log(
+              `True Event in error(${palletIndex}.${error}). =>`
+            );
+            return resolve(void 0);
+          }
+        }
+      }
+
+      await sleep(2000);
+    }
+  });
+}
+
 export async function sudoTx(
   api: ApiPromise,
   call: SubmittableExtrinsic<'promise'>
