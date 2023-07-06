@@ -3,14 +3,14 @@ import { BLOCK_TIME } from "../utils/constants";
 import { killNodes, polkadotApi as api, spawnNodes } from "../utils/util";
 import { Keyring, WsProvider } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
-import {sudoTx, waitForEvent} from "../utils/setup";
+import {sudoTx, waitForEvent, sleep} from "../utils/setup";
 // Keyring needed to sign using Alice account
 const keyring = new Keyring({ type: "sr25519" });
 
 // This script contains the integration test for the ESG pallet.
 // ESG pallet is the pallet in 5ire-chain which is responsible to add the esg score and related transactions.
 
-describe.only("ESG Pallet Integration tests", function () {
+describe("ESG Pallet Integration tests", function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {
@@ -47,11 +47,13 @@ describe.only("ESG Pallet Integration tests", function () {
     await deRegisterOracleForOracleNotExist(alice, charlie);
 
     await deRegisterOracleFromBadOrigin(bob, charlie);
+
   });
 
   after(async () => {
     await killNodes();
   });
+
 });
 
 // Setup the API and Accounts
@@ -64,13 +66,9 @@ async function init() {
   return { alice, bob, charlie, dave };
 }
 
-function delay(ms: number) {
-    return new Promise( resolve => setTimeout(resolve, ms) );
-}
-
 // Register the Bob account as oracle in ESG pallet from ALICE(sudo account).
 async function registerOracle(alice: KeyringPair, bob: KeyringPair) {
-  console.log(`\n: Registering Oracle`);
+  console.log(`\n Registering Oracle from sudo account Success `);
 
   const transaction = await api.tx.esgScore.registerAnOracle(bob.address, true);
 
@@ -99,7 +97,7 @@ async function registerOracle(alice: KeyringPair, bob: KeyringPair) {
 
 // Register the Dave account as oracle in ESG pallet from BOB(sudo oracle account).
 async function registerOracleBySudoOracle(bob: KeyringPair, dave: KeyringPair) {
-  console.log(`\n Registering Oracle by the sudo oracle `);
+  console.log(`\n Registering Oracle by the sudo oracle success `);
 
   const transaction = await api.tx.esgScore.registerAnOracle(dave.address, true);
 
@@ -127,7 +125,7 @@ async function registerOracleBySudoOracle(bob: KeyringPair, dave: KeyringPair) {
 
 // Register the Bob account as oracle in ESG pallet failed for non-sudo account.
 async function registerOracleFailedCallerNotRootOrSudoOracle( bob: KeyringPair, charlie: KeyringPair) {
-  console.log(`\n Registering Oracle failed due to CallerNotRootOrSudoOracle`);
+  console.log(`\n Registering Oracle fail due to CallerNotRootOrSudoOracle`);
 
   const transaction = await api.tx.esgScore.registerAnOracle(charlie.address, true);
 
@@ -149,13 +147,13 @@ async function registerOracleFailedCallerNotRootOrSudoOracle( bob: KeyringPair, 
       }
     });
 
-  await delay(12000);
+  await sleep(12000);
   return true;
 }
 
 // Register the Bob account as oracle in ESG pallet failed for already registered account.
 async function registerOracleFailedOracleRegisteredAlready( alice: KeyringPair, bob: KeyringPair) {
-  console.log(`\n Registering Oracle failed due to OracleRegisteredAlready`);
+  console.log(`\n Registering Oracle fail due to OracleRegisteredAlready`);
 
   const transaction = await api.tx.esgScore.registerAnOracle(bob.address, true);
 
@@ -177,7 +175,7 @@ async function registerOracleFailedOracleRegisteredAlready( alice: KeyringPair, 
 
       }
     });
-    await delay(12000);
+    await sleep(12000);
 
   return true;
 }
@@ -222,7 +220,7 @@ async function insertEsgScoresCallerNotAnOracle(
   charlie: KeyringPair,
   jsonData: string
 ) {
-  console.log(`\n Inserting ESG Score of the user from CallerNotAnOracle.`);
+  console.log(`\n Inserting ESG Score fail of the user due to CallerNotAnOracle.`);
 
   const transaction = await api.tx.esgScore.upsertEsgScores(jsonData);
 
@@ -247,13 +245,14 @@ async function insertEsgScoresCallerNotAnOracle(
       }
     }
   );
-  await delay(12000);
+
+  await sleep(12000);
   return true;
 }
 
 // De-Register the Bob account as oracle in ESG pallet from ALICE(sudo account).
 async function deRegisterOracle(alice: KeyringPair, bob: KeyringPair) {
-  console.log(`\n: De-Registering Oracle`);
+  console.log(`\n De-Registering Oracle account from sudo account success `);
 
   const existingOracleAccounts = await api.query.esgScore.sudoOraclesStore();
   expect(existingOracleAccounts.toString().includes(bob.address.toString()));
@@ -276,9 +275,9 @@ async function deRegisterOracle(alice: KeyringPair, bob: KeyringPair) {
   return true;
 }
 
-// De-Register the Bob account as oracle in ESG pallet from ALICE(sudo account).
+// De-Register the Charlie(not a oracle) account as oracle in ESG pallet from ALICE(sudo account).
 async function deRegisterOracleForOracleNotExist(alice: KeyringPair, charlie: KeyringPair) {
-  console.log(`\nDe-Registering Oracle for OracleNotExist`);
+  console.log(`\nDe-Registering Oracle fail due to OracleNotExist`);
 
   const transaction = api.tx.esgScore.deregisterAnOracle(
     charlie.address,
@@ -304,14 +303,14 @@ async function deRegisterOracleForOracleNotExist(alice: KeyringPair, charlie: Ke
        }
      });
 
-     await delay(12000);
+     await sleep(12000);
 
   return true;
 }
 
 // De-Register the charlie account as oracle in ESG pallet from charlie(non sudo account).
 async function deRegisterOracleFromBadOrigin(bob: KeyringPair, charlie: KeyringPair) {
-  console.log(`\nDe-Registering Oracle for FromBadOrigin`);
+  console.log(`\nDe-Registering Oracle fail due to FromBadOrigin`);
 
 
   const transaction = api.tx.esgScore.deregisterAnOracle(
@@ -321,7 +320,7 @@ async function deRegisterOracleFromBadOrigin(bob: KeyringPair, charlie: KeyringP
 
  const unsub = await transaction
    .signAndSend(bob, { tip: 200, nonce: -1 }, (result) => {
-       console.log(`Oracle De-Registration for OracleNotExist is ${result.status}`);
+       console.log(`Oracle De-Registration for FromBadOrigin is ${result.status}`);
        if (result.status.isInBlock) {
          console.log(
            `Oracle Registration at blockHash ${result.status.asInBlock}`
@@ -337,7 +336,7 @@ async function deRegisterOracleFromBadOrigin(bob: KeyringPair, charlie: KeyringP
        }
      });
 
-     await delay(12000);
+     await sleep(12000);
 
   return true;
 }
