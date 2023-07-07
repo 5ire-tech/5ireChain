@@ -9,7 +9,7 @@ import {encodeAddress} from "@polkadot/util-crypto";
 // Keyring needed to sign using Alice account
 const keyring = new Keyring({ type: 'sr25519' });
 
-describe.only('Negative Native token tests', function () {
+describe('Negative Native token tests', function () {
   this.timeout(300 * BLOCK_TIME);
   // 4 session.
   this.slow(40 * BLOCK_TIME);
