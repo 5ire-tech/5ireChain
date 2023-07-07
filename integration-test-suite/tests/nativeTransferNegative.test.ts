@@ -50,7 +50,7 @@ describe('Negative Native token tests', function () {
 
           const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
           expect(filteredData[0].event.data[0].module.index == 6).true; //EVM
-          expect(filteredData[0].event.data[0].module.error == '0x02000000').true; //InvalidNonce, index 5
+          expect(filteredData[0].event.data[0].module.error == '0x02000000').true; //Insufficient Balance, index 5
 
           unsub();
           resolve({
