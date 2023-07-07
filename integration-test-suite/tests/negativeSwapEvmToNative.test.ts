@@ -13,7 +13,7 @@ import {sleep} from "../utils/setup";
 const keyring = new Keyring({ type: 'sr25519' });
 const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
 
-describe.only('EVM withdraw test', function () {
+describe('EVM withdraw test', function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {
