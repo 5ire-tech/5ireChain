@@ -28,6 +28,8 @@ describe("ESG Pallet Integration tests", function () {
       },
     ];
 
+    const esgDataString = "[{account:\"5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y\"score:\"43\",},]";
+
     const jsonData = JSON.stringify(esgData);
 
     await registerOracle(alice, bob);
@@ -37,6 +39,8 @@ describe("ESG Pallet Integration tests", function () {
     await registerOracleFailedOracleRegisteredAlready(alice, bob);
 
     await insertEsgScores(bob, charlie, jsonData);
+
+    await insertEsgScoresFailInvalidJson(bob, charlie, esgDataString);
 
     await insertEsgScoresCallerNotAnOracle(charlie, jsonData);
 
@@ -48,6 +52,12 @@ describe("ESG Pallet Integration tests", function () {
 
     await deRegisterOracleFromBadOrigin(bob, charlie);
 
+    await registerNonSudoOracle(alice, bob);
+
+    await registerOracleFailedOracleRegisteredAlreadyForNonSudo(alice, bob);
+
+    // Insert ESG Scores by non-sudo user which we inserted in 2nd last step.
+    await insertEsgScores(bob, charlie, jsonData);
   });
 
   after(async () => {
@@ -215,6 +225,41 @@ async function insertEsgScores(
   return true;
 }
 
+// Insert the ESG scores of the User by oracle account(bob) we added above.
+async function insertEsgScoresFailInvalidJson(
+  bob: KeyringPair,
+  user: KeyringPair,
+  jsonData: string
+) {
+  console.log(`\n Inserting ESG Score of the user fail due to Invalid JSON.`);
+
+  const transaction = await api.tx.esgScore.upsertEsgScores(jsonData);
+
+  const unsub = await transaction.signAndSend(
+    bob,
+    { tip: 200, nonce: -1 },
+    (result) => {
+      console.log(`Insertion of ESG score is ${result.status}`);
+      if (result.status.isInBlock) {
+        console.log(
+          `Insertion of ESG score at blockHash ${result.status.asInBlock}`
+        );
+        console.log(`Waiting for finalization... (can take a minute)`);
+      } else if (result.status.isFinalized) {
+        const data = JSON.stringify(result.events);
+        console.log(data);
+        const dataStr = JSON.parse(data);
+        const filteredErrorData = dataStr.filter((item: any) => item.event.index === "0x0001");
+        expect(filteredErrorData[0].event.data[0].module.error).to.equal("0x02000000");
+        console.log(`Error found: ${filteredErrorData[0].event.data[0].module.error}`);
+      }
+    }
+  );
+
+  await sleep(12000);
+  return true;
+}
+
 // Insert the ESG scores of the User by non oracle account(Charlie) we added above.
 async function insertEsgScoresCallerNotAnOracle(
   charlie: KeyringPair,
@@ -337,6 +382,64 @@ async function deRegisterOracleFromBadOrigin(bob: KeyringPair, charlie: KeyringP
      });
 
      await sleep(12000);
+
+  return true;
+}
+
+// Register the Bob account as non-sudo oracle in ESG pallet from ALICE(sudo account).
+async function registerNonSudoOracle(alice: KeyringPair, bob: KeyringPair) {
+  console.log(`\n Registering non-sudo Oracle from sudo account Success `);
+
+  const transaction = await api.tx.esgScore.registerAnOracle(bob.address, false);
+
+  const unsub = await api.tx.sudo
+    .sudo(transaction.method.toHex())
+    .signAndSend(alice, { tip: 200, nonce: -1 }, (result) => {
+      console.log(`Oracle Registration is ${result.status}`);
+      if (result.status.isInBlock) {
+        console.log(
+          `Oracle Registration at blockHash ${result.status.asInBlock}`
+        );
+        console.log(`Waiting for finalization... (can take a minute)`);
+      } else if (result.status.isFinalized) {
+        const data = JSON.stringify(result.events);
+        console.log(data);
+      }
+    });
+
+  await waitForEvent(api, "esgScore", "NewOracleRegistered");
+  const oracleAccounts = await api.query.esgScore.nonSudoOraclesStore();
+  expect(oracleAccounts.toString().includes(bob.address.toString()));
+  console.log(`Account verified in the oracle storage: ${oracleAccounts}`);
+
+  return true;
+}
+
+// Register the Bob account as oracle in ESG pallet failed for already registered account.
+async function registerOracleFailedOracleRegisteredAlreadyForNonSudo( alice: KeyringPair, bob: KeyringPair) {
+  console.log(`\n Registering Oracle fail due to OracleRegisteredAlready for non-sudo oracle`);
+
+  const transaction = await api.tx.esgScore.registerAnOracle(bob.address, false);
+
+  const unsub = await api.tx.sudo
+  .sudo(transaction.method.toHex())
+  .signAndSend(alice, { tip: 200, nonce: -1 }, (result) => {
+      console.log(`Oracle Registration is ${result.status}`);
+      if (result.status.isInBlock) {
+        console.log(
+          `Oracle Registration at blockHash ${result.status.asInBlock}`
+        );
+        console.log(`Waiting for finalization... (can take a minute)`);
+      } else if (result.status.isFinalized) {
+        const data = JSON.stringify(result.events);
+        const dataStr = JSON.parse(data)
+        const filteredErrorData = dataStr.filter((item: any) => item.event.index === "0x1400");
+        expect(filteredErrorData[0].event.data[0].err.module.error).to.equal("0x05000000");
+        console.log(`Error found: ${filteredErrorData[0].event.data[0].err.module.error}`);
+
+      }
+    });
+    await sleep(12000);
 
   return true;
 }
