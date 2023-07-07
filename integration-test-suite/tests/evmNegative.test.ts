@@ -4,7 +4,7 @@ import {killNodes, polkadotApi, polkadotApi as api, spawnNodes} from "../utils/u
 import {Keyring} from "@polkadot/api";
 import {addressToEvm} from "@polkadot/util-crypto";
 import { KeyringPair } from '@polkadot/keyring/types';
-import {waitForError, waitForEvent} from "../utils/setup";
+import {waitForError, waitForEvent, waitNfinalizedBlocks} from "../utils/setup";
 import {bytesToHex} from "web3-utils";
 // Keyring needed to sign using Alice account
 const keyring = new Keyring({ type: 'sr25519' });
@@ -22,6 +22,8 @@ describe.only('EVM related tests', function () {
   it('Should fail with invalid nonce', async () => {
     const {  alice, aliceEthAccount } = await init();
     await createContractWithInvalidNonceFailure(aliceEthAccount, alice);
+    
+    
   });
 
   // Creation of contract should fail with gas price too low
@@ -37,13 +39,13 @@ describe.only('EVM related tests', function () {
   });
 
   // Creation of contract should fail with gas limit too high
-  it.skip('Should fail with gas limit too high', async () => {
+  it('Should fail with gas limit too high', async () => {
     const {  alice, aliceEthAccount } = await init();
     await createContractWithGasLimitTooHighFailure(aliceEthAccount, alice);
   });
 
   // Creation of contract should fail with balance low
-  it.only('Should fail with balance low for evm', async () => {
+  it('Should fail with balance low for evm', async () => {
     const {  alice, bob, aliceEthAccount } = await init();
 
     for (let i = 0; i < 10; i++) {
@@ -54,7 +56,7 @@ describe.only('EVM related tests', function () {
   });
 
   // Creation of contract should fail with balance low
-  it.skip('Should fail with balance low', async () => {
+  it('Should fail with balance low', async () => {
     const {  alice, bob, aliceEthAccount } = await init();
     // Retrieve the account balance & nonce for Alice
     // @ts-ignore
@@ -223,7 +225,7 @@ async function createContractWithGasPriceTooLowFailure(evmAddress:any, alice: Ke
       }
     });
   });
-  return contract;
+  expect(contract).to.throw;
 }
 
 async function createContractWithGasLimitTooLowFailure(evmAddress:any, alice: KeyringPair) {
@@ -267,7 +269,7 @@ async function createContractWithGasLimitTooHighFailure(evmAddress:any, alice: K
   const source = evmAddress;
   const init = ERC20_BYTECODES;
   const value = 0;
-  const gasLimit = polkadotApi.createType("Balance", "10000000");
+  const gasLimit = polkadotApi.createType("Balance", "15000000");
   const maxFeePerGas = polkadotApi.createType("Balance", "10000000000000");
   const maxPriorityFeePerGas: BigInt =  BigInt(1000000000000);
   const nonce = 0;
@@ -276,28 +278,34 @@ async function createContractWithGasLimitTooHighFailure(evmAddress:any, alice: K
   const transaction = await api.tx.evm.create(source, init, value, gasLimit, maxFeePerGas, maxPriorityFeePerGas, nonce, accessList);
 
   const contract = new Promise<{ block: string}>(async (resolve, reject) => {
-    const unsub = await transaction.signAndSend(alice, {tip: 200, nonce: -1}, (result) => {
-      console.log(`Contract creation is ${result.status}`);
-      if (result.status.isInBlock) {
-        console.log(`Contract included at blockHash ${result.status.asInBlock}`);
-        console.log(`Waiting for finalization... (can take a minute)`);
-      } else if (result.status.isFinalized) {
-        const data = JSON.stringify(result.events);
-        const dataStr = JSON.parse(data);
+    try {
+      const unsub = await transaction.signAndSend(alice, {tip: 200, nonce: -1}, (result) => {
+        console.log(`Contract creation is ${result.status}`);
+        if (result.status.isInBlock) {
+          console.log(`Contract included at blockHash ${result.status.asInBlock}`);
+          console.log(`Waiting for finalization... (can take a minute)`);
+        } else if (result.status.isFinalized) {
+          const data = JSON.stringify(result.events);
+          const dataStr = JSON.parse(data);
+  
+          const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
+          console.log(`filteredData ${JSON.stringify(filteredData)}`);
+          expect(filteredData[0].event.data[0].module.index == 58).true; //EVM
+          expect(filteredData[0].event.data[0].module.error == '0x06000000').true; //GasLimitTooLow
+  
+          unsub();
+          resolve({
+            block: result.status.asFinalized.toString(),
+          });
+        }
+      });
+    }
+    catch (error){
+      reject(error)
+    }
 
-        const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
-        console.log(`filteredData ${JSON.stringify(filteredData)}`);
-        expect(filteredData[0].event.data[0].module.index == 58).true; //EVM
-        expect(filteredData[0].event.data[0].module.error == '0x06000000').true; //GasLimitTooLow
-
-        unsub();
-        resolve({
-          block: result.status.asFinalized.toString(),
-        });
-      }
-    });
   });
-  return contract;
+  //return contract;
 }
 
 async function createContractWithInsufficientBalanceFailure(evmAddress:any, alice: KeyringPair) {
