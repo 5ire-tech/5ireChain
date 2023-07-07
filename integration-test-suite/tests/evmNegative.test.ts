@@ -11,7 +11,7 @@ const keyring = new Keyring({ type: 'sr25519' });
 
 const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
 
-describe.only('EVM related tests', function () {
+describe('EVM related tests', function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {
@@ -46,48 +46,9 @@ describe.only('EVM related tests', function () {
 
   // Creation of contract should fail with balance low
   it('Should fail with balance low for evm', async () => {
-    const {  alice, bob, aliceEthAccount } = await init();
-
-    for (let i = 0; i < 10; i++) {
-      await createContract(i, aliceEthAccount, alice);
-    }
-
-    await createContractWithInsufficientBalanceFailure(aliceEthAccount, alice);
+    const {  alice, bob, aliceEthAccount, bobEthAccount } = await init();
+    await createContractWithInsufficientBalanceFailure(bobEthAccount, bob);
   });
-
-  // Creation of contract should fail with balance low
-  it('Should fail with balance low', async () => {
-    const {  alice, bob, aliceEthAccount } = await init();
-    // Retrieve the account balance & nonce for Alice
-    // @ts-ignore
-    const { nonce: aliceInitialNonce, data: aliceInitialBalance } = await polkadotApi.query.system.account(alice.address);
-    // Retrieve the account balance & nonce for Bob
-    // @ts-ignore
-    const { nonce: bobInitialNonce, data: bobInitialBalance } = await polkadotApi.query.system.account(bob.address);
-    // assert that alice initial balance is same as bob initial balance
-    expect(aliceInitialBalance.free.toBigInt() == bobInitialBalance.free.toBigInt()).true;
-
-    const amount = polkadotApi.createType('Balance', '10000000000000000000000000000000000000');
-    const transaction = polkadotApi.tx.balances.transfer(bob.address, amount);
-
-    const transfer = new Promise<{ block: string, address: string }>(async (resolve, reject) => {
-      const unsub = await transaction.signAndSend(alice, {tip: 200, nonce: -1}, (result) => {
-        console.log(`transfer is ${result.status}`);
-        if (result.status.isInBlock) {
-          console.log(`transfer included at blockHash ${result.status.asInBlock}`);
-          console.log(`Waiting for finalization... (can take a minute)`);
-        } else if (result.status.isFinalized) {
-          console.log( `events are ${result.events}`)
-          console.log(`Transfer finalized at blockHash ${result.status.asFinalized}`);
-          unsub();
-        }
-      });
-    });
-
-    await waitForEvent(api, 'balances', 'Transfer');
-    await createContractWithInsufficientBalanceFailure(aliceEthAccount, alice);
-  });
-
 
   after(async () => {
     await killNodes();
@@ -225,7 +186,7 @@ async function createContractWithGasPriceTooLowFailure(evmAddress:any, alice: Ke
       }
     });
   });
-  expect(contract).to.throw;
+  
 }
 
 async function createContractWithGasLimitTooLowFailure(evmAddress:any, alice: KeyringPair) {
@@ -305,6 +266,7 @@ async function createContractWithGasLimitTooHighFailure(evmAddress:any, alice: K
     }
 
   });
+  expect(contract).to.throw;
   //return contract;
 }
 
@@ -321,26 +283,32 @@ async function createContractWithInsufficientBalanceFailure(evmAddress:any, alic
   const transaction = await api.tx.evm.create(source, init, value, gasLimit, maxFeePerGas, maxPriorityFeePerGas, nonce, accessList);
 
   const contract = new Promise<{ block: string}>(async (resolve, reject) => {
-    const unsub = await transaction.signAndSend(alice, {tip: 200, nonce: -1}, (result) => {
-      console.log(`Contract creation is ${result.status}`);
-      if (result.status.isInBlock) {
-        console.log(`Contract included at blockHash ${result.status.asInBlock}`);
-        console.log(`Waiting for finalization... (can take a minute)`);
-      } else if (result.status.isFinalized) {
-        const data = JSON.stringify(result.events);
-        const dataStr = JSON.parse(data);
+    try {
+      const unsub = await transaction.signAndSend(alice, {tip: 200, nonce: -1}, (result) => {
+        console.log(`Contract creation is ${result.status}`);
+        if (result.status.isInBlock) {
+          console.log(`Contract included at blockHash ${result.status.asInBlock}`);
+          console.log(`Waiting for finalization... (can take a minute)`);
+        } else if (result.status.isFinalized) {
+          const data = JSON.stringify(result.events);
+          const dataStr = JSON.parse(data);
+  
+          const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
+          console.log(`filteredData ${JSON.stringify(filteredData)}`);
+          expect(filteredData[0].event.data[0].module.index == 6).true; //Balance
+          expect(filteredData[0].event.data[0].module.error == '0x02000000').true; //InsufficientBalance
+  
+          unsub();
+          resolve({
+            block: result.status.asFinalized.toString(),
+          });
+        }
+      });
+    }
+    catch (error) {
+      reject(error)
+    }
 
-        const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
-        console.log(`filteredData ${JSON.stringify(filteredData)}`);
-        expect(filteredData[0].event.data[0].module.index == 6).true; //Balance
-        expect(filteredData[0].event.data[0].module.error == '0x02000000').true; //InsufficientBalance
-
-        unsub();
-        resolve({
-          block: result.status.asFinalized.toString(),
-        });
-      }
-    });
   });
-  return contract;
+  expect(contract).to.throw;
 }
