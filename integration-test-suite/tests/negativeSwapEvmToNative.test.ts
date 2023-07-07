@@ -29,6 +29,8 @@ describe.only('EVM withdraw test', function () {
         new Web3.providers.HttpProvider("http://127.0.0.1:9933")
       );
     await BalanceLow(aliceEthAccount, alice);
+    await BadOrigin(aliceEthAccount, bob);
+
 
   });
 
@@ -64,7 +66,33 @@ describe.only('EVM withdraw test', function () {
         const dataStr = JSON.parse(data);
         const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
         expect(filteredData[0].event.data[0].module.error).to.equal("0x02000000");
-        console.log("Test passed");
+        console.log(`Error found: ${filteredData[0].event.data[0].module.error}`);
+
+        unsub();
+      }
+    });
+    await sleep(10000);
+  }
+
+   // Negative test for Error BadOrigin
+   async function BadOrigin(aliceEthAccount: Uint8Array, alice: KeyringPair) {
+    const amount = polkadotApi.createType("Balance", "1000000000000000000000000000000000");
+    const transaction = await polkadotApi.tx.evm.withdraw(aliceEthAccount, amount);
+
+    const unsub = await transaction.signAndSend(alice,  {tip: 200000000, nonce: -1}, (result) => {
+      console.log(`Swap is ${result.status}`);
+      if (result.status.isInBlock) {
+        console.log(`Swap included at blockHash ${result.status.asInBlock}`);
+        console.log(`Waiting for finalization... (can take a minute)`);
+      } else if (result.status.isFinalized) {
+        console.log(`events are ${result.events}`);
+        console.log(`Swap finalized at blockHash ${result.status.asFinalized}`);
+
+        const data = JSON.stringify(result.events);
+        const dataStr = JSON.parse(data);
+        const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
+        expect(filteredData[0].event.data[0].badOrigin === null);
+        console.log(`Error found: ${filteredData[0].event.data[0].badOrigin}`);
 
         unsub();
       }
