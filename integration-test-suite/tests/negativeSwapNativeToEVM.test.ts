@@ -11,7 +11,7 @@ const keyring = new Keyring({ type: 'sr25519' });
 
 const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
 
-describe.only('Swap Native to EVM', function () {
+describe('Swap Native to EVM', function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {
