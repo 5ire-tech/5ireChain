@@ -14,7 +14,7 @@ const keyring = new Keyring({ type: "sr25519" });
 
 // We should test within 5 eras  ( 200 blocks)
 
-describe.only("Negative Reward Distribution tests", function () {
+describe("Negative Reward Distribution tests", function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {
