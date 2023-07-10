@@ -68,33 +68,34 @@ describe('Negative EVM withdraw test', function () {
 
    // Negative test for Error BadOrigin
    async function BadOrigin(aliceEthAccount: Uint8Array, alice: KeyringPair) {
-    const amount = polkadotApi.createType("Balance", "1000000000000000000000000000000000");
-    const transaction = await polkadotApi.tx.evm.withdraw(aliceEthAccount, amount);
+     const amount = polkadotApi.createType("Balance", "1000000000000000000000000000000000");
+     const transaction = await polkadotApi.tx.evm.withdraw(aliceEthAccount, amount);
 
-    const unsub = await transaction.signAndSend(alice,  {tip: 200000000, nonce: -1}, (result) => {
-      console.log(`Swap is ${result.status}`);
-      if (result.status.isInBlock) {
-        console.log(`Swap included at blockHash ${result.status.asInBlock}`);
-        console.log(`Waiting for finalization... (can take a minute)`);
-      } else if (result.status.isFinalized) {
-        console.log(`events are ${result.events}`);
-        console.log(`Swap finalized at blockHash ${result.status.asFinalized}`);
-        if (result.dispatchError) {
-          if (result.dispatchError.isModule) {
-            // for module errors, we have the section indexed, lookup
-            const decoded = polkadotApi.registry.findMetaError(result.dispatchError.asModule);
-            const { docs, name, section } = decoded;
-    
-            console.log(`${section}.${name}: ${docs.join(' ')}`);
-          } else {
-            // Other, CannotLookup, BadOrigin, no extra info
-      
-            expect(result.dispatchError.toString()).to.equal("BadOrigin")
-          }
-        }
+     const unsub = await transaction.signAndSend(alice, {tip: 200000000, nonce: -1}, (result) => {
+       console.log(`Swap is ${result.status}`);
+       if (result.status.isInBlock) {
+         console.log(`Swap included at blockHash ${result.status.asInBlock}`);
+         console.log(`Waiting for finalization... (can take a minute)`);
+       } else if (result.status.isFinalized) {
+         console.log(`events are ${result.events}`);
+         console.log(`Swap finalized at blockHash ${result.status.asFinalized}`);
+         if (result.dispatchError) {
+           if (result.dispatchError.isModule) {
+             // for module errors, we have the section indexed, lookup
+             const decoded = polkadotApi.registry.findMetaError(result.dispatchError.asModule);
+             const {docs, name, section} = decoded;
+
+             console.log(`${section}.${name}: ${docs.join(' ')}`);
+           } else {
+             // Other, CannotLookup, BadOrigin, no extra info
+
+             expect(result.dispatchError.toString()).to.equal("BadOrigin")
+           }
+         }
 
 
-        unsub();
-      }
-    });
-    await sleep(12000);
+         unsub();
+       }
+     });
+     await sleep(12000);
+  }
