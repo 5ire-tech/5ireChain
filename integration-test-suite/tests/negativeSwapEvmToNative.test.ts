@@ -4,16 +4,14 @@ import {killNodes, polkadotApi, spawnNodes} from "../utils/util";
 import {Keyring} from "@polkadot/api";
 import {addressToEvm} from "@polkadot/util-crypto";
 import { KeyringPair } from '@polkadot/keyring/types';
-import {bytesToHex} from "web3-utils";
-import { Web3 } from "web3";
 import {sleep} from "../utils/setup";
 
 
 // Keyring needed to sign using Alice account
 const keyring = new Keyring({ type: 'sr25519' });
-const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
 
-describe('EVM withdraw test', function () {
+
+describe('Negative EVM withdraw test', function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {
@@ -23,9 +21,6 @@ describe('EVM withdraw test', function () {
   // Should do evm deposit
   it('Should test negative scenerios of Swap EVM to Native', async () => {
     const {alice, bob, aliceEthAccount} = await init();
-    const web3 = new Web3(
-        new Web3.providers.HttpProvider("http://127.0.0.1:9933")
-      );
     await BalanceLow(aliceEthAccount, alice);
     await BadOrigin(aliceEthAccount, bob);
 
@@ -64,7 +59,6 @@ describe('EVM withdraw test', function () {
         const dataStr = JSON.parse(data);
         const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
         expect(filteredData[0].event.data[0].module.error).to.equal("0x02000000");
-        console.log(`Error found: ${filteredData[0].event.data[0].module.error}`);
 
         unsub();
       }
@@ -85,15 +79,22 @@ describe('EVM withdraw test', function () {
       } else if (result.status.isFinalized) {
         console.log(`events are ${result.events}`);
         console.log(`Swap finalized at blockHash ${result.status.asFinalized}`);
+        if (result.dispatchError) {
+          if (result.dispatchError.isModule) {
+            // for module errors, we have the section indexed, lookup
+            const decoded = polkadotApi.registry.findMetaError(result.dispatchError.asModule);
+            const { docs, name, section } = decoded;
+    
+            console.log(`${section}.${name}: ${docs.join(' ')}`);
+          } else {
+            // Other, CannotLookup, BadOrigin, no extra info
+      
+            expect(result.dispatchError.toString()).to.equal("BadOrigin")
+          }
+        }
 
-        const data = JSON.stringify(result.events);
-        const dataStr = JSON.parse(data);
-        const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
-        expect(filteredData[0].event.data[0].badOrigin === null);
-        console.log(`Error found: ${filteredData[0].event.data[0].badOrigin}`);
 
         unsub();
       }
     });
     await sleep(12000);
-  }
