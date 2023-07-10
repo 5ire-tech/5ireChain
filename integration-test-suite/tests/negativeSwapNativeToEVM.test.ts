@@ -4,22 +4,21 @@ import {killNodes, polkadotApi as api, spawnNodes} from "../utils/util";
 import {Keyring} from "@polkadot/api";
 import {addressToEvm} from "@polkadot/util-crypto";
 import { KeyringPair } from '@polkadot/keyring/types';
-import {sleep, waitForEvent} from "../utils/setup";
+import {sleep} from "../utils/setup";
 import {bytesToHex} from "web3-utils";
 // Keyring needed to sign using Alice account
 const keyring = new Keyring({ type: 'sr25519' });
 
-const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
 
-describe('Swap Native to EVM', function () {
+describe('Negative Swap Native to EVM', function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {
     await spawnNodes();
   });
 
-  // Should Swap Native to EVM
-  it('Should Swap Native to EVM', async () => {
+  // Balance low deposit to evm 
+  it('Should not  Swap Native to EVM due to insufficient native balance  ', async () => {
     const {alice, bob, aliceEthAccount} = await init();
     await BalanceLowDepositToEvm(aliceEthAccount, bob);
 
@@ -68,8 +67,6 @@ describe('Swap Native to EVM', function () {
           const dataStr = JSON.parse(data);
           const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
           expect(filteredData[0].event.data[0].module.error).to.equal("0x02000000");
-          console.log(`Error found: ${filteredData[0].event.data[0].module.error}`);
-
           unsub();
         }
       });
