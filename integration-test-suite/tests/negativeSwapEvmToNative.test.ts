@@ -10,6 +10,7 @@ import {sleep} from "../utils/setup";
 // Keyring needed to sign using Alice account
 const keyring = new Keyring({ type: 'sr25519' });
 
+
 describe('Negative EVM withdraw test', function () {
   this.timeout(300 * BLOCK_TIME);
 
@@ -57,9 +58,7 @@ describe('Negative EVM withdraw test', function () {
         const data = JSON.stringify(result.events);
         const dataStr = JSON.parse(data);
         const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
-      
         expect(filteredData[0].event.data[0].module.error).to.equal("0x02000000");
-        
 
         unsub();
       }
@@ -80,7 +79,6 @@ describe('Negative EVM withdraw test', function () {
       } else if (result.status.isFinalized) {
         console.log(`events are ${result.events}`);
         console.log(`Swap finalized at blockHash ${result.status.asFinalized}`);
-
         if (result.dispatchError) {
           if (result.dispatchError.isModule) {
             // for module errors, we have the section indexed, lookup
@@ -95,8 +93,8 @@ describe('Negative EVM withdraw test', function () {
           }
         }
 
+
         unsub();
       }
     });
     await sleep(12000);
-  } 
