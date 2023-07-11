@@ -1,0 +1,83 @@
+name: CI
+on:
+  push:
+    branches:
+      - QA
+      - UAT
+      - Testnet
+      - master
+  # pull_request:
+  #   branches: [master, develop]
+  workflow_dispatch:
+
+env:
+  CARGO_NET_GIT_FETCH_WITH_CLI: true
+
+jobs:
+  # 5irechain integration tests
+  e2e:
+    name: integration-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Configure sccache
+        run: |
+          echo "RUSTC_WRAPPER=sccache" >> $GITHUB_ENV
+          echo "SCCACHE_GHA_ENABLED=true" >> $GITHUB_ENV
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@v0.0.3
+
+      - name: Restore Cache
+        if: always()
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            target/release
+            target/debug
+          key: ${{ runner.os }}-cargo-index-${{ github.ref_name }}-e2e
+
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: nightly
+
+      - name: Install Nodejs
+        uses: actions/setup-node@v3
+        with:
+          cache: "yarn"
+          cache-dependency-path: "./integration-test-suite/yarn.lock"
+
+      - name: Install Protobuf
+        run: sudo apt-get install protobuf-compiler
+
+      - name: Install Packages
+        run: cd integration-test-suite && yarn install --frozen-lockfile
+
+      - uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: "${{ secrets.READ_DEPLOY_KEY }}"
+
+      - name: Build Node for Integration Tests (Release)
+        run: cargo build --release
+
+      - name: Run Integration Tests
+        run: cd integration-test-suite && yarn test
+
+      - name: Save Cache
+        if: ${{ !cancelled() }}
+        uses: actions/cache/save@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            target/release
+            target/debug
+          key: ${{ runner.os }}-cargo-index-${{ github.ref_name }}-integration-tests
