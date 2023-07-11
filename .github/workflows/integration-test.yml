@@ -1,5 +1,14 @@
 name: CI
-on: [push]
+on:
+  push:
+    branches:
+      - QA
+      - UAT
+      - Testnet
+      - master
+  # pull_request:
+  #   branches: [master, develop]
+  workflow_dispatch:
 
 env:
   CARGO_NET_GIT_FETCH_WITH_CLI: true
