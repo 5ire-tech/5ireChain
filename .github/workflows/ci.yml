@@ -36,12 +36,10 @@ jobs:
           ssh-private-key: "${{ secrets.READ_DEPLOY_KEY }}"
 
       - name: Build
-        run: |
-          cargo check
+        run: cargo check
 
       - name: Test
-        run: |
-          cargo test
+        run: cargo test
 
   lint:
     runs-on: ubuntu-latest
@@ -64,6 +62,9 @@ jobs:
 
       #- name: Check format
       #  run: cargo +nightly fmt --all --check
+
+      - name: Add Cargo Clippy
+        run: rustup component add clippy
 
       - name: Clippy
         run: cargo clippy
