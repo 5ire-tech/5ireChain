@@ -1,8 +1,5 @@
 name: CI suite
-
-on:
-  pull_request:
-    branches: [ master ]
+on: [push]
 
 concurrency:
   group: ${{ github.ref }}
