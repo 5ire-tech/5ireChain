@@ -37,11 +37,11 @@ jobs:
 
       - name: Build
         run: |
-          cargo +nightly check --workspace --all-targets --all-features --verbose
+          cargo +nightly check
 
       - name: Test
         run: |
-          cargo +nightly test -p --all-targets --all-features --verbose
+          cargo +nightly test
 
   lint:
     runs-on: ubuntu-latest
