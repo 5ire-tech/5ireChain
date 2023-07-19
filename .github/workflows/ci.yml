@@ -67,6 +67,9 @@ jobs:
         with:
           ssh-private-key: "${{ secrets.READ_DEPLOY_KEY }}"
 
+      - name: Install Protobuf
+        run: sudo apt-get install protobuf-compiler
+
       #- name: Check format
       #  run: cargo +nightly fmt --all --check
 
