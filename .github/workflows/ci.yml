@@ -12,7 +12,8 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v3
         with:
-          access_token: ${{ github.token }}
+          token: ${{ github.token }}
+          submodules: recursive
 
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -43,8 +44,9 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v3
-      with:
-        access_token: ${{ github.token }}
+        with:
+          token: ${{ github.token }}
+          submodules: recursive
 
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@nightly
