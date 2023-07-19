@@ -60,6 +60,10 @@ jobs:
         with:
           cache-on-failure: true
 
+      - uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: "${{ secrets.READ_DEPLOY_KEY }}"
+
       #- name: Check format
       #  run: cargo +nightly fmt --all --check
 
