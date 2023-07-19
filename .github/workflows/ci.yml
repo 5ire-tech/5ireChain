@@ -1,4 +1,4 @@
-name: CI suite
+name: Checks and Lint
 on: [push]
 
 concurrency:
