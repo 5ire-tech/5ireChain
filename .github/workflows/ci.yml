@@ -58,5 +58,5 @@ jobs:
       - name: Check format
         run: cargo +nightly fmt --all --check
 
-      -name: Clippy
-       run: cargo clippy
+      - name: Clippy
+        run: cargo clippy
