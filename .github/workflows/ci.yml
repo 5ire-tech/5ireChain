@@ -1,14 +1,56 @@
-name: Checks and Lint
-on: [push]
-
-concurrency:
-  group: ${{ github.ref }}
-  cancel-in-progress: true
+name: CI
+on:
+  push:
+    branches:
+      - QA
+      - UAT
+      - Testnet
+      - master
+  # pull_request:
+  #   branches: [master, develop]
+  workflow_dispatch:
 
 env:
   CARGO_NET_GIT_FETCH_WITH_CLI: true
 
 jobs:
+  # 5irechain linting(fmt + clippy)
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+        with:
+          token: ${{ github.token }}
+          submodules: recursive
+
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+
+      - uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: "${{ secrets.READ_DEPLOY_KEY }}"
+
+      - name: Install Protobuf
+        run: sudo apt-get install protobuf-compiler
+
+      - name: Check format
+        run: cargo +nightly fmt --all --check
+
+      - name: Add Cargo Clippy
+        run: rustup component add clippy
+
+      - name: Clippy
+        run: cargo clippy -- -D warnings
+
+  # 5irechain cargo check and unit test
   build_and_test:
     runs-on: ubuntu-latest
     steps:
@@ -44,37 +86,70 @@ jobs:
       - name: Test
         run: cargo test
 
-  lint:
+  # 5irechain integration tests
+  e2e:
+    name: integration-tests
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout sources
-        uses: actions/checkout@v3
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.1
         with:
-          token: ${{ github.token }}
-          submodules: recursive
+          access_token: ${{ github.token }}
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Configure sccache
+        run: |
+          echo "RUSTC_WRAPPER=sccache" >> $GITHUB_ENV
+          echo "SCCACHE_GHA_ENABLED=true" >> $GITHUB_ENV
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@v0.0.3
+
+      - name: Restore Cache
+        if: always()
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            target/release
+            target/debug
+          key: ${{ runner.os }}-cargo-index-${{ github.ref_name }}-e2e
 
       - name: Install toolchain
-        uses: dtolnay/rust-toolchain@nightly
+        uses: dtolnay/rust-toolchain@stable
         with:
-          components: rustfmt
+          toolchain: nightly
 
-      - name: Rust cache
-        uses: Swatinem/rust-cache@v2
+      - name: Install Nodejs
+        uses: actions/setup-node@v3
         with:
-          cache-on-failure: true
+          cache: "yarn"
+          cache-dependency-path: "./integration-test-suite/yarn.lock"
+
+      - name: Install Protobuf
+        run: sudo apt-get install protobuf-compiler
+
+      - name: Install Packages
+        run: cd integration-test-suite && yarn install --frozen-lockfile
 
       - uses: webfactory/ssh-agent@v0.5.4
         with:
           ssh-private-key: "${{ secrets.READ_DEPLOY_KEY }}"
 
-      - name: Install Protobuf
-        run: sudo apt-get install protobuf-compiler
+      - name: Build Node for Integration Tests (Release)
+        run: cargo build --release
 
-      #- name: Check format
-      #  run: cargo +nightly fmt --all --check
+      - name: Run Integration Tests
+        run: cd integration-test-suite && yarn test
 
-      - name: Add Cargo Clippy
-        run: rustup component add clippy
-
-      - name: Clippy
-        run: cargo clippy -- -D warnings
+      - name: Save Cache
+        if: ${{ !cancelled() }}
+        uses: actions/cache/save@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            target/release
+            target/debug
+          key: ${{ runner.os }}-cargo-index-${{ github.ref_name }}-integration-tests
