@@ -6,14 +6,86 @@ on:
       - UAT
       - Testnet
       - master
-  # pull_request:
-  #   branches: [master, develop]
+  pull_request:
+    branches: [master]
   workflow_dispatch:
 
 env:
   CARGO_NET_GIT_FETCH_WITH_CLI: true
 
 jobs:
+  # 5irechain linting(fmt + clippy)
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+        with:
+          token: ${{ github.token }}
+          submodules: recursive
+
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+
+      - uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: "${{ secrets.READ_DEPLOY_KEY }}"
+
+      - name: Install Protobuf
+        run: sudo apt-get install protobuf-compiler
+
+      - name: Check format
+        run: cargo +nightly fmt --all --check
+
+      - name: Add Cargo Clippy
+        run: rustup component add clippy
+
+      - name: Clippy
+        run: cargo clippy -- -D warnings
+
+  # 5irechain cargo check and unit test
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+        with:
+          token: ${{ github.token }}
+          submodules: recursive
+
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          toolchain: nightly
+          targets: wasm32-unknown-unknown
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          version: '3.9.1'
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+
+      - uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: "${{ secrets.READ_DEPLOY_KEY }}"
+
+      - name: Build
+        run: cargo check
+
+      - name: Test
+        run: cargo test
+
   # 5irechain integration tests
   e2e:
     name: integration-tests
