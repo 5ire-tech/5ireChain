@@ -70,15 +70,11 @@ where
 		) {
 			let header = match self.client.header(id) {
 				Ok(Some(h)) => h,
-				_ => {
-					return Err(internal_err(format!("Failed to retrieve header at {}", id)))
-				},
+				_ => return Err(internal_err(format!("Failed to retrieve header at {}", id))),
 			};
 			let number = match self.client.number(header.hash()) {
 				Ok(Some(n)) => n,
-				_ => {
-					return Err(internal_err(format!("Failed to retrieve block number at {}", id)))
-				},
+				_ => return Err(internal_err(format!("Failed to retrieve block number at {}", id))),
 			};
 			// Highest and lowest block number within the requested range.
 			let highest = UniqueSaturatedInto::<u64>::unique_saturated_into(number);
