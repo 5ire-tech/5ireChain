@@ -60,11 +60,8 @@ where
 	) -> Result<FeeHistory> {
 		// The max supported range size is 1024 by spec.
 		let range_limit = U256::from(1024);
-		let block_count = if block_count > range_limit {
-			range_limit.as_u64()
-		} else {
-			block_count.as_u64()
-		};
+		let block_count =
+			if block_count > range_limit { range_limit.as_u64() } else { block_count.as_u64() };
 
 		if let Ok(Some(id)) = frontier_backend_client::native_block_id::<B, C>(
 			self.client.as_ref(),
@@ -74,17 +71,14 @@ where
 			let header = match self.client.header(id) {
 				Ok(Some(h)) => h,
 				_ => {
-					return Err(internal_err(format!("Failed to retrieve header at {}", id)));
-				}
+					return Err(internal_err(format!("Failed to retrieve header at {}", id)))
+				},
 			};
 			let number = match self.client.number(header.hash()) {
 				Ok(Some(n)) => n,
 				_ => {
-					return Err(internal_err(format!(
-						"Failed to retrieve block number at {}",
-						id
-					)));
-				}
+					return Err(internal_err(format!("Failed to retrieve block number at {}", id)))
+				},
 			};
 			// Highest and lowest block number within the requested range.
 			let highest = UniqueSaturatedInto::<u64>::unique_saturated_into(number);
@@ -94,7 +88,7 @@ where
 				UniqueSaturatedInto::<u64>::unique_saturated_into(self.client.info().best_number);
 			// Only support in-cache queries.
 			if lowest < best_number.saturating_sub(self.fee_history_cache_limit) {
-				return Err(internal_err("Block range out of bounds."));
+				return Err(internal_err("Block range out of bounds."))
 			}
 			if let Ok(fee_history_cache) = &self.fee_history_cache.lock() {
 				let mut response = FeeHistory {
@@ -139,24 +133,18 @@ where
 					response.reward = Some(rewards);
 				}
 				// Calculate next base fee.
-				if let (Some(last_gas_used), Some(last_fee_per_gas)) = (
-					response.gas_used_ratio.last(),
-					response.base_fee_per_gas.last(),
-				) {
+				if let (Some(last_gas_used), Some(last_fee_per_gas)) =
+					(response.gas_used_ratio.last(), response.base_fee_per_gas.last())
+				{
 					let schema = frontier_backend_client::onchain_storage_schema::<B, C, BE>(
 						self.client.as_ref(),
 						id,
 					);
-					let handler = self
-						.overrides
-						.schemas
-						.get(&schema)
-						.unwrap_or(&self.overrides.fallback);
+					let handler =
+						self.overrides.schemas.get(&schema).unwrap_or(&self.overrides.fallback);
 					let default_elasticity = sp_runtime::Permill::from_parts(125_000);
-					let elasticity = handler
-						.elasticity(&id)
-						.unwrap_or(default_elasticity)
-						.deconstruct();
+					let elasticity =
+						handler.elasticity(&id).unwrap_or(default_elasticity).deconstruct();
 					let elasticity = elasticity as f64 / 1_000_000f64;
 					let last_fee_per_gas = last_fee_per_gas.as_u64() as f64;
 					if last_gas_used > &0.5 {
@@ -173,20 +161,15 @@ where
 						response.base_fee_per_gas.push(U256::from(new_base_fee));
 					} else {
 						// Same base gas
-						response
-							.base_fee_per_gas
-							.push(U256::from(last_fee_per_gas as u64));
+						response.base_fee_per_gas.push(U256::from(last_fee_per_gas as u64));
 					}
 				}
-				return Ok(response);
+				return Ok(response)
 			} else {
-				return Err(internal_err("Failed to read fee history cache."));
+				return Err(internal_err("Failed to read fee history cache."))
 			}
 		}
-		Err(internal_err(format!(
-			"Failed to retrieve requested block {:?}.",
-			newest_block
-		)))
+		Err(internal_err(format!("Failed to retrieve requested block {:?}.", newest_block)))
 	}
 
 	pub fn max_priority_fee_per_gas(&self) -> Result<U256> {
@@ -213,7 +196,7 @@ where
 				}
 			}
 		} else {
-			return Err(internal_err("Failed to read fee oracle cache."));
+			return Err(internal_err("Failed to read fee oracle cache."))
 		}
 		Ok(*rewards.iter().min().unwrap_or(&U256::zero()))
 	}

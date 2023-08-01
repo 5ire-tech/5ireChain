@@ -63,11 +63,7 @@ pub mod pallet {
 	#[cfg(feature = "std")]
 	impl<T: Config> GenesisConfig<T> {
 		pub fn new(base_fee_per_gas: U256, elasticity: Permill) -> Self {
-			Self {
-				base_fee_per_gas,
-				elasticity,
-				_marker: PhantomData,
-			}
+			Self { base_fee_per_gas, elasticity, _marker: PhantomData }
 		}
 	}
 
@@ -130,27 +126,29 @@ pub mod pallet {
 		fn on_finalize(_n: <T as frame_system::Config>::BlockNumber) {
 			if <Elasticity<T>>::get().is_zero() {
 				// Zero elasticity means constant BaseFeePerGas.
-				return;
+				return
 			}
 
 			let lower = T::Threshold::lower();
 			let upper = T::Threshold::upper();
-			// `target` is the ideal congestion of the network where the base fee should remain unchanged.
-			// Under normal circumstances the `target` should be 50%.
-			// If we go below the `target`, the base fee is linearly decreased by the Elasticity delta of lower~target.
-			// If we go above the `target`, the base fee is linearly increased by the Elasticity delta of upper~target.
-			// The base fee is fully increased (default 12.5%) if the block is upper full (default 100%).
-			// The base fee is fully decreased (default 12.5%) if the block is lower empty (default 0%).
+			// `target` is the ideal congestion of the network where the base fee should remain
+			// unchanged. Under normal circumstances the `target` should be 50%.
+			// If we go below the `target`, the base fee is linearly decreased by the Elasticity
+			// delta of lower~target. If we go above the `target`, the base fee is linearly
+			// increased by the Elasticity delta of upper~target. The base fee is fully increased
+			// (default 12.5%) if the block is upper full (default 100%). The base fee is fully
+			// decreased (default 12.5%) if the block is lower empty (default 0%).
 			let weight = <frame_system::Pallet<T>>::block_weight();
 			let max_weight = <<T as frame_system::Config>::BlockWeights>::get().max_block;
 
-			// We convert `weight` into block fullness and ensure we are within the lower and upper bound.
+			// We convert `weight` into block fullness and ensure we are within the lower and upper
+			// bound.
 			let weight_used =
 				Permill::from_rational(weight.total().ref_time(), max_weight.ref_time())
 					.clamp(lower, upper);
 			// After clamp `weighted_used` is always between `lower` and `upper`.
-			// We scale the block fullness range to the lower/upper range, and the usage represents the
-			// actual percentage within this new scale.
+			// We scale the block fullness range to the lower/upper range, and the usage represents
+			// the actual percentage within this new scale.
 			let usage = (weight_used - lower) / (upper - lower);
 
 			// Target is our ideal block fullness.

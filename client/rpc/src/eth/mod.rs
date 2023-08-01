@@ -48,11 +48,9 @@ use sp_runtime::{
 	traits::{BlakeTwo256, Block as BlockT, UniqueSaturatedInto},
 };
 // Frontier
-use fc_rpc_core::{types::*, EthApiServer};
-use fp_rpc::{TransactionStatus};
-use fp_rpc::ConvertTransactionRuntimeApi;
-use fp_rpc::EthereumRuntimeRPCApi;
 use crate::{internal_err, overrides::OverrideHandle, public_key, signer::EthSigner};
+use fc_rpc_core::{types::*, EthApiServer};
+use fp_rpc::{ConvertTransactionRuntimeApi, EthereumRuntimeRPCApi, TransactionStatus};
 
 pub use self::{
 	cache::{EthBlockDataCacheTask, EthTask},
@@ -258,8 +256,7 @@ where
 		number: BlockNumber,
 		index: Index,
 	) -> Result<Option<Transaction>> {
-		self.transaction_by_block_number_and_index(number, index)
-			.await
+		self.transaction_by_block_number_and_index(number, index).await
 	}
 
 	async fn transaction_receipt(&self, hash: H256) -> Result<Option<Receipt>> {
@@ -411,11 +408,7 @@ fn rich_block_build(
 					)
 				} else {
 					BlockTransactions::Hashes(
-						block
-							.transactions
-							.iter()
-							.map(|transaction| transaction.hash())
-							.collect(),
+						block.transactions.iter().map(|transaction| transaction.hash()).collect(),
 					)
 				}
 			},
@@ -458,16 +451,13 @@ fn transaction_build(
 	};
 
 	// Block hash.
-	transaction.block_hash = block
-		.as_ref()
-		.map(|block| H256::from(keccak_256(&rlp::encode(&block.header))));
+	transaction.block_hash =
+		block.as_ref().map(|block| H256::from(keccak_256(&rlp::encode(&block.header))));
 	// Block number.
 	transaction.block_number = block.as_ref().map(|block| block.header.number);
 	// Transaction index.
 	transaction.transaction_index = status.as_ref().map(|status| {
-		U256::from(UniqueSaturatedInto::<u32>::unique_saturated_into(
-			status.transaction_index,
-		))
+		U256::from(UniqueSaturatedInto::<u32>::unique_saturated_into(status.transaction_index))
 	});
 	// From.
 	transaction.from = status.as_ref().map_or(
@@ -535,9 +525,6 @@ where
 		}
 		Ok(api)
 	} else {
-		Err(internal_err(format!(
-			"Cannot get header for block {:?}",
-			best
-		)))
+		Err(internal_err(format!("Cannot get header for block {:?}", best)))
 	}
 }

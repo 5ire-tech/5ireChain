@@ -75,7 +75,7 @@ where
 				{
 					api_version
 				} else {
-					return Err(internal_err("failed to retrieve Runtime Api version"));
+					return Err(internal_err("failed to retrieve Runtime Api version"))
 				};
 				// If the transaction is not yet mapped in the frontier db,
 				// check for it in the transaction pool.
@@ -105,25 +105,21 @@ where
 					})?
 				} else {
 					#[allow(deprecated)]
-					let legacy = api.extrinsic_filter_before_version_2(&best_block, xts)
-						.map_err(|err| {
-							internal_err(format!(
-								"fetch runtime extrinsic filter failed: {:?}",
-								err
-							))
-						})?;
+					let legacy = api.extrinsic_filter_before_version_2(&best_block, xts).map_err(|err| {
+						internal_err(format!("fetch runtime extrinsic filter failed: {:?}", err))
+					})?;
 					legacy.into_iter().map(|tx| tx.into()).collect()
 				};
 
 				for txn in ethereum_transactions {
 					let inner_hash = txn.hash();
 					if hash == inner_hash {
-						return Ok(Some(transaction_build(txn, None, None, None)));
+						return Ok(Some(transaction_build(txn, None, None, None)))
 					}
 				}
 				// Unknown transaction.
-				return Ok(None);
-			}
+				return Ok(None)
+			},
 		};
 
 		let id = match frontier_backend_client::load_hash::<B, C>(
@@ -144,9 +140,7 @@ where
 			frontier_backend_client::onchain_storage_schema::<B, C, BE>(client.as_ref(), id);
 
 		let block = block_data_cache.current_block(schema, substrate_hash).await;
-		let statuses = block_data_cache
-			.current_transaction_statuses(schema, substrate_hash)
-			.await;
+		let statuses = block_data_cache.current_transaction_statuses(schema, substrate_hash).await;
 
 		let base_fee = client.runtime_api().gas_price(&id).unwrap_or_default();
 
@@ -190,9 +184,7 @@ where
 			frontier_backend_client::onchain_storage_schema::<B, C, BE>(client.as_ref(), id);
 
 		let block = block_data_cache.current_block(schema, substrate_hash).await;
-		let statuses = block_data_cache
-			.current_transaction_statuses(schema, substrate_hash)
-			.await;
+		let statuses = block_data_cache.current_transaction_statuses(schema, substrate_hash).await;
 
 		let base_fee = client.runtime_api().gas_price(&id).unwrap_or_default();
 
@@ -210,7 +202,7 @@ where
 				} else {
 					Err(internal_err(format!("{:?} is out of bounds", index)))
 				}
-			}
+			},
 			_ => Ok(None),
 		}
 	}
@@ -241,9 +233,7 @@ where
 			frontier_backend_client::onchain_storage_schema::<B, C, BE>(client.as_ref(), id);
 
 		let block = block_data_cache.current_block(schema, substrate_hash).await;
-		let statuses = block_data_cache
-			.current_transaction_statuses(schema, substrate_hash)
-			.await;
+		let statuses = block_data_cache.current_transaction_statuses(schema, substrate_hash).await;
 
 		let base_fee = client.runtime_api().gas_price(&id).unwrap_or_default();
 
@@ -261,7 +251,7 @@ where
 				} else {
 					Err(internal_err(format!("{:?} is out of bounds", index)))
 				}
-			}
+			},
 			_ => Ok(None),
 		}
 	}
@@ -300,15 +290,10 @@ where
 
 		let schema =
 			frontier_backend_client::onchain_storage_schema::<B, C, BE>(client.as_ref(), id);
-		let handler = overrides
-			.schemas
-			.get(&schema)
-			.unwrap_or(&overrides.fallback);
+		let handler = overrides.schemas.get(&schema).unwrap_or(&overrides.fallback);
 
 		let block = block_data_cache.current_block(schema, substrate_hash).await;
-		let statuses = block_data_cache
-			.current_transaction_statuses(schema, substrate_hash)
-			.await;
+		let statuses = block_data_cache.current_transaction_statuses(schema, substrate_hash).await;
 		let receipts = handler.current_receipts(&id);
 		let is_eip1559 = handler.is_eip1559(&id);
 
@@ -319,7 +304,8 @@ where
 
 				let (logs, logs_bloom, status_code, cumulative_gas_used, gas_used) = if !is_eip1559
 				{
-					// Pre-london frontier update stored receipts require cumulative gas calculation.
+					// Pre-london frontier update stored receipts require cumulative gas
+					// calculation.
 					match receipt {
 						ethereum::ReceiptV3::Legacy(ref d) => {
 							let index = core::cmp::min(receipts.len(), index + 1);
@@ -340,39 +326,32 @@ where
 								U256::from(cumulative_gas),
 								d.used_gas,
 							)
-						}
-						_ => {
+						},
+						_ =>
 							return Err(internal_err(format!(
 								"Unknown receipt for request {}",
 								hash
-							)))
-						}
+							))),
 					}
 				} else {
 					match receipt {
-						ethereum::ReceiptV3::Legacy(ref d)
-						| ethereum::ReceiptV3::EIP2930(ref d)
-						| ethereum::ReceiptV3::EIP1559(ref d) => {
+						ethereum::ReceiptV3::Legacy(ref d) |
+						ethereum::ReceiptV3::EIP2930(ref d) |
+						ethereum::ReceiptV3::EIP1559(ref d) => {
 							let cumulative_gas = d.used_gas;
 							let gas_used = if index > 0 {
 								let previous_receipt = receipts[index - 1].clone();
 								let previous_gas_used = match previous_receipt {
-									ethereum::ReceiptV3::Legacy(d)
-									| ethereum::ReceiptV3::EIP2930(d)
-									| ethereum::ReceiptV3::EIP1559(d) => d.used_gas,
+									ethereum::ReceiptV3::Legacy(d) |
+									ethereum::ReceiptV3::EIP2930(d) |
+									ethereum::ReceiptV3::EIP1559(d) => d.used_gas,
 								};
 								cumulative_gas.saturating_sub(previous_gas_used)
 							} else {
 								cumulative_gas
 							};
-							(
-								d.logs.clone(),
-								d.logs_bloom,
-								d.status_code,
-								cumulative_gas,
-								gas_used,
-							)
-						}
+							(d.logs.clone(), d.logs_bloom, d.status_code, cumulative_gas, gas_used)
+						},
 					}
 				};
 
@@ -410,9 +389,9 @@ where
 								cumulative_receipts
 									.iter()
 									.map(|r| match r {
-										ethereum::ReceiptV3::Legacy(d)
-										| ethereum::ReceiptV3::EIP2930(d)
-										| ethereum::ReceiptV3::EIP1559(d) => d.logs.len() as u32,
+										ethereum::ReceiptV3::Legacy(d) |
+										ethereum::ReceiptV3::EIP2930(d) |
+										ethereum::ReceiptV3::EIP1559(d) => d.logs.len() as u32,
 									})
 									.sum::<u32>(),
 							);
@@ -444,8 +423,8 @@ where
 						ethereum::ReceiptV3::EIP2930(_) => U256::from(1),
 						ethereum::ReceiptV3::EIP1559(_) => U256::from(2),
 					},
-				}));
-			}
+				}))
+			},
 			_ => Ok(None),
 		}
 	}

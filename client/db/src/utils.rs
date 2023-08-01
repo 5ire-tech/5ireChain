@@ -30,23 +30,17 @@ where
 	C: sp_blockchain::HeaderBackend<Block> + Send + Sync,
 {
 	let db: Arc<dyn Database<DbHash>> = match &config.source {
-		DatabaseSource::ParityDb { path } => {
-			open_parity_db::<Block, C>(client, path, &config.source)?
-		}
-		DatabaseSource::RocksDb { path, .. } => {
-			open_kvdb_rocksdb::<Block, C>(client, path, true, &config.source)?
-		}
-		DatabaseSource::Auto {
-			paritydb_path,
-			rocksdb_path,
-			..
-		} => {
+		DatabaseSource::ParityDb { path } =>
+			open_parity_db::<Block, C>(client, path, &config.source)?,
+		DatabaseSource::RocksDb { path, .. } =>
+			open_kvdb_rocksdb::<Block, C>(client, path, true, &config.source)?,
+		DatabaseSource::Auto { paritydb_path, rocksdb_path, .. } => {
 			match open_kvdb_rocksdb::<Block, C>(client.clone(), rocksdb_path, false, &config.source)
 			{
 				Ok(db) => db,
 				Err(_) => open_parity_db::<Block, C>(client, paritydb_path, &config.source)?,
 			}
-		}
+		},
 		_ => return Err("Missing feature flags `parity-db`".to_string()),
 	};
 	Ok(db)
@@ -76,7 +70,7 @@ where
 	// write database version only after the database is succesfully opened
 	#[cfg(not(test))]
 	crate::upgrade::update_version(path).map_err(|_| "Cannot update db version".to_string())?;
-	return Ok(sp_database::as_database(db));
+	return Ok(sp_database::as_database(db))
 }
 
 #[cfg(not(feature = "kvdb-rocksdb"))]

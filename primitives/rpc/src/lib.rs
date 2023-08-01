@@ -186,8 +186,9 @@ pub trait ConvertTransaction<E> {
 // so we are guaranteed at compile time that `NoTransactionConverter` can never be instantiated.
 pub enum NoTransactionConverter {}
 impl<E> ConvertTransaction<E> for NoTransactionConverter {
-	// `convert_transaction` is a method taking `&self` as a parameter, so it can only be called via an instance of type Self,
-	// so we are guaranteed at compile time that this method can never be called.
+	// `convert_transaction` is a method taking `&self` as a parameter, so it can only be called via
+	// an instance of type Self, so we are guaranteed at compile time that this method can never be
+	// called.
 	fn convert_transaction(&self, _transaction: ethereum::TransactionV2) -> E {
 		unreachable!()
 	}

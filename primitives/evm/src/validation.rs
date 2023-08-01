@@ -69,25 +69,21 @@ impl<'config, E: From<InvalidEvmTransactionError>> CheckEvmTransaction<'config, 
 		config: CheckEvmTransactionConfig<'config>,
 		transaction: CheckEvmTransactionInput,
 	) -> Self {
-		CheckEvmTransaction {
-			config,
-			transaction,
-			_marker: Default::default(),
-		}
+		CheckEvmTransaction { config, transaction, _marker: Default::default() }
 	}
 
 	pub fn validate_in_pool_for(&self, who: &Account) -> Result<&Self, E> {
 		if self.transaction.nonce < who.nonce {
-			return Err(InvalidEvmTransactionError::TxNonceTooLow.into());
+			return Err(InvalidEvmTransactionError::TxNonceTooLow.into())
 		}
 		self.validate_common()
 	}
 
 	pub fn validate_in_block_for(&self, who: &Account) -> Result<&Self, E> {
 		if self.transaction.nonce > who.nonce {
-			return Err(InvalidEvmTransactionError::TxNonceTooHigh.into());
+			return Err(InvalidEvmTransactionError::TxNonceTooHigh.into())
 		} else if self.transaction.nonce < who.nonce {
-			return Err(InvalidEvmTransactionError::TxNonceTooLow.into());
+			return Err(InvalidEvmTransactionError::TxNonceTooLow.into())
 		}
 		self.validate_common()
 	}
@@ -96,7 +92,7 @@ impl<'config, E: From<InvalidEvmTransactionError>> CheckEvmTransaction<'config, 
 		// Chain id matches the one in the signature.
 		if let Some(chain_id) = self.transaction.chain_id {
 			if chain_id != self.config.chain_id {
-				return Err(InvalidEvmTransactionError::InvalidChainId.into());
+				return Err(InvalidEvmTransactionError::InvalidChainId.into())
 			}
 		}
 		Ok(self)
@@ -108,7 +104,7 @@ impl<'config, E: From<InvalidEvmTransactionError>> CheckEvmTransaction<'config, 
 		if self.config.is_transactional || gas_price > U256::zero() {
 			// Transaction max fee is at least the current base fee.
 			if gas_price < self.config.base_fee {
-				return Err(InvalidEvmTransactionError::GasPriceTooLow.into());
+				return Err(InvalidEvmTransactionError::GasPriceTooLow.into())
 			}
 		}
 		Ok(self)
@@ -131,7 +127,7 @@ impl<'config, E: From<InvalidEvmTransactionError>> CheckEvmTransaction<'config, 
 		if self.config.is_transactional || fee > U256::zero() {
 			let total_payment = self.transaction.value.saturating_add(fee);
 			if who.balance < total_payment {
-				return Err(InvalidEvmTransactionError::BalanceTooLow.into());
+				return Err(InvalidEvmTransactionError::BalanceTooLow.into())
 			}
 		}
 		Ok(self)
@@ -149,13 +145,12 @@ impl<'config, E: From<InvalidEvmTransactionError>> CheckEvmTransaction<'config, 
 			// Legacy or EIP-2930 transaction.
 			(Some(gas_price), None, None) => Ok((gas_price, Some(gas_price))),
 			// EIP-1559 transaction without tip.
-			(None, Some(max_fee_per_gas), None) => {
-				Ok((max_fee_per_gas, Some(self.config.base_fee)))
-			}
+			(None, Some(max_fee_per_gas), None) =>
+				Ok((max_fee_per_gas, Some(self.config.base_fee))),
 			// EIP-1559 tip.
 			(None, Some(max_fee_per_gas), Some(max_priority_fee_per_gas)) => {
 				if max_priority_fee_per_gas > max_fee_per_gas {
-					return Err(InvalidEvmTransactionError::PriorityFeeTooHigh.into());
+					return Err(InvalidEvmTransactionError::PriorityFeeTooHigh.into())
 				}
 				let effective_gas_price = self
 					.config
@@ -164,7 +159,7 @@ impl<'config, E: From<InvalidEvmTransactionError>> CheckEvmTransaction<'config, 
 					.unwrap_or_else(U256::max_value)
 					.min(max_fee_per_gas);
 				Ok((max_fee_per_gas, Some(effective_gas_price)))
-			}
+			},
 			_ => {
 				if self.config.is_transactional {
 					Err(InvalidEvmTransactionError::InvalidPaymentInput.into())
@@ -172,7 +167,7 @@ impl<'config, E: From<InvalidEvmTransactionError>> CheckEvmTransaction<'config, 
 					// Allow non-set fee input for non-transactional calls.
 					Ok((U256::zero(), None))
 				}
-			}
+			},
 		}
 	}
 
@@ -197,12 +192,12 @@ impl<'config, E: From<InvalidEvmTransactionError>> CheckEvmTransaction<'config, 
 			};
 
 			if gasometer.record_transaction(transaction_cost).is_err() {
-				return Err(InvalidEvmTransactionError::GasLimitTooLow.into());
+				return Err(InvalidEvmTransactionError::GasLimitTooLow.into())
 			}
 
 			// Transaction gas limit is within the upper bound block gas limit.
 			if self.transaction.gas_limit > self.config.block_gas_limit {
-				return Err(InvalidEvmTransactionError::GasLimitTooHigh.into());
+				return Err(InvalidEvmTransactionError::GasLimitTooHigh.into())
 			}
 		}
 
@@ -411,10 +406,7 @@ mod tests {
 	#[test]
 	// Default (valid) transaction succeeds in pool and in block.
 	fn validate_in_pool_and_block_succeeds() {
-		let who = Account {
-			balance: U256::from(1_000_000u128),
-			nonce: U256::zero(),
-		};
+		let who = Account { balance: U256::from(1_000_000u128), nonce: U256::zero() };
 		let test = default_transaction(true);
 		// Pool
 		assert!(test.validate_in_pool_for(&who).is_ok());
@@ -425,10 +417,7 @@ mod tests {
 	#[test]
 	// Nonce too low fails in pool and in block.
 	fn validate_in_pool_and_block_fails_nonce_too_low() {
-		let who = Account {
-			balance: U256::from(1_000_000u128),
-			nonce: U256::from(1u8),
-		};
+		let who = Account { balance: U256::from(1_000_000u128), nonce: U256::from(1u8) };
 		let test = default_transaction(true);
 		// Pool
 		let res = test.validate_in_pool_for(&who);
@@ -443,10 +432,7 @@ mod tests {
 	#[test]
 	// Nonce too high succeeds in pool.
 	fn validate_in_pool_succeeds_nonce_too_high() {
-		let who = Account {
-			balance: U256::from(1_000_000u128),
-			nonce: U256::from(1u8),
-		};
+		let who = Account { balance: U256::from(1_000_000u128), nonce: U256::from(1u8) };
 		let test = transaction_nonce_high();
 		let res = test.validate_in_pool_for(&who);
 		assert!(res.is_ok());
@@ -455,10 +441,7 @@ mod tests {
 	#[test]
 	// Nonce too high fails in block.
 	fn validate_in_block_fails_nonce_too_high() {
-		let who = Account {
-			balance: U256::from(1_000_000u128),
-			nonce: U256::from(1u8),
-		};
+		let who = Account { balance: U256::from(1_000_000u128), nonce: U256::from(1u8) };
 		let test = transaction_nonce_high();
 		let res = test.validate_in_block_for(&who);
 		assert!(res.is_err());
@@ -467,10 +450,7 @@ mod tests {
 	#[test]
 	// Gas limit too low transactional fails in pool and in block.
 	fn validate_in_pool_and_block_transactional_fails_gas_limit_too_low() {
-		let who = Account {
-			balance: U256::from(1_000_000u128),
-			nonce: U256::zero(),
-		};
+		let who = Account { balance: U256::from(1_000_000u128), nonce: U256::zero() };
 		let is_transactional = true;
 		let test = transaction_gas_limit_low(is_transactional);
 		// Pool
@@ -486,10 +466,7 @@ mod tests {
 	#[test]
 	// Gas limit too low non-transactional succeeds in pool and in block.
 	fn validate_in_pool_and_block_non_transactional_succeeds_gas_limit_too_low() {
-		let who = Account {
-			balance: U256::from(1_000_000u128),
-			nonce: U256::zero(),
-		};
+		let who = Account { balance: U256::from(1_000_000u128), nonce: U256::zero() };
 		let is_transactional = false;
 		let test = transaction_gas_limit_low(is_transactional);
 		// Pool
@@ -503,10 +480,7 @@ mod tests {
 	#[test]
 	// Gas limit too high fails in pool and in block.
 	fn validate_in_pool_for_fails_gas_limit_too_high() {
-		let who = Account {
-			balance: U256::from(1_000_000u128),
-			nonce: U256::zero(),
-		};
+		let who = Account { balance: U256::from(1_000_000u128), nonce: U256::zero() };
 		let test = transaction_gas_limit_high();
 		// Pool
 		let res = test.validate_in_pool_for(&who);
@@ -598,10 +572,7 @@ mod tests {
 	#[test]
 	// Sufficient balance succeeds.
 	fn validate_balance_succeeds() {
-		let who = Account {
-			balance: U256::from(21_000_000_000_001u128),
-			nonce: U256::zero(),
-		};
+		let who = Account { balance: U256::from(21_000_000_000_001u128), nonce: U256::zero() };
 		// Transactional
 		let test = default_transaction(true);
 		let res = test.with_balance_for(&who);
@@ -615,10 +586,7 @@ mod tests {
 	#[test]
 	// Insufficient balance fails.
 	fn validate_insufficient_balance_fails() {
-		let who = Account {
-			balance: U256::from(21_000_000_000_000u128),
-			nonce: U256::zero(),
-		};
+		let who = Account { balance: U256::from(21_000_000_000_000u128), nonce: U256::zero() };
 		// Transactional
 		let test = default_transaction(true);
 		let res = test.with_balance_for(&who);
@@ -634,10 +602,7 @@ mod tests {
 	#[test]
 	// Fee not set on transactional fails.
 	fn validate_non_fee_transactional_fails() {
-		let who = Account {
-			balance: U256::from(21_000_000_000_001u128),
-			nonce: U256::zero(),
-		};
+		let who = Account { balance: U256::from(21_000_000_000_001u128), nonce: U256::zero() };
 		let test = transaction_none_fee(true);
 		let res = test.with_balance_for(&who);
 		assert!(res.is_err());
@@ -647,10 +612,7 @@ mod tests {
 	#[test]
 	// Fee not set on non-transactional succeeds.
 	fn validate_non_fee_non_transactional_succeeds() {
-		let who = Account {
-			balance: U256::from(0u8),
-			nonce: U256::zero(),
-		};
+		let who = Account { balance: U256::from(0u8), nonce: U256::zero() };
 		let test = transaction_none_fee(false);
 		let res = test.with_balance_for(&who);
 		assert!(res.is_ok());
@@ -687,10 +649,7 @@ mod tests {
 	#[test]
 	// Account balance is matched against the provided gas_price for Legacy transactions.
 	fn validate_balance_for_legacy_transaction_succeeds() {
-		let who = Account {
-			balance: U256::from(21_000_000_000_001u128),
-			nonce: U256::zero(),
-		};
+		let who = Account { balance: U256::from(21_000_000_000_001u128), nonce: U256::zero() };
 		let test = legacy_transaction();
 		let res = test.with_balance_for(&who);
 		assert!(res.is_ok());
@@ -699,10 +658,7 @@ mod tests {
 	#[test]
 	// Account balance is matched against the provided gas_price for Legacy transactions.
 	fn validate_balance_for_legacy_transaction_fails() {
-		let who = Account {
-			balance: U256::from(21_000_000_000_000u128),
-			nonce: U256::zero(),
-		};
+		let who = Account { balance: U256::from(21_000_000_000_000u128), nonce: U256::zero() };
 		let test = legacy_transaction();
 		let res = test.with_balance_for(&who);
 		assert!(res.is_err());
@@ -712,10 +668,7 @@ mod tests {
 	#[test]
 	// Transaction with invalid fee input - mixing gas_price and max_fee_per_gas.
 	fn validate_balance_with_invalid_fee_input() {
-		let who = Account {
-			balance: U256::from(21_000_000_000_001u128),
-			nonce: U256::zero(),
-		};
+		let who = Account { balance: U256::from(21_000_000_000_001u128), nonce: U256::zero() };
 		// Fails for transactional.
 		let is_transactional = true;
 		let test = invalid_transaction_mixed_fees(is_transactional);

@@ -38,17 +38,12 @@ impl<K: Eq + core::hash::Hash, V: Encode> LRUCacheByteLimited<K, V> {
 				Err(e) => {
 					log::error!(target: "eth-cache", "Failed to register metrics: {:?}", e);
 					None
-				}
+				},
 			},
 			None => None,
 		};
 
-		Self {
-			cache: LruCache::unbounded(),
-			max_size,
-			metrics,
-			size: 0,
-		}
+		Self { cache: LruCache::unbounded(), max_size, metrics, size: 0 }
 	}
 	pub fn get(&mut self, k: &K) -> Option<&V> {
 		if let Some(v) = self.cache.get(k) {
@@ -74,7 +69,7 @@ impl<K: Eq + core::hash::Hash, V: Encode> LRUCacheByteLimited<K, V> {
 				let v_size = v.encoded_size() as u64;
 				self.size -= v_size;
 			} else {
-				break;
+				break
 			}
 		}
 

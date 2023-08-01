@@ -212,9 +212,8 @@ impl fp_self_contained::SelfContainedCall for RuntimeCall {
 		len: usize,
 	) -> Option<Result<(), TransactionValidityError>> {
 		match self {
-			RuntimeCall::Ethereum(call) => {
-				call.pre_dispatch_self_contained(info, dispatch_info, len)
-			}
+			RuntimeCall::Ethereum(call) =>
+				call.pre_dispatch_self_contained(info, dispatch_info, len),
 			_ => None,
 		}
 	}
@@ -224,9 +223,8 @@ impl fp_self_contained::SelfContainedCall for RuntimeCall {
 		info: Self::SignedInfo,
 	) -> Option<sp_runtime::DispatchResultWithInfo<sp_runtime::traits::PostDispatchInfoOf<Self>>> {
 		match self {
-			call @ RuntimeCall::Ethereum(crate::Call::transact { .. }) => {
-				Some(call.dispatch(RuntimeOrigin::from(RawOrigin::EthereumTransaction(info))))
-			}
+			call @ RuntimeCall::Ethereum(crate::Call::transact { .. }) =>
+				Some(call.dispatch(RuntimeOrigin::from(RawOrigin::EthereumTransaction(info)))),
 			_ => None,
 		}
 	}
@@ -258,17 +256,12 @@ fn address_build(seed: u8) -> AccountInfo {
 // our desired mockup.
 pub fn new_test_ext(accounts_len: usize) -> (Vec<AccountInfo>, sp_io::TestExternalities) {
 	// sc_cli::init_logger("");
-	let mut ext = frame_system::GenesisConfig::default()
-		.build_storage::<Test>()
-		.unwrap();
+	let mut ext = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap();
 
-	let pairs = (0..accounts_len)
-		.map(|i| address_build(i as u8))
-		.collect::<Vec<_>>();
+	let pairs = (0..accounts_len).map(|i| address_build(i as u8)).collect::<Vec<_>>();
 
-	let balances: Vec<_> = (0..accounts_len)
-		.map(|i| (pairs[i].account_id.clone(), 10_000_000))
-		.collect();
+	let balances: Vec<_> =
+		(0..accounts_len).map(|i| (pairs[i].account_id.clone(), 10_000_000)).collect();
 
 	pallet_balances::GenesisConfig::<Test> { balances }
 		.assimilate_storage(&mut ext)
@@ -284,13 +277,9 @@ pub fn new_test_ext_with_initial_balance(
 	initial_balance: u64,
 ) -> (Vec<AccountInfo>, sp_io::TestExternalities) {
 	// sc_cli::init_logger("");
-	let mut ext = frame_system::GenesisConfig::default()
-		.build_storage::<Test>()
-		.unwrap();
+	let mut ext = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap();
 
-	let pairs = (0..accounts_len)
-		.map(|i| address_build(i as u8))
-		.collect::<Vec<_>>();
+	let pairs = (0..accounts_len).map(|i| address_build(i as u8)).collect::<Vec<_>>();
 
 	let balances: Vec<_> = (0..accounts_len)
 		.map(|i| (pairs[i].account_id.clone(), initial_balance))
@@ -312,9 +301,7 @@ pub fn contract_address(sender: H160, nonce: u64) -> H160 {
 }
 
 pub fn storage_address(sender: H160, slot: H256) -> H256 {
-	H256::from(keccak_256(
-		[&H256::from(sender)[..], &slot[..]].concat().as_slice(),
-	))
+	H256::from(keccak_256([&H256::from(sender)[..], &slot[..]].concat().as_slice()))
 }
 
 pub struct LegacyUnsignedTransaction {
@@ -353,10 +340,7 @@ impl LegacyUnsignedTransaction {
 	pub fn sign_with_chain_id(&self, key: &H256, chain_id: u64) -> Transaction {
 		let hash = self.signing_hash();
 		let msg = libsecp256k1::Message::parse(hash.as_fixed_bytes());
-		let s = libsecp256k1::sign(
-			&msg,
-			&libsecp256k1::SecretKey::parse_slice(&key[..]).unwrap(),
-		);
+		let s = libsecp256k1::sign(&msg, &libsecp256k1::SecretKey::parse_slice(&key[..]).unwrap());
 		let sig = s.0.serialize();
 
 		let sig = TransactionSignature::new(

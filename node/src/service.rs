@@ -24,31 +24,32 @@ use crate::rpc::{create_full, BabeDeps, FullDeps, GrandpaDeps};
 use fc_db::Backend as FrontierBackend;
 use node_5ire_runtime::{self, opaque::Block, RuntimeApi};
 
-
 use codec::Encode;
 use frame_system_rpc_runtime_api::AccountNonceApi;
 // use futures::prelude::*;
 // use node_executor::ExecutorDispatch;
 // use node_primitives::Block;
 // use node_5ire_runtime::RuntimeApi;
-use sc_client_api::{BlockBackend,BlockchainEvents};
+use futures::{future, StreamExt};
+use sc_client_api::{BlockBackend, BlockchainEvents};
 use sc_consensus_babe::{self, SlotProportion};
 pub use sc_executor::NativeElseWasmExecutor;
 use sc_network::{Event, NetworkService};
-use sc_network_common::{ service::NetworkEventStream};
-use sc_service::{config::Configuration, error::Error as ServiceError,BasePath, RpcHandlers, TaskManager};
+use sc_network_common::service::NetworkEventStream;
+use sc_service::{
+	config::Configuration, error::Error as ServiceError, BasePath, RpcHandlers, TaskManager,
+};
 use sc_telemetry::{Telemetry, TelemetryWorker};
 use sp_api::ProvideRuntimeApi;
 use sp_core::crypto::Pair;
 use sp_runtime::{generic, traits::Block as BlockT, SaturatedConversion};
-use futures::{future, StreamExt};
 
 // use std::sync::Arc;
 use std::{
-    collections::BTreeMap,
-    path::PathBuf,
-    sync::{Arc, Mutex},
-    time::Duration,
+	collections::BTreeMap,
+	path::PathBuf,
+	sync::{Arc, Mutex},
+	time::Duration,
 };
 
 // Frontier
@@ -58,20 +59,19 @@ use fc_rpc_core::types::{FeeHistoryCache, FeeHistoryCacheLimit, FilterPool};
 // Our native executor instance.
 pub struct ExecutorDispatch;
 impl sc_executor::NativeExecutionDispatch for ExecutorDispatch {
-    /// Only enable the benchmarking host functions when we actually want to benchmark.
-    #[cfg(feature = "runtime-benchmarks")]
-    type ExtendHostFunctions = frame_benchmarking::benchmarking::HostFunctions;
-    /// Otherwise we only use the default Substrate host functions.
-    #[cfg(not(feature = "runtime-benchmarks"))]
-    type ExtendHostFunctions = ();
-    fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
-        node_5ire_runtime::api::dispatch(method, data)
-    }
-    fn native_version() -> sc_executor::NativeVersion {
-        node_5ire_runtime::native_version()
-    }
+	/// Only enable the benchmarking host functions when we actually want to benchmark.
+	#[cfg(feature = "runtime-benchmarks")]
+	type ExtendHostFunctions = frame_benchmarking::benchmarking::HostFunctions;
+	/// Otherwise we only use the default Substrate host functions.
+	#[cfg(not(feature = "runtime-benchmarks"))]
+	type ExtendHostFunctions = ();
+	fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
+		node_5ire_runtime::api::dispatch(method, data)
+	}
+	fn native_version() -> sc_executor::NativeVersion {
+		node_5ire_runtime::native_version()
+	}
 }
-
 
 /// The full client type definition.
 pub type FullClient =
@@ -79,7 +79,7 @@ pub type FullClient =
 type FullBackend = sc_service::TFullBackend<Block>;
 type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
 type FullGrandpaBlockImport =
-grandpa::GrandpaBlockImport<FullBackend, Block, FullClient, FullSelectChain>;
+	grandpa::GrandpaBlockImport<FullBackend, Block, FullClient, FullSelectChain>;
 
 /// The transaction pool type defintion.
 pub type TransactionPool = sc_transaction_pool::FullPool<Block, FullClient>;
@@ -97,7 +97,6 @@ pub fn fetch_nonce(client: &FullClient, account: sp_core::sr25519::Pair) -> u32 
 		.account_nonce(&generic::BlockId::Hash(best_hash), account.public().into())
 		.expect("Fetching account nonce works; qed")
 }
-
 
 pub(crate) fn db_config_dir(config: &Configuration) -> PathBuf {
 	config
@@ -143,8 +142,11 @@ pub fn create_extrinsic(
 		)),
 		frame_system::CheckNonce::<node_5ire_runtime::Runtime>::from(nonce),
 		frame_system::CheckWeight::<node_5ire_runtime::Runtime>::new(),
-		// pallet_asset_tx_payment::ChargeAssetTxPayment::<node_5ire_runtime::Runtime>::from(tip,None),
-		pallet_transaction_payment::ChargeTransactionPayment::<node_5ire_runtime::Runtime>::from(tip),
+		// pallet_asset_tx_payment::ChargeAssetTxPayment::<node_5ire_runtime::Runtime>::from(tip,
+		// None),
+		pallet_transaction_payment::ChargeTransactionPayment::<node_5ire_runtime::Runtime>::from(
+			tip,
+		),
 	);
 
 	let raw_payload = node_5ire_runtime::SignedPayload::from_raw(
@@ -170,8 +172,6 @@ pub fn create_extrinsic(
 		extra,
 	)
 }
-
-
 
 /// Result of [`new_full_base`].
 pub struct NewFullBase {
@@ -214,7 +214,7 @@ pub fn new_full_base(
 		select_chain,
 		transaction_pool,
 		// other: (rpc_builder, import_setup, rpc_setup, mut telemetry,frontier_backend,network),
-		other: ( import_setup, mut telemetry,frontier_backend),
+		other: (import_setup, mut telemetry, frontier_backend),
 	} = new_partial(&config)?;
 
 	// let shared_voter_state = rpc_setup;
@@ -235,7 +235,7 @@ pub fn new_full_base(
 		Vec::default(),
 	));
 
-	let (network, system_rpc_tx, tx_handler_controller,network_starter) =
+	let (network, system_rpc_tx, tx_handler_controller, network_starter) =
 		sc_service::build_network(sc_service::BuildNetworkParams {
 			config: &config,
 			client: client.clone(),
@@ -263,7 +263,6 @@ pub fn new_full_base(
 	let enable_grandpa = !config.disable_grandpa;
 	let prometheus_registry = config.prometheus_registry().cloned();
 
-
 	let overrides = crate::rpc::overrides_handle(client.clone());
 	let block_data_cache = Arc::new(fc_rpc::EthBlockDataCacheTask::new(
 		task_manager.spawn_handle(),
@@ -273,70 +272,66 @@ pub fn new_full_base(
 		prometheus_registry.clone(),
 	));
 
+	let subscription_task_executor = Arc::new(task_manager.spawn_handle());
 
-
-	let subscription_task_executor =Arc::new(task_manager.spawn_handle());
-	
 	// let (rpc_extensions_builder, rpc_setup) = {
-		let (_, grandpa_link, babe_link) = &import_setup;
+	let (_, grandpa_link, babe_link) = &import_setup;
 
-		let justification_stream = grandpa_link.justification_stream();
-		let shared_authority_set = grandpa_link.shared_authority_set().clone();
-		let shared_voter_state = grandpa::SharedVoterState::empty();
-		// let shared_voter_state2 = shared_voter_state.clone();
+	let justification_stream = grandpa_link.justification_stream();
+	let shared_authority_set = grandpa_link.shared_authority_set().clone();
+	let shared_voter_state = grandpa::SharedVoterState::empty();
+	// let shared_voter_state2 = shared_voter_state.clone();
 
-		let finality_proof_provider = grandpa::FinalityProofProvider::new_for_service(
-			backend.clone(),
-			Some(shared_authority_set.clone()),
-		);
+	let finality_proof_provider = grandpa::FinalityProofProvider::new_for_service(
+		backend.clone(),
+		Some(shared_authority_set.clone()),
+	);
 
-		let babe_config = babe_link.config().clone();
-		let shared_epoch_changes = babe_link.epoch_changes().clone();
+	let babe_config = babe_link.config().clone();
+	let shared_epoch_changes = babe_link.epoch_changes().clone();
 
+	let client = client.clone();
+	// let pool = transaction_pool.clone();
+	let select_chain = select_chain.clone();
+	let keystore = keystore_container.sync_keystore();
+	let _chain_spec = config.chain_spec.cloned_box();
+
+	let filter_pool: Option<FilterPool> = Some(Arc::new(Mutex::new(BTreeMap::new())));
+
+	let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
+	let fee_history_cache_limit: FeeHistoryCacheLimit = 1000;
+	let execute_gas_limit_multiplier = 1000;
+	let rpc_backend = backend.clone();
+	// let prometheus_registry = config.prometheus_registry().cloned();
+	// let overrides = crate::rpc::overrides_handle(client.clone());
+	// let block_data_cache = Arc::new(fc_rpc::EthBlockDataCacheTask::new(
+	// 	task_manager.spawn_handle(),
+	// 	overrides.clone(),
+	// 	50,
+	// 	50,
+	// 	prometheus_registry.clone(),
+	// ));
+
+	let rpc_extensions_builder = {
+		let is_authority = false;
+		let enable_dev_signer = false;
+		let max_past_logs = 10000;
+		let chain_spec = config.chain_spec.cloned_box();
 		let client = client.clone();
-		// let pool = transaction_pool.clone();
+
+		let pool = transaction_pool.clone();
+		let network = network.clone();
 		let select_chain = select_chain.clone();
-		let keystore = keystore_container.sync_keystore();
-		let _chain_spec = config.chain_spec.cloned_box();
+		let voter_state = shared_voter_state.clone();
+		let frontier_backend = frontier_backend.clone();
+		let fee_history_cache = fee_history_cache.clone();
+		let fee_history_cache_limit = fee_history_cache_limit.clone();
+		let execute_gas_limit_multiplier = execute_gas_limit_multiplier.clone();
+		let overrides = overrides.clone();
+		let filter_pool = filter_pool.clone();
 
-		let filter_pool: Option<FilterPool> = Some(Arc::new(Mutex::new(BTreeMap::new())));
-
-	    let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
-	    let fee_history_cache_limit: FeeHistoryCacheLimit = 1000;
-		let execute_gas_limit_multiplier  = 1000;
-		let rpc_backend = backend.clone();
-		// let prometheus_registry = config.prometheus_registry().cloned();
-		// let overrides = crate::rpc::overrides_handle(client.clone());
-		// let block_data_cache = Arc::new(fc_rpc::EthBlockDataCacheTask::new(
-		// 	task_manager.spawn_handle(),
-		// 	overrides.clone(),
-		// 	50,
-		// 	50,
-		// 	prometheus_registry.clone(),
-		// ));
-		
-		let rpc_extensions_builder =  {
-			let is_authority = false;
-			let enable_dev_signer = false;
-			let max_past_logs = 10000;
-			let chain_spec = config.chain_spec.cloned_box();
-			let client = client.clone();
-	
-			let pool = transaction_pool.clone();
-			let network = network.clone();
-			let select_chain = select_chain.clone();
-			let voter_state = shared_voter_state.clone();
-			let frontier_backend = frontier_backend.clone();
-			let fee_history_cache = fee_history_cache.clone();
-			let fee_history_cache_limit = fee_history_cache_limit.clone();
-			let execute_gas_limit_multiplier =  execute_gas_limit_multiplier.clone();
-			let overrides = overrides.clone();
-			let filter_pool=filter_pool.clone();
-
-			Box::new(move |deny_unsafe, subscription_executor|
-				{
-	
-				let deps = FullDeps {
+		Box::new(move |deny_unsafe, subscription_executor| {
+			let deps = FullDeps {
 				client: client.clone(),
 				pool: pool.clone(),
 				graph: pool.pool().clone(),
@@ -363,16 +358,16 @@ pub fn new_full_base(
 				filter_pool: filter_pool.clone(),
 				backend: frontier_backend.clone(),
 				max_past_logs,
-				fee_history_cache:fee_history_cache.clone(),
-				fee_history_cache_limit:fee_history_cache_limit.clone(),
+				fee_history_cache: fee_history_cache.clone(),
+				fee_history_cache_limit: fee_history_cache_limit.clone(),
 				execute_gas_limit_multiplier: execute_gas_limit_multiplier.clone(),
+			};
+			create_full(deps, subscription_task_executor.clone(), rpc_backend.clone())
+				.map_err(Into::into)
+		})
+	};
 
-			   };
-			create_full(deps,subscription_task_executor.clone(),rpc_backend.clone()).map_err(Into::into)
-		    })
-		};
-
-		// (rpc_extensions_builder, shared_voter_state2)
+	// (rpc_extensions_builder, shared_voter_state2)
 	// };
 	let backend = backend.clone();
 	let backends = backend.clone();
@@ -404,7 +399,6 @@ pub fn new_full_base(
 		fee_history_cache,
 		fee_history_cache_limit,
 	);
-
 
 	if let Some(hwbench) = hwbench {
 		sc_sysinfo::print_hwbench(&hwbench);
@@ -467,7 +461,7 @@ pub fn new_full_base(
 							&parent,
 						)?;
 
-					Ok((slot,timestamp, uncles, storage_proof))
+					Ok((slot, timestamp, uncles, storage_proof))
 				}
 			},
 			force_authoring,
@@ -642,7 +636,7 @@ pub fn new_partial(
 	let justification_import = grandpa_block_import.clone();
 
 	let frontier_backend =
-		Arc::new(FrontierBackend::open(client.clone(),&config.database, &db_config_dir(config))?);
+		Arc::new(FrontierBackend::open(client.clone(), &config.database, &db_config_dir(config))?);
 
 	let (block_import, babe_link) = sc_consensus_babe::block_import(
 		sc_consensus_babe::configuration(&*client)?,
@@ -669,7 +663,7 @@ pub fn new_partial(
 			let uncles =
 				sp_authorship::InherentDataProvider::<<Block as BlockT>::Header>::check_inherents();
 
-			Ok((slot,timestamp, uncles))
+			Ok((slot, timestamp, uncles))
 		},
 		&task_manager.spawn_essential_handle(),
 		config.prometheus_registry(),
@@ -679,7 +673,6 @@ pub fn new_partial(
 
 	let import_setup = (block_import, grandpa_link, babe_link);
 
-
 	Ok(sc_service::PartialComponents {
 		client,
 		backend,
@@ -688,8 +681,9 @@ pub fn new_partial(
 		select_chain,
 		import_queue,
 		transaction_pool,
-		// other: (rpc_extensions_builder, import_setup, rpc_setup, telemetry,frontier_backend,network),
-		other: (import_setup,telemetry,frontier_backend),
+		// other: (rpc_extensions_builder, import_setup, rpc_setup,
+		// telemetry,frontier_backend,network),
+		other: (import_setup, telemetry, frontier_backend),
 	})
 }
 fn spawn_frontier_tasks(
@@ -749,11 +743,11 @@ pub fn new_full(
 mod tests {
 	use crate::service::{new_full_base, NewFullBase};
 	use codec::Encode;
-	use node_primitives::{Block, DigestItem, Signature};
 	use node_5ire_runtime::{
 		constants::{currency::CENTS, time::SLOT_DURATION},
 		Address, BalancesCall, Call, UncheckedExtrinsic,
 	};
+	use node_primitives::{Block, DigestItem, Signature};
 	use sc_client_api::BlockBackend;
 	use sc_consensus::{BlockImport, BlockImportParams, ForkChoiceStrategy};
 	use sc_consensus_babe::{BabeIntermediate, CompatibleDigestItem, INTERMEDIATE_KEY};
@@ -999,6 +993,3 @@ mod tests {
 		)
 	}
 }
-
-
-

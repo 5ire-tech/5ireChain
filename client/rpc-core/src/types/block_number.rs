@@ -81,10 +81,7 @@ impl Serialize for BlockNumber {
 		S: Serializer,
 	{
 		match *self {
-			BlockNumber::Hash {
-				hash,
-				require_canonical,
-			} => serializer.serialize_str(&format!(
+			BlockNumber::Hash { hash, require_canonical } => serializer.serialize_str(&format!(
 				"{{ 'hash': '{}', 'requireCanonical': '{}'  }}",
 				hash, require_canonical
 			)),
@@ -130,19 +127,19 @@ impl<'a> Visitor<'a> for BlockNumberVisitor {
 							})?;
 
 							block_number = Some(number);
-							break;
+							break
 						} else {
 							return Err(Error::custom(
 								"Invalid block number: missing 0x prefix".to_string(),
-							));
+							))
 						}
-					}
+					},
 					"blockHash" => {
 						block_hash = Some(visitor.next_value()?);
-					}
+					},
 					"requireCanonical" => {
 						require_canonical = visitor.next_value()?;
-					}
+					},
 					key => return Err(Error::custom(format!("Unknown key: {}", key))),
 				},
 				None => break,
@@ -150,14 +147,11 @@ impl<'a> Visitor<'a> for BlockNumberVisitor {
 		}
 
 		if let Some(number) = block_number {
-			return Ok(BlockNumber::Num(number));
+			return Ok(BlockNumber::Num(number))
 		}
 
 		if let Some(hash) = block_hash {
-			return Ok(BlockNumber::Hash {
-				hash,
-				require_canonical,
-			});
+			return Ok(BlockNumber::Hash { hash, require_canonical })
 		}
 
 		Err(Error::custom("Invalid input"))

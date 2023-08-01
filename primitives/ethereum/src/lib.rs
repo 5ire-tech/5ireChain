@@ -63,11 +63,7 @@ pub struct TransactionData {
 impl From<TransactionData> for CheckEvmTransactionInput {
 	fn from(t: TransactionData) -> Self {
 		CheckEvmTransactionInput {
-			to: if let TransactionAction::Call(to) = t.action {
-				Some(to)
-			} else {
-				None
-			},
+			to: if let TransactionAction::Call(to) = t.action { Some(to) } else { None },
 			chain_id: t.chain_id,
 			input: t.input,
 			nonce: t.nonce,

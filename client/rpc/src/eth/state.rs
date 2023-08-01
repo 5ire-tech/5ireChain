@@ -132,7 +132,7 @@ where
 				}
 			}
 
-			return Ok(current_nonce);
+			return Ok(current_nonce)
 		}
 
 		let id = match frontier_backend_client::native_block_id::<B, C>(
