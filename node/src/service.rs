@@ -675,6 +675,7 @@ pub fn new_partial(config: &Configuration) -> Result<PartialComponentsType, Serv
 		other: (import_setup, telemetry, frontier_backend),
 	})
 }
+
 #[allow(clippy::too_many_arguments)]
 fn spawn_frontier_tasks(
 	task_manager: &TaskManager,
