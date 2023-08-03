@@ -74,16 +74,16 @@ where
 	if let Some(api_version) = client
 		.runtime_api()
 		.api_version::<dyn EthereumRuntimeRPCApi<Block>>(&id)
-		.map_err(|e| format!("{:?}", e))?
+		.map_err(|e| format!("{e:?}"))?
 	{
 		let block = if api_version > 1 {
-			client.runtime_api().current_block(&id).map_err(|e| format!("{:?}", e))?
+			client.runtime_api().current_block(&id).map_err(|e| format!("{e:?}"))?
 		} else {
 			#[allow(deprecated)]
 			let legacy_block = client
 				.runtime_api()
 				.current_block_before_version_2(&id)
-				.map_err(|e| format!("{:?}", e))?;
+				.map_err(|e| format!("{e:?}"))?;
 			legacy_block.map(|block| block.into())
 		};
 		let block_hash = block
@@ -118,7 +118,7 @@ where
 	let mut current_syncing_tips = frontier_backend.meta().current_syncing_tips()?;
 
 	if current_syncing_tips.is_empty() {
-		let mut leaves = substrate_backend.leaves().map_err(|e| format!("{:?}", e))?;
+		let mut leaves = substrate_backend.leaves().map_err(|e| format!("{e:?}"))?;
 		if leaves.is_empty() {
 			return Ok(false)
 		}

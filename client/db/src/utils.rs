@@ -66,7 +66,7 @@ where
 	let mut db_config = kvdb_rocksdb::DatabaseConfig::with_columns(crate::columns::NUM_COLUMNS);
 	db_config.create_if_missing = create;
 
-	let db = kvdb_rocksdb::Database::open(&db_config, path).map_err(|err| format!("{}", err))?;
+	let db = kvdb_rocksdb::Database::open(&db_config, path).map_err(|err| format!("{err}"))?;
 	// write database version only after the database is succesfully opened
 	#[cfg(not(test))]
 	crate::upgrade::update_version(path).map_err(|_| "Cannot update db version".to_string())?;
@@ -104,7 +104,7 @@ where
 	let mut config = parity_db::Options::with_columns(path, crate::columns::NUM_COLUMNS as u8);
 	config.columns[crate::columns::BLOCK_MAPPING as usize].btree_index = true;
 
-	let db = parity_db::Db::open_or_create(&config).map_err(|err| format!("{}", err))?;
+	let db = parity_db::Db::open_or_create(&config).map_err(|err| format!("{err}"))?;
 	// write database version only after the database is succesfully opened
 	#[cfg(not(test))]
 	crate::upgrade::update_version(path).map_err(|_| "Cannot update db version".to_string())?;

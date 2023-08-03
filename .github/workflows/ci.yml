@@ -15,7 +15,33 @@ env:
 
 jobs:
   # 5irechain linting(fmt + clippy)
-  lint:
+  lint_fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+        with:
+          token: ${{ github.token }}
+          submodules: recursive
+
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+
+      - uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: "${{ secrets.READ_DEPLOY_KEY }}"
+
+      - name: Check format
+        run: cargo +nightly fmt --all --check
+
+  lint_clippy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
@@ -40,9 +66,6 @@ jobs:
 
       - name: Install Protobuf
         run: sudo apt-get install protobuf-compiler
-
-      - name: Check format
-        run: cargo +nightly fmt --all --check
 
       - name: Add Cargo Clippy
         run: rustup component add clippy
