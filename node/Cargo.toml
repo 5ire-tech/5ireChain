@@ -122,6 +122,11 @@ substrate-frame-cli = { version = "4.0.0-dev", optional = true, git = "ssh://git
 try-runtime-cli = { version = "0.10.0-dev", optional = true, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1" }
 sc-cli = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1", optional = true }
 
+[dev-dependencies]
+sp-tracing = { version = "6.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1" }
+sc-service-test  = { version = "2.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1" }
+pallet-asset-tx-payment = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1" }
+
 
 [features]
 #  default = []

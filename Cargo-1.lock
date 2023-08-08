@@ -2113,6 +2113,7 @@ dependencies = [
  "evm",
  "frame-support",
  "parity-scale-codec",
+ "serde",
  "sp-core",
  "sp-std",
 ]
@@ -4977,7 +4978,7 @@ dependencies = [
  "evm",
  "fp-consensus",
  "fp-ethereum",
- "fp-evm 3.0.0-dev",
+ "fp-evm 3.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=upgrade/5irechain-V0.1)",
  "fp-rpc",
  "fp-self-contained",
  "fp-storage",
@@ -5043,7 +5044,7 @@ dependencies = [
 name = "pallet-evm-precompile-simple"
 version = "2.0.0-dev"
 dependencies = [
- "fp-evm 3.0.0-dev",
+ "fp-evm 3.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=upgrade/5irechain-V0.1)",
  "pallet-evm-test-vector-support",
  "ripemd",
  "sp-io",
