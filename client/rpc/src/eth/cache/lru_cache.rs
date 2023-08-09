@@ -38,17 +38,12 @@ impl<K: Eq + core::hash::Hash, V: Encode> LRUCacheByteLimited<K, V> {
 				Err(e) => {
 					log::error!(target: "eth-cache", "Failed to register metrics: {:?}", e);
 					None
-				}
+				},
 			},
 			None => None,
 		};
 
-		Self {
-			cache: LruCache::unbounded(),
-			max_size,
-			metrics,
-			size: 0,
-		}
+		Self { cache: LruCache::unbounded(), max_size, metrics, size: 0 }
 	}
 	pub fn get(&mut self, k: &K) -> Option<&V> {
 		if let Some(v) = self.cache.get(k) {
@@ -74,7 +69,7 @@ impl<K: Eq + core::hash::Hash, V: Encode> LRUCacheByteLimited<K, V> {
 				let v_size = v.encoded_size() as u64;
 				self.size -= v_size;
 			} else {
-				break;
+				break
 			}
 		}
 
@@ -101,22 +96,22 @@ impl LRUCacheByteLimitedMetrics {
 		Ok(Self {
 			hits: prometheus_endpoint::register(
 				prometheus::IntCounter::new(
-					format!("frontier_eth_{}_hits", cache_name),
-					format!("Hits of eth {} cache.", cache_name),
+					format!("frontier_eth_{cache_name}_hits"),
+					format!("Hits of eth {cache_name} cache."),
 				)?,
 				registry,
 			)?,
 			miss: prometheus_endpoint::register(
 				prometheus::IntCounter::new(
-					format!("frontier_eth_{}_miss", cache_name),
-					format!("Misses of eth {} cache.", cache_name),
+					format!("frontier_eth_{cache_name}_miss"),
+					format!("Misses of eth {cache_name} cache."),
 				)?,
 				registry,
 			)?,
 			size: prometheus_endpoint::register(
 				prometheus_endpoint::Gauge::new(
-					format!("frontier_eth_{}_size", cache_name),
-					format!("Size of eth {} data cache.", cache_name),
+					format!("frontier_eth_{cache_name}_size"),
+					format!("Size of eth {cache_name} data cache."),
 				)?,
 				registry,
 			)?,
