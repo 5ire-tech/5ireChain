@@ -61,10 +61,9 @@ jobs:
           submodules: recursive
 
       - name: Install toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          toolchain: nightly
-          targets: wasm32-unknown-unknown
+          uses: dtolnay/rust-toolchain@stable
+          with:
+            toolchain: nightly
 
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
@@ -80,8 +79,8 @@ jobs:
         with:
           ssh-private-key: "${{ secrets.READ_DEPLOY_KEY }}"
 
-      #- name: Build
-        #run: cargo check
+      - name: Build
+        run: cargo check
 
       - name: Test
         run: cargo test
