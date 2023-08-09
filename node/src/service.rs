@@ -729,5 +729,3 @@ pub fn new_full(
 	new_full_base(config, disable_hardware_benchmarks, |_, _| ())
 		.map(|NewFullBase { task_manager, .. }| task_manager)
 }
-
-
