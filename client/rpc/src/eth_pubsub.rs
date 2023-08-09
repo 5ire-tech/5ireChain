@@ -130,9 +130,9 @@ impl EthSubscriptionResult {
 		let mut log_index: u32 = 0;
 		for (receipt_index, receipt) in receipts.into_iter().enumerate() {
 			let receipt_logs = match receipt {
-				ethereum::ReceiptV3::Legacy(d)
-				| ethereum::ReceiptV3::EIP2930(d)
-				| ethereum::ReceiptV3::EIP1559(d) => d.logs,
+				ethereum::ReceiptV3::Legacy(d) |
+				ethereum::ReceiptV3::EIP2930(d) |
+				ethereum::ReceiptV3::EIP1559(d) => d.logs,
 			};
 			let mut transaction_log_index: u32 = 0;
 			let transaction_hash: Option<H256> = if receipt_logs.len() > 0 {
@@ -182,12 +182,12 @@ impl EthSubscriptionResult {
 		if params.filter.is_some() {
 			let block_number =
 				UniqueSaturatedInto::<u64>::unique_saturated_into(block.header.number);
-			if !params.filter_block_range(block_number)
-				|| !params.filter_block_hash(block_hash)
-				|| !params.filter_address(&log)
-				|| !params.filter_topics(&log)
+			if !params.filter_block_range(block_number) ||
+				!params.filter_block_hash(block_hash) ||
+				!params.filter_address(&log) ||
+				!params.filter_topics(&log)
 			{
-				return false;
+				return false
 			}
 		}
 		true
@@ -236,18 +236,15 @@ where
 									C,
 									BE,
 								>(client.as_ref(), id);
-								let handler = overrides
-									.schemas
-									.get(&schema)
-									.unwrap_or(&overrides.fallback);
+								let handler =
+									overrides.schemas.get(&schema).unwrap_or(&overrides.fallback);
 
 								let block = handler.current_block(&id);
 								let receipts = handler.current_receipts(&id);
 
 								match (receipts, block) {
-									(Some(receipts), Some(block)) => {
-										futures::future::ready(Some((block, receipts)))
-									}
+									(Some(receipts), Some(block)) =>
+										futures::future::ready(Some((block, receipts))),
 									_ => futures::future::ready(None),
 								}
 							} else {
@@ -263,7 +260,7 @@ where
 						})
 						.map(|x| PubSubResult::Log(Box::new(x)));
 					sink.pipe_from_stream(stream).await;
-				}
+				},
 				Kind::NewHeads => {
 					let stream = client
 						.import_notification_stream()
@@ -276,10 +273,8 @@ where
 									C,
 									BE,
 								>(client.as_ref(), id);
-								let handler = overrides
-									.schemas
-									.get(&schema)
-									.unwrap_or(&overrides.fallback);
+								let handler =
+									overrides.schemas.get(&schema).unwrap_or(&overrides.fallback);
 
 								let block = handler.current_block(&id);
 								futures::future::ready(block)
@@ -289,7 +284,7 @@ where
 						})
 						.map(EthSubscriptionResult::new_heads);
 					sink.pipe_from_stream(stream).await;
-				}
+				},
 				Kind::NewPendingTransactions => {
 					use sc_transaction_pool_api::InPoolTransaction;
 
@@ -306,7 +301,7 @@ where
 								{
 									api_version
 								} else {
-									return futures::future::ready(None);
+									return futures::future::ready(None)
 								};
 
 								let xts = vec![xt.data().clone()];
@@ -325,13 +320,12 @@ where
 								};
 
 								let res = match txs {
-									Some(txs) => {
+									Some(txs) =>
 										if txs.len() == 1 {
 											Some(txs[0].clone())
 										} else {
 											None
-										}
-									}
+										},
 									_ => None,
 								};
 								futures::future::ready(res)
@@ -341,7 +335,7 @@ where
 						})
 						.map(|transaction| PubSubResult::TransactionHash(transaction.hash()));
 					sink.pipe_from_stream(stream).await;
-				}
+				},
 				Kind::Syncing => {
 					let client = Arc::clone(&client);
 					let network = Arc::clone(&network);
@@ -401,15 +395,12 @@ where
 						}
 						last_syncing_status = syncing_status;
 					}
-				}
+				},
 			}
 		}
 		.boxed();
-		self.subscriptions.spawn(
-			"frontier-rpc-subscription",
-			Some("rpc"),
-			fut.map(drop).boxed(),
-		);
+		self.subscriptions
+			.spawn("frontier-rpc-subscription", Some("rpc"), fut.map(drop).boxed());
 		Ok(())
 	}
 }

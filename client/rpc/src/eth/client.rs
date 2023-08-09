@@ -19,6 +19,7 @@
 use ethereum_types::{H160, H256, U256, U64};
 use jsonrpsee::core::RpcResult as Result;
 // Substrate
+use fp_rpc::EthereumRuntimeRPCApi;
 use sc_client_api::backend::{Backend, StateBackend, StorageProvider};
 use sc_network_common::ExHashT;
 use sc_transaction_pool::ChainApi;
@@ -29,7 +30,6 @@ use sp_runtime::{
 	generic::BlockId,
 	traits::{BlakeTwo256, Block as BlockT, UniqueSaturatedInto},
 };
-use fp_rpc::EthereumRuntimeRPCApi;
 // Frontier
 use fc_rpc_core::types::*;
 
@@ -56,8 +56,8 @@ where
 			Ok(SyncStatus::Info(SyncInfo {
 				starting_block: U256::zero(),
 				current_block: block_number,
-				// TODO `highest_block` is not correct, should load `best_seen_block` from NetworkWorker,
-				// but afaik that is not currently possible in Substrate:
+				// TODO `highest_block` is not correct, should load `best_seen_block` from
+				// NetworkWorker, but afaik that is not currently possible in Substrate:
 				// https://github.com/paritytech/substrate/issues/7311
 				highest_block: block_number,
 				warp_chunks_amount: None,
@@ -95,9 +95,9 @@ where
 	}
 
 	pub fn block_number(&self) -> Result<U256> {
-		Ok(U256::from(
-			UniqueSaturatedInto::<u128>::unique_saturated_into(self.client.info().best_number),
-		))
+		Ok(U256::from(UniqueSaturatedInto::<u128>::unique_saturated_into(
+			self.client.info().best_number,
+		)))
 	}
 
 	pub fn chain_id(&self) -> Result<Option<U64>> {
@@ -106,7 +106,7 @@ where
 			self.client
 				.runtime_api()
 				.chain_id(&BlockId::Hash(hash))
-				.map_err(|err| internal_err(format!("fetch runtime chain id failed: {:?}", err)))?
+				.map_err(|err| internal_err(format!("fetch runtime chain id failed: {err:?}")))?
 				.into(),
 		))
 	}

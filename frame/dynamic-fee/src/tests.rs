@@ -31,9 +31,7 @@ use sp_runtime::{
 };
 
 pub fn new_test_ext() -> TestExternalities {
-	let t = frame_system::GenesisConfig::default()
-		.build_storage::<Test>()
-		.unwrap();
+	let t = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap();
 	TestExternalities::new(t)
 }
 
@@ -114,15 +112,9 @@ fn run_to_block(n: u64) {
 fn double_set_in_a_block_failed() {
 	new_test_ext().execute_with(|| {
 		run_to_block(3);
-		assert_ok!(DynamicFee::note_min_gas_price_target(
-			RuntimeOrigin::none(),
-			U256::zero()
-		));
+		assert_ok!(DynamicFee::note_min_gas_price_target(RuntimeOrigin::none(), U256::zero()));
 		let _ = DynamicFee::note_min_gas_price_target(RuntimeOrigin::none(), U256::zero());
 		run_to_block(4);
-		assert_ok!(DynamicFee::note_min_gas_price_target(
-			RuntimeOrigin::none(),
-			U256::zero()
-		));
+		assert_ok!(DynamicFee::note_min_gas_price_target(RuntimeOrigin::none(), U256::zero()));
 	});
 }

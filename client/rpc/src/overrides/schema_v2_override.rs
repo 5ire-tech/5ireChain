@@ -43,10 +43,7 @@ pub struct SchemaV2Override<B: BlockT, C, BE> {
 
 impl<B: BlockT, C, BE> SchemaV2Override<B, C, BE> {
 	pub fn new(client: Arc<C>) -> Self {
-		Self {
-			client,
-			_marker: PhantomData,
-		}
+		Self { client, _marker: PhantomData }
 	}
 }
 
@@ -61,7 +58,7 @@ where
 		if let Ok(Some(header)) = self.client.header(*id) {
 			if let Ok(Some(data)) = self.client.storage(header.hash(), key) {
 				if let Ok(result) = Decode::decode(&mut &data.0[..]) {
-					return Some(result);
+					return Some(result)
 				}
 			}
 		}
@@ -99,10 +96,7 @@ where
 	fn current_block(&self, block: &BlockId<B>) -> Option<ethereum::BlockV2> {
 		self.query_storage::<ethereum::BlockV2>(
 			block,
-			&StorageKey(storage_prefix_build(
-				PALLET_ETHEREUM,
-				ETHEREUM_CURRENT_BLOCK,
-			)),
+			&StorageKey(storage_prefix_build(PALLET_ETHEREUM, ETHEREUM_CURRENT_BLOCK)),
 		)
 	}
 
@@ -110,10 +104,7 @@ where
 	fn current_receipts(&self, block: &BlockId<B>) -> Option<Vec<ethereum::ReceiptV3>> {
 		self.query_storage::<Vec<ethereum::ReceiptV0>>(
 			block,
-			&StorageKey(storage_prefix_build(
-				PALLET_ETHEREUM,
-				ETHEREUM_CURRENT_RECEIPTS,
-			)),
+			&StorageKey(storage_prefix_build(PALLET_ETHEREUM, ETHEREUM_CURRENT_RECEIPTS)),
 		)
 		.map(|receipts| {
 			receipts
@@ -134,10 +125,7 @@ where
 	fn current_transaction_statuses(&self, block: &BlockId<B>) -> Option<Vec<TransactionStatus>> {
 		self.query_storage::<Vec<TransactionStatus>>(
 			block,
-			&StorageKey(storage_prefix_build(
-				PALLET_ETHEREUM,
-				ETHEREUM_CURRENT_TRANSACTION_STATUS,
-			)),
+			&StorageKey(storage_prefix_build(PALLET_ETHEREUM, ETHEREUM_CURRENT_TRANSACTION_STATUS)),
 		)
 	}
 

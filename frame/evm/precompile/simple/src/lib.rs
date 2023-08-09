@@ -58,7 +58,7 @@ impl LinearCostPrecompile for ECRecover {
 		// v can only be 27 or 28 on the full 32 bytes value.
 		// https://github.com/ethereum/go-ethereum/blob/a907d7e81aaeea15d80b2d3209ad8e08e3bf49e0/core/vm/contracts.go#L177
 		if input[32..63] != [0u8; 31] || ![27, 28].contains(&input[63]) {
-			return Ok((ExitSucceed::Returned, [0u8; 0].to_vec()));
+			return Ok((ExitSucceed::Returned, [0u8; 0].to_vec()))
 		}
 
 		let result = match sp_io::crypto::secp256k1_ecdsa_recover(&sig, &msg) {
@@ -66,7 +66,7 @@ impl LinearCostPrecompile for ECRecover {
 				let mut address = sp_io::hashing::keccak_256(&pubkey);
 				address[0..12].copy_from_slice(&[0u8; 12]);
 				address.to_vec()
-			}
+			},
 			Err(_) => [0u8; 0].to_vec(),
 		};
 
