@@ -61,9 +61,9 @@ jobs:
           submodules: recursive
 
       - name: Install toolchain
-          uses: dtolnay/rust-toolchain@stable
-          with:
-            toolchain: nightly
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: nightly
 
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
