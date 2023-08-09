@@ -61,12 +61,10 @@ jobs:
           submodules: recursive
 
       - name: Install toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@nightly
         with:
           toolchain: nightly
-
-      - name: Install Protobuf
-        run: sudo apt-get install protobuf-compiler
+          targets: wasm32-unknown-unknown
 
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
