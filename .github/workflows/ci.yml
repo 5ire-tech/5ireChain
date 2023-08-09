@@ -65,6 +65,9 @@ jobs:
         with:
           toolchain: nightly
 
+      - name: Install Protobuf
+        run: sudo apt-get install protobuf-compiler
+
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
         with:
