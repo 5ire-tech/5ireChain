@@ -82,7 +82,7 @@ jobs:
 
       - name: Build
         run: cargo check
-      
+
       - name: Display Disk Space
       - run: sudo df -h
 
