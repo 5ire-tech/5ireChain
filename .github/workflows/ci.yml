@@ -84,7 +84,7 @@ jobs:
         run: cargo check
 
       - name: Display Disk Space
-      - run: sudo df -h
+        run: sudo df -h
 
       - name: Test
         run: cargo test
