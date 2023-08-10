@@ -86,8 +86,13 @@ jobs:
       - name: Display Disk Space
         run: |
           sudo df -h
+          echo "----------------List Root File System Usage----------------"
           sudo du -csh /*
+          echo "----------------List /mnt File System Usage----------------"
           sudo du -csh /mnt/*
+          echo "----------------List /mnt File System Usage----------------"
+          sudo du -csh /home/*
+          echo "########################## Done ###########################"
 
       # - name: Test
       #   run: cargo test
