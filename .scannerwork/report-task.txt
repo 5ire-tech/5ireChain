@@ -1,0 +1,6 @@
+projectKey=Demo
+serverUrl=http://adcf3329d703945969e8bf0c7eb8e9f9-1460841669.us-east-1.elb.amazonaws.com:9000
+serverVersion=9.9.1.69595
+dashboardUrl=http://adcf3329d703945969e8bf0c7eb8e9f9-1460841669.us-east-1.elb.amazonaws.com:9000/dashboard?id=Demo
+ceTaskId=AYmG6W4K1u-i3nXBPbKO
+ceTaskUrl=http://adcf3329d703945969e8bf0c7eb8e9f9-1460841669.us-east-1.elb.amazonaws.com:9000/api/ce/task?id=AYmG6W4K1u-i3nXBPbKO

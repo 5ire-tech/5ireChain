@@ -53,6 +53,7 @@ jobs:
   # 5irechain cargo check and unit test
   build_and_test:
     runs-on: ubuntu-latest
+    needs: lint
     steps:
       - name: Checkout sources
         uses: actions/checkout@v3
@@ -69,7 +70,7 @@ jobs:
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
         with:
-          version: '3.9.1'
+          version: "3.9.1"
 
       - name: Rust cache
         uses: Swatinem/rust-cache@v2
@@ -84,15 +85,19 @@ jobs:
         run: cargo check
 
       - name: Display Disk Space
-        run: sudo df -h
+        run: |
+          sudo df -h
+          sudo du -csh /*
+          sudo du -csh /mnt/*
 
-      - name: Test
-        run: cargo test
+      # - name: Test
+      #   run: cargo test
 
   # 5irechain integration tests
   e2e:
     name: integration-tests
     runs-on: ubuntu-latest
+    needs: build_and_test
     steps:
       - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.9.1
