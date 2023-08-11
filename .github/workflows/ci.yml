@@ -59,6 +59,9 @@ jobs:
       - name: Add Cargo Clippy
         run: rustup component add clippy
 
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@v0.0.3
+
       - name: Clippy
         run: cargo clippy -- -D warnings
 
@@ -82,9 +85,6 @@ jobs:
 
       - name: Run Integration Tests
         run: cd integration-test-suite && yarn test
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@v0.0.3
 
       - name: Save Cache
         if: ${{ !cancelled() }}
