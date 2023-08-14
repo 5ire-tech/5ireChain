@@ -16,7 +16,7 @@ env:
 jobs:
   # 5irechain linting(fmt + clippy)
   lint_and_test_and_integration_test:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout sources
         uses: actions/checkout@v3
