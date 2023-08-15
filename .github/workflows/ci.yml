@@ -48,8 +48,11 @@ jobs:
       - name: Install Protobuf
         run: sudo apt-get install protobuf-compiler
 
-      - name: Install Libclang
-        run: sudo apt-get install libclang-dev
+      - name: Set up Clang
+        uses: egor-tensin/setup-clang@v1
+        with:
+          version: latest
+          platform: x64
 
       - name: Configure sccache
         run: |
