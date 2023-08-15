@@ -49,7 +49,7 @@ jobs:
         run: sudo apt-get install protobuf-compiler
 
       - name: Install Libclang
-        run: sudo apt-get install libclang-dev
+        run: sudo apt-get install libclang
 
       - name: Configure sccache
         run: |
