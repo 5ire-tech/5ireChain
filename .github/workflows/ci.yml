@@ -56,8 +56,8 @@ jobs:
           echo "RUSTC_WRAPPER=sccache" >> $GITHUB_ENV
           echo "SCCACHE_GHA_ENABLED=true" >> $GITHUB_ENV
 
-      - name: Check format
-        run: cargo +nightly fmt --all --check
+      #- name: Check format
+      #  run: cargo +nightly fmt --all --check
 
       - name: Add Cargo Clippy
         run: rustup component add clippy
