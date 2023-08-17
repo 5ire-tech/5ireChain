@@ -56,20 +56,20 @@ jobs:
           echo "RUSTC_WRAPPER=sccache" >> $GITHUB_ENV
           echo "SCCACHE_GHA_ENABLED=true" >> $GITHUB_ENV
 
-      #- name: Check format
-      #  run: cargo +nightly fmt --all --check
+      - name: Check format
+        run: cargo +nightly fmt --all --check
 
-      #- name: Add Cargo Clippy
-      #  run: rustup component add clippy
+      - name: Add Cargo Clippy
+        run: rustup component add clippy
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@v0.0.3
 
-      #- name: Clippy
-      #  run: cargo clippy -- -D warnings
+      - name: Clippy
+        run: cargo clippy -- -D warnings
 
-      #- name: Check
-      #  run: cargo check
+      - name: Check
+        run: cargo check
 
       - name: Test
         run: cargo test
