@@ -15,8 +15,8 @@ env:
 
 jobs:
   # 5irechain linting(fmt + clippy)
-  lint:
-    runs-on: ubuntu-latest
+  lint_and_test_and_integration_test:
+    runs-on: self-hosted
     steps:
       - name: Checkout sources
         uses: actions/checkout@v3
@@ -47,6 +47,9 @@ jobs:
 
       - name: Install Protobuf
         run: sudo apt-get install protobuf-compiler
+
+      - name: Install Libclang
+        run: sudo apt-get install -y libclang-dev
 
       - name: Configure sccache
         run: |
