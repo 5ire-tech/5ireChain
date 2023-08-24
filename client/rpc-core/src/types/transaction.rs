@@ -210,34 +210,34 @@ impl Serialize for LocalTransactionStatus {
 			Mined(ref tx) => {
 				struc.serialize_field(status, "mined")?;
 				struc.serialize_field(transaction, tx)?;
-			}
+			},
 			Culled(ref tx) => {
 				struc.serialize_field(status, "culled")?;
 				struc.serialize_field(transaction, tx)?;
-			}
+			},
 			Dropped(ref tx) => {
 				struc.serialize_field(status, "dropped")?;
 				struc.serialize_field(transaction, tx)?;
-			}
+			},
 			Canceled(ref tx) => {
 				struc.serialize_field(status, "canceled")?;
 				struc.serialize_field(transaction, tx)?;
-			}
+			},
 			Invalid(ref tx) => {
 				struc.serialize_field(status, "invalid")?;
 				struc.serialize_field(transaction, tx)?;
-			}
+			},
 			Rejected(ref tx, ref reason) => {
 				struc.serialize_field(status, "rejected")?;
 				struc.serialize_field(transaction, tx)?;
 				struc.serialize_field("error", reason)?;
-			}
+			},
 			Replaced(ref tx, ref gas_price, ref hash) => {
 				struc.serialize_field(status, "replaced")?;
 				struc.serialize_field(transaction, tx)?;
 				struc.serialize_field("hash", hash)?;
 				struc.serialize_field("gasPrice", gas_price)?;
-			}
+			},
 		}
 
 		struc.end()

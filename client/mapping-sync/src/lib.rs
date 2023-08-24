@@ -50,12 +50,12 @@ pub fn sync_block<Block: BlockT>(
 			backend.mapping().write_hashes(mapping_commitment)?;
 
 			Ok(())
-		}
+		},
 		Err(FindLogError::NotFound) => {
 			backend.mapping().write_none(header.hash())?;
 
 			Ok(())
-		}
+		},
 		Err(FindLogError::MultipleLogs) => Err("Multiple logs found".to_string()),
 	}
 }
@@ -77,10 +77,7 @@ where
 		.map_err(|e| format!("{:?}", e))?
 	{
 		let block = if api_version > 1 {
-			client
-				.runtime_api()
-				.current_block(&id)
-				.map_err(|e| format!("{:?}", e))?
+			client.runtime_api().current_block(&id).map_err(|e| format!("{:?}", e))?
 		} else {
 			#[allow(deprecated)]
 			let legacy_block = client
@@ -123,7 +120,7 @@ where
 	if current_syncing_tips.is_empty() {
 		let mut leaves = substrate_backend.leaves().map_err(|e| format!("{:?}", e))?;
 		if leaves.is_empty() {
-			return Ok(false);
+			return Ok(false)
 		}
 		current_syncing_tips.append(&mut leaves);
 	}
@@ -134,38 +131,32 @@ where
 			fetch_header(substrate_backend, frontier_backend, checking_tip, sync_from)?
 		{
 			operating_header = Some(checking_header);
-			break;
+			break
 		}
 	}
 	let operating_header = match operating_header {
 		Some(operating_header) => operating_header,
 		None => {
-			frontier_backend
-				.meta()
-				.write_current_syncing_tips(current_syncing_tips)?;
-			return Ok(false);
-		}
+			frontier_backend.meta().write_current_syncing_tips(current_syncing_tips)?;
+			return Ok(false)
+		},
 	};
 
 	if operating_header.number() == &Zero::zero() {
 		sync_genesis_block(client, frontier_backend, &operating_header)?;
 
-		frontier_backend
-			.meta()
-			.write_current_syncing_tips(current_syncing_tips)?;
+		frontier_backend.meta().write_current_syncing_tips(current_syncing_tips)?;
 		Ok(true)
 	} else {
-		if SyncStrategy::Parachain == strategy
-			&& operating_header.number() > &client.info().best_number
+		if SyncStrategy::Parachain == strategy &&
+			operating_header.number() > &client.info().best_number
 		{
-			return Ok(false);
+			return Ok(false)
 		}
 		sync_block(frontier_backend, &operating_header)?;
 
 		current_syncing_tips.push(*operating_header.parent_hash());
-		frontier_backend
-			.meta()
-			.write_current_syncing_tips(current_syncing_tips)?;
+		frontier_backend.meta().write_current_syncing_tips(current_syncing_tips)?;
 		Ok(true)
 	}
 }
@@ -186,14 +177,8 @@ where
 	let mut synced_any = false;
 
 	for _ in 0..limit {
-		synced_any = synced_any
-			|| sync_one_block(
-				client,
-				substrate_backend,
-				frontier_backend,
-				sync_from,
-				strategy,
-			)?;
+		synced_any = synced_any ||
+			sync_one_block(client, substrate_backend, frontier_backend, sync_from, strategy)?;
 	}
 
 	Ok(synced_any)
@@ -209,13 +194,12 @@ where
 	B: sp_blockchain::HeaderBackend<Block> + sp_blockchain::Backend<Block>,
 {
 	if frontier_backend.mapping().is_synced(&checking_tip)? {
-		return Ok(None);
+		return Ok(None)
 	}
 
 	match substrate_backend.header(BlockId::Hash(checking_tip)) {
-		Ok(Some(checking_header)) if checking_header.number() >= &sync_from => {
-			Ok(Some(checking_header))
-		}
+		Ok(Some(checking_header)) if checking_header.number() >= &sync_from =>
+			Ok(Some(checking_header)),
 		Ok(Some(_)) => Ok(None),
 		Ok(None) | Err(_) => Err("Header not found".to_string()),
 	}

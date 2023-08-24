@@ -117,24 +117,21 @@ impl<B: BlockT> EthBlockDataCacheTask<B> {
 			while let Some(message) = task_rx.recv().await {
 				use EthBlockDataCacheMessage::*;
 				match message {
-					RequestCurrentBlock {
-						block_hash,
-						schema,
-						response_tx,
-					} => Self::request_current(
-						&spawn_handle,
-						&mut blocks_cache,
-						&mut awaiting_blocks,
-						Arc::clone(&overrides),
-						block_hash,
-						schema,
-						response_tx,
-						task_tx.clone(),
-						move |handler| FetchedCurrentBlock {
+					RequestCurrentBlock { block_hash, schema, response_tx } =>
+						Self::request_current(
+							&spawn_handle,
+							&mut blocks_cache,
+							&mut awaiting_blocks,
+							Arc::clone(&overrides),
 							block_hash,
-							block: handler.current_block(&BlockId::Hash(block_hash)),
-						},
-					),
+							schema,
+							response_tx,
+							task_tx.clone(),
+							move |handler| FetchedCurrentBlock {
+								block_hash,
+								block: handler.current_block(&BlockId::Hash(block_hash)),
+							},
+						),
 					FetchedCurrentBlock { block_hash, block } => {
 						if let Some(wait_list) = awaiting_blocks.remove(&block_hash) {
 							for sender in wait_list {
@@ -145,31 +142,25 @@ impl<B: BlockT> EthBlockDataCacheTask<B> {
 						if let Some(block) = block {
 							blocks_cache.put(block_hash, block);
 						}
-					}
+					},
 
-					RequestCurrentTransactionStatuses {
-						block_hash,
-						schema,
-						response_tx,
-					} => Self::request_current(
-						&spawn_handle,
-						&mut statuses_cache,
-						&mut awaiting_statuses,
-						Arc::clone(&overrides),
-						block_hash,
-						schema,
-						response_tx,
-						task_tx.clone(),
-						move |handler| FetchedCurrentTransactionStatuses {
+					RequestCurrentTransactionStatuses { block_hash, schema, response_tx } =>
+						Self::request_current(
+							&spawn_handle,
+							&mut statuses_cache,
+							&mut awaiting_statuses,
+							Arc::clone(&overrides),
 							block_hash,
-							statuses: handler
-								.current_transaction_statuses(&BlockId::Hash(block_hash)),
-						},
-					),
-					FetchedCurrentTransactionStatuses {
-						block_hash,
-						statuses,
-					} => {
+							schema,
+							response_tx,
+							task_tx.clone(),
+							move |handler| FetchedCurrentTransactionStatuses {
+								block_hash,
+								statuses: handler
+									.current_transaction_statuses(&BlockId::Hash(block_hash)),
+							},
+						),
+					FetchedCurrentTransactionStatuses { block_hash, statuses } => {
 						if let Some(wait_list) = awaiting_statuses.remove(&block_hash) {
 							for sender in wait_list {
 								let _ = sender.send(statuses.clone());
@@ -179,7 +170,7 @@ impl<B: BlockT> EthBlockDataCacheTask<B> {
 						if let Some(statuses) = statuses {
 							statuses_cache.put(block_hash, statuses);
 						}
-					}
+					},
 				}
 			}
 		});
@@ -205,7 +196,7 @@ impl<B: BlockT> EthBlockDataCacheTask<B> {
 		// Data is cached, we respond immediately.
 		if let Some(data) = cache.get(&block_hash).cloned() {
 			let _ = response_tx.send(Some(data));
-			return;
+			return
 		}
 
 		// Another request already triggered caching but the
@@ -213,7 +204,7 @@ impl<B: BlockT> EthBlockDataCacheTask<B> {
 		// list.
 		if let Some(waiting) = wait_list.get_mut(&block_hash) {
 			waiting.push(response_tx);
-			return;
+			return
 		}
 
 		// Data is neither cached nor already requested, so we start fetching
@@ -221,10 +212,7 @@ impl<B: BlockT> EthBlockDataCacheTask<B> {
 		wait_list.insert(block_hash, vec![response_tx]);
 
 		spawn_handle.spawn("EthBlockDataCacheTask Worker", None, async move {
-			let handler = overrides
-				.schemas
-				.get(&schema)
-				.unwrap_or(&overrides.fallback);
+			let handler = overrides.schemas.get(&schema).unwrap_or(&overrides.fallback);
 
 			let message = handler_call(handler);
 			let _ = task_tx.send(message).await;
@@ -240,11 +228,7 @@ impl<B: BlockT> EthBlockDataCacheTask<B> {
 		let (response_tx, response_rx) = oneshot::channel();
 
 		self.0
-			.send(EthBlockDataCacheMessage::RequestCurrentBlock {
-				block_hash,
-				schema,
-				response_tx,
-			})
+			.send(EthBlockDataCacheMessage::RequestCurrentBlock { block_hash, schema, response_tx })
 			.await
 			.ok()?;
 
@@ -260,13 +244,11 @@ impl<B: BlockT> EthBlockDataCacheTask<B> {
 		let (response_tx, response_rx) = oneshot::channel();
 
 		self.0
-			.send(
-				EthBlockDataCacheMessage::RequestCurrentTransactionStatuses {
-					block_hash,
-					schema,
-					response_tx,
-				},
-			)
+			.send(EthBlockDataCacheMessage::RequestCurrentTransactionStatuses {
+				block_hash,
+				schema,
+				response_tx,
+			})
 			.await
 			.ok()?;
 

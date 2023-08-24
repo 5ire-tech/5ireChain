@@ -18,13 +18,14 @@
 
 //! Substrate chain configurations.
 
+use fp_evm::GenesisAccount;
 use grandpa_primitives::AuthorityId as GrandpaId;
 use node_5ire_runtime::{
 	constants::currency::*, wasm_binary_unwrap, AuthorityDiscoveryConfig, BabeConfig,
-	BalancesConfig, Block, CouncilConfig, DemocracyConfig, ElectionsConfig, GrandpaConfig,
-	ImOnlineConfig, IndicesConfig, MaxNominations, NominationPoolsConfig, SessionConfig,
-	SessionKeys, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
-	TechnicalCommitteeConfig, EVMConfig, EthereumConfig,
+	BalancesConfig, Block, CouncilConfig, DemocracyConfig, EVMConfig, ElectionsConfig,
+	EthereumConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, MaxNominations,
+	NominationPoolsConfig, SessionConfig, SessionKeys, StakerStatus, StakingConfig, SudoConfig,
+	SystemConfig, TechnicalCommitteeConfig,
 };
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sc_chain_spec::ChainSpecExtension;
@@ -39,8 +40,6 @@ use sp_runtime::{
 	Perbill,
 };
 use std::{collections::BTreeMap, str::FromStr};
-use fp_evm::GenesisAccount;
-
 
 // use std::str::FromStr;
 // use std::collections::BTreeMap;
@@ -183,7 +182,7 @@ fn staging_testnet_config_genesis() -> GenesisConfig {
 
 	let endowed_accounts: Vec<AccountId> = vec![root_key.clone()];
 
-	testnet_genesis(initial_authorities, vec![], root_key, Some(endowed_accounts),42)
+	testnet_genesis(initial_authorities, vec![], root_key, Some(endowed_accounts), 42)
 }
 
 /// Staging testnet config.
@@ -359,13 +358,10 @@ pub fn testnet_genesis(
 		technical_membership: Default::default(),
 		treasury: Default::default(),
 
-
 		society: Default::default(),
 		vesting: Default::default(),
 		assets: Default::default(),
 		transaction_storage: Default::default(),
-
-
 
 		transaction_payment: Default::default(),
 		alliance: Default::default(),
@@ -376,17 +372,12 @@ pub fn testnet_genesis(
 			..Default::default()
 		},
 
-	// EVM compatibility
-
-
-		evm:Default::default(),
+		// EVM compatibility
+		evm: Default::default(),
 		ethereum: EthereumConfig {},
 		dynamic_fee: Default::default(),
 		base_fee: Default::default(),
 	}
-
-
-
 }
 
 /// Helper function to create GenesisConfig for development
@@ -510,13 +501,10 @@ pub fn development_genesis(
 		technical_membership: Default::default(),
 		treasury: Default::default(),
 
-
 		society: Default::default(),
 		vesting: Default::default(),
 		assets: Default::default(),
 		transaction_storage: Default::default(),
-
-
 
 		transaction_payment: Default::default(),
 		alliance: Default::default(),
@@ -536,7 +524,8 @@ pub fn development_genesis(
 					// Derived from SS58 (42 prefix) address
 					// SS58: 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
 					// hex: 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d
-					// Using the full hex key, truncating to the first 20 bytes (the first 40 hex chars)
+					// Using the full hex key, truncating to the first 20 bytes (the first 40 hex
+					// chars)
 					H160::from_str("d43593c715fdd31c61141abd04a99fd6822c8558")
 						.expect("internal H160 is valid; qed"),
 					GenesisAccount {
@@ -552,7 +541,8 @@ pub fn development_genesis(
 					// Derived from SS58 (42 prefix) address
 					// SS58: 5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty
 					// hex: 0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48
-					// Using the full hex key, truncating to the first 20 bytes (the first 40 hex chars)
+					// Using the full hex key, truncating to the first 20 bytes (the first 40 hex
+					// chars)
 					H160::from_str("8eaf04151687736326c9fea17e25fc5287613693")
 						.expect("internal H160 is valid; qed"),
 					GenesisAccount {

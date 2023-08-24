@@ -45,11 +45,7 @@ impl<B: BlockT, C, H: ExHashT> Net<B, C, H> {
 		network: Arc<NetworkService<B, H>>,
 		peer_count_as_hex: bool,
 	) -> Self {
-		Self {
-			client,
-			network,
-			peer_count_as_hex,
-		}
+		Self { client, network, peer_count_as_hex }
 	}
 }
 

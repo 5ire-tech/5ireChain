@@ -54,7 +54,7 @@ pub fn maybe_deserialize_value<B: BlockT>(
 				let res = parse_db_values(io::stdin());
 				let _ = io::stdin().read_line(&mut buffer);
 				res
-			}
+			},
 		}
 	} else {
 		Ok(None)
@@ -68,11 +68,8 @@ pub trait FrontierDbMessage {
 		key: K,
 		value: &V,
 	) -> sc_cli::Error {
-		format!(
-			"Key `{:?}` and Value `{:?}` are not compatible with this operation",
-			key, value
-		)
-		.into()
+		format!("Key `{:?}` and Value `{:?}` are not compatible with this operation", key, value)
+			.into()
 	}
 
 	fn key_column_error<K: core::fmt::Debug, V: core::fmt::Debug>(
@@ -80,11 +77,8 @@ pub trait FrontierDbMessage {
 		key: K,
 		value: &V,
 	) -> sc_cli::Error {
-		format!(
-			"Key `{:?}` and Column `{:?}` are not compatible with this operation",
-			key, value
-		)
-		.into()
+		format!("Key `{:?}` and Column `{:?}` are not compatible with this operation", key, value)
+			.into()
 	}
 
 	fn key_not_empty_error<K: core::fmt::Debug>(&self, key: K) -> sc_cli::Error {
@@ -122,7 +116,7 @@ pub trait FrontierDbMessage {
 		let mut buffer = String::new();
 		io::stdin().read_line(&mut buffer)?;
 		if buffer.trim() != "confirm" {
-			return Err("-- Cancel exit --".into());
+			return Err("-- Cancel exit --".into())
 		}
 		Ok(())
 	}

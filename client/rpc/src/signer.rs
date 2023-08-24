@@ -107,7 +107,7 @@ impl EthSigner for EthDevSigner {
 										internal_err("signer generated invalid signature")
 									})?,
 							}));
-					}
+					},
 					TransactionMessage::EIP2930(m) => {
 						let signing_message = libsecp256k1::Message::parse_slice(&m.hash()[..])
 							.map_err(|_| internal_err("invalid signing message"))?;
@@ -129,7 +129,7 @@ impl EthSigner for EthDevSigner {
 								r,
 								s,
 							}));
-					}
+					},
 					TransactionMessage::EIP1559(m) => {
 						let signing_message = libsecp256k1::Message::parse_slice(&m.hash()[..])
 							.map_err(|_| internal_err("invalid signing message"))?;
@@ -152,9 +152,9 @@ impl EthSigner for EthDevSigner {
 								r,
 								s,
 							}));
-					}
+					},
 				}
-				break;
+				break
 			}
 		}
 
