@@ -1,6 +1,6 @@
 // This file is part of Substrate.
 
-// Copyright (C) 2018-2022 Parity Technologies (UK) Ltd.
+// Copyright (C) Parity Technologies (UK) Ltd.
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
 // This program is free software: you can redistribute it and/or modify
@@ -19,12 +19,11 @@
 //! Substrate chain configurations.
 
 use grandpa_primitives::AuthorityId as GrandpaId;
-use node_5ire_runtime::{
-	constants::currency::*, wasm_binary_unwrap, AuthorityDiscoveryConfig, BabeConfig,
-	BalancesConfig, Block, CouncilConfig, DemocracyConfig, ElectionsConfig, GrandpaConfig,
-	ImOnlineConfig, IndicesConfig, MaxNominations, NominationPoolsConfig, SessionConfig,
-	SessionKeys, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
-	TechnicalCommitteeConfig, EVMConfig, EthereumConfig,
+use node_template_runtime::{
+	constants::currency::*, wasm_binary_unwrap, BabeConfig, BalancesConfig, Block, CouncilConfig,
+	DemocracyConfig, ElectionsConfig, ImOnlineConfig, IndicesConfig, MaxNominations,
+	NominationPoolsConfig, SessionConfig, SessionKeys, SocietyConfig, StakerStatus, StakingConfig,
+	SudoConfig, SystemConfig, TechnicalCommitteeConfig,
 };
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sc_chain_spec::ChainSpecExtension;
@@ -33,19 +32,13 @@ use sc_telemetry::TelemetryEndpoints;
 use serde::{Deserialize, Serialize};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
-use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public, H160, U256};
+use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
 use sp_runtime::{
 	traits::{IdentifyAccount, Verify},
 	Perbill,
 };
-use std::{collections::BTreeMap, str::FromStr};
-use fp_evm::GenesisAccount;
 
-
-// use std::str::FromStr;
-// use std::collections::BTreeMap;
-
-pub use node_5ire_runtime::GenesisConfig;
+pub use node_template_runtime::RuntimeGenesisConfig;
 pub use node_primitives::{AccountId, Balance, Signature};
 
 type AccountPublic = <Signature as Verify>::Signer;
@@ -68,7 +61,7 @@ pub struct Extensions {
 }
 
 /// Specialized `ChainSpec`.
-pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig, Extensions>;
+pub type ChainSpec = sc_service::GenericChainSpec<RuntimeGenesisConfig, Extensions>;
 /// Flaming Fir testnet generator
 // pub fn flaming_fir_config() -> Result<ChainSpec, String> {
 // 	ChainSpec::from_json_bytes(&include_bytes!("../res/flaming-fir.json")[..])
@@ -83,17 +76,17 @@ fn session_keys(
 	SessionKeys { grandpa, babe, im_online, authority_discovery }
 }
 
-fn staging_testnet_config_genesis() -> GenesisConfig {
+fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 	#[rustfmt::skip]
-	// stash, controller, session-key
-	// generated with secret:
-	// for i in 1 2 3 4 ; do for j in stash controller; do subkey inspect "$secret"/fir/$j/$i; done; done
-	//
-	// and
-	//
-	// for i in 1 2 3 4 ; do for j in session; do subkey --ed25519 inspect "$secret"//fir//$j//$i; done; done
+		// stash, controller, session-key
+		// generated with secret:
+		// for i in 1 2 3 4 ; do for j in stash controller; do subkey inspect "$secret"/fir/$j/$i; done; done
+		//
+		// and
+		//
+		// for i in 1 2 3 4 ; do for j in session; do subkey --ed25519 inspect "$secret"//fir//$j//$i; done; done
 
-	let initial_authorities: Vec<(
+		let initial_authorities: Vec<(
 		AccountId,
 		AccountId,
 		GrandpaId,
@@ -183,15 +176,15 @@ fn staging_testnet_config_genesis() -> GenesisConfig {
 
 	let endowed_accounts: Vec<AccountId> = vec![root_key.clone()];
 
-	testnet_genesis(initial_authorities, vec![], root_key, Some(endowed_accounts),42)
+	testnet_genesis(initial_authorities, vec![], root_key, Some(endowed_accounts))
 }
 
 /// Staging testnet config.
 pub fn staging_testnet_config() -> ChainSpec {
 	let boot_nodes = vec![];
 	ChainSpec::from_genesis(
-		"Firechain Staging",
-		"firechain_staging_network",
+		"Staging Testnet",
+		"staging_testnet",
 		ChainType::Live,
 		staging_testnet_config_genesis,
 		boot_nodes,
@@ -201,10 +194,7 @@ pub fn staging_testnet_config() -> ChainSpec {
 		),
 		None,
 		None,
-		Some(
-			serde_json::from_str("{\"tokenDecimals\": 18, \"tokenSymbol\": \"5IRE\"}")
-				.expect("Provided valid json map"),
-		),
+		None,
 		Default::default(),
 	)
 }
@@ -218,8 +208,8 @@ pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Pu
 
 /// Helper function to generate an account ID from seed
 pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
-where
-	AccountPublic: From<<TPublic::Pair as Pair>::Public>,
+	where
+		AccountPublic: From<<TPublic::Pair as Pair>::Public>,
 {
 	AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
 }
@@ -238,7 +228,7 @@ pub fn authority_keys_from_seed(
 	)
 }
 
-/// Helper function to create GenesisConfig for testing
+/// Helper function to create RuntimeGenesisConfig for testing
 pub fn testnet_genesis(
 	initial_authorities: Vec<(
 		AccountId,
@@ -251,8 +241,7 @@ pub fn testnet_genesis(
 	initial_nominators: Vec<AccountId>,
 	root_key: AccountId,
 	endowed_accounts: Option<Vec<AccountId>>,
-	_chain_id: u64,
-) -> GenesisConfig {
+) -> RuntimeGenesisConfig {
 	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
 		vec![
 			get_account_id_from_seed::<sr25519::Public>("Alice"),
@@ -284,7 +273,7 @@ pub fn testnet_genesis(
 	let mut rng = rand::thread_rng();
 	let stakers = initial_authorities
 		.iter()
-		.map(|x| (x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator))
+		.map(|x| (x.0.clone(), x.0.clone(), STASH, StakerStatus::Validator))
 		.chain(initial_nominators.iter().map(|x| {
 			use rand::{seq::SliceRandom, Rng};
 			let limit = (MaxNominations::get() as usize).min(initial_authorities.len());
@@ -304,8 +293,8 @@ pub fn testnet_genesis(
 	const ENDOWMENT: Balance = 10_000_000 * DOLLARS;
 	const STASH: Balance = ENDOWMENT / 1000;
 
-	GenesisConfig {
-		system: SystemConfig { code: wasm_binary_unwrap().to_vec() },
+	RuntimeGenesisConfig {
+		system: SystemConfig { code: wasm_binary_unwrap().to_vec(), ..Default::default() },
 		balances: BalancesConfig {
 			balances: endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT)).collect(),
 		},
@@ -350,23 +339,23 @@ pub fn testnet_genesis(
 		},
 		sudo: SudoConfig { key: Some(root_key) },
 		babe: BabeConfig {
-			authorities: vec![],
-			epoch_config: Some(node_5ire_runtime::BABE_GENESIS_EPOCH_CONFIG),
+			epoch_config: Some(node_template_runtime::BABE_GENESIS_EPOCH_CONFIG),
+			..Default::default()
 		},
 		im_online: ImOnlineConfig { keys: vec![] },
-		authority_discovery: AuthorityDiscoveryConfig { keys: vec![] },
-		grandpa: GrandpaConfig { authorities: vec![] },
+		authority_discovery: Default::default(),
+		grandpa: Default::default(),
 		technical_membership: Default::default(),
 		treasury: Default::default(),
-
-
-		society: Default::default(),
+		society: SocietyConfig { pot: 0 },
 		vesting: Default::default(),
-		assets: Default::default(),
+		assets: pallet_assets::GenesisConfig {
+			// This asset is used by the NIS pallet as counterpart currency.
+			assets: vec![(9, get_account_id_from_seed::<sr25519::Public>("Alice"), true, 1)],
+			..Default::default()
+		},
+		pool_assets: Default::default(),
 		transaction_storage: Default::default(),
-
-
-
 		transaction_payment: Default::default(),
 		alliance: Default::default(),
 		alliance_motion: Default::default(),
@@ -375,210 +364,16 @@ pub fn testnet_genesis(
 			min_join_bond: 1 * DOLLARS,
 			..Default::default()
 		},
-
-	// EVM compatibility
-
-
-		evm:Default::default(),
-		ethereum: EthereumConfig {},
-		dynamic_fee: Default::default(),
-		base_fee: Default::default(),
-	}
-
-
-
-}
-
-/// Helper function to create GenesisConfig for development
-pub fn development_genesis(
-	initial_authorities: Vec<(
-		AccountId,
-		AccountId,
-		GrandpaId,
-		BabeId,
-		ImOnlineId,
-		AuthorityDiscoveryId,
-	)>,
-	initial_nominators: Vec<AccountId>,
-	root_key: AccountId,
-	endowed_accounts: Option<Vec<AccountId>>,
-	_chain_id: u64,
-) -> GenesisConfig {
-	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
-		vec![
-			get_account_id_from_seed::<sr25519::Public>("Alice"),
-			get_account_id_from_seed::<sr25519::Public>("Bob"),
-			get_account_id_from_seed::<sr25519::Public>("Charlie"),
-			get_account_id_from_seed::<sr25519::Public>("Dave"),
-			get_account_id_from_seed::<sr25519::Public>("Eve"),
-			get_account_id_from_seed::<sr25519::Public>("Ferdie"),
-			get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Charlie//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Dave//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
-		]
-	});
-	// endow all authorities and nominators.
-	initial_authorities
-		.iter()
-		.map(|x| &x.0)
-		.chain(initial_nominators.iter())
-		.for_each(|x| {
-			if !endowed_accounts.contains(x) {
-				endowed_accounts.push(x.clone())
-			}
-		});
-
-	// stakers: all validators and nominators.
-	let mut rng = rand::thread_rng();
-	let stakers = initial_authorities
-		.iter()
-		.map(|x| (x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator))
-		.chain(initial_nominators.iter().map(|x| {
-			use rand::{seq::SliceRandom, Rng};
-			let limit = (MaxNominations::get() as usize).min(initial_authorities.len());
-			let count = rng.gen::<usize>() % limit;
-			let nominations = initial_authorities
-				.as_slice()
-				.choose_multiple(&mut rng, count)
-				.into_iter()
-				.map(|choice| choice.0.clone())
-				.collect::<Vec<_>>();
-			(x.clone(), x.clone(), STASH, StakerStatus::Nominator(nominations))
-		}))
-		.collect::<Vec<_>>();
-
-	let num_endowed_accounts = endowed_accounts.len();
-
-	const ENDOWMENT: Balance = 5_000_000_000 * DOLLARS;
-	const STASH: Balance = ENDOWMENT / 1000;
-
-	GenesisConfig {
-		system: SystemConfig { code: wasm_binary_unwrap().to_vec() },
-		balances: BalancesConfig {
-			balances: endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT)).collect(),
-		},
-		indices: IndicesConfig { indices: vec![] },
-		session: SessionConfig {
-			keys: initial_authorities
-				.iter()
-				.map(|x| {
-					(
-						x.0.clone(),
-						x.0.clone(),
-						session_keys(x.2.clone(), x.3.clone(), x.4.clone(), x.5.clone()),
-					)
-				})
-				.collect::<Vec<_>>(),
-		},
-		staking: StakingConfig {
-			validator_count: initial_authorities.len() as u32,
-			minimum_validator_count: initial_authorities.len() as u32,
-			invulnerables: initial_authorities.iter().map(|x| x.0.clone()).collect(),
-			slash_reward_fraction: Perbill::from_percent(10),
-			stakers,
-			..Default::default()
-		},
-		democracy: DemocracyConfig::default(),
-		elections: ElectionsConfig {
-			members: endowed_accounts
-				.iter()
-				.take((num_endowed_accounts + 1) / 2)
-				.cloned()
-				.map(|member| (member, STASH))
-				.collect(),
-		},
-		council: CouncilConfig::default(),
-		technical_committee: TechnicalCommitteeConfig {
-			members: endowed_accounts
-				.iter()
-				.take((num_endowed_accounts + 1) / 2)
-				.cloned()
-				.collect(),
-			phantom: Default::default(),
-		},
-		sudo: SudoConfig { key: Some(root_key) },
-		babe: BabeConfig {
-			authorities: vec![],
-			epoch_config: Some(node_5ire_runtime::BABE_GENESIS_EPOCH_CONFIG),
-		},
-		im_online: ImOnlineConfig { keys: vec![] },
-		authority_discovery: AuthorityDiscoveryConfig { keys: vec![] },
-		grandpa: GrandpaConfig { authorities: vec![] },
-		technical_membership: Default::default(),
-		treasury: Default::default(),
-
-
-		society: Default::default(),
-		vesting: Default::default(),
-		assets: Default::default(),
-		transaction_storage: Default::default(),
-
-
-
-		transaction_payment: Default::default(),
-		alliance: Default::default(),
-		alliance_motion: Default::default(),
-		nomination_pools: NominationPoolsConfig {
-			min_create_bond: 10 * DOLLARS,
-			min_join_bond: 1 * DOLLARS,
-			..Default::default()
-		},
-
-		// EVM compatibility
-		evm: EVMConfig {
-			accounts: {
-				let mut map = BTreeMap::new();
-				map.insert(
-					// H160 address of Alice dev account
-					// Derived from SS58 (42 prefix) address
-					// SS58: 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
-					// hex: 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d
-					// Using the full hex key, truncating to the first 20 bytes (the first 40 hex chars)
-					H160::from_str("d43593c715fdd31c61141abd04a99fd6822c8558")
-						.expect("internal H160 is valid; qed"),
-					GenesisAccount {
-						balance: U256::from_str("0xfffffffffffffffffffff")
-							.expect("internal U256 is valid; qed"),
-						code: Default::default(),
-						nonce: Default::default(),
-						storage: Default::default(),
-					},
-				);
-				map.insert(
-					// H160 address of Bob dev account
-					// Derived from SS58 (42 prefix) address
-					// SS58: 5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty
-					// hex: 0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48
-					// Using the full hex key, truncating to the first 20 bytes (the first 40 hex chars)
-					H160::from_str("8eaf04151687736326c9fea17e25fc5287613693")
-						.expect("internal H160 is valid; qed"),
-					GenesisAccount {
-						balance: U256::from_str("0xfffffffffffffffffffff")
-							.expect("internal U256 is valid; qed"),
-						code: Default::default(),
-						nonce: Default::default(),
-						storage: Default::default(),
-					},
-				);
-				map
-			},
-		},
-		ethereum: EthereumConfig {},
-		dynamic_fee: Default::default(),
-		base_fee: Default::default(),
+		glutton: Default::default(),
 	}
 }
 
-fn development_config_genesis() -> GenesisConfig {
-	development_genesis(
+fn development_config_genesis() -> RuntimeGenesisConfig {
+	testnet_genesis(
 		vec![authority_keys_from_seed("Alice")],
 		vec![],
 		get_account_id_from_seed::<sr25519::Public>("Alice"),
 		None,
-		42,
 	)
 }
 
@@ -593,39 +388,32 @@ pub fn development_config() -> ChainSpec {
 		None,
 		None,
 		None,
-		Some(
-			serde_json::from_str("{\"tokenDecimals\": 18, \"tokenSymbol\": \"5IRE\"}")
-				.expect("Provided valid json map"),
-		),
+		None,
 		Default::default(),
 	)
 }
 
-fn local_testnet_genesis() -> GenesisConfig {
+fn local_testnet_genesis() -> RuntimeGenesisConfig {
 	testnet_genesis(
 		vec![authority_keys_from_seed("Alice"), authority_keys_from_seed("Bob")],
 		vec![],
 		get_account_id_from_seed::<sr25519::Public>("Alice"),
 		None,
-		42,
 	)
 }
 
 /// Local testnet config (multivalidator Alice + Bob)
 pub fn local_testnet_config() -> ChainSpec {
 	ChainSpec::from_genesis(
-		"firechain Local Testnet",
-		"firechain_testnet",
+		"Local Testnet",
+		"local_testnet",
 		ChainType::Local,
 		local_testnet_genesis,
 		vec![],
 		None,
 		None,
 		None,
-		Some(
-			serde_json::from_str("{\"tokenDecimals\": 18, \"tokenSymbol\": \"5IRE\"}")
-				.expect("Provided valid json map"),
-		),
+		None,
 		Default::default(),
 	)
 }
@@ -637,13 +425,12 @@ pub(crate) mod tests {
 	use sc_service_test;
 	use sp_runtime::BuildStorage;
 
-	fn local_testnet_genesis_instant_single() -> GenesisConfig {
+	fn local_testnet_genesis_instant_single() -> RuntimeGenesisConfig {
 		testnet_genesis(
 			vec![authority_keys_from_seed("Alice")],
 			vec![],
 			get_account_id_from_seed::<sr25519::Public>("Alice"),
 			None,
-			42,
 		)
 	}
 
@@ -685,12 +472,13 @@ pub(crate) mod tests {
 		sp_tracing::try_init_simple();
 
 		sc_service_test::connectivity(integration_test_config_with_two_authorities(), |config| {
-			let NewFullBase { task_manager, client, network, transaction_pool, .. } =
+			let NewFullBase { task_manager, client, network, sync, transaction_pool, .. } =
 				new_full_base(config, false, |_, _| ())?;
 			Ok(sc_service_test::TestNetComponents::new(
 				task_manager,
 				client,
 				network,
+				sync,
 				transaction_pool,
 			))
 		});
