@@ -23,7 +23,7 @@ use crate::{
 	cli::{Cli, Subcommand},
 };
 use frame_benchmarking_cli::*;
-use node_template_runtime::{ExistentialDeposit, RuntimeApi};
+use firechain_runtime::{ExistentialDeposit, RuntimeApi};
 use node_executor::ExecutorDispatch;
 use node_primitives::Block;
 use sc_cli::{Result, SubstrateCli};
@@ -34,13 +34,13 @@ use std::sync::Arc;
 
 #[cfg(feature = "try-runtime")]
 use {
-	node_template_runtime::constants::time::SLOT_DURATION,
+	firechain_runtime::constants::time::SLOT_DURATION,
 	try_runtime_cli::block_building_info::substrate_info,
 };
 
 impl SubstrateCli for Cli {
 	fn impl_name() -> String {
-		"Substrate Node".into()
+		"FireChain Node".into()
 	}
 
 	fn impl_version() -> String {
@@ -56,11 +56,11 @@ impl SubstrateCli for Cli {
 	}
 
 	fn support_url() -> String {
-		"https://github.com/paritytech/substrate/issues/new".into()
+		"https://github.com/5ire-tech/5ire-evm-base/issues/new".into()
 	}
 
 	fn copyright_start_year() -> i32 {
-		2017
+		2023
 	}
 
 	fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {

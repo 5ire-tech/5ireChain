@@ -22,7 +22,7 @@
 
 use crate::service::{create_extrinsic, FullClient};
 
-use node_template_runtime::{BalancesCall, SystemCall};
+use firechain_runtime::{BalancesCall, SystemCall};
 use node_primitives::{AccountId, Balance};
 use sc_cli::Result;
 use sp_inherents::{InherentData, InherentDataProvider};

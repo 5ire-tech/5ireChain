@@ -19,7 +19,7 @@
 //! Substrate chain configurations.
 
 use grandpa_primitives::AuthorityId as GrandpaId;
-use node_template_runtime::{
+use firechain_runtime::{
 	constants::currency::*, wasm_binary_unwrap, BabeConfig, BalancesConfig, Block, CouncilConfig,
 	DemocracyConfig, ElectionsConfig, ImOnlineConfig, IndicesConfig, MaxNominations,
 	NominationPoolsConfig, SessionConfig, SessionKeys, SocietyConfig, StakerStatus, StakingConfig,
@@ -38,7 +38,7 @@ use sp_runtime::{
 	Perbill,
 };
 
-pub use node_template_runtime::RuntimeGenesisConfig;
+pub use firechain_runtime::RuntimeGenesisConfig;
 pub use node_primitives::{AccountId, Balance, Signature};
 
 type AccountPublic = <Signature as Verify>::Signer;
@@ -183,8 +183,8 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 pub fn staging_testnet_config() -> ChainSpec {
 	let boot_nodes = vec![];
 	ChainSpec::from_genesis(
-		"Staging Testnet",
-		"staging_testnet",
+		"Firechain Testnet",
+		"Firechain Staging",
 		ChainType::Live,
 		staging_testnet_config_genesis,
 		boot_nodes,
@@ -194,7 +194,10 @@ pub fn staging_testnet_config() -> ChainSpec {
 		),
 		None,
 		None,
-		None,
+		Some(
+			serde_json::from_str("{\"tokenDecimals\": 18, \"tokenSymbol\": \"5IRE\"}")
+				.expect("Provided valid json map"),
+		),
 		Default::default(),
 	)
 }
@@ -273,7 +276,7 @@ pub fn testnet_genesis(
 	let mut rng = rand::thread_rng();
 	let stakers = initial_authorities
 		.iter()
-		.map(|x| (x.0.clone(), x.0.clone(), STASH, StakerStatus::Validator))
+		.map(|x| (x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator))
 		.chain(initial_nominators.iter().map(|x| {
 			use rand::{seq::SliceRandom, Rng};
 			let limit = (MaxNominations::get() as usize).min(initial_authorities.len());
@@ -339,7 +342,7 @@ pub fn testnet_genesis(
 		},
 		sudo: SudoConfig { key: Some(root_key) },
 		babe: BabeConfig {
-			epoch_config: Some(node_template_runtime::BABE_GENESIS_EPOCH_CONFIG),
+			epoch_config: Some(firechain_runtime::BABE_GENESIS_EPOCH_CONFIG),
 			..Default::default()
 		},
 		im_online: ImOnlineConfig { keys: vec![] },
@@ -349,11 +352,7 @@ pub fn testnet_genesis(
 		treasury: Default::default(),
 		society: SocietyConfig { pot: 0 },
 		vesting: Default::default(),
-		assets: pallet_assets::GenesisConfig {
-			// This asset is used by the NIS pallet as counterpart currency.
-			assets: vec![(9, get_account_id_from_seed::<sr25519::Public>("Alice"), true, 1)],
-			..Default::default()
-		},
+		assets: Default::default(),
 		pool_assets: Default::default(),
 		transaction_storage: Default::default(),
 		transaction_payment: Default::default(),
