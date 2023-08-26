@@ -2,15 +2,17 @@
 name = "pallet-evm-precompile-blake2"
 version = "2.0.0-dev"
 license = "Apache-2.0"
-edition = "2021"
 description = "BLAKE2 precompiles for EVM pallet."
- 
+authors = { workspace = true }
+edition = { workspace = true }
+repository = { workspace = true }
+
 [dependencies]
 # Frontier
-fp-evm = { version = "3.0.0-dev", path = "../../../../primitives/evm", default-features = false }
+fp-evm = { workspace = true }
 
 [dev-dependencies]
-pallet-evm-test-vector-support = { version = "1.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
+pallet-evm-test-vector-support = { workspace = true }
 
 [features]
 default = ["std"]

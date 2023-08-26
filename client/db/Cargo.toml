@@ -2,35 +2,66 @@
 name = "fc-db"
 version = "2.0.0-dev"
 license = "GPL-3.0-or-later WITH Classpath-exception-2.0"
-edition = "2021"
-description = "Frontier database backend."
- 
+description = "Frontier database backend"
+authors = { workspace = true }
+edition = { workspace = true }
+repository = { workspace = true }
+
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
-kvdb-rocksdb = { version = "0.17.0", optional = true }
-log = "0.4.17"
-parity-db = { version = "0.4.2", optional = true }
-parking_lot = "0.12.1"
-scale-codec = { package = "parity-scale-codec", version = "3.2.1", default-features = false, features = ["derive"] }
-smallvec = "1.10"
+async-trait = { workspace = true }
+ethereum = { workspace = true, features = ["with-codec"], optional = true }
+futures = { workspace = true, optional = true }
+kvdb-rocksdb = { workspace = true, optional = true }
+log = { workspace = true }
+parity-db = { workspace = true }
+parking_lot = { workspace = true }
+scale-codec = { package = "parity-scale-codec", workspace = true }
+smallvec = { version = "1.10", optional = true }
+sqlx = { workspace = true, features = ["runtime-tokio-native-tls", "sqlite"], optional = true }
+tokio = { workspace = true, features = ["macros", "sync"], optional = true }
 # Substrate
-sp-blockchain = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git" , branch = "QA", default-features = false}
-sc-client-db = { version = "0.10.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA",default-features = false  }
-sp-core = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git" , branch = "QA", default-features = false}
-sp-database = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sp-runtime = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git" , branch = "QA", default-features = false}
+sc-client-api = { workspace = true, optional = true }
+sc-client-db = { workspace = true }
+sp-api = { workspace = true, optional = true }
+sp-blockchain = { workspace = true }
+sp-core = { workspace = true }
+sp-database = { workspace = true }
+sp-runtime = { workspace = true }
+sp-storage = { workspace = true, optional = true }
 # Frontier
-fp-storage = { version = "2.0.0", path = "../../primitives/storage" }
-
-[features]
-default = ["kvdb-rocksdb", "parity-db"]
+fc-storage = { workspace = true, optional = true }
+fp-consensus = { workspace = true, features = ["default"], optional = true }
+fp-rpc = { workspace = true, features = ["default"], optional = true }
+fp-storage = { workspace = true, features = ["default"] }
 
 [dev-dependencies]
-futures = "0.3.25"
+futures = { workspace = true }
+maplit = "1.0.2"
 tempfile = "3.3.0"
 # Substrate
-sp-block-builder = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sp-consensus = { version = "0.10.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-substrate-test-runtime-client = { version = "2.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
+sc-block-builder = { workspace = true }
+sp-consensus = { workspace = true }
+substrate-test-runtime-client = { workspace = true }
+
+[features]
+default = ["rocksdb"]
+rocksdb = [
+	"kvdb-rocksdb",
+	"sc-client-db/rocksdb",
+	"smallvec",
+]
+sql = [
+	"ethereum",
+	"futures",
+	"sqlx",
+	"tokio",
+	"sc-client-api",
+	"sp-api",
+	"sp-storage",
+	"fc-storage",
+	"fp-consensus",
+	"fp-rpc",
+]

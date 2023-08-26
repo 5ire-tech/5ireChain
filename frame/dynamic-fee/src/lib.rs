@@ -17,6 +17,7 @@
 
 // Ensure we're `no_std` when compiling for Wasm.
 #![cfg_attr(not(feature = "std"), no_std)]
+#![warn(unused_crate_dependencies)]
 
 #[cfg(test)]
 mod tests;
@@ -38,8 +39,6 @@ pub mod pallet {
 	use frame_system::pallet_prelude::*;
 
 	#[pallet::pallet]
-	#[pallet::generate_store(pub(super) trait Store)]
-	#[pallet::without_storage_info]
 	pub struct Pallet<T>(PhantomData<T>);
 
 	#[pallet::config]
@@ -86,24 +85,25 @@ pub mod pallet {
 	}
 
 	#[pallet::genesis_config]
-	#[cfg_attr(feature = "std", derive(Default))]
-	pub struct GenesisConfig {
+	#[derive(frame_support::DefaultNoBound)]
+	pub struct GenesisConfig<T> {
 		pub min_gas_price: U256,
+		#[serde(skip)]
+		pub _marker: PhantomData<T>,
 	}
 
 	#[pallet::genesis_build]
-	impl<T: Config> GenesisBuild<T> for GenesisConfig {
+	impl<T: Config> BuildGenesisConfig for GenesisConfig<T> {
 		fn build(&self) {
 			MinGasPrice::<T>::put(self.min_gas_price);
 		}
 	}
 
 	#[pallet::storage]
-	#[pallet::getter(fn min_gas_price)]
-	pub(super) type MinGasPrice<T: Config> = StorageValue<_, U256, ValueQuery>;
+	pub type MinGasPrice<T: Config> = StorageValue<_, U256, ValueQuery>;
 
 	#[pallet::storage]
-	pub(super) type TargetMinGasPrice<T: Config> = StorageValue<_, U256>;
+	pub type TargetMinGasPrice<T: Config> = StorageValue<_, U256>;
 
 	#[derive(Encode, Decode, RuntimeDebug)]
 	pub enum InherentError {}
