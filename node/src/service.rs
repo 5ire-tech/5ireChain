@@ -101,8 +101,8 @@ pub fn create_extrinsic(
 		)),
 		frame_system::CheckNonce::<firechain_runtime::Runtime>::from(nonce),
 		frame_system::CheckWeight::<firechain_runtime::Runtime>::new(),
-		pallet_asset_conversion_tx_payment::ChargeAssetTxPayment::<firechain_runtime::Runtime>::from(
-			tip, None,
+		pallet_transaction_payment::ChargeTransactionPayment::<firechain_runtime::Runtime>::from(
+			tip,
 		),
 	);
 

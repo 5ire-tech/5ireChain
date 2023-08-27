@@ -18,6 +18,7 @@
 
 //! Substrate chain configurations.
 
+// use fp_evm::GenesisAccount;
 use grandpa_primitives::AuthorityId as GrandpaId;
 use firechain_runtime::{
 	constants::currency::*, wasm_binary_unwrap, BabeConfig, BalancesConfig, Block, CouncilConfig,
@@ -32,13 +33,14 @@ use sc_telemetry::TelemetryEndpoints;
 use serde::{Deserialize, Serialize};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
-use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
+use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public, H160, U256, storage::Storage};
 use sp_runtime::{
 	traits::{IdentifyAccount, Verify},
 	Perbill,
 };
+use std::{collections::BTreeMap, str::FromStr};
 
-pub use firechain_runtime::RuntimeGenesisConfig;
+pub use firechain_runtime::{RuntimeGenesisConfig, EVMConfig, GenesisConfig};
 pub use node_primitives::{AccountId, Balance, Signature};
 
 type AccountPublic = <Signature as Verify>::Signer;
@@ -364,6 +366,11 @@ pub fn testnet_genesis(
 			..Default::default()
 		},
 		glutton: Default::default(),
+		// EVM compatibility
+		evm: Default::default(),
+		ethereum: Default::default(),
+		dynamic_fee: Default::default(),
+		base_fee: Default::default(),
 	}
 }
 
@@ -377,6 +384,7 @@ fn development_config_genesis() -> RuntimeGenesisConfig {
 }
 
 /// Development config (single validator Alice)
+/// Need to work on it..
 pub fn development_config() -> ChainSpec {
 	ChainSpec::from_genesis(
 		"Development",
