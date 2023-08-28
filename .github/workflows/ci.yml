@@ -7,7 +7,7 @@ on:
       - Testnet
       - master
   pull_request:
-    branches: [master]
+    branches: [master, qa]
   workflow_dispatch:
 
 env:
