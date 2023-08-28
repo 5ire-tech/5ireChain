@@ -133,9 +133,7 @@ pub fn test_precompile_test_vectors<P: Precompile>(filepath: &str) -> Result<(),
 					);
 				}
 			},
-			Err(err) => {
-				return Err(format!("Test '{}' returned error: {:?}", test.name, err))
-			},
+			Err(err) => return Err(format!("Test '{}' returned error: {:?}", test.name, err)),
 		}
 	}
 
