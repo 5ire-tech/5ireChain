@@ -428,6 +428,7 @@ pub mod pallet {
 		ExecutedFailed { address: H160 },
 	}
 
+	#[allow(clippy::redundant_closure_call)]
 	#[pallet::error]
 	pub enum Error<T> {
 		/// Not enough balance to perform action

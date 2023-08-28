@@ -49,7 +49,7 @@ where
 		self.client
 			.runtime_api()
 			.gas_price(&block)
-			.map_err(|err| internal_err(format!("fetch runtime chain id failed: {:?}", err)))
+			.map_err(|err| internal_err(format!("fetch runtime chain id failed: {err:?}")))
 	}
 
 	pub fn fee_history(
@@ -70,15 +70,11 @@ where
 		) {
 			let header = match self.client.header(id) {
 				Ok(Some(h)) => h,
-				_ => {
-					return Err(internal_err(format!("Failed to retrieve header at {}", id)))
-				},
+				_ => return Err(internal_err(format!("Failed to retrieve header at {id}"))),
 			};
 			let number = match self.client.number(header.hash()) {
 				Ok(Some(n)) => n,
-				_ => {
-					return Err(internal_err(format!("Failed to retrieve block number at {}", id)))
-				},
+				_ => return Err(internal_err(format!("Failed to retrieve block number at {id}"))),
 			};
 			// Highest and lowest block number within the requested range.
 			let highest = UniqueSaturatedInto::<u64>::unique_saturated_into(number);
@@ -169,7 +165,7 @@ where
 				return Err(internal_err("Failed to read fee history cache."))
 			}
 		}
-		Err(internal_err(format!("Failed to retrieve requested block {:?}.", newest_block)))
+		Err(internal_err(format!("Failed to retrieve requested block {newest_block:?}.")))
 	}
 
 	pub fn max_priority_fee_per_gas(&self) -> Result<U256> {

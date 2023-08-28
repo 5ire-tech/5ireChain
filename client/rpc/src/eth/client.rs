@@ -106,7 +106,7 @@ where
 			self.client
 				.runtime_api()
 				.chain_id(&BlockId::Hash(hash))
-				.map_err(|err| internal_err(format!("fetch runtime chain id failed: {:?}", err)))?
+				.map_err(|err| internal_err(format!("fetch runtime chain id failed: {err:?}")))?
 				.into(),
 		))
 	}

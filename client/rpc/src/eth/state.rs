@@ -57,7 +57,7 @@ where
 			let api = pending_runtime_api(self.client.as_ref(), self.graph.as_ref())?;
 			Ok(api
 				.account_basic(&BlockId::Hash(self.client.info().best_hash), address)
-				.map_err(|err| internal_err(format!("fetch runtime chain id failed: {:?}", err)))?
+				.map_err(|err| internal_err(format!("fetch runtime chain id failed: {err:?}")))?
 				.balance)
 		} else if let Ok(Some(id)) = frontier_backend_client::native_block_id::<B, C>(
 			self.client.as_ref(),
@@ -68,7 +68,7 @@ where
 				.client
 				.runtime_api()
 				.account_basic(&id, address)
-				.map_err(|err| internal_err(format!("fetch runtime chain id failed: {:?}", err)))?
+				.map_err(|err| internal_err(format!("fetch runtime chain id failed: {err:?}")))?
 				.balance)
 		} else {
 			Ok(U256::zero())
@@ -117,7 +117,7 @@ where
 				.runtime_api()
 				.account_basic(&block, address)
 				.map_err(|err| {
-					internal_err(format!("fetch runtime account basic failed: {:?}", err))
+					internal_err(format!("fetch runtime account basic failed: {err:?}"))
 				})?
 				.nonce;
 
@@ -148,7 +148,7 @@ where
 			.client
 			.runtime_api()
 			.account_basic(&id, address)
-			.map_err(|err| internal_err(format!("fetch runtime account basic failed: {:?}", err)))?
+			.map_err(|err| internal_err(format!("fetch runtime account basic failed: {err:?}")))?
 			.nonce)
 	}
 

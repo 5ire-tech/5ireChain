@@ -110,6 +110,6 @@ impl<'a> Deserialize<'a> for Params {
 
 		from_value(v)
 			.map(Params::Logs)
-			.map_err(|e| D::Error::custom(format!("Invalid Pub-Sub parameters: {}", e)))
+			.map_err(|e| D::Error::custom(format!("Invalid Pub-Sub parameters: {e}")))
 	}
 }

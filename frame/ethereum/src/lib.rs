@@ -278,6 +278,7 @@ pub mod pallet {
 		Executed { from: H160, to: H160, transaction_hash: H256, exit_reason: ExitReason },
 	}
 
+	#[allow(clippy::redundant_closure_call)]
 	#[pallet::error]
 	pub enum Error<T> {
 		/// Signature is invalid.

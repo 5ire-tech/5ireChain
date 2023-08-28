@@ -72,12 +72,12 @@ impl fmt::Display for UpgradeError {
 				write!(f, "Database version cannot be read from existing db_version file")
 			},
 			UpgradeError::UnsupportedVersion(version) => {
-				write!(f, "Database version no longer supported: {}", version)
+				write!(f, "Database version no longer supported: {version}")
 			},
 			UpgradeError::FutureDatabaseVersion(version) => {
-				write!(f, "Database version comes from future version of the client: {}", version)
+				write!(f, "Database version comes from future version of the client: {version}")
 			},
-			UpgradeError::Io(err) => write!(f, "Io error: {}", err),
+			UpgradeError::Io(err) => write!(f, "Io error: {err}"),
 		}
 	}
 }
@@ -122,7 +122,7 @@ pub(crate) fn current_version(path: &Path) -> UpgradeResult<u32> {
 		Err(ref err) if err.kind() == ErrorKind::NotFound => {
 			fs::create_dir_all(path)?;
 			let mut file = fs::File::create(version_file_path(path))?;
-			file.write_all(format!("{}", CURRENT_VERSION).as_bytes())?;
+			file.write_all(format!("{CURRENT_VERSION}").as_bytes())?;
 			Ok(CURRENT_VERSION)
 		},
 		Err(_) => Err(UpgradeError::UnknownDatabaseVersion),
@@ -139,7 +139,7 @@ pub(crate) fn current_version(path: &Path) -> UpgradeResult<u32> {
 pub(crate) fn update_version(path: &Path) -> io::Result<()> {
 	fs::create_dir_all(path)?;
 	let mut file = fs::File::create(version_file_path(path))?;
-	file.write_all(format!("{}", CURRENT_VERSION).as_bytes())?;
+	file.write_all(format!("{CURRENT_VERSION}").as_bytes())?;
 	Ok(())
 }
 

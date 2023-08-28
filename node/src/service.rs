@@ -197,7 +197,7 @@ pub fn new_full_base(
 ) -> Result<NewFullBase, ServiceError> {
 	let hwbench = if !disable_hardware_benchmarks {
 		config.database.path().map(|database_path| {
-			let _ = std::fs::create_dir_all(&database_path);
+			let _ = std::fs::create_dir_all(database_path);
 			sc_sysinfo::gather_hwbench(Some(database_path))
 		})
 	} else {
@@ -289,9 +289,7 @@ pub fn new_full_base(
 	let babe_config = babe_link.config().clone();
 	let shared_epoch_changes = babe_link.epoch_changes().clone();
 
-	let client = client.clone();
 	// let pool = transaction_pool.clone();
-	let select_chain = select_chain.clone();
 	let keystore = keystore_container.sync_keystore();
 	let _chain_spec = config.chain_spec.cloned_box();
 
@@ -323,12 +321,7 @@ pub fn new_full_base(
 		let select_chain = select_chain.clone();
 		let voter_state = shared_voter_state.clone();
 		let frontier_backend = frontier_backend.clone();
-		let fee_history_cache = fee_history_cache.clone();
-		let fee_history_cache_limit = fee_history_cache_limit.clone();
-		let execute_gas_limit_multiplier = execute_gas_limit_multiplier.clone();
 		let overrides = overrides.clone();
-		let filter_pool = filter_pool.clone();
-
 		Box::new(move |deny_unsafe, subscription_executor| {
 			let deps = FullDeps {
 				client: client.clone(),
@@ -358,8 +351,8 @@ pub fn new_full_base(
 				backend: frontier_backend.clone(),
 				max_past_logs,
 				fee_history_cache: fee_history_cache.clone(),
-				fee_history_cache_limit: fee_history_cache_limit.clone(),
-				execute_gas_limit_multiplier: execute_gas_limit_multiplier.clone(),
+				fee_history_cache_limit,
+				execute_gas_limit_multiplier,
 			};
 			create_full(deps, subscription_task_executor.clone(), rpc_backend.clone())
 				.map_err(Into::into)
@@ -368,7 +361,6 @@ pub fn new_full_base(
 
 	// (rpc_extensions_builder, shared_voter_state2)
 	// };
-	let backend = backend.clone();
 	let backends = backend.clone();
 	let rpc_handlers = sc_service::spawn_tasks(sc_service::SpawnTasksParams {
 		config,
@@ -394,7 +386,7 @@ pub fn new_full_base(
 		backends,
 		frontier_backend,
 		filter_pool,
-		overrides.clone(),
+		overrides,
 		fee_history_cache,
 		fee_history_cache_limit,
 	);
@@ -558,33 +550,30 @@ pub fn new_full_base(
 	Ok(NewFullBase { task_manager, client, network, transaction_pool, rpc_handlers })
 }
 
-/// Creates a new partial node.
-pub fn new_partial(
-	config: &Configuration,
-) -> Result<
-	sc_service::PartialComponents<
-		FullClient,
-		FullBackend,
-		FullSelectChain,
-		sc_consensus::DefaultImportQueue<Block, FullClient>,
-		sc_transaction_pool::FullPool<Block, FullClient>,
+type PartialComponentsType = sc_service::PartialComponents<
+	FullClient,
+	FullBackend,
+	FullSelectChain,
+	sc_consensus::DefaultImportQueue<Block, FullClient>,
+	sc_transaction_pool::FullPool<Block, FullClient>,
+	(
+		// impl Fn(
+		// 	node_rpc::DenyUnsafe,
+		// 	sc_rpc::SubscriptionTaskExecutor,
+		// ) -> Result<jsonrpsee::RpcModule<()>, sc_service::Error>,
 		(
-			// impl Fn(
-			// 	node_rpc::DenyUnsafe,
-			// 	sc_rpc::SubscriptionTaskExecutor,
-			// ) -> Result<jsonrpsee::RpcModule<()>, sc_service::Error>,
-			(
-				sc_consensus_babe::BabeBlockImport<Block, FullClient, FullGrandpaBlockImport>,
-				grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
-				sc_consensus_babe::BabeLink<Block>,
-			),
-			// grandpa::SharedVoterState,
-			Option<Telemetry>,
-			Arc<FrontierBackend<Block>>,
+			sc_consensus_babe::BabeBlockImport<Block, FullClient, FullGrandpaBlockImport>,
+			grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
+			sc_consensus_babe::BabeLink<Block>,
 		),
-	>,
-	ServiceError,
-> {
+		// grandpa::SharedVoterState,
+		Option<Telemetry>,
+		Arc<FrontierBackend<Block>>,
+	),
+>;
+
+/// Creates a new partial node.
+pub fn new_partial(config: &Configuration) -> Result<PartialComponentsType, ServiceError> {
 	let telemetry = config
 		.telemetry_endpoints
 		.clone()
@@ -685,6 +674,8 @@ pub fn new_partial(
 		other: (import_setup, telemetry, frontier_backend),
 	})
 }
+
+#[allow(clippy::too_many_arguments)]
 fn spawn_frontier_tasks(
 	task_manager: &TaskManager,
 	client: Arc<FullClient>,

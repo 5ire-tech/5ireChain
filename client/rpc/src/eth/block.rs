@@ -56,14 +56,14 @@ where
 			backend.as_ref(),
 			hash,
 		)
-		.map_err(|err| internal_err(format!("{:?}", err)))?
+		.map_err(|err| internal_err(format!("{err:?}")))?
 		{
 			Some(hash) => hash,
 			_ => return Ok(None),
 		};
 		let substrate_hash = client
 			.expect_block_hash_from_id(&id)
-			.map_err(|_| internal_err(format!("Expect block number from id: {}", id)))?;
+			.map_err(|_| internal_err(format!("Expect block number from id: {id}")))?;
 
 		let schema =
 			frontier_backend_client::onchain_storage_schema::<B, C, BE>(client.as_ref(), id);
@@ -104,7 +104,7 @@ where
 		};
 		let substrate_hash = client
 			.expect_block_hash_from_id(&id)
-			.map_err(|_| internal_err(format!("Expect block number from id: {}", id)))?;
+			.map_err(|_| internal_err(format!("Expect block number from id: {id}")))?;
 
 		let schema =
 			frontier_backend_client::onchain_storage_schema::<B, C, BE>(client.as_ref(), id);
@@ -136,7 +136,7 @@ where
 			self.backend.as_ref(),
 			hash,
 		)
-		.map_err(|err| internal_err(format!("{:?}", err)))?
+		.map_err(|err| internal_err(format!("{err:?}")))?
 		{
 			Some(hash) => hash,
 			_ => return Ok(None),

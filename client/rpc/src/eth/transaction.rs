@@ -63,7 +63,7 @@ where
 			hash,
 			true,
 		)
-		.map_err(|err| internal_err(format!("{:?}", err)))?
+		.map_err(|err| internal_err(format!("{err:?}")))?
 		{
 			Some((hash, index)) => (hash, index as usize),
 			None => {
@@ -101,12 +101,12 @@ where
 
 				let ethereum_transactions: Vec<EthereumTransaction> = if api_version > 1 {
 					api.extrinsic_filter(&best_block, xts).map_err(|err| {
-						internal_err(format!("fetch runtime extrinsic filter failed: {:?}", err))
+						internal_err(format!("fetch runtime extrinsic filter failed: {err:?}"))
 					})?
 				} else {
 					#[allow(deprecated)]
 					let legacy = api.extrinsic_filter_before_version_2(&best_block, xts).map_err(|err| {
-						internal_err(format!("fetch runtime extrinsic filter failed: {:?}", err))
+						internal_err(format!("fetch runtime extrinsic filter failed: {err:?}"))
 					})?;
 					legacy.into_iter().map(|tx| tx.into()).collect()
 				};
@@ -127,14 +127,14 @@ where
 			backend.as_ref(),
 			hash,
 		)
-		.map_err(|err| internal_err(format!("{:?}", err)))?
+		.map_err(|err| internal_err(format!("{err:?}")))?
 		{
 			Some(hash) => hash,
 			_ => return Ok(None),
 		};
 		let substrate_hash = client
 			.expect_block_hash_from_id(&id)
-			.map_err(|_| internal_err(format!("Expect block number from id: {}", id)))?;
+			.map_err(|_| internal_err(format!("Expect block number from id: {id}")))?;
 
 		let schema =
 			frontier_backend_client::onchain_storage_schema::<B, C, BE>(client.as_ref(), id);
@@ -169,14 +169,14 @@ where
 			backend.as_ref(),
 			hash,
 		)
-		.map_err(|err| internal_err(format!("{:?}", err)))?
+		.map_err(|err| internal_err(format!("{err:?}")))?
 		{
 			Some(hash) => hash,
 			_ => return Ok(None),
 		};
 		let substrate_hash = client
 			.expect_block_hash_from_id(&id)
-			.map_err(|_| internal_err(format!("Expect block number from id: {}", id)))?;
+			.map_err(|_| internal_err(format!("Expect block number from id: {id}")))?;
 
 		let index = index.value();
 
@@ -200,7 +200,7 @@ where
 						Some(base_fee),
 					)))
 				} else {
-					Err(internal_err(format!("{:?} is out of bounds", index)))
+					Err(internal_err(format!("{index:?} is out of bounds")))
 				}
 			},
 			_ => Ok(None),
@@ -226,7 +226,7 @@ where
 		};
 		let substrate_hash = client
 			.expect_block_hash_from_id(&id)
-			.map_err(|_| internal_err(format!("Expect block number from id: {}", id)))?;
+			.map_err(|_| internal_err(format!("Expect block number from id: {id}")))?;
 
 		let index = index.value();
 		let schema =
@@ -249,7 +249,7 @@ where
 						Some(base_fee),
 					)))
 				} else {
-					Err(internal_err(format!("{:?} is out of bounds", index)))
+					Err(internal_err(format!("{index:?} is out of bounds")))
 				}
 			},
 			_ => Ok(None),
@@ -268,7 +268,7 @@ where
 			hash,
 			true,
 		)
-		.map_err(|err| internal_err(format!("{:?}", err)))?
+		.map_err(|err| internal_err(format!("{err:?}")))?
 		{
 			Some((hash, index)) => (hash, index as usize),
 			None => return Ok(None),
@@ -279,14 +279,14 @@ where
 			backend.as_ref(),
 			hash,
 		)
-		.map_err(|err| internal_err(format!("{:?}", err)))?
+		.map_err(|err| internal_err(format!("{err:?}")))?
 		{
 			Some(hash) => hash,
 			_ => return Ok(None),
 		};
 		let substrate_hash = client
 			.expect_block_hash_from_id(&id)
-			.map_err(|_| internal_err(format!("Expect block number from id: {}", id)))?;
+			.map_err(|_| internal_err(format!("Expect block number from id: {id}")))?;
 
 		let schema =
 			frontier_backend_client::onchain_storage_schema::<B, C, BE>(client.as_ref(), id);
@@ -314,8 +314,7 @@ where
 								.map(|r| match r {
 									ethereum::ReceiptV3::Legacy(d) => Ok(d.used_gas.as_u32()),
 									_ => Err(internal_err(format!(
-										"Unknown receipt for request {}",
-										hash
+										"Unknown receipt for request {hash}"
 									))),
 								})
 								.sum::<Result<u32>>()?;
@@ -328,10 +327,7 @@ where
 							)
 						},
 						_ =>
-							return Err(internal_err(format!(
-								"Unknown receipt for request {}",
-								hash
-							))),
+							return Err(internal_err(format!("Unknown receipt for request {hash}"))),
 					}
 				} else {
 					match receipt {
