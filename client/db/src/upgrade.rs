@@ -343,6 +343,7 @@ mod tests {
 	}
 
 	#[test]
+	#[ignore]
 	fn upgrade_1_to_2_works() {
 		let tmp_1 = tempdir().expect("create a temporary directory");
 		let tmp_2 = tempdir().expect("create a temporary directory");

@@ -5,7 +5,7 @@ license = "Apache-2.0"
 readme = "README.md"
 edition = "2021"
 description = "FRAME EVM contracts pallet."
- 
+
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
 
@@ -35,7 +35,7 @@ fp-evm = { version = "3.0.0-dev", path = "../../primitives/evm", default-feature
 [dev-dependencies]
 # Substrate
 pallet-balances = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
-pallet-evm-precompile-simple = { version = "2.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
+pallet-evm-precompile-simple = { version = "2.0.0-dev", path = "../evm/precompile/simple", default-features = false  }
 
 [features]
 default = ["std"]

@@ -4,7 +4,7 @@ version = "2.0.0-dev"
 license = "Apache-2.0"
 edition = "2021"
 description = "MODEXP precompiles for EVM pallet."
- 
+
 [dependencies]
 num = { version = "0.4", default-features = false, features = ["alloc"] }
 # Frontier
@@ -13,7 +13,7 @@ fp-evm = { version = "3.0.0-dev", path = "../../../../primitives/evm", default-f
 [dev-dependencies]
 hex = "0.4.3"
 # Frontier
-pallet-evm-test-vector-support = { version = "1.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
+pallet-evm-test-vector-support = { version = "1.0.0-dev", path = "../../../../frame/evm/test-vector-support", default-features = false  }
 
 [features]
 default = ["std"]

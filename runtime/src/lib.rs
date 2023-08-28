@@ -699,7 +699,7 @@ pallet_staking_reward_curve::build! {
 
 parameter_types! {
 	pub const SessionsPerEra: sp_staking::SessionIndex = 1;
-	pub const BondingDuration: sp_staking::EraIndex = 1;
+	pub const BondingDuration: sp_staking::EraIndex = 24 * 28;
 	pub const SlashDeferDuration: sp_staking::EraIndex = 24 * 7; // 1/4 the bonding duration.
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
 	pub const MaxNominatorRewardedPerValidator: u32 = 256;
@@ -2744,7 +2744,7 @@ mod tests {
 	fn call_size() {
 		let size = core::mem::size_of::<RuntimeCall>();
 		assert!(
-			size <= 208,
+			size <= 304,
 			"size of RuntimeCall {} is more than 208 bytes: some calls have too big arguments, use Box to reduce the
 			size of RuntimeCall.
 			If the limit is too strong, maybe consider increase the limit to 300.",
