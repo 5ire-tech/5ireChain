@@ -2349,14 +2349,14 @@ dependencies = [
  "sp-consensus",
  "sp-consensus-babe",
  "sp-consensus-grandpa",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-inherents",
  "sp-keyring",
  "sp-keystore",
- "sp-runtime 24.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-statement-store",
  "sp-timestamp",
- "sp-tracing 10.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-tracing",
  "sp-transaction-storage-proof",
  "substrate-build-script-utils",
  "substrate-cli-test-utils",
@@ -2465,15 +2465,15 @@ dependencies = [
  "sp-block-builder",
  "sp-consensus-babe",
  "sp-consensus-grandpa",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-inherents",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-io",
  "sp-offchain",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-session",
  "sp-staking",
  "sp-statement-store",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
  "sp-transaction-pool",
  "sp-version",
  "static_assertions",
@@ -2562,13 +2562,13 @@ dependencies = [
  "scale-info",
  "serde",
  "sp-api",
- "sp-application-crypto 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime-interface 17.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-storage 13.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-application-crypto",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-runtime-interface",
+ "sp-std",
+ "sp-storage",
  "static_assertions",
 ]
 
@@ -2605,17 +2605,17 @@ dependencies = [
  "serde_json",
  "sp-api",
  "sp-blockchain",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-database",
- "sp-externalities 0.19.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-externalities",
  "sp-inherents",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-io",
  "sp-keystore",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-state-machine",
- "sp-storage 13.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-storage",
  "sp-trie",
- "sp-wasm-interface 14.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-wasm-interface",
  "thiserror",
  "thousands",
 ]
@@ -2630,9 +2630,9 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "scale-info",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -2656,11 +2656,11 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "scale-info",
- "sp-arithmetic 16.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-arithmetic",
+ "sp-core",
  "sp-npos-elections",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -2673,11 +2673,11 @@ dependencies = [
  "frame-try-runtime",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-tracing 10.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+ "sp-tracing",
 ]
 
 [[package]]
@@ -2704,9 +2704,9 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "serde",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
  "spinners",
  "substrate-rpc-client",
  "tokio",
@@ -2732,18 +2732,18 @@ dependencies = [
  "serde",
  "smallvec",
  "sp-api",
- "sp-arithmetic 16.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-arithmetic",
+ "sp-core",
  "sp-core-hashing-proc-macro",
- "sp-debug-derive 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-debug-derive",
  "sp-inherents",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-io",
+ "sp-runtime",
  "sp-staking",
  "sp-state-machine",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-tracing 10.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-weights 20.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
+ "sp-tracing",
+ "sp-weights",
  "tt-call",
 ]
 
@@ -2798,12 +2798,12 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
  "sp-version",
- "sp-weights 20.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-weights",
 ]
 
 [[package]]
@@ -2816,9 +2816,9 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -2838,8 +2838,8 @@ dependencies = [
  "frame-support",
  "parity-scale-codec",
  "sp-api",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -3959,15 +3959,15 @@ dependencies = [
  "sp-block-builder",
  "sp-consensus-babe",
  "sp-consensus-grandpa",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-inherents",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-io",
  "sp-offchain",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-session",
  "sp-staking",
  "sp-statement-store",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
  "sp-transaction-pool",
  "sp-version",
  "static_assertions",
@@ -4866,9 +4866,9 @@ dependencies = [
  "serde",
  "sp-api",
  "sp-blockchain",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-mmr-primitives",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
 ]
 
 [[package]]
@@ -5118,11 +5118,11 @@ dependencies = [
  "parity-scale-codec",
  "sc-executor",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-keystore",
  "sp-state-machine",
  "sp-statement-store",
- "sp-tracing 10.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-tracing",
  "sp-trie",
 ]
 
@@ -5137,8 +5137,8 @@ dependencies = [
  "sc-client-api",
  "sc-service",
  "sp-blockchain",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
  "thiserror",
 ]
 
@@ -5147,8 +5147,8 @@ name = "node-primitives"
 version = "2.0.0"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
 dependencies = [
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
 ]
 
 [[package]]
@@ -5361,11 +5361,11 @@ dependencies = [
  "pallet-identity",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-core-hashing",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5379,11 +5379,11 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "sp-api",
- "sp-arithmetic 16.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-arithmetic",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5396,8 +5396,8 @@ dependencies = [
  "pallet-transaction-payment",
  "parity-scale-codec",
  "scale-info",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5410,8 +5410,8 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "scale-info",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5426,10 +5426,10 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5442,9 +5442,9 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5457,10 +5457,10 @@ dependencies = [
  "pallet-session",
  "parity-scale-codec",
  "scale-info",
- "sp-application-crypto 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-application-crypto",
  "sp-authority-discovery",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5473,8 +5473,8 @@ dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
  "scale-info",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5491,14 +5491,14 @@ dependencies = [
  "pallet-timestamp",
  "parity-scale-codec",
  "scale-info",
- "sp-application-crypto 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-application-crypto",
  "sp-consensus-babe",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
  "sp-session",
  "sp-staking",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
 ]
 
 [[package]]
@@ -5514,11 +5514,11 @@ dependencies = [
  "pallet-balances",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-tracing 10.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+ "sp-tracing",
 ]
 
 [[package]]
@@ -5532,8 +5532,8 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5548,10 +5548,10 @@ dependencies = [
  "pallet-treasury",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5567,10 +5567,10 @@ dependencies = [
  "pallet-treasury",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5584,10 +5584,10 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5611,10 +5611,10 @@ dependencies = [
  "serde",
  "smallvec",
  "sp-api",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
  "wasm-instrument 0.4.0",
  "wasmi",
 ]
@@ -5627,9 +5627,9 @@ dependencies = [
  "bitflags 1.3.2",
  "parity-scale-codec",
  "scale-info",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-weights 20.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
+ "sp-weights",
 ]
 
 [[package]]
@@ -5654,9 +5654,9 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5670,11 +5670,11 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-arithmetic 16.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-arithmetic",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5689,10 +5689,10 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5709,12 +5709,12 @@ dependencies = [
  "parity-scale-codec",
  "rand 0.8.5",
  "scale-info",
- "sp-arithmetic 16.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-arithmetic",
+ "sp-core",
+ "sp-io",
  "sp-npos-elections",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
  "strum",
 ]
 
@@ -5728,7 +5728,7 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "sp-npos-elections",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
 ]
 
 [[package]]
@@ -5742,12 +5742,12 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
  "sp-npos-elections",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-staking",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
 ]
 
 [[package]]
@@ -5763,10 +5763,10 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-io",
+ "sp-runtime",
  "sp-staking",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
 ]
 
 [[package]]
@@ -5781,10 +5781,10 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5800,14 +5800,14 @@ dependencies = [
  "pallet-session",
  "parity-scale-codec",
  "scale-info",
- "sp-application-crypto 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-application-crypto",
  "sp-consensus-grandpa",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
  "sp-session",
  "sp-staking",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
 ]
 
 [[package]]
@@ -5821,9 +5821,9 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "scale-info",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5838,12 +5838,12 @@ dependencies = [
  "pallet-authorship",
  "parity-scale-codec",
  "scale-info",
- "sp-application-crypto 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-application-crypto",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
  "sp-staking",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
 ]
 
 [[package]]
@@ -5856,11 +5856,11 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
  "sp-keyring",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5873,8 +5873,8 @@ dependencies = [
  "parity-scale-codec",
  "safe-mix",
  "scale-info",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5887,8 +5887,8 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "scale-info",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5902,10 +5902,10 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5919,12 +5919,12 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-arithmetic 16.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-weights 20.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-arithmetic",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+ "sp-weights",
 ]
 
 [[package]]
@@ -5937,11 +5937,11 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
  "sp-mmr-primitives",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5955,9 +5955,9 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5973,8 +5973,8 @@ dependencies = [
  "pallet-nfts",
  "parity-scale-codec",
  "scale-info",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5989,10 +5989,10 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -6016,10 +6016,10 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "scale-info",
- "sp-arithmetic 16.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-arithmetic",
+ "sp-core",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -6032,11 +6032,11 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
  "sp-staking",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
 ]
 
 [[package]]
@@ -6053,10 +6053,10 @@ dependencies = [
  "pallet-staking",
  "parity-scale-codec",
  "scale-info",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime-interface 17.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-runtime-interface",
  "sp-staking",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
 ]
 
 [[package]]
@@ -6067,7 +6067,7 @@ dependencies = [
  "pallet-nomination-pools",
  "parity-scale-codec",
  "sp-api",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
 ]
 
 [[package]]
@@ -6082,9 +6082,9 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-staking",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
 ]
 
 [[package]]
@@ -6106,9 +6106,9 @@ dependencies = [
  "pallet-staking",
  "parity-scale-codec",
  "scale-info",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-staking",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
 ]
 
 [[package]]
@@ -6122,10 +6122,10 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -6138,9 +6138,9 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "scale-info",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -6154,11 +6154,11 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-arithmetic 16.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-arithmetic",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -6171,9 +6171,9 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "scale-info",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -6189,10 +6189,10 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
- "sp-arithmetic 16.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-arithmetic",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -6206,10 +6206,10 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -6221,10 +6221,10 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -6238,11 +6238,11 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-arithmetic 16.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-arithmetic",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -6256,10 +6256,10 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-weights 20.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+ "sp-weights",
 ]
 
 [[package]]
@@ -6274,12 +6274,12 @@ dependencies = [
  "pallet-timestamp",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
  "sp-session",
  "sp-staking",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
  "sp-trie",
 ]
 
@@ -6294,9 +6294,9 @@ dependencies = [
  "pallet-session",
  "pallet-staking",
  "rand 0.8.5",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-session",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
 ]
 
 [[package]]
@@ -6312,10 +6312,10 @@ dependencies = [
  "parity-scale-codec",
  "rand_chacha 0.2.2",
  "scale-info",
- "sp-arithmetic 16.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-arithmetic",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -6334,11 +6334,11 @@ dependencies = [
  "rand_chacha 0.2.2",
  "scale-info",
  "serde",
- "sp-application-crypto 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-application-crypto",
+ "sp-io",
+ "sp-runtime",
  "sp-staking",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
 ]
 
 [[package]]
@@ -6372,10 +6372,10 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -6389,11 +6389,11 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "sp-api",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
  "sp-statement-store",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
 ]
 
 [[package]]
@@ -6406,9 +6406,9 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "scale-info",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -6423,9 +6423,9 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "sp-inherents",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
  "sp-timestamp",
 ]
 
@@ -6442,10 +6442,10 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -6458,10 +6458,10 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -6474,10 +6474,10 @@ dependencies = [
  "parity-scale-codec",
  "sp-api",
  "sp-blockchain",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-rpc",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-weights 20.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-weights",
 ]
 
 [[package]]
@@ -6488,8 +6488,8 @@ dependencies = [
  "pallet-transaction-payment",
  "parity-scale-codec",
  "sp-api",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-weights 20.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-weights",
 ]
 
 [[package]]
@@ -6507,9 +6507,9 @@ dependencies = [
  "scale-info",
  "serde",
  "sp-inherents",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
  "sp-transaction-storage-proof",
 ]
 
@@ -6526,8 +6526,8 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -6541,8 +6541,8 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -6555,10 +6555,10 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -6572,8 +6572,8 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -6587,8 +6587,8 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "sp-api",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -7862,8 +7862,8 @@ version = "4.1.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
 dependencies = [
  "log",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-wasm-interface 14.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-wasm-interface",
  "thiserror",
 ]
 
@@ -7888,9 +7888,9 @@ dependencies = [
  "sp-api",
  "sp-authority-discovery",
  "sp-blockchain",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-keystore",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "substrate-prometheus-endpoint",
  "thiserror",
 ]
@@ -7912,9 +7912,9 @@ dependencies = [
  "sp-api",
  "sp-blockchain",
  "sp-consensus",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-inherents",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "substrate-prometheus-endpoint",
 ]
 
@@ -7928,9 +7928,9 @@ dependencies = [
  "sp-api",
  "sp-block-builder",
  "sp-blockchain",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-inherents",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
 ]
 
 [[package]]
@@ -7947,8 +7947,8 @@ dependencies = [
  "serde",
  "serde_json",
  "sp-blockchain",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
  "sp-state-machine",
 ]
 
@@ -7991,11 +7991,11 @@ dependencies = [
  "serde",
  "serde_json",
  "sp-blockchain",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-keyring",
  "sp-keystore",
  "sp-panic-handler",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-version",
  "thiserror",
  "tiny-bip39",
@@ -8018,13 +8018,13 @@ dependencies = [
  "sp-api",
  "sp-blockchain",
  "sp-consensus",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-database",
- "sp-externalities 0.19.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-externalities",
+ "sp-runtime",
  "sp-state-machine",
  "sp-statement-store",
- "sp-storage 13.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-storage",
  "substrate-prometheus-endpoint",
 ]
 
@@ -8045,11 +8045,11 @@ dependencies = [
  "sc-client-api",
  "sc-state-db",
  "schnellru",
- "sp-arithmetic 16.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-arithmetic",
  "sp-blockchain",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-database",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-state-machine",
  "sp-trie",
 ]
@@ -8072,8 +8072,8 @@ dependencies = [
  "sp-api",
  "sp-blockchain",
  "sp-consensus",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
  "sp-state-machine",
  "substrate-prometheus-endpoint",
  "thiserror",
@@ -8101,16 +8101,16 @@ dependencies = [
  "sc-transaction-pool-api",
  "scale-info",
  "sp-api",
- "sp-application-crypto 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-application-crypto",
  "sp-block-builder",
  "sp-blockchain",
  "sp-consensus",
  "sp-consensus-babe",
  "sp-consensus-slots",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-inherents",
  "sp-keystore",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "substrate-prometheus-endpoint",
  "thiserror",
 ]
@@ -8127,13 +8127,13 @@ dependencies = [
  "sc-rpc-api",
  "serde",
  "sp-api",
- "sp-application-crypto 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-application-crypto",
  "sp-blockchain",
  "sp-consensus",
  "sp-consensus-babe",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-keystore",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "thiserror",
 ]
 
@@ -8147,7 +8147,7 @@ dependencies = [
  "sc-client-api",
  "sc-consensus",
  "sp-blockchain",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
 ]
 
 [[package]]
@@ -8179,14 +8179,14 @@ dependencies = [
  "sc-utils",
  "serde_json",
  "sp-api",
- "sp-application-crypto 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-arithmetic 16.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-application-crypto",
+ "sp-arithmetic",
  "sp-blockchain",
  "sp-consensus",
  "sp-consensus-grandpa",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-keystore",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "substrate-prometheus-endpoint",
  "thiserror",
 ]
@@ -8206,8 +8206,8 @@ dependencies = [
  "sc-rpc",
  "serde",
  "sp-blockchain",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
  "thiserror",
 ]
 
@@ -8224,13 +8224,13 @@ dependencies = [
  "sc-client-api",
  "sc-consensus",
  "sc-telemetry",
- "sp-arithmetic 16.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-arithmetic",
  "sp-blockchain",
  "sp-consensus",
  "sp-consensus-slots",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-inherents",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-state-machine",
 ]
 
@@ -8245,14 +8245,14 @@ dependencies = [
  "sc-executor-wasmtime",
  "schnellru",
  "sp-api",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-externalities 0.19.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-externalities",
+ "sp-io",
  "sp-panic-handler",
- "sp-runtime-interface 17.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime-interface",
  "sp-trie",
  "sp-version",
- "sp-wasm-interface 14.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-wasm-interface",
  "tracing",
 ]
 
@@ -8263,7 +8263,7 @@ source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-
 dependencies = [
  "sc-allocator",
  "sp-maybe-compressed-blob",
- "sp-wasm-interface 14.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-wasm-interface",
  "thiserror",
  "wasm-instrument 0.3.0",
 ]
@@ -8280,8 +8280,8 @@ dependencies = [
  "rustix 0.36.15",
  "sc-allocator",
  "sc-executor-common",
- "sp-runtime-interface 17.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-wasm-interface 14.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime-interface",
+ "sp-wasm-interface",
  "wasmtime",
 ]
 
@@ -8298,7 +8298,7 @@ dependencies = [
  "sc-network",
  "sc-network-common",
  "sp-blockchain",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
 ]
 
 [[package]]
@@ -8309,8 +8309,8 @@ dependencies = [
  "array-bytes",
  "parking_lot 0.12.1",
  "serde_json",
- "sp-application-crypto 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-application-crypto",
+ "sp-core",
  "sp-keystore",
  "thiserror",
 ]
@@ -8345,10 +8345,10 @@ dependencies = [
  "serde",
  "serde_json",
  "smallvec",
- "sp-arithmetic 16.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-arithmetic",
  "sp-blockchain",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
  "substrate-prometheus-endpoint",
  "thiserror",
  "unsigned-varint",
@@ -8371,7 +8371,7 @@ dependencies = [
  "sc-client-api",
  "sc-network",
  "sp-blockchain",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "thiserror",
  "unsigned-varint",
 ]
@@ -8390,7 +8390,7 @@ dependencies = [
  "sc-consensus",
  "sp-consensus",
  "sp-consensus-grandpa",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
 ]
 
 [[package]]
@@ -8406,7 +8406,7 @@ dependencies = [
  "sc-network",
  "sc-network-common",
  "schnellru",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "substrate-prometheus-endpoint",
  "tracing",
 ]
@@ -8427,8 +8427,8 @@ dependencies = [
  "sc-client-api",
  "sc-network",
  "sp-blockchain",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
  "thiserror",
 ]
 
@@ -8474,12 +8474,12 @@ dependencies = [
  "sc-utils",
  "schnellru",
  "smallvec",
- "sp-arithmetic 16.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-arithmetic",
  "sp-blockchain",
  "sp-consensus",
  "sp-consensus-grandpa",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
  "substrate-prometheus-endpoint",
  "thiserror",
 ]
@@ -8498,7 +8498,7 @@ dependencies = [
  "sc-network-common",
  "sc-utils",
  "sp-consensus",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "substrate-prometheus-endpoint",
 ]
 
@@ -8527,11 +8527,11 @@ dependencies = [
  "sc-transaction-pool-api",
  "sc-utils",
  "sp-api",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-externalities 0.19.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-externalities",
  "sp-keystore",
  "sp-offchain",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "threadpool",
  "tracing",
 ]
@@ -8565,11 +8565,11 @@ dependencies = [
  "serde_json",
  "sp-api",
  "sp-blockchain",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-keystore",
  "sp-offchain",
  "sp-rpc",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-session",
  "sp-statement-store",
  "sp-version",
@@ -8588,9 +8588,9 @@ dependencies = [
  "scale-info",
  "serde",
  "serde_json",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-rpc",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-version",
  "thiserror",
 ]
@@ -8629,8 +8629,8 @@ dependencies = [
  "serde",
  "sp-api",
  "sp-blockchain",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
  "sp-version",
  "thiserror",
  "tokio-stream",
@@ -8680,13 +8680,13 @@ dependencies = [
  "sp-api",
  "sp-blockchain",
  "sp-consensus",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-externalities 0.19.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-externalities",
  "sp-keystore",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-session",
  "sp-state-machine",
- "sp-storage 13.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-storage",
  "sp-transaction-pool",
  "sp-transaction-storage-proof",
  "sp-trie",
@@ -8724,12 +8724,12 @@ dependencies = [
  "sp-api",
  "sp-blockchain",
  "sp-consensus",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
  "sp-state-machine",
- "sp-storage 13.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-tracing 10.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-storage",
+ "sp-tracing",
  "sp-trie",
  "substrate-test-runtime",
  "substrate-test-runtime-client",
@@ -8745,7 +8745,7 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "parking_lot 0.12.1",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
 ]
 
 [[package]]
@@ -8759,8 +8759,8 @@ dependencies = [
  "sc-client-api",
  "sp-api",
  "sp-blockchain",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
  "sp-statement-store",
  "substrate-prometheus-endpoint",
  "tokio",
@@ -8775,7 +8775,7 @@ dependencies = [
  "fs4",
  "log",
  "sc-client-db",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "thiserror",
  "tokio",
 ]
@@ -8795,7 +8795,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sp-blockchain",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "thiserror",
 ]
 
@@ -8813,9 +8813,9 @@ dependencies = [
  "sc-telemetry",
  "serde",
  "serde_json",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-std",
 ]
 
 [[package]]
@@ -8856,10 +8856,10 @@ dependencies = [
  "serde",
  "sp-api",
  "sp-blockchain",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-rpc",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-tracing 10.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-tracing",
  "thiserror",
  "tracing",
  "tracing-log",
@@ -8895,9 +8895,9 @@ dependencies = [
  "serde",
  "sp-api",
  "sp-blockchain",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-tracing 10.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
+ "sp-tracing",
  "sp-transaction-pool",
  "substrate-prometheus-endpoint",
  "thiserror",
@@ -8914,8 +8914,8 @@ dependencies = [
  "parity-scale-codec",
  "serde",
  "sp-blockchain",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
  "thiserror",
 ]
 
@@ -8931,7 +8931,7 @@ dependencies = [
  "log",
  "parking_lot 0.12.1",
  "prometheus",
- "sp-arithmetic 16.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-arithmetic",
 ]
 
 [[package]]
@@ -9417,12 +9417,12 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "sp-api-proc-macro",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-externalities 0.19.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-externalities",
  "sp-metadata-ir",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-state-machine",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
  "sp-trie",
  "sp-version",
  "thiserror",
@@ -9450,21 +9450,9 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
-]
-
-[[package]]
-name = "sp-application-crypto"
-version = "23.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
-dependencies = [
- "parity-scale-codec",
- "scale-info",
- "sp-core 21.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-io",
+ "sp-std",
 ]
 
 [[package]]
@@ -9477,20 +9465,7 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "static_assertions",
-]
-
-[[package]]
-name = "sp-arithmetic"
-version = "16.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
-dependencies = [
- "integer-sqrt",
- "num-traits",
- "parity-scale-codec",
- "scale-info",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
+ "sp-std",
  "static_assertions",
 ]
 
@@ -9502,9 +9477,9 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "sp-api",
- "sp-application-crypto 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-application-crypto",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -9514,8 +9489,8 @@ source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-
 dependencies = [
  "sp-api",
  "sp-inherents",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -9531,7 +9506,7 @@ dependencies = [
  "sp-api",
  "sp-consensus",
  "sp-database",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-state-machine",
  "thiserror",
 ]
@@ -9544,9 +9519,9 @@ dependencies = [
  "async-trait",
  "futures",
  "log",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-inherents",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-state-machine",
  "thiserror",
 ]
@@ -9560,11 +9535,11 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "sp-api",
- "sp-application-crypto 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-application-crypto",
  "sp-consensus-slots",
  "sp-inherents",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
  "sp-timestamp",
 ]
 
@@ -9578,12 +9553,12 @@ dependencies = [
  "scale-info",
  "serde",
  "sp-api",
- "sp-application-crypto 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-application-crypto",
  "sp-consensus-slots",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-inherents",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
  "sp-timestamp",
 ]
 
@@ -9598,11 +9573,11 @@ dependencies = [
  "scale-info",
  "serde",
  "sp-api",
- "sp-application-crypto 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-application-crypto",
+ "sp-core",
  "sp-keystore",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -9613,7 +9588,7 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
  "sp-timestamp",
 ]
 
@@ -9649,41 +9624,16 @@ dependencies = [
  "secrecy",
  "serde",
  "sp-core-hashing",
- "sp-debug-derive 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-externalities 0.19.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime-interface 17.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-storage 13.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-debug-derive",
+ "sp-externalities",
+ "sp-runtime-interface",
+ "sp-std",
+ "sp-storage",
  "ss58-registry",
  "substrate-bip39",
  "thiserror",
  "tiny-bip39",
  "tracing",
- "zeroize",
-]
-
-[[package]]
-name = "sp-core"
-version = "21.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
-dependencies = [
- "bitflags 1.3.2",
- "bounded-collections",
- "hash-db",
- "hash256-std-hasher",
- "log",
- "merlin",
- "parity-scale-codec",
- "paste",
- "primitive-types",
- "scale-info",
- "schnorrkel",
- "secrecy",
- "sp-debug-derive 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-runtime-interface 17.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-storage 13.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "ss58-registry",
  "zeroize",
 ]
 
@@ -9730,35 +9680,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "sp-debug-derive"
-version = "8.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.29",
-]
-
-[[package]]
 name = "sp-externalities"
 version = "0.19.0"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
 dependencies = [
  "environmental",
  "parity-scale-codec",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-storage 13.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
-]
-
-[[package]]
-name = "sp-externalities"
-version = "0.19.0"
-source = "git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
-dependencies = [
- "environmental",
- "parity-scale-codec",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-storage 13.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
+ "sp-std",
+ "sp-storage",
 ]
 
 [[package]]
@@ -9770,8 +9699,8 @@ dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
  "scale-info",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
  "thiserror",
 ]
 
@@ -9788,31 +9717,14 @@ dependencies = [
  "parity-scale-codec",
  "rustversion",
  "secp256k1",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-externalities 0.19.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-externalities",
  "sp-keystore",
- "sp-runtime-interface 17.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime-interface",
  "sp-state-machine",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-tracing 10.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
+ "sp-tracing",
  "sp-trie",
- "tracing",
- "tracing-core",
-]
-
-[[package]]
-name = "sp-io"
-version = "23.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
-dependencies = [
- "bytes",
- "parity-scale-codec",
- "rustversion",
- "sp-core 21.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-externalities 0.19.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-runtime-interface 17.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-tracing 10.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
  "tracing",
  "tracing-core",
 ]
@@ -9823,8 +9735,8 @@ version = "24.0.0"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
 dependencies = [
  "lazy_static",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
  "strum",
 ]
 
@@ -9835,8 +9747,8 @@ source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-
 dependencies = [
  "parity-scale-codec",
  "parking_lot 0.12.1",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-externalities 0.19.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-externalities",
  "thiserror",
 ]
 
@@ -9857,7 +9769,7 @@ dependencies = [
  "frame-metadata",
  "parity-scale-codec",
  "scale-info",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
 ]
 
 [[package]]
@@ -9871,10 +9783,10 @@ dependencies = [
  "scale-info",
  "serde",
  "sp-api",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-debug-derive 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-debug-derive",
+ "sp-runtime",
+ "sp-std",
  "thiserror",
 ]
 
@@ -9886,10 +9798,10 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
- "sp-arithmetic 16.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-arithmetic",
+ "sp-core",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -9898,8 +9810,8 @@ version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
 dependencies = [
  "sp-api",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
 ]
 
 [[package]]
@@ -9919,7 +9831,7 @@ source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-
 dependencies = [
  "rustc-hash",
  "serde",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
 ]
 
 [[package]]
@@ -9936,32 +9848,12 @@ dependencies = [
  "rand 0.8.5",
  "scale-info",
  "serde",
- "sp-application-crypto 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-arithmetic 16.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-weights 20.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
-]
-
-[[package]]
-name = "sp-runtime"
-version = "24.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
-dependencies = [
- "either",
- "hash256-std-hasher",
- "impl-trait-for-tuples",
- "log",
- "parity-scale-codec",
- "paste",
- "scale-info",
- "sp-application-crypto 23.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-arithmetic 16.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-core 21.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-io 23.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-weights 20.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
+ "sp-application-crypto",
+ "sp-arithmetic",
+ "sp-core",
+ "sp-io",
+ "sp-std",
+ "sp-weights",
 ]
 
 [[package]]
@@ -9973,30 +9865,12 @@ dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
  "primitive-types",
- "sp-externalities 0.19.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime-interface-proc-macro 11.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-storage 13.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-tracing 10.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-wasm-interface 14.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "static_assertions",
-]
-
-[[package]]
-name = "sp-runtime-interface"
-version = "17.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
-dependencies = [
- "bytes",
- "impl-trait-for-tuples",
- "parity-scale-codec",
- "primitive-types",
- "sp-externalities 0.19.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-runtime-interface-proc-macro 11.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-storage 13.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-tracing 10.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-wasm-interface 14.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
+ "sp-externalities",
+ "sp-runtime-interface-proc-macro",
+ "sp-std",
+ "sp-storage",
+ "sp-tracing",
+ "sp-wasm-interface",
  "static_assertions",
 ]
 
@@ -10004,18 +9878,6 @@ dependencies = [
 name = "sp-runtime-interface-proc-macro"
 version = "11.0.0"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
-dependencies = [
- "Inflector",
- "proc-macro-crate",
- "proc-macro2",
- "quote",
- "syn 2.0.29",
-]
-
-[[package]]
-name = "sp-runtime-interface-proc-macro"
-version = "11.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
 dependencies = [
  "Inflector",
  "proc-macro-crate",
@@ -10032,11 +9894,11 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "sp-api",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-keystore",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-staking",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
 ]
 
 [[package]]
@@ -10048,9 +9910,9 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -10064,10 +9926,10 @@ dependencies = [
  "parking_lot 0.12.1",
  "rand 0.8.5",
  "smallvec",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-externalities 0.19.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-externalities",
  "sp-panic-handler",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
  "sp-trie",
  "thiserror",
  "tracing",
@@ -10082,12 +9944,12 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "sp-api",
- "sp-application-crypto 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-externalities 0.19.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime-interface 17.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-application-crypto",
+ "sp-core",
+ "sp-externalities",
+ "sp-runtime",
+ "sp-runtime-interface",
+ "sp-std",
  "thiserror",
 ]
 
@@ -10095,11 +9957,6 @@ dependencies = [
 name = "sp-std"
 version = "8.0.0"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
-
-[[package]]
-name = "sp-std"
-version = "8.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
 
 [[package]]
 name = "sp-storage"
@@ -10110,19 +9967,8 @@ dependencies = [
  "parity-scale-codec",
  "ref-cast",
  "serde",
- "sp-debug-derive 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
-]
-
-[[package]]
-name = "sp-storage"
-version = "13.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
-dependencies = [
- "parity-scale-codec",
- "ref-cast",
- "sp-debug-derive 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
+ "sp-debug-derive",
+ "sp-std",
 ]
 
 [[package]]
@@ -10133,8 +9979,8 @@ dependencies = [
  "async-trait",
  "parity-scale-codec",
  "sp-inherents",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
  "thiserror",
 ]
 
@@ -10144,21 +9990,10 @@ version = "10.0.0"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
 dependencies = [
  "parity-scale-codec",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
  "tracing",
  "tracing-core",
  "tracing-subscriber",
-]
-
-[[package]]
-name = "sp-tracing"
-version = "10.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
-dependencies = [
- "parity-scale-codec",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "tracing",
- "tracing-core",
 ]
 
 [[package]]
@@ -10167,7 +10002,7 @@ version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
 dependencies = [
  "sp-api",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
 ]
 
 [[package]]
@@ -10178,10 +10013,10 @@ dependencies = [
  "async-trait",
  "parity-scale-codec",
  "scale-info",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-inherents",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
  "sp-trie",
 ]
 
@@ -10200,8 +10035,8 @@ dependencies = [
  "parking_lot 0.12.1",
  "scale-info",
  "schnellru",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-std",
  "thiserror",
  "tracing",
  "trie-db",
@@ -10219,8 +10054,8 @@ dependencies = [
  "scale-info",
  "serde",
  "sp-core-hashing-proc-macro",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
+ "sp-std",
  "sp-version-proc-macro",
  "thiserror",
 ]
@@ -10245,18 +10080,8 @@ dependencies = [
  "impl-trait-for-tuples",
  "log",
  "parity-scale-codec",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
  "wasmtime",
-]
-
-[[package]]
-name = "sp-wasm-interface"
-version = "14.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
-dependencies = [
- "impl-trait-for-tuples",
- "parity-scale-codec",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
 ]
 
 [[package]]
@@ -10268,24 +10093,10 @@ dependencies = [
  "scale-info",
  "serde",
  "smallvec",
- "sp-arithmetic 16.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-debug-derive 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
-]
-
-[[package]]
-name = "sp-weights"
-version = "20.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
-dependencies = [
- "parity-scale-codec",
- "scale-info",
- "smallvec",
- "sp-arithmetic 16.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-core 21.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-debug-derive 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
+ "sp-arithmetic",
+ "sp-core",
+ "sp-debug-derive",
+ "sp-std",
 ]
 
 [[package]]
@@ -10475,8 +10286,8 @@ dependencies = [
  "frame-support",
  "frame-system",
  "sc-cli",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
 ]
 
 [[package]]
@@ -10494,8 +10305,8 @@ dependencies = [
  "sp-api",
  "sp-block-builder",
  "sp-blockchain",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
 ]
 
 [[package]]
@@ -10520,7 +10331,7 @@ dependencies = [
  "log",
  "sc-rpc-api",
  "serde",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
 ]
 
 [[package]]
@@ -10533,8 +10344,8 @@ dependencies = [
  "sc-client-api",
  "sc-rpc-api",
  "serde",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
  "sp-state-machine",
  "sp-trie",
  "trie-db",
@@ -10559,10 +10370,10 @@ dependencies = [
  "serde_json",
  "sp-blockchain",
  "sp-consensus",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
  "sp-keyring",
  "sp-keystore",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-state-machine",
 ]
 
@@ -10584,21 +10395,21 @@ dependencies = [
  "sc-service",
  "scale-info",
  "sp-api",
- "sp-application-crypto 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-application-crypto",
  "sp-block-builder",
  "sp-consensus-aura",
  "sp-consensus-babe",
  "sp-consensus-grandpa",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-externalities 0.19.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-externalities",
  "sp-inherents",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-io",
  "sp-keyring",
  "sp-offchain",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-session",
  "sp-state-machine",
- "sp-std 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-std",
  "sp-transaction-pool",
  "sp-trie",
  "sp-version",
@@ -10618,8 +10429,8 @@ dependencies = [
  "sp-api",
  "sp-blockchain",
  "sp-consensus",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-runtime",
  "substrate-test-client",
  "substrate-test-runtime",
 ]
@@ -11248,19 +11059,19 @@ dependencies = [
  "sp-api",
  "sp-consensus-aura",
  "sp-consensus-babe",
- "sp-core 21.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-debug-derive 8.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
- "sp-externalities 0.19.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-core",
+ "sp-debug-derive",
+ "sp-externalities",
  "sp-inherents",
- "sp-io 23.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-io",
  "sp-keystore",
  "sp-rpc",
- "sp-runtime 24.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-runtime",
  "sp-state-machine",
  "sp-timestamp",
  "sp-transaction-storage-proof",
  "sp-version",
- "sp-weights 20.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0)",
+ "sp-weights",
  "substrate-rpc-client",
  "zstd 0.12.4",
 ]
