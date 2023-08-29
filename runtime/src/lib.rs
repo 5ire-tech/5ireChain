@@ -114,6 +114,8 @@ mod voter_bags;
 /// Runtime API definition for assets.
 pub mod assets_api;
 
+pub use pallet_esg;
+
 // Make the WASM binary available.
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
@@ -550,6 +552,9 @@ impl pallet_session::Config for Runtime {
 	type SessionHandler = <SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
 	type Keys = SessionKeys;
 	type WeightInfo = pallet_session::weights::SubstrateWeight<Runtime>;
+	type AllSessionHandler = <SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
+	type DataProvider = Staking;
+	type TargetsBound = MaxOnChainElectableTargets;
 }
 
 impl pallet_session::historical::Config for Runtime {
@@ -618,6 +623,8 @@ impl pallet_staking::Config for Runtime {
 	type EventListeners = NominationPools;
 	type WeightInfo = pallet_staking::weights::SubstrateWeight<Runtime>;
 	type BenchmarkingConfig = StakingBenchmarkingConfig;
+	type ESG = EsgScore;
+	type Reliability = ImOnline;
 }
 
 impl pallet_fast_unstake::Config for Runtime {
@@ -1352,6 +1359,8 @@ impl pallet_im_online::Config for Runtime {
 	type WeightInfo = pallet_im_online::weights::SubstrateWeight<Runtime>;
 	type MaxKeys = MaxKeys;
 	type MaxPeerInHeartbeats = MaxPeerInHeartbeats;
+	type DataProvider = Staking;
+	type TargetsBound = MaxOnChainElectableTargets;
 }
 
 impl pallet_offences::Config for Runtime {
@@ -1882,6 +1891,12 @@ impl pallet_statement::Config for Runtime {
 	type MaxAllowedBytes = MaxAllowedBytes;
 }
 
+impl pallet_esg::Config for Runtime {
+	type RuntimeEvent = RuntimeEvent;
+	type MaxFileSize = ConstU32<1024000>;
+	type WeightInfo = pallet_esg::weights::SubstrateWeight<Runtime>;
+}
+
 construct_runtime!(
 	pub struct Runtime
 	{
@@ -1955,6 +1970,7 @@ construct_runtime!(
 		MessageQueue: pallet_message_queue,
 		Pov: frame_benchmarking_pallet_pov,
 		Statement: pallet_statement,
+		EsgScore: pallet_esg,
 	}
 );
 
