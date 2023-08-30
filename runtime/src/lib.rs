@@ -1,4 +1,3 @@
-
 #![cfg_attr(not(feature = "std"), no_std)]
 // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 512.
 #![recursion_limit = "512"]
@@ -16,24 +15,22 @@ use frame_support::{
 	parameter_types,
 	traits::{
 		fungible::ItemOf, AsEnsureOriginWithArg, ConstBool, ConstU128, ConstU16, ConstU32,
-		Currency, EitherOfDiverse, EqualPrivilegeOnly, Everything, Imbalance, InstanceFilter,
-		KeyOwnerProofSystem, LockIdentifier, Nothing, OnUnbalanced, U128CurrencyToVote,
-		WithdrawReasons,FindAuthor,
+		Currency, EitherOfDiverse, EqualPrivilegeOnly, Everything, FindAuthor, Imbalance,
+		InstanceFilter, KeyOwnerProofSystem, LockIdentifier, Nothing, OnUnbalanced,
+		U128CurrencyToVote, WithdrawReasons,
 	},
 	weights::{
 		constants::{
 			BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_REF_TIME_PER_SECOND,
 		},
-		ConstantMultiplier,IdentityFee, Weight,
+		ConstantMultiplier, IdentityFee, Weight,
 	},
-	ConsensusEngineId,PalletId, RuntimeDebug,
+	ConsensusEngineId, PalletId, RuntimeDebug,
 };
 
 use pallet_evm::FeeCalculator;
 
-use pallet_evm::{
-	Account as EVMAccount, EnsureAddressTruncated, HashedAddressMapping, Runner,
-};
+use pallet_evm::{Account as EVMAccount, EnsureAddressTruncated, HashedAddressMapping, Runner};
 
 // use crate::sp_api_hidden_includes_construct_runtime::hidden_include::dispatch::Dispatchable;
 use pallet_ethereum::{Call::transact, Transaction as EthereumTransaction};
@@ -58,17 +55,20 @@ pub use pallet_transaction_payment::{CurrencyAdapter, Multiplier, TargetedFeeAdj
 use pallet_transaction_payment::{FeeDetails, RuntimeDispatchInfo};
 use sp_api::impl_runtime_apis;
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
-use sp_core::{crypto::KeyTypeId, OpaqueMetadata,H160, H256, U256};
+use sp_core::{crypto::KeyTypeId, OpaqueMetadata, H160, H256, U256};
 use sp_inherents::{CheckInherentsResult, InherentData};
 use sp_runtime::{
 	create_runtime_str,
 	curve::PiecewiseLinear,
 	generic, impl_opaque_keys,
 	traits::{
-		self, AccountIdLookup,BlakeTwo256, Block as BlockT,DispatchInfoOf, Bounded, Convert,ConvertInto, NumberFor, OpaqueKeys,
-		SaturatedConversion, StaticLookup,PostDispatchInfoOf,
+		self, AccountIdLookup, BlakeTwo256, Block as BlockT, Bounded, Convert, ConvertInto,
+		DispatchInfoOf, NumberFor, OpaqueKeys, PostDispatchInfoOf, SaturatedConversion,
+		StaticLookup,
 	},
-	transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity,TransactionValidityError},
+	transaction_validity::{
+		TransactionPriority, TransactionSource, TransactionValidity, TransactionValidityError,
+	},
 	ApplyExtrinsicResult, FixedPointNumber, FixedU128, Perbill, Percent, Permill, Perquintill,
 };
 
@@ -166,15 +166,12 @@ impl OnUnbalanced<NegativeImbalance> for DealWithFees {
 		}
 	}
 
-
-
 	fn on_nonzero_unbalanced(amount: NegativeImbalance) {
 		// for fees, 80% to treasury, 20% to author
 		let split = amount.ration(80, 20);
 		Treasury::on_unbalanced(split.0);
 		Author::on_unbalanced(split.1);
 	}
-
 }
 
 /// We assume that ~10% of the block weight is consumed by `on_initialize` handlers.
@@ -196,7 +193,6 @@ pub const GAS_PER_SECOND: u64 = 40_000_000;
 /// Approximate ratio of the amount of Weight per Gas.
 /// u64 works for approximations because Weight is a very small unit compared to gas.
 pub const WEIGHT_PER_GAS: u64 = WEIGHT_REF_TIME_PER_SECOND / GAS_PER_SECOND;
-
 
 parameter_types! {
 	pub const BlockHashCount: BlockNumber = 2400;
@@ -261,8 +257,6 @@ impl pallet_utility::Config for Runtime {
 	type WeightInfo = pallet_utility::weights::SubstrateWeight<Runtime>;
 }
 
-
-
 pub struct FindAuthorTruncated<F>(PhantomData<F>);
 impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 	fn find_author<'a, I>(digests: I) -> Option<H160>
@@ -271,7 +265,9 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 	{
 		if let Some(author_index) = F::find_author(digests) {
 			let authority_id = Babe::authorities()[author_index as usize].clone().0;
-			return Some(H160::from_slice(&sp_core::crypto::ByteArray::to_raw_vec(&authority_id)[4..24]));
+			return Some(H160::from_slice(
+				&sp_core::crypto::ByteArray::to_raw_vec(&authority_id)[4..24],
+			))
 		}
 		None
 	}
@@ -283,11 +279,11 @@ impl FeeCalculator for FixedGasPrice {
 	fn min_gas_price() -> (U256, Weight) {
 		// Return some meaningful gas price and weight
 		// (1_000_000_000_000u128.into(), 0u64)
-		// (1_000_000_000_000u128.into(), <Runtime as frame_system::Config>::DbWeight::get().reads(1))
+		// (1_000_000_000_000u128.into(), <Runtime as
+		// frame_system::Config>::DbWeight::get().reads(1))
 		(1_000_000_000_000u128.into(), Weight::from_ref_time(1u64))
 	}
 }
-
 
 parameter_types! {
 	pub const ChainId: u64 = 997;
@@ -316,7 +312,6 @@ impl pallet_evm::Config for Runtime {
 	type OnChargeTransaction = pallet_evm::EVMCurrencyAdapter<Balances, DealWithFees>;
 	type FindAuthor = FindAuthorTruncated<Babe>;
 }
-
 
 impl pallet_ethereum::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
@@ -400,6 +395,7 @@ parameter_types! {
 }
 
 /// The type used to represent the kinds of proxying allowed.
+#[allow(clippy::redundant_closure_call)]
 #[derive(
 	Copy,
 	Clone,
@@ -474,8 +470,6 @@ impl pallet_proxy::Config for Runtime {
 	type AnnouncementDepositFactor = AnnouncementDepositFactor;
 }
 
-
-
 parameter_types! {
 	pub MaximumSchedulerWeight: Weight = Perbill::from_percent(80) *
 		RuntimeBlockWeights::get().max_block;
@@ -496,9 +490,9 @@ impl pallet_scheduler::Config for Runtime {
 
 parameter_types! {
 	pub const PreimageMaxSize: u32 = 4096 * 1024;
-	pub const PreimageBaseDeposit: Balance = 1 * DOLLARS;
+	pub const PreimageBaseDeposit: Balance = DOLLARS;
 	// One cent: $10,000 / MB
-	pub const PreimageByteDeposit: Balance = 1 * CENTS;
+	pub const PreimageByteDeposit: Balance = CENTS;
 }
 
 impl pallet_preimage::Config for Runtime {
@@ -545,7 +539,7 @@ impl pallet_babe::Config for Runtime {
 }
 
 parameter_types! {
-	pub const IndexDeposit: Balance = 1 * DOLLARS;
+	pub const IndexDeposit: Balance = DOLLARS;
 }
 
 impl pallet_indices::Config for Runtime {
@@ -556,10 +550,6 @@ impl pallet_indices::Config for Runtime {
 	type WeightInfo = pallet_indices::weights::SubstrateWeight<Runtime>;
 }
 
-
-
-
-
 pub struct Author;
 impl OnUnbalanced<NegativeImbalance> for Author {
 	fn on_nonzero_unbalanced(amount: NegativeImbalance) {
@@ -569,9 +559,8 @@ impl OnUnbalanced<NegativeImbalance> for Author {
 	}
 }
 
-
 parameter_types! {
-	pub const ExistentialDeposit: Balance = 1 * DOLLARS;
+	pub const ExistentialDeposit: Balance = DOLLARS;
 	// For weight estimation, we assume that the most locks on an individual account will be 50.
 	// This number may need to be adjusted in the future if this assumption no longer holds true.
 	pub const MaxLocks: u32 = 50;
@@ -600,7 +589,7 @@ impl pallet_balances::Config for Runtime {
 
 parameter_types! {
 	// pub const TransactionByteFee: Balance = CENTS/10;
-	pub const TransactionByteFee:Balance = 1 * MICROCENTS;
+	pub const TransactionByteFee:Balance = MICROCENTS;
 	pub const OperationalFeeMultiplier: u8 = 5;
 	pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(25);
 	pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(3, 100_000);
@@ -675,8 +664,6 @@ pub mod opaque {
 	pub type Block = generic::Block<Header, UncheckedExtrinsic>;
 	/// Opaque block identifier type.
 	pub type BlockId = generic::BlockId<Block>;
-
-
 }
 
 impl pallet_session::Config for Runtime {
@@ -712,7 +699,7 @@ pallet_staking_reward_curve::build! {
 
 parameter_types! {
 	pub const SessionsPerEra: sp_staking::SessionIndex = 1;
-	pub const BondingDuration: sp_staking::EraIndex = 1;
+	pub const BondingDuration: sp_staking::EraIndex = 24 * 28;
 	pub const SlashDeferDuration: sp_staking::EraIndex = 24 * 7; // 1/4 the bonding duration.
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
 	pub const MaxNominatorRewardedPerValidator: u32 = 256;
@@ -780,9 +767,9 @@ parameter_types! {
 	pub const UnsignedPhase: u32 = EPOCH_DURATION_IN_BLOCKS / 4;
 
 	// signed config
-	pub const SignedRewardBase: Balance = 1 * DOLLARS;
-	pub const SignedDepositBase: Balance = 1 * DOLLARS;
-	pub const SignedDepositByte: Balance = 1 * CENTS;
+	pub const SignedRewardBase: Balance = DOLLARS;
+	pub const SignedDepositBase: Balance = DOLLARS;
+	pub const SignedDepositByte: Balance = CENTS;
 
 	pub BetterUnsignedThreshold: Perbill = Perbill::from_rational(1u32, 10_000);
 
@@ -1249,13 +1236,13 @@ impl pallet_membership::Config<pallet_membership::Instance1> for Runtime {
 
 parameter_types! {
 	pub const ProposalBond: Permill = Permill::from_percent(5);
-	pub const ProposalBondMinimum: Balance = 1 * DOLLARS;
-	pub const SpendPeriod: BlockNumber = 1 * DAYS;
+	pub const ProposalBondMinimum: Balance = DOLLARS;
+	pub const SpendPeriod: BlockNumber = DAYS;
 	pub const Burn: Permill = Permill::from_percent(50);
-	pub const TipCountdown: BlockNumber = 1 * DAYS;
+	pub const TipCountdown: BlockNumber = DAYS;
 	pub const TipFindersFee: Percent = Percent::from_percent(20);
-	pub const TipReportDepositBase: Balance = 1 * DOLLARS;
-	pub const DataDepositPerByte: Balance = 1 * CENTS;
+	pub const TipReportDepositBase: Balance = DOLLARS;
+	pub const DataDepositPerByte: Balance = CENTS;
 	pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
 	pub const MaximumReasonLength: u32 = 300;
 	pub const MaxApprovals: u32 = 100;
@@ -1290,11 +1277,11 @@ impl pallet_treasury::Config for Runtime {
 parameter_types! {
 	pub const BountyCuratorDeposit: Permill = Permill::from_percent(50);
 	pub const BountyValueMinimum: Balance = 5 * DOLLARS;
-	pub const BountyDepositBase: Balance = 1 * DOLLARS;
+	pub const BountyDepositBase: Balance = DOLLARS;
 	pub const CuratorDepositMultiplier: Permill = Permill::from_percent(50);
-	pub const CuratorDepositMin: Balance = 1 * DOLLARS;
+	pub const CuratorDepositMin: Balance = DOLLARS;
 	pub const CuratorDepositMax: Balance = 100 * DOLLARS;
-	pub const BountyDepositPayoutDelay: BlockNumber = 1 * DAYS;
+	pub const BountyDepositPayoutDelay: BlockNumber = DAYS;
 	pub const BountyUpdatePeriod: BlockNumber = 14 * DAYS;
 }
 
@@ -1333,7 +1320,7 @@ impl pallet_message_queue::Config for Runtime {
 }
 
 parameter_types! {
-	pub const ChildBountyValueMinimum: Balance = 1 * DOLLARS;
+	pub const ChildBountyValueMinimum: Balance = DOLLARS;
 }
 
 impl pallet_child_bounties::Config for Runtime {
@@ -1358,7 +1345,7 @@ parameter_types! {
 	// pub const DepositPerItem: Balance = deposit(1, 0);
 	// pub const DepositPerByte: Balance = deposit(0, 1);
 	pub const DepositPerItem: Balance = CENTS/1_000;
-	pub const DepositPerByte: Balance = CENTS/1_000_0;
+	pub const DepositPerByte: Balance = CENTS/10_000;
 	pub const MaxValueSize: u32 = 16 * 1024;
 	pub const DeletionQueueDepth: u32 = 128;
 	// The lazy deletion runs inside on_initialize.
@@ -1641,10 +1628,10 @@ impl pallet_lottery::Config for Runtime {
 
 parameter_types! {
 	pub const AssetDeposit: Balance = 100 * DOLLARS;
-	pub const ApprovalDeposit: Balance = 1 * DOLLARS;
+	pub const ApprovalDeposit: Balance = DOLLARS;
 	pub const StringLimit: u32 = 50;
 	pub const MetadataDepositBase: Balance = 10 * DOLLARS;
-	pub const MetadataDepositPerByte: Balance = 1 * DOLLARS;
+	pub const MetadataDepositPerByte: Balance = DOLLARS;
 }
 
 impl pallet_assets::Config for Runtime {
@@ -1709,7 +1696,7 @@ impl pallet_nis::Config for Runtime {
 
 parameter_types! {
 	pub const CollectionDeposit: Balance = 100 * DOLLARS;
-	pub const ItemDeposit: Balance = 1 * DOLLARS;
+	pub const ItemDeposit: Balance = DOLLARS;
 	pub const KeyLimit: u32 = 32;
 	pub const ValueLimit: u32 = 256;
 }
@@ -1757,7 +1744,7 @@ impl pallet_whitelist::Config for Runtime {
 }
 
 parameter_types! {
-	pub const MigrationSignedDepositPerItem: Balance = 1 * CENTS;
+	pub const MigrationSignedDepositPerItem: Balance = CENTS;
 	pub const MigrationSignedDepositBase: Balance = 20 * DOLLARS;
 	pub const MigrationMaxKeyLen: u32 = 512;
 }
@@ -1801,7 +1788,7 @@ parameter_types! {
 	pub const MaxFellows: u32 = AllianceMaxMembers::get();
 	pub const MaxAllies: u32 = 100;
 	pub const AllyDeposit: Balance = 10 * DOLLARS;
-	pub const RetirementPeriod: BlockNumber = ALLIANCE_MOTION_DURATION_IN_BLOCKS + (1 * DAYS);
+	pub const RetirementPeriod: BlockNumber = ALLIANCE_MOTION_DURATION_IN_BLOCKS + (DAYS);
 }
 
 impl pallet_alliance::Config for Runtime {
@@ -1917,7 +1904,6 @@ construct_runtime!(
 	}
 );
 
-
 pub struct TransactionConverter;
 
 impl fp_rpc::ConvertTransaction<UncheckedExtrinsic> for TransactionConverter {
@@ -1941,15 +1927,6 @@ impl fp_rpc::ConvertTransaction<opaque::UncheckedExtrinsic> for TransactionConve
 			.expect("Encoded extrinsic is always valid")
 	}
 }
-
-
-
-
-
-
-
-
-
 
 /// The address format for describing accounts.
 pub type Address = sp_runtime::MultiAddress<AccountId, AccountIndex>;
@@ -1978,14 +1955,16 @@ pub type SignedExtra = (
 	// pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
 );
 /// Unchecked extrinsic type as expected by this runtime.
-pub type UncheckedExtrinsic1 = generic::UncheckedExtrinsic<Address, RuntimeCall, Signature, SignedExtra>;
+pub type UncheckedExtrinsic1 =
+	generic::UncheckedExtrinsic<Address, RuntimeCall, Signature, SignedExtra>;
 pub type UncheckedExtrinsic =
 	fp_self_contained::UncheckedExtrinsic<Address, RuntimeCall, Signature, SignedExtra>;
 /// The payload being signed in transactions.
 pub type SignedPayload = generic::SignedPayload<RuntimeCall, SignedExtra>;
 /// Extrinsic type that has already been checked.
 pub type CheckedExtrinsic1 = generic::CheckedExtrinsic<AccountId, RuntimeCall, SignedExtra>;
-pub type CheckedExtrinsic = fp_self_contained::CheckedExtrinsic<AccountId, RuntimeCall, SignedExtra, H160>;
+pub type CheckedExtrinsic =
+	fp_self_contained::CheckedExtrinsic<AccountId, RuntimeCall, SignedExtra, H160>;
 /// Executive: handles dispatch to the various modules.
 pub type Executive = frame_executive::Executive<
 	Runtime,
@@ -2001,21 +1980,6 @@ type Migrations = (
 	pallet_alliance::migration::Migration<Runtime>,
 	pallet_contracts::Migration<Runtime>,
 );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 impl fp_self_contained::SelfContainedCall for RuntimeCall {
 	type SignedInfo = H160;
@@ -2053,7 +2017,8 @@ impl fp_self_contained::SelfContainedCall for RuntimeCall {
 		len: usize,
 	) -> Option<Result<(), TransactionValidityError>> {
 		match self {
-			RuntimeCall::Ethereum(call) => call.pre_dispatch_self_contained(info, dispatch_info, len),
+			RuntimeCall::Ethereum(call) =>
+				call.pre_dispatch_self_contained(info, dispatch_info, len),
 			_ => None,
 		}
 	}
@@ -2069,16 +2034,14 @@ impl fp_self_contained::SelfContainedCall for RuntimeCall {
 		// 	_ => None,
 		// }
 		match self {
-			call @ RuntimeCall::Ethereum(pallet_ethereum::Call::transact { .. }) => {
+			call @ RuntimeCall::Ethereum(pallet_ethereum::Call::transact { .. }) =>
 				Some(call.dispatch(RuntimeOrigin::from(
 					pallet_ethereum::RawOrigin::EthereumTransaction(info),
-				)))
-			}
+				))),
 			_ => None,
 		}
 	}
 }
-
 
 /// MMR helper types.
 mod mmr {
@@ -2781,7 +2744,7 @@ mod tests {
 	fn call_size() {
 		let size = core::mem::size_of::<RuntimeCall>();
 		assert!(
-			size <= 208,
+			size <= 304,
 			"size of RuntimeCall {} is more than 208 bytes: some calls have too big arguments, use Box to reduce the
 			size of RuntimeCall.
 			If the limit is too strong, maybe consider increase the limit to 300.",

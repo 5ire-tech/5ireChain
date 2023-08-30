@@ -31,10 +31,9 @@ use sp_runtime::{
 	traits::{BlakeTwo256, Block as BlockT, NumberFor, One, Saturating, UniqueSaturatedInto},
 };
 // Frontier
-use fc_rpc_core::{types::*, EthFilterApiServer};
-use fp_rpc::{TransactionStatus};
-use fp_rpc::EthereumRuntimeRPCApi;
 use crate::{eth::cache::EthBlockDataCacheTask, frontier_backend_client, internal_err};
+use fc_rpc_core::{types::*, EthFilterApiServer};
+use fp_rpc::{EthereumRuntimeRPCApi, TransactionStatus};
 
 pub struct EthFilter<B: BlockT, C, BE> {
 	client: Arc<C>,
@@ -81,7 +80,7 @@ where
 				return Err(internal_err(format!(
 					"Filter pool is full (limit {:?}).",
 					self.max_stored_filters
-				)));
+				)))
 			}
 			let last_key = match {
 				let mut iter = locked.iter();
@@ -140,15 +139,8 @@ where
 		// anonymous types) we collect all necessary data in this enum then have
 		// a single async block.
 		enum FuturePath<B: BlockT> {
-			Block {
-				last: u64,
-				next: u64,
-			},
-			Log {
-				filter: Filter,
-				from_number: NumberFor<B>,
-				current_number: NumberFor<B>,
-			},
+			Block { last: u64, next: u64 },
+			Log { filter: Filter, from_number: NumberFor<B>, current_number: NumberFor<B> },
 			Error(jsonrpsee::core::Error),
 		}
 
@@ -176,7 +168,7 @@ where
 						);
 
 						FuturePath::<B>::Block { last, next }
-					}
+					},
 					// For each event since last poll, get a vector of ethereum logs.
 					FilterType::Log(filter) => {
 						// Update filter `last_poll`.
@@ -202,11 +194,8 @@ where
 						}
 
 						// The from clause is the max(last_poll, filter_from).
-						let last_poll = pool_item
-							.last_poll
-							.to_min_block_num()
-							.unwrap()
-							.unique_saturated_into();
+						let last_poll =
+							pool_item.last_poll.to_min_block_num().unwrap().unique_saturated_into();
 
 						let filter_from = filter
 							.from_block
@@ -217,17 +206,13 @@ where
 						let from_number = std::cmp::max(last_poll, filter_from);
 
 						// Build the response.
-						FuturePath::Log {
-							filter: filter.clone(),
-							from_number,
-							current_number,
-						}
-					}
+						FuturePath::Log { filter: filter.clone(), from_number, current_number }
+					},
 					// Should never reach here.
 					_ => FuturePath::Error(internal_err("Method not available.")),
 				}
 			} else {
-				FuturePath::Error(internal_err(format!("Filter id {:?} does not exist.", key)))
+				FuturePath::Error(internal_err(format!("Filter id {key:?} does not exist.")))
 			}
 		} else {
 			FuturePath::Error(internal_err("Filter pool is not available."))
@@ -243,9 +228,9 @@ where
 				let mut ethereum_hashes: Vec<H256> = Vec::new();
 				for n in last..next {
 					let id = BlockId::Number(n.unique_saturated_into());
-					let substrate_hash = client.expect_block_hash_from_id(&id).map_err(|_| {
-						internal_err(format!("Expect block number from id: {}", id))
-					})?;
+					let substrate_hash = client
+						.expect_block_hash_from_id(&id)
+						.map_err(|_| internal_err(format!("Expect block number from id: {id}")))?;
 
 					let schema = frontier_backend_client::onchain_storage_schema::<B, C, BE>(
 						client.as_ref(),
@@ -258,12 +243,8 @@ where
 					}
 				}
 				Ok(FilterChanges::Hashes(ethereum_hashes))
-			}
-			FuturePath::Log {
-				filter,
-				from_number,
-				current_number,
-			} => {
+			},
+			FuturePath::Log { filter, from_number, current_number } => {
 				let mut ret: Vec<Log> = Vec::new();
 				let _ = filter_range_logs(
 					client.as_ref(),
@@ -277,7 +258,7 @@ where
 				.await?;
 
 				Ok(FilterChanges::Logs(ret))
-			}
+			},
 		}
 	}
 
@@ -288,20 +269,15 @@ where
 		// We want to get the filter, while releasing the pool lock outside
 		// of the async block.
 		let filter_result: Result<Filter> = (|| {
-			let pool = pool
-				.lock()
-				.map_err(|_| internal_err("Filter pool is not available."))?;
+			let pool = pool.lock().map_err(|_| internal_err("Filter pool is not available."))?;
 
 			let pool_item = pool
 				.get(&key)
-				.ok_or_else(|| internal_err(format!("Filter id {:?} does not exist.", key)))?;
+				.ok_or_else(|| internal_err(format!("Filter id {key:?} does not exist.")))?;
 
 			match &pool_item.filter_type {
 				FilterType::Log(filter) => Ok(filter.clone()),
-				_ => Err(internal_err(format!(
-					"Filter id {:?} is not a Log filter.",
-					key
-				))),
+				_ => Err(internal_err(format!("Filter id {key:?} is not a Log filter."))),
 			}
 		})();
 
@@ -350,7 +326,7 @@ where
 			if locked.remove(&key).is_some() {
 				Ok(true)
 			} else {
-				Err(internal_err(format!("Filter id {:?} does not exist.", key)))
+				Err(internal_err(format!("Filter id {key:?} does not exist.")))
 			}
 		} else {
 			Err(internal_err("Filter pool is not available."))
@@ -371,22 +347,21 @@ where
 				backend.as_ref(),
 				hash,
 			)
-			.map_err(|err| internal_err(format!("{:?}", err)))?
+			.map_err(|err| internal_err(format!("{err:?}")))?
 			{
 				Some(hash) => hash,
 				_ => return Ok(Vec::new()),
 			};
 			let substrate_hash = client
 				.expect_block_hash_from_id(&id)
-				.map_err(|_| internal_err(format!("Expect block number from id: {}", id)))?;
+				.map_err(|_| internal_err(format!("Expect block number from id: {id}")))?;
 
 			let schema =
 				frontier_backend_client::onchain_storage_schema::<B, C, BE>(client.as_ref(), id);
 
 			let block = block_data_cache.current_block(schema, substrate_hash).await;
-			let statuses = block_data_cache
-				.current_transaction_statuses(schema, substrate_hash)
-				.await;
+			let statuses =
+				block_data_cache.current_transaction_statuses(schema, substrate_hash).await;
 			if let (Some(block), Some(statuses)) = (block, statuses) {
 				filter_block_logs(&mut ret, &filter, block, statuses);
 			}
@@ -460,19 +435,18 @@ where
 		let id = BlockId::Number(current_number);
 		let substrate_hash = client
 			.expect_block_hash_from_id(&id)
-			.map_err(|_| internal_err(format!("Expect block number from id: {}", id)))?;
+			.map_err(|_| internal_err(format!("Expect block number from id: {id}")))?;
 
 		let schema = frontier_backend_client::onchain_storage_schema::<B, C, BE>(client, id);
 
 		let block = block_data_cache.current_block(schema, substrate_hash).await;
 
 		if let Some(block) = block {
-			if FilteredParams::address_in_bloom(block.header.logs_bloom, &address_bloom_filter)
-				&& FilteredParams::topics_in_bloom(block.header.logs_bloom, &topics_bloom_filter)
+			if FilteredParams::address_in_bloom(block.header.logs_bloom, &address_bloom_filter) &&
+				FilteredParams::topics_in_bloom(block.header.logs_bloom, &topics_bloom_filter)
 			{
-				let statuses = block_data_cache
-					.current_transaction_statuses(schema, substrate_hash)
-					.await;
+				let statuses =
+					block_data_cache.current_transaction_statuses(schema, substrate_hash).await;
 				if let Some(statuses) = statuses {
 					filter_block_logs(ret, filter, block, statuses);
 				}
@@ -480,19 +454,16 @@ where
 		}
 		// Check for restrictions
 		if ret.len() as u32 > max_past_logs {
-			return Err(internal_err(format!(
-				"query returned more than {} results",
-				max_past_logs
-			)));
+			return Err(internal_err(format!("query returned more than {max_past_logs} results")))
 		}
 		if begin_request.elapsed() > max_duration {
 			return Err(internal_err(format!(
 				"query timeout of {} seconds exceeded",
 				max_duration.as_secs()
-			)));
+			)))
 		}
 		if current_number == to {
-			break;
+			break
 		} else {
 			current_number = current_number.saturating_add(One::one());
 		}
@@ -532,18 +503,16 @@ fn filter_block_logs<'a>(
 					if !params.filter_address(&log) || !params.filter_topics(&log) {
 						add = false;
 					}
-				}
-				(Some(_), _) => {
+				},
+				(Some(_), _) =>
 					if !params.filter_address(&log) {
 						add = false;
-					}
-				}
-				(_, Some(_)) => {
+					},
+				(_, Some(_)) =>
 					if !params.filter_topics(&log) {
 						add = false;
-					}
-				}
-				_ => {}
+					},
+				_ => {},
 			}
 			if add {
 				log.block_hash = Some(block_hash);

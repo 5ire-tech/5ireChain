@@ -78,10 +78,7 @@ where
 
 		#[cfg(feature = "forbid-evm-reentrancy")]
 		if IN_EVM.with(|in_evm| in_evm.replace(true)) {
-			return Err(RunnerError {
-				error: Error::<T>::Reentrancy,
-				weight,
-			});
+			return Err(RunnerError { error: Error::<T>::Reentrancy, weight })
 		}
 
 		let res = Self::execute_inner(
@@ -138,10 +135,7 @@ where
 		// projects using Frontier can have stateful precompiles that can manage funds or
 		// which calls other contracts that expects this precompile address to be trustworthy.
 		if !<AccountCodes<T>>::get(source).is_empty() || precompiles.is_precompile(source) {
-			return Err(RunnerError {
-				error: Error::<T>::TransactionMustComeFromEOA,
-				weight,
-			});
+			return Err(RunnerError { error: Error::<T>::TransactionMustComeFromEOA, weight })
 		}
 
 		let (total_fee_per_gas, _actual_priority_fee_per_gas) =
@@ -154,44 +148,31 @@ where
 				// With tip, we include as much of the tip on top of base_fee that we can, never
 				// exceeding max_fee_per_gas
 				(Some(max_fee_per_gas), Some(max_priority_fee_per_gas), _) => {
-					let actual_priority_fee_per_gas = max_fee_per_gas
-						.saturating_sub(base_fee)
-						.min(max_priority_fee_per_gas);
+					let actual_priority_fee_per_gas =
+						max_fee_per_gas.saturating_sub(base_fee).min(max_priority_fee_per_gas);
 					(
 						base_fee.saturating_add(actual_priority_fee_per_gas),
 						actual_priority_fee_per_gas,
 					)
-				}
+				},
 				// Gas price check is skipped for non-transactional calls that don't
 				// define a `max_fee_per_gas` input.
 				(None, _, false) => (Default::default(), U256::zero()),
 				// Unreachable, previously validated. Handle gracefully.
-				_ => {
-					return Err(RunnerError {
-						error: Error::<T>::GasPriceTooLow,
-						weight,
-					})
-				}
+				_ => return Err(RunnerError { error: Error::<T>::GasPriceTooLow, weight }),
 			};
 
 		// After eip-1559 we make sure the account can pay both the evm execution and priority fees.
-		let total_fee =
-			total_fee_per_gas
-				.checked_mul(U256::from(gas_limit))
-				.ok_or(RunnerError {
-					error: Error::<T>::FeeOverflow,
-					weight,
-				})?;
+		let total_fee = total_fee_per_gas
+			.checked_mul(U256::from(gas_limit))
+			.ok_or(RunnerError { error: Error::<T>::FeeOverflow, weight })?;
 
 		// Deduct fee from the `source` account. Returns `None` if `total_fee` is Zero.
 		let fee = T::OnChargeTransaction::withdraw_fee(&source, total_fee)
 			.map_err(|e| RunnerError { error: e, weight })?;
 
 		// Execute the EVM call.
-		let vicinity = Vicinity {
-			gas_price: base_fee,
-			origin: source,
-		};
+		let vicinity = Vicinity { gas_price: base_fee, origin: source };
 
 		let metadata = StackSubstateMetadata::new(gas_limit, config);
 		let state = SubstrateStackState::new(&vicinity, metadata);
@@ -274,12 +255,7 @@ where
 			});
 		}
 
-		Ok(ExecutionInfo {
-			value: retv,
-			exit_reason: reason,
-			used_gas,
-			logs: state.substate.logs,
-		})
+		Ok(ExecutionInfo { value: retv, exit_reason: reason, used_gas, logs: state.substate.logs })
 	}
 }
 
@@ -540,11 +516,11 @@ impl<'config> SubstrateStackSubstate<'config> {
 
 	pub fn deleted(&self, address: H160) -> bool {
 		if self.deletes.contains(&address) {
-			return true;
+			return true
 		}
 
 		if let Some(parent) = self.parent.as_ref() {
-			return parent.deleted(address);
+			return parent.deleted(address)
 		}
 
 		false
@@ -555,11 +531,7 @@ impl<'config> SubstrateStackSubstate<'config> {
 	}
 
 	pub fn log(&mut self, address: H160, topics: Vec<H256>, data: Vec<u8>) {
-		self.logs.push(Log {
-			address,
-			topics,
-			data,
-		});
+		self.logs.push(Log { address, topics, data });
 	}
 
 	fn recursive_is_cold<F: Fn(&Accessed) -> bool>(&self, f: &F) -> bool {
@@ -567,10 +539,7 @@ impl<'config> SubstrateStackSubstate<'config> {
 		if local_is_accessed {
 			false
 		} else {
-			self.parent
-				.as_ref()
-				.map(|p| p.recursive_is_cold(f))
-				.unwrap_or(true)
+			self.parent.as_ref().map(|p| p.recursive_is_cold(f)).unwrap_or(true)
 		}
 	}
 }
@@ -649,10 +618,7 @@ impl<'vicinity, 'config, T: Config> BackendT for SubstrateStackState<'vicinity, 
 	fn basic(&self, address: H160) -> evm::backend::Basic {
 		let (account, _) = Pallet::<T>::account_basic(&address);
 
-		evm::backend::Basic {
-			balance: account.balance,
-			nonce: account.nonce,
-		}
+		evm::backend::Basic { balance: account.balance, nonce: account.nonce }
 	}
 
 	fn code(&self, address: H160) -> Vec<u8> {
@@ -785,10 +751,7 @@ where
 		T::Currency::transfer(
 			&source,
 			&target,
-			transfer
-				.value
-				.try_into()
-				.map_err(|_| ExitError::OutOfFund)?,
+			transfer.value.try_into().map_err(|_| ExitError::OutOfFund)?,
 			ExistenceRequirement::AllowDeath,
 		)
 		.map_err(|_| ExitError::OutOfFund)
@@ -811,8 +774,7 @@ where
 	}
 
 	fn is_cold(&self, address: H160) -> bool {
-		self.substate
-			.recursive_is_cold(&|a| a.accessed_addresses.contains(&address))
+		self.substate.recursive_is_cold(&|a| a.accessed_addresses.contains(&address))
 	}
 
 	fn is_storage_cold(&self, address: H160, key: H256) -> bool {
@@ -855,22 +817,13 @@ mod tests {
 					false,
 					|_| (ExitReason::Succeed(ExitSucceed::Stopped), ()),
 				);
-				assert_matches!(
-					res,
-					Err(RunnerError {
-						error: Error::<Test>::Reentrancy,
-						..
-					})
-				);
+				assert_matches!(res, Err(RunnerError { error: Error::<Test>::Reentrancy, .. }));
 				(ExitReason::Error(ExitError::CallTooDeep), ())
 			},
 		);
 		assert_matches!(
 			res,
-			Ok(ExecutionInfo {
-				exit_reason: ExitReason::Error(ExitError::CallTooDeep),
-				..
-			})
+			Ok(ExecutionInfo { exit_reason: ExitReason::Error(ExitError::CallTooDeep), .. })
 		);
 
 		// Should succeed if there is no reentrancy

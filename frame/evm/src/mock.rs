@@ -163,7 +163,7 @@ impl PrecompileSet for MockPrecompileSet {
 		let address = handle.code_address();
 
 		if address == H160::from_low_u64_be(1) {
-			return Some(pallet_evm_precompile_simple::Identity::execute(handle));
+			return Some(pallet_evm_precompile_simple::Identity::execute(handle))
 		}
 
 		None

@@ -106,24 +106,21 @@ frame_support::construct_runtime!(
 );
 
 pub fn new_test_ext(base_fee: Option<U256>, elasticity: Option<Permill>) -> TestExternalities {
-	let mut t = frame_system::GenesisConfig::default()
-		.build_storage::<Test>()
-		.unwrap();
+	let mut t = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap();
 
 	match (base_fee, elasticity) {
-		(Some(base_fee), Some(elasticity)) => {
-			pallet_base_fee::GenesisConfig::<Test>::new(base_fee, elasticity)
-		}
+		(Some(base_fee), Some(elasticity)) =>
+			pallet_base_fee::GenesisConfig::<Test>::new(base_fee, elasticity),
 		(None, Some(elasticity)) => {
 			let mut config = pallet_base_fee::GenesisConfig::<Test>::default();
 			config.elasticity = elasticity;
 			config
-		}
+		},
 		(Some(base_fee), None) => {
 			let mut config = pallet_base_fee::GenesisConfig::<Test>::default();
 			config.base_fee_per_gas = base_fee;
 			config
-		}
+		},
 		(None, None) => pallet_base_fee::GenesisConfig::<Test>::default(),
 	}
 	.assimilate_storage(&mut t)
@@ -135,10 +132,7 @@ pub fn new_test_ext(base_fee: Option<U256>, elasticity: Option<Permill>) -> Test
 #[test]
 fn should_default() {
 	new_test_ext(None, None).execute_with(|| {
-		assert_eq!(
-			BaseFee::base_fee_per_gas(),
-			U256::from(100_000_000_000 as u128)
-		);
+		assert_eq!(BaseFee::base_fee_per_gas(), U256::from(100_000_000_000 as u128));
 		assert_eq!(BaseFee::elasticity(), Permill::from_parts(125_000));
 	});
 }
@@ -263,7 +257,8 @@ fn should_increase_delta_of_base_fee() {
 			DispatchClass::Normal,
 		);
 		BaseFee::on_finalize(System::block_number());
-		// Expect a 6.25% increase in base fee for a target capacity of 50% ((75/50)-1 = 0.5 * 0.125 = 0.0625).
+		// Expect a 6.25% increase in base fee for a target capacity of 50% ((75/50)-1 = 0.5 * 0.125
+		// = 0.0625).
 		assert_eq!(BaseFee::base_fee_per_gas(), U256::from(1062500000));
 	});
 }
@@ -289,10 +284,7 @@ fn set_base_fee_per_gas_dispatchable() {
 	let base_fee = U256::from(1_000_000_000);
 	new_test_ext(Some(base_fee), None).execute_with(|| {
 		assert_eq!(BaseFee::base_fee_per_gas(), U256::from(1000000000));
-		assert_ok!(BaseFee::set_base_fee_per_gas(
-			RuntimeOrigin::root(),
-			U256::from(1)
-		));
+		assert_ok!(BaseFee::set_base_fee_per_gas(RuntimeOrigin::root(), U256::from(1)));
 		assert_eq!(BaseFee::base_fee_per_gas(), U256::from(1));
 	});
 }
@@ -302,10 +294,7 @@ fn set_elasticity_dispatchable() {
 	let base_fee = U256::from(1_000_000_000);
 	new_test_ext(Some(base_fee), None).execute_with(|| {
 		assert_eq!(BaseFee::elasticity(), Permill::from_parts(125_000));
-		assert_ok!(BaseFee::set_elasticity(
-			RuntimeOrigin::root(),
-			Permill::from_parts(1_000)
-		));
+		assert_ok!(BaseFee::set_elasticity(RuntimeOrigin::root(), Permill::from_parts(1_000)));
 		assert_eq!(BaseFee::elasticity(), Permill::from_parts(1_000));
 	});
 }

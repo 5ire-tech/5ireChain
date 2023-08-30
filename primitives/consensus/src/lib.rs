@@ -76,10 +76,7 @@ impl Hashes {
 
 		let block_hash = block.header.hash();
 
-		Hashes {
-			transaction_hashes,
-			block_hash,
-		}
+		Hashes { transaction_hashes, block_hash }
 	}
 }
 

@@ -39,10 +39,7 @@ pub struct Web3<B, C> {
 
 impl<B, C> Web3<B, C> {
 	pub fn new(client: Arc<C>) -> Self {
-		Self {
-			client,
-			_marker: PhantomData,
-		}
+		Self { client, _marker: PhantomData }
 	}
 }
 
@@ -58,7 +55,7 @@ where
 			.client
 			.runtime_api()
 			.version(&BlockId::Hash(hash))
-			.map_err(|err| internal_err(format!("fetch runtime version failed: {:?}", err)))?;
+			.map_err(|err| internal_err(format!("fetch runtime version failed: {err:?}")))?;
 		Ok(format!(
 			"{spec_name}/v{spec_version}.{impl_version}/{pkg_name}-{pkg_version}",
 			spec_name = version.spec_name,

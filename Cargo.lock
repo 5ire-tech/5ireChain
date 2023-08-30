@@ -1771,6 +1771,7 @@ dependencies = [
  "parity-db",
  "parity-scale-codec",
  "parking_lot 0.12.1",
+ "sc-block-builder",
  "sc-client-db",
  "smallvec",
  "sp-block-builder",
@@ -1934,7 +1935,7 @@ dependencies = [
  "fc-rpc-core",
  "fp-consensus",
  "fp-dynamic-fee",
- "fp-evm 3.0.0-dev",
+ "fp-evm",
  "fp-rpc",
  "fp-storage",
  "frame-benchmarking",
@@ -1977,6 +1978,7 @@ dependencies = [
  "sc-rpc",
  "sc-rpc-api",
  "sc-service",
+ "sc-service-test",
  "sc-sync-state-rpc",
  "sc-sysinfo",
  "sc-telemetry",
@@ -1998,6 +2000,7 @@ dependencies = [
  "sp-keystore",
  "sp-runtime",
  "sp-timestamp",
+ "sp-tracing",
  "sp-transaction-storage-proof",
  "substrate-build-script-utils",
  "substrate-frame-cli",
@@ -2093,7 +2096,7 @@ version = "1.0.0-dev"
 dependencies = [
  "ethereum",
  "ethereum-types",
- "fp-evm 3.0.0-dev",
+ "fp-evm",
  "frame-support",
  "num_enum",
  "parity-scale-codec",
@@ -2113,24 +2116,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "fp-evm"
-version = "3.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=QA#5b4d3427559aef1b1c77eed6fec2779ea869dd5f"
-dependencies = [
- "evm",
- "frame-support",
- "parity-scale-codec",
- "sp-core",
- "sp-std",
-]
-
-[[package]]
 name = "fp-rpc"
 version = "3.0.0-dev"
 dependencies = [
  "ethereum",
  "ethereum-types",
- "fp-evm 3.0.0-dev",
+ "fp-evm",
  "parity-scale-codec",
  "scale-info",
  "sp-api",
@@ -4307,7 +4298,7 @@ dependencies = [
  "pallet-evm",
  "pallet-evm-precompile-modexp",
  "pallet-evm-precompile-sha3fips",
- "pallet-evm-precompile-simple 2.0.0-dev",
+ "pallet-evm-precompile-simple",
  "pallet-fast-unstake",
  "pallet-grandpa",
  "pallet-hotfix-sufficients",
@@ -4728,7 +4719,7 @@ dependencies = [
 name = "pallet-base-fee"
 version = "1.0.0"
 dependencies = [
- "fp-evm 3.0.0-dev",
+ "fp-evm",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
@@ -4883,7 +4874,7 @@ name = "pallet-dynamic-fee"
 version = "4.0.0-dev"
 dependencies = [
  "fp-dynamic-fee",
- "fp-evm 3.0.0-dev",
+ "fp-evm",
  "frame-support",
  "frame-system",
  "pallet-timestamp",
@@ -4980,7 +4971,7 @@ dependencies = [
  "evm",
  "fp-consensus",
  "fp-ethereum",
- "fp-evm 3.0.0-dev",
+ "fp-evm",
  "fp-rpc",
  "fp-self-contained",
  "fp-storage",
@@ -5006,14 +4997,14 @@ version = "6.0.0-dev"
 dependencies = [
  "environmental",
  "evm",
- "fp-evm 3.0.0-dev",
+ "fp-evm",
  "frame-benchmarking",
  "frame-support",
  "frame-system",
  "hex",
  "log",
  "pallet-balances",
- "pallet-evm-precompile-simple 2.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=QA)",
+ "pallet-evm-precompile-simple",
  "pallet-timestamp",
  "parity-scale-codec",
  "rlp",
@@ -5028,7 +5019,7 @@ dependencies = [
 name = "pallet-evm-precompile-modexp"
 version = "2.0.0-dev"
 dependencies = [
- "fp-evm 3.0.0-dev",
+ "fp-evm",
  "hex",
  "num",
  "pallet-evm-test-vector-support",
@@ -5038,7 +5029,7 @@ dependencies = [
 name = "pallet-evm-precompile-sha3fips"
 version = "2.0.0-dev"
 dependencies = [
- "fp-evm 3.0.0-dev",
+ "fp-evm",
  "tiny-keccak",
 ]
 
@@ -5046,18 +5037,8 @@ dependencies = [
 name = "pallet-evm-precompile-simple"
 version = "2.0.0-dev"
 dependencies = [
- "fp-evm 3.0.0-dev",
+ "fp-evm",
  "pallet-evm-test-vector-support",
- "ripemd",
- "sp-io",
-]
-
-[[package]]
-name = "pallet-evm-precompile-simple"
-version = "2.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=QA#5b4d3427559aef1b1c77eed6fec2779ea869dd5f"
-dependencies = [
- "fp-evm 3.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=QA)",
  "ripemd",
  "sp-io",
 ]
@@ -5065,10 +5046,9 @@ dependencies = [
 [[package]]
 name = "pallet-evm-test-vector-support"
 version = "1.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=QA#5b4d3427559aef1b1c77eed6fec2779ea869dd5f"
 dependencies = [
  "evm",
- "fp-evm 3.0.0-dev (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=QA)",
+ "fp-evm",
  "hex",
  "serde",
  "serde_json",
@@ -7731,6 +7711,44 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-futures",
+]
+
+[[package]]
+name = "sc-service-test"
+version = "2.0.0"
+source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=QA#5b4d3427559aef1b1c77eed6fec2779ea869dd5f"
+dependencies = [
+ "array-bytes",
+ "fdlimit",
+ "futures",
+ "log",
+ "parity-scale-codec",
+ "parking_lot 0.12.1",
+ "sc-block-builder",
+ "sc-client-api",
+ "sc-client-db",
+ "sc-consensus",
+ "sc-executor",
+ "sc-network",
+ "sc-network-common",
+ "sc-service",
+ "sc-transaction-pool-api",
+ "sp-api",
+ "sp-blockchain",
+ "sp-consensus",
+ "sp-core",
+ "sp-externalities",
+ "sp-io",
+ "sp-panic-handler",
+ "sp-runtime",
+ "sp-state-machine",
+ "sp-storage",
+ "sp-tracing",
+ "sp-trie",
+ "substrate-test-runtime",
+ "substrate-test-runtime-client",
+ "tempfile",
+ "tokio",
 ]
 
 [[package]]

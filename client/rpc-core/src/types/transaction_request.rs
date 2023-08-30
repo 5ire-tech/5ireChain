@@ -112,7 +112,7 @@ impl From<TransactionRequest> for Option<TransactionMessage> {
 					chain_id: 0,
 					access_list: req.access_list.unwrap_or_default(),
 				}))
-			}
+			},
 			_ => None,
 		}
 	}
