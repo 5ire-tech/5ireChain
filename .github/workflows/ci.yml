@@ -2,12 +2,12 @@ name: CI
 on:
   push:
     branches:
-      - qa
+      - QA
       - UAT
       - Testnet
       - master
   pull_request:
-    branches: [master, qa]
+    branches: [master, QA]
   workflow_dispatch:
 
 env:
