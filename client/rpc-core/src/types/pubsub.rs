@@ -105,11 +105,11 @@ impl<'a> Deserialize<'a> for Params {
 		let v: Value = Deserialize::deserialize(deserializer)?;
 
 		if v.is_null() {
-			return Ok(Params::None);
+			return Ok(Params::None)
 		}
 
 		from_value(v)
 			.map(Params::Logs)
-			.map_err(|e| D::Error::custom(format!("Invalid Pub-Sub parameters: {}", e)))
+			.map_err(|e| D::Error::custom(format!("Invalid Pub-Sub parameters: {e}")))
 	}
 }

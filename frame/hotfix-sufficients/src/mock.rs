@@ -26,10 +26,7 @@ use super::*;
 use crate as pallet_hotfix_sufficients;
 
 pub fn new_test_ext() -> sp_io::TestExternalities {
-	frame_system::GenesisConfig::default()
-		.build_storage::<Test>()
-		.unwrap()
-		.into()
+	frame_system::GenesisConfig::default().build_storage::<Test>().unwrap().into()
 }
 
 frame_support::construct_runtime!(

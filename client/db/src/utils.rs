@@ -30,23 +30,17 @@ where
 	C: sp_blockchain::HeaderBackend<Block> + Send + Sync,
 {
 	let db: Arc<dyn Database<DbHash>> = match &config.source {
-		DatabaseSource::ParityDb { path } => {
-			open_parity_db::<Block, C>(client, path, &config.source)?
-		}
-		DatabaseSource::RocksDb { path, .. } => {
-			open_kvdb_rocksdb::<Block, C>(client, path, true, &config.source)?
-		}
-		DatabaseSource::Auto {
-			paritydb_path,
-			rocksdb_path,
-			..
-		} => {
+		DatabaseSource::ParityDb { path } =>
+			open_parity_db::<Block, C>(client, path, &config.source)?,
+		DatabaseSource::RocksDb { path, .. } =>
+			open_kvdb_rocksdb::<Block, C>(client, path, true, &config.source)?,
+		DatabaseSource::Auto { paritydb_path, rocksdb_path, .. } => {
 			match open_kvdb_rocksdb::<Block, C>(client.clone(), rocksdb_path, false, &config.source)
 			{
 				Ok(db) => db,
 				Err(_) => open_parity_db::<Block, C>(client, paritydb_path, &config.source)?,
 			}
-		}
+		},
 		_ => return Err("Missing feature flags `parity-db`".to_string()),
 	};
 	Ok(db)
@@ -72,11 +66,11 @@ where
 	let mut db_config = kvdb_rocksdb::DatabaseConfig::with_columns(crate::columns::NUM_COLUMNS);
 	db_config.create_if_missing = create;
 
-	let db = kvdb_rocksdb::Database::open(&db_config, path).map_err(|err| format!("{}", err))?;
+	let db = kvdb_rocksdb::Database::open(&db_config, path).map_err(|err| format!("{err}"))?;
 	// write database version only after the database is succesfully opened
 	#[cfg(not(test))]
 	crate::upgrade::update_version(path).map_err(|_| "Cannot update db version".to_string())?;
-	return Ok(sp_database::as_database(db));
+	return Ok(sp_database::as_database(db))
 }
 
 #[cfg(not(feature = "kvdb-rocksdb"))]
@@ -110,7 +104,7 @@ where
 	let mut config = parity_db::Options::with_columns(path, crate::columns::NUM_COLUMNS as u8);
 	config.columns[crate::columns::BLOCK_MAPPING as usize].btree_index = true;
 
-	let db = parity_db::Db::open_or_create(&config).map_err(|err| format!("{}", err))?;
+	let db = parity_db::Db::open_or_create(&config).map_err(|err| format!("{err}"))?;
 	// write database version only after the database is succesfully opened
 	#[cfg(not(test))]
 	crate::upgrade::update_version(path).map_err(|_| "Cannot update db version".to_string())?;

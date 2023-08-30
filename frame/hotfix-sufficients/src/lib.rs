@@ -54,6 +54,7 @@ pub mod pallet {
 		type WeightInfo: WeightInfo;
 	}
 
+	#[allow(clippy::redundant_closure_call)]
 	#[pallet::error]
 	pub enum Error<T> {
 		/// Maximum address count exceeded
@@ -62,10 +63,12 @@ pub mod pallet {
 
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
-		/// Increment `sufficients` for existing accounts having a nonzero `nonce` but zero `sufficients`, `consumers` and `providers` value.
-		/// This state was caused by a previous bug in EVM create account dispatchable.
+		/// Increment `sufficients` for existing accounts having a nonzero `nonce` but zero
+		/// `sufficients`, `consumers` and `providers` value. This state was caused by a previous
+		/// bug in EVM create account dispatchable.
 		///
-		/// Any accounts in the input list not satisfying the above condition will remain unaffected.
+		/// Any accounts in the input list not satisfying the above condition will remain
+		/// unaffected.
 		#[pallet::call_index(0)]
 		#[pallet::weight(
 			<T as pallet::Config>::WeightInfo::hotfix_inc_account_sufficients(addresses.len().try_into().unwrap_or(u32::MAX))
@@ -77,10 +80,7 @@ pub mod pallet {
 			const MAX_ADDRESS_COUNT: usize = 1000;
 
 			frame_system::ensure_signed(origin)?;
-			ensure!(
-				addresses.len() <= MAX_ADDRESS_COUNT,
-				Error::<T>::MaxAddressCountExceeded
-			);
+			ensure!(addresses.len() <= MAX_ADDRESS_COUNT, Error::<T>::MaxAddressCountExceeded);
 
 			for address in addresses {
 				let account_id = T::AddressMapping::into_account_id(address);
@@ -94,10 +94,7 @@ pub mod pallet {
 				}
 			}
 
-			Ok(PostDispatchInfo {
-				actual_weight: None,
-				pays_fee: Pays::Yes,
-			})
+			Ok(PostDispatchInfo { actual_weight: None, pays_fee: Pays::Yes })
 		}
 	}
 }

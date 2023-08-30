@@ -1,0 +1,100 @@
+name: CI
+on:
+  push:
+    branches:
+      - qa
+      - UAT
+      - Testnet
+      - master
+  pull_request:
+    branches: [master, qa]
+  workflow_dispatch:
+
+env:
+  CARGO_NET_GIT_FETCH_WITH_CLI: true
+
+jobs:
+  # 5irechain linting(fmt + clippy)
+  lint_and_test_and_integration_test:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+        with:
+          token: ${{ github.token }}
+          submodules: recursive
+
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          toolchain: nightly
+          targets: wasm32-unknown-unknown
+          components: rustfmt
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+
+      - uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: "${{ secrets.READ_DEPLOY_KEY }}"
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          version: "3.9.1"
+
+      - name: Install Protobuf
+        run: sudo apt-get install protobuf-compiler
+
+      - name: Install Libclang
+        run: sudo apt-get install -y libclang-dev
+
+      - name: Configure sccache
+        run: |
+          echo "RUSTC_WRAPPER=sccache" >> $GITHUB_ENV
+          echo "SCCACHE_GHA_ENABLED=true" >> $GITHUB_ENV
+
+      - name: Check format
+        run: cargo +nightly fmt --all --check
+
+      - name: Add Cargo Clippy
+        run: rustup component add clippy
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@v0.0.3
+
+      - name: Clippy
+        run: cargo clippy -- -D warnings
+
+      - name: Check
+        run: cargo check
+
+      - name: Test
+        run: cargo test
+
+      - name: Build Node for Integration Tests (Release)
+        run: cargo build --release
+
+      - name: Install Nodejs
+        uses: actions/setup-node@v3
+        with:
+          cache: "yarn"
+          cache-dependency-path: "./integration-test-suite/yarn.lock"
+
+      - name: Install Packages
+        run: cd integration-test-suite && yarn install --frozen-lockfile
+
+      - name: Run Integration Tests
+        run: cd integration-test-suite && yarn test
+
+      - name: Save Cache
+        if: ${{ !cancelled() }}
+        uses: actions/cache/save@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            target/release
+            target/debug
+          key: ${{ runner.os }}-cargo-index-${{ github.ref_name }}-integration-tests
