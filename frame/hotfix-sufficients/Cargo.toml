@@ -3,31 +3,30 @@ name = "pallet-hotfix-sufficients"
 version = "1.0.0"
 license = "Apache-2.0"
 readme = "README.md"
-edition = "2021"
 description = "Hotfix zero-value account sufficients with non-zero-value nonces."
- 
+authors = { workspace = true }
+edition = { workspace = true }
+repository = { workspace = true }
+
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
-scale-codec = { package = "parity-scale-codec", version = "3.2.1", default-features = false, features = ["derive"] }
-scale-info = { version = "2.3.1", default-features = false, features = ["derive"] }
+scale-codec = { package = "parity-scale-codec", workspace = true }
+scale-info = { workspace = true }
 # Substrate
-sp-core = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sp-runtime = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sp-std = { version = "5.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
-# Substrate FRAME
-frame-benchmarking = { version = "4.0.0-dev",  git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false , optional = true }
-
-frame-support = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
-frame-system = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
-
+frame-benchmarking = { workspace = true, optional = true }
+frame-support = { workspace = true }
+frame-system = { workspace = true }
+sp-core = { workspace = true }
+sp-runtime = { workspace = true }
+sp-std = { workspace = true }
 # Frontier
-pallet-evm = {version="6.0.0-dev", path = "../evm", default-features = false }
+pallet-evm = { workspace = true }
 
 [dev-dependencies]
 # Substrate
-sp-io = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
+sp-io = { workspace = true, features = ["default"] }
 
 [features]
 default = ["std"]
@@ -35,7 +34,7 @@ std = [
 	"scale-codec/std",
 	"scale-info/std",
 	# Substrate
-	"frame-benchmarking/std",
+	"frame-benchmarking?/std",
 	"frame-support/std",
 	"frame-system/std",
 	"sp-core/std",

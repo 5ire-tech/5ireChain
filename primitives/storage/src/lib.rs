@@ -16,8 +16,9 @@
 // limitations under the License.
 
 #![cfg_attr(not(feature = "std"), no_std)]
+#![deny(unused_crate_dependencies)]
 
-use codec::{Decode, Encode};
+use scale_codec::{Decode, Encode};
 
 /// Current version of pallet Ethereum's storage schema is stored under this key.
 pub const PALLET_ETHEREUM_SCHEMA: &[u8] = b":ethereum_schema";
@@ -41,8 +42,8 @@ pub const BASE_FEE_PER_GAS: &[u8] = b"BaseFeePerGas";
 pub const BASE_FEE_ELASTICITY: &[u8] = b"Elasticity";
 
 /// The schema version for Pallet Ethereum's storage
-#[derive(Clone, Copy, Debug, Encode, Decode, PartialEq, Eq, PartialOrd, Ord)]
-#[cfg_attr(feature = "std", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Encode, Decode)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum EthereumStorageSchema {
 	Undefined,
 	V1,

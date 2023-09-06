@@ -47,7 +47,7 @@ impl FromStr for MetaKey {
 
 	// A convenience function to verify the user input is known.
 	fn from_str(input: &str) -> Result<MetaKey, Self::Err> {
-		let tips = str::from_utf8(fc_db::static_keys::CURRENT_SYNCING_TIPS).unwrap();
+		let tips = str::from_utf8(fc_db::kv::static_keys::CURRENT_SYNCING_TIPS).unwrap();
 		let schema = str::from_utf8(fp_storage::PALLET_ETHEREUM_SCHEMA_CACHE).unwrap();
 		match input {
 			x if x == tips => Ok(MetaKey::Tips),
@@ -59,11 +59,11 @@ impl FromStr for MetaKey {
 
 pub struct MetaDb<'a, B: BlockT> {
 	cmd: &'a FrontierDbCmd,
-	backend: Arc<fc_db::Backend<B>>,
+	backend: Arc<fc_db::kv::Backend<B>>,
 }
 
 impl<'a, B: BlockT> MetaDb<'a, B> {
-	pub fn new(cmd: &'a FrontierDbCmd, backend: Arc<fc_db::Backend<B>>) -> Self {
+	pub fn new(cmd: &'a FrontierDbCmd, backend: Arc<fc_db::kv::Backend<B>>) -> Self {
 		Self { cmd, backend }
 	}
 
@@ -83,7 +83,7 @@ impl<'a, B: BlockT> MetaDb<'a, B> {
 				// Insert data to the meta column, static schema cache key.
 				(MetaKey::Schema, Some(MetaValue::Schema(schema_map))) => {
 					if self.backend.meta().ethereum_schema()?.is_none() {
-						let data:Vec<(fp_storage::EthereumStorageSchema, H256)> = schema_map
+						let data = schema_map
 							.iter()
 							.map(|(key, value)| (*value, *key))
 							.collect::<Vec<(fp_storage::EthereumStorageSchema, H256)>>();
