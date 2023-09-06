@@ -158,7 +158,7 @@ pub fn create_full<C, P, SC, B>(
 
 	io.merge(System::new(client.clone(), pool, deny_unsafe).into_rpc())?;
 	// Making synchronous calls in light client freezes the browser currently,
-	// more context: https://github.com/paritytech/substrate/pull/3480
+	// more context: ssh://git@github.com/5ire-tech/5ire-substrate.git/pull/3480
 	// These RPCs should use an asynchronous caller instead.
 	io.merge(
 		Mmr::new(

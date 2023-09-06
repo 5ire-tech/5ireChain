@@ -56,7 +56,7 @@ where
 				current_block: block_number,
 				// TODO `highest_block` is not correct, should load `best_seen_block` from NetworkWorker,
 				// but afaik that is not currently possible in Substrate:
-				// https://github.com/paritytech/substrate/issues/7311
+				// ssh://git@github.com/5ire-tech/5ire-substrate.git/issues/7311
 				highest_block: block_number,
 				warp_chunks_amount: None,
 				warp_chunks_processed: None,
