@@ -205,7 +205,9 @@ export function start5ireChainNode(
           '-lruntime::offchain=debug',
           '--rpc-cors',
           'all',
-          '--ws-external',
+          '--rpc-methods=unsafe',
+          '--unsafe-rpc-external',
+          '--unsafe-ws-external'
         ]
         : []),
     ],
