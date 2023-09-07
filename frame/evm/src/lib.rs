@@ -183,7 +183,7 @@ pub mod pallet {
 	impl<T: Config> Pallet<T> {
 		/// Withdraw balance from EVM into currency/balances pallet.
 		#[pallet::call_index(0)]
-		#[pallet::weight(<T as pallet::Config>::WeightInfo::withdraw())]
+		#[pallet::weight((0, DispatchClass::Normal,Pays::No))]
 		pub fn withdraw(
 			origin: OriginFor<T>,
 			address: H160,
@@ -191,14 +191,33 @@ pub mod pallet {
 		) -> DispatchResult {
 			let destination = T::WithdrawOrigin::ensure_address_origin(&address, origin)?;
 			let address_account_id = T::AddressMapping::into_account_id(address);
-
 			T::Currency::transfer(
 				&address_account_id,
 				&destination,
 				value,
 				ExistenceRequirement::AllowDeath,
 			)?;
+			Ok(())
+		}
 
+		/// Deposit balance from EVM into currency/balances pallet.
+		#[pallet::call_index(4)]
+		#[pallet::weight(0)]
+		pub fn deposit(origin: OriginFor<T>, address: H160, value: BalanceOf<T>) -> DispatchResult {
+			let destination = ensure_signed(origin.clone())?;
+			let address_account_id = T::AddressMapping::into_account_id(address);
+			// let evm_value= value.saturating_mul(10u64.pow(18u32).unique_saturated_into());
+			// let native_value= value.saturating_mul(10u64.pow(12u32).unique_saturated_into());
+			// let mint_value= evm_value.saturating_sub(native_value);
+
+			// info!("Here deposit balance {:?}",value);
+			T::Currency::transfer(
+				&destination,
+				&address_account_id,
+				value,
+				ExistenceRequirement::AllowDeath,
+			)?;
+			// T::Currency::deposit_creating(&address_account_id,mint_value);
 			Ok(())
 		}
 
