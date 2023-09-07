@@ -2,60 +2,76 @@
 name = "fc-rpc"
 version = "2.0.0-dev"
 license = "GPL-3.0-or-later WITH Classpath-exception-2.0"
-edition = "2021"
 description = "Ethereum RPC (web3) compatibility layer for Substrate."
- 
+authors = { workspace = true }
+edition = { workspace = true }
+repository = { workspace = true }
+
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
-ethereum = { version = "0.14.0", default-features = false }
-ethereum-types = { version = "0.14.1", default-features = false }
-evm = { version = "0.37.0", default-features = false }
-futures = "0.3.25"
-hex = "0.4.3"
-jsonrpsee = "0.16.2"
-libsecp256k1 = "0.7.1"
-log = "0.4.17"
-lru = "0.8.1"
+ethereum = { workspace = true, features = ["with-codec"] }
+ethereum-types = { workspace = true }
+evm = { workspace = true }
+futures = { workspace = true }
+hex = { workspace = true }
+jsonrpsee = { workspace = true, features = ["server", "macros"] }
+libsecp256k1 = { workspace = true }
+log = { workspace = true }
 prometheus = { version = "0.13.1", default-features = false }
 rand = "0.8"
-rlp = { version = "0.5", default-features = false }
-scale-codec = { package = "parity-scale-codec", version = "3.2.1", default-features = false, features = ["derive"] }
-tokio = { version = "1.24", features = ["sync"] }
+rlp = { workspace = true }
+scale-codec = { package = "parity-scale-codec", workspace = true }
+schnellru = "0.2.1"
+serde = { workspace = true }
+tokio = { workspace = true, features = ["sync"] }
 
 # Substrate
-prometheus-endpoint = { package = "substrate-prometheus-endpoint", version = "0.10.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.36" }
-sc-client-api = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sc-network = { version = "0.10.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sc-network-common = { version = "0.10.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sp-consensus = { version = "0.10.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-
-sc-rpc = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sc-service = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sc-transaction-pool = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
-sc-transaction-pool-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sp-api = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sp-block-builder = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sp-blockchain = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
-sp-core = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sp-io = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
-sp-runtime = { version = "7.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
-sp-storage = { version = "7.0.0",  git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
+prometheus-endpoint = { workspace = true }
+sc-client-api = { workspace = true }
+sc-network = { workspace = true }
+sc-network-common = { workspace = true }
+sc-network-sync = { workspace = true }
+sc-rpc = { workspace = true }
+sc-service = { workspace = true }
+sc-transaction-pool = { workspace = true }
+sc-transaction-pool-api = { workspace = true }
+sc-utils = { workspace = true }
+sp-api = { workspace = true }
+sp-block-builder = { workspace = true }
+sp-blockchain = { workspace = true }
+sp-consensus = { workspace = true }
+sp-core = { workspace = true }
+sp-io = { workspace = true }
+sp-runtime = { workspace = true }
+sp-state-machine = { workspace = true }
+sp-storage = { workspace = true }
 # Frontier
-fp-ethereum = { version = "1.0.0-dev", path = "../../primitives/ethereum", default-features = false }
-fc-db = { path = "../db" }
-fc-rpc-core = { version = "1.1.0-dev", path = "../../client/rpc-core" }
-fp-rpc = { version = "3.0.0-dev", path = "../../primitives/rpc" }
-fp-storage = { version = "2.0.0", path = "../../primitives/storage" }
+fc-db = { workspace = true }
+fc-mapping-sync = { workspace = true }
+fc-rpc-core = { workspace = true }
+fc-storage = { workspace = true }
+fp-ethereum = { workspace = true, features = ["default"] }
+fp-evm = { workspace = true }
+fp-rpc = { workspace = true, features = ["default"] }
+fp-storage = { workspace = true, features = ["default"] }
+pallet-evm = { workspace = true }
 
 [dev-dependencies]
 tempfile = "3.3.0"
 # Substrate
-sc-block-builder = { version = "0.10.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
-sc-client-db = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA",default-features = false  }
-sp-consensus = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
-substrate-test-runtime-client = { version = "2.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
+sc-block-builder = { workspace = true }
+sc-client-db = { workspace = true, features = ["rocksdb"] }
+sp-consensus = { workspace = true }
+substrate-test-runtime-client = { workspace = true }
 
 [features]
+default = ["rocksdb"]
+rocksdb = [
+	"sc-service/rocksdb",
+	"fc-db/rocksdb",
+	"fc-mapping-sync/rocksdb",
+]
+txpool = ["fc-rpc-core/txpool"]
 rpc-binary-search-estimate = []

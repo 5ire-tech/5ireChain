@@ -2,20 +2,21 @@
 name = "pallet-evm-precompile-bn128"
 version = "2.0.0-dev"
 license = "Apache-2.0"
-edition = "2021"
 description = "BN128 precompiles for EVM pallet."
- 
-[dependencies]
-bn = { package = "substrate-bn", version = "0.6", default-features = false }
-# Substrate
-sp-core = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
+authors = { workspace = true }
+edition = { workspace = true }
+repository = { workspace = true }
 
+[dependencies]
+bn = { workspace = true }
+# Substrate
+sp-core = { workspace = true }
 # Frontier
-fp-evm = { version = "3.0.0-dev", path = "../../../../primitives/evm", default-features = false }
+fp-evm = { workspace = true }
 
 [dev-dependencies]
 # Frontier
-pallet-evm-test-vector-support = { version = "1.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false }
+pallet-evm-test-vector-support = { workspace = true }
 
 [features]
 default = ["std"]
