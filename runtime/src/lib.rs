@@ -79,10 +79,7 @@ use fp_account::EthereumSignature;
 use fp_rpc::TransactionStatus;
 //
 use pallet_ethereum::{Call::transact, PostLogContent, Transaction as EthereumTransaction};
-use pallet_evm::{
-	Account as EVMAccount, EnsureAccountId20, FeeCalculator, GasWeightMapping,
-	IdentityAddressMapping, Runner,EnsureAddressNever, EnsureAddressRoot,HashedAddressMapping
-};
+use pallet_evm::{Account as EVMAccount, EnsureAccountId20, FeeCalculator, GasWeightMapping, IdentityAddressMapping, Runner, EnsureAddressNever, EnsureAddressRoot, HashedAddressMapping, EnsureAddressSame, EnsureAddressTruncated};
 // use account::AccountId20;
 use pallet_dynamic_fee;
 use pallet_base_fee;
@@ -1955,11 +1952,11 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 		None
 	}
 }
-const BLOCK_GAS_LIMIT: u64 = 75_000_000;
+const BLOCK_GAS_LIMIT: u64 = 75_000_000_000;
 const MAX_POV_SIZE: u64 = 5 * 1024 * 1024;
 parameter_types! {
 	pub const ChainId: u64 = 997;
-	pub BlockGasLimit: U256 = U256::from(BLOCK_GAS_LIMIT);
+	pub BlockGasLimit: U256 = U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT.ref_time() / WEIGHT_PER_GAS);
 	pub const GasLimitPovSizeRatio: u64 = BLOCK_GAS_LIMIT.saturating_div(MAX_POV_SIZE);
 	pub PrecompilesValue: FrontierPrecompiles<Runtime> = FrontierPrecompiles::<_>::new();
 	pub WeightPerGas: Weight = Weight::from_parts(weight_per_gas(BLOCK_GAS_LIMIT, NORMAL_DISPATCH_RATIO, WEIGHT_PER_GAS), 0);
@@ -2001,8 +1998,8 @@ impl pallet_evm::Config for Runtime {
 	type GasWeightMapping = pallet_evm::FixedGasWeightMapping<Self>;
 	type WeightPerGas = WeightPerGas;
 	type BlockHashMapping = pallet_ethereum::EthereumBlockHashMapping<Self>;
-	type CallOrigin = EnsureAddressRoot<AccountId>;
-	type WithdrawOrigin = EnsureAddressNever<AccountId>;
+	type CallOrigin = EnsureAddressTruncated;
+	type WithdrawOrigin = EnsureAddressTruncated;
 	type AddressMapping = HashedAddressMapping<BlakeTwo256>;
 	type Currency = Balances;
 	type RuntimeEvent = RuntimeEvent;
