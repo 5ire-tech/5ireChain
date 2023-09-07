@@ -8,6 +8,10 @@ mod benchmarking;
 mod cli;
 mod command;
 mod rpc;
+mod eth;
+mod client;
+
+// mod command_helper;
 
 fn main() -> sc_cli::Result<()> {
 	command::run()

@@ -2488,6 +2488,32 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6999dc1837253364c2ebb0704ba97994bd874e8f195d665c50b7548f6ea92764"
 
 [[package]]
+name = "fc-cli"
+version = "1.0.0-dev"
+dependencies = [
+ "clap 4.4.0",
+ "ethereum-types",
+ "fc-db",
+ "firechain-runtime",
+ "fp-rpc",
+ "fp-storage",
+ "futures",
+ "parity-scale-codec",
+ "sc-block-builder",
+ "sc-cli",
+ "sc-client-db",
+ "serde",
+ "serde_json",
+ "sp-api",
+ "sp-blockchain",
+ "sp-consensus",
+ "sp-io",
+ "sp-runtime",
+ "substrate-test-runtime-client",
+ "tempfile",
+]
+
+[[package]]
 name = "fc-consensus"
 version = "2.0.0-dev"
 dependencies = [
@@ -2733,7 +2759,19 @@ dependencies = [
  "clap 4.4.0",
  "clap_complete",
  "criterion",
+ "fc-cli",
+ "fc-consensus",
+ "fc-db",
+ "fc-mapping-sync",
+ "fc-rpc",
+ "fc-rpc-core",
+ "fc-storage",
  "firechain-runtime",
+ "fp-consensus",
+ "fp-dynamic-fee",
+ "fp-evm",
+ "fp-rpc",
+ "fp-storage",
  "frame-benchmarking",
  "frame-benchmarking-cli",
  "frame-system",
@@ -2752,10 +2790,12 @@ dependencies = [
  "pallet-asset-conversion-tx-payment",
  "pallet-asset-tx-payment",
  "pallet-assets",
+ "pallet-evm",
  "pallet-im-online",
  "pallet-timestamp",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc",
+ "pallet-transaction-payment-rpc-runtime-api",
  "parity-scale-codec",
  "platforms",
  "rand 0.8.5",
@@ -2807,10 +2847,13 @@ dependencies = [
  "sp-inherents",
  "sp-keyring",
  "sp-keystore",
+ "sp-offchain",
  "sp-runtime",
+ "sp-session",
  "sp-statement-store",
  "sp-timestamp",
  "sp-tracing",
+ "sp-transaction-pool",
  "sp-transaction-storage-proof",
  "substrate-build-script-utils",
  "substrate-cli-test-utils",

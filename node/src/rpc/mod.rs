@@ -43,12 +43,22 @@ use grandpa::{
 use sc_rpc::SubscriptionTaskExecutor;
 pub use sc_rpc_api::DenyUnsafe;
 use sc_transaction_pool_api::TransactionPool;
-use sp_api::ProvideRuntimeApi;
+use sp_api::{CallApiAt, ProvideRuntimeApi};
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
 use sp_consensus_babe::BabeApi;
 use sp_keystore::KeystorePtr;
+use fp_storage::EthereumStorageSchema;
+use sc_client_api::{
+	backend::{Backend, StorageProvider},
+	client::BlockchainEvents,
+};
+use sc_transaction_pool::ChainApi;
+use sp_runtime::traits::Block as BlockT;
+
+mod eth;
+pub use self::eth::{create_eth, overrides_handle, EthDeps};
 
 /// Extra dependencies for BABE.
 pub struct BabeDeps {
@@ -73,7 +83,7 @@ pub struct GrandpaDeps<B> {
 }
 
 /// Full client dependencies.
-pub struct FullDeps<C, P, SC, B> {
+pub struct FullDeps<C, P, SC, B, A: ChainApi, CT> {
 	/// The client instance to use.
 	pub client: Arc<C>,
 	/// Transaction pool instance.
@@ -92,10 +102,24 @@ pub struct FullDeps<C, P, SC, B> {
 	pub statement_store: Arc<dyn sp_statement_store::StatementStore>,
 	/// The backend used by the node.
 	pub backend: Arc<B>,
+	/// Ethereum-compatibility specific dependencies.
+	pub eth: EthDeps<C, P, A, CT, Block>,
+}
+
+pub struct DefaultEthConfig<C, BE>(std::marker::PhantomData<(C, BE)>);
+
+impl<C, BE> fc_rpc::EthConfig<Block, C> for DefaultEthConfig<C, BE>
+	where
+		C: sc_client_api::StorageProvider<Block, BE> + Sync + Send + 'static,
+		BE: Backend<Block> + 'static,
+{
+	type EstimateGasAdapter = ();
+	type RuntimeStorageOverride =
+	fc_rpc::frontier_backend_client::SystemAccountId20StorageOverride<Block, C, BE>;
 }
 
 /// Instantiate all Full RPC extensions.
-pub fn create_full<C, P, SC, B>(
+pub fn create_full<C, P, BE,SC, B, A, CT>(
 	FullDeps {
 		client,
 		pool,
@@ -106,7 +130,14 @@ pub fn create_full<C, P, SC, B>(
 		grandpa,
 		statement_store,
 		backend,
-	}: FullDeps<C, P, SC, B>,
+		eth,
+	}: FullDeps<C, P, SC, B, A, CT>,
+	subscription_task_executor: SubscriptionTaskExecutor,
+	pubsub_notification_sinks: Arc<
+		fc_mapping_sync::EthereumBlockNotificationSinks<
+			fc_mapping_sync::EthereumBlockNotification<Block>,
+		>,
+	>,
 ) -> Result<RpcModule<()>, Box<dyn std::error::Error + Send + Sync>>
 	where
 		C: ProvideRuntimeApi<Block>
@@ -120,12 +151,23 @@ pub fn create_full<C, P, SC, B>(
 		C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Nonce>,
 		C::Api: mmr_rpc::MmrRuntimeApi<Block, <Block as sp_runtime::traits::Block>::Hash, BlockNumber>,
 		C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
+		C::Api: fp_rpc::ConvertTransactionRuntimeApi<Block>,
+		C::Api: fp_rpc::EthereumRuntimeRPCApi<Block>,
+		C: BlockchainEvents<Block> + 'static,
+		C: HeaderBackend<Block>
+		+ HeaderMetadata<Block, Error = BlockChainError>
+		+ StorageProvider<Block, BE>,
+		C: CallApiAt<Block> + ProvideRuntimeApi<Block>,
 		C::Api: BabeApi<Block>,
 		C::Api: BlockBuilder<Block>,
 		P: TransactionPool + 'static,
 		SC: SelectChain<Block> + 'static,
+		BE: Backend<Block> + 'static,
 		B: sc_client_api::Backend<Block> + Send + Sync + 'static,
 		B::State: sc_client_api::backend::StateBackend<sp_runtime::traits::HashFor<Block>>,
+		P: TransactionPool<Block = Block> + 'static,
+		A: ChainApi<Block = Block> + 'static,
+		CT: fp_rpc::ConvertTransaction<<Block as BlockT>::Extrinsic> + Send + Sync + 'static,
 {
 	use mmr_rpc::{Mmr, MmrApiServer};
 	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApiServer};
@@ -158,7 +200,7 @@ pub fn create_full<C, P, SC, B>(
 
 	io.merge(System::new(client.clone(), pool, deny_unsafe).into_rpc())?;
 	// Making synchronous calls in light client freezes the browser currently,
-	// more context: ssh://git@github.com/5ire-tech/5ire-substrate.git/pull/3480
+	// more context: https://github.com/paritytech/substrate/pull/3480
 	// These RPCs should use an asynchronous caller instead.
 	io.merge(
 		Mmr::new(
@@ -195,6 +237,14 @@ pub fn create_full<C, P, SC, B>(
 	let statement_store =
 		sc_rpc::statement::StatementStore::new(statement_store, deny_unsafe).into_rpc();
 	io.merge(statement_store)?;
+
+	// Ethereum compatibility RPCs
+	let io = create_eth::<_, _, _, _, _, _, DefaultEthConfig<C, BE>>(
+		io,
+		eth,
+		subscription_task_executor,
+		pubsub_notification_sinks,
+	)?;
 
 	Ok(io)
 }

@@ -46,5 +46,5 @@ Use the following command to build the node and run it after build successfully:
 
 ```sh
 cargo build --release
-./target/release/firechian-node --dev --tmp
+./target/release/firechain-node --dev --tmp
 ```
