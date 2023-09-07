@@ -66,11 +66,7 @@ impl Hashes {
 	pub fn from_block(block: ethereum::BlockV2) -> Self {
 		Hashes {
 			block_hash: block.header.hash(),
-			transaction_hashes: block
-				.transactions
-				.into_iter()
-				.map(|txn| txn.hash())
-				.collect(),
+			transaction_hashes: block.transactions.into_iter().map(|txn| txn.hash()).collect(),
 		}
 	}
 }

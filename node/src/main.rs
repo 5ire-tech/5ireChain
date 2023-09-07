@@ -6,10 +6,10 @@ mod chain_spec;
 mod service;
 mod benchmarking;
 mod cli;
-mod command;
-mod rpc;
-mod eth;
 mod client;
+mod command;
+mod eth;
+mod rpc;
 
 // mod command_helper;
 

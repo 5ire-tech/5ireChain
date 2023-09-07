@@ -69,16 +69,14 @@ where
 			let valid_weight =
 				info.weight.ref_time() <= T::GasWeightMapping::gas_to_weight(gas, false).ref_time();
 			if !valid_weight {
-				return Err(PrecompileFailure::Error {
-					exit_status: ExitError::OutOfGas,
-				});
+				return Err(PrecompileFailure::Error { exit_status: ExitError::OutOfGas })
 			}
 		}
 
 		let origin = T::AddressMapping::into_account_id(context.caller);
 
 		if let Some(err) = DispatchValidator::validate_before_dispatch(&origin, &call) {
-			return Err(err);
+			return Err(err)
 		}
 
 		handle
@@ -92,16 +90,8 @@ where
 					handle.record_cost(cost)?;
 
 					handle.refund_external_cost(
-						Some(
-							info.weight
-								.ref_time()
-								.saturating_sub(actual_weight.ref_time()),
-						),
-						Some(
-							info.weight
-								.proof_size()
-								.saturating_sub(actual_weight.proof_size()),
-						),
+						Some(info.weight.ref_time().saturating_sub(actual_weight.ref_time())),
+						Some(info.weight.proof_size().saturating_sub(actual_weight.proof_size())),
 					);
 				}
 
@@ -109,7 +99,7 @@ where
 					exit_status: ExitSucceed::Stopped,
 					output: Default::default(),
 				})
-			}
+			},
 			Err(e) => Err(PrecompileFailure::Error {
 				exit_status: ExitError::Other(
 					format!("dispatch execution failed: {}", <&'static str>::from(e)).into(),
@@ -140,7 +130,7 @@ where
 		if !(info.pays_fee == Pays::Yes && info.class == DispatchClass::Normal) {
 			return Some(PrecompileFailure::Error {
 				exit_status: ExitError::Other("invalid call".into()),
-			});
+			})
 		}
 		None
 	}

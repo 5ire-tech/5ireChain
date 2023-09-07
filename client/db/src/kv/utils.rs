@@ -29,24 +29,18 @@ pub fn open_database<Block: BlockT, C: HeaderBackend<Block>>(
 	config: &DatabaseSettings,
 ) -> Result<Arc<dyn Database<DbHash>>, String> {
 	let db: Arc<dyn Database<DbHash>> = match &config.source {
-		DatabaseSource::Auto {
-			paritydb_path,
-			rocksdb_path,
-			..
-		} => {
+		DatabaseSource::Auto { paritydb_path, rocksdb_path, .. } => {
 			match open_kvdb_rocksdb::<Block, C>(client.clone(), rocksdb_path, false, &config.source)
 			{
 				Ok(db) => db,
 				Err(_) => open_parity_db::<Block, C>(client, paritydb_path, &config.source)?,
 			}
-		}
+		},
 		#[cfg(feature = "rocksdb")]
-		DatabaseSource::RocksDb { path, .. } => {
-			open_kvdb_rocksdb::<Block, C>(client, path, true, &config.source)?
-		}
-		DatabaseSource::ParityDb { path } => {
-			open_parity_db::<Block, C>(client, path, &config.source)?
-		}
+		DatabaseSource::RocksDb { path, .. } =>
+			open_kvdb_rocksdb::<Block, C>(client, path, true, &config.source)?,
+		DatabaseSource::ParityDb { path } =>
+			open_parity_db::<Block, C>(client, path, &config.source)?,
 		_ => return Err("Supported db sources: `auto` | `rocksdb` | `paritydb`".to_string()),
 	};
 	Ok(db)
@@ -73,7 +67,7 @@ fn open_kvdb_rocksdb<Block: BlockT, C: HeaderBackend<Block>>(
 	// write database version only after the database is succesfully opened
 	#[cfg(not(test))]
 	super::upgrade::update_version(path).map_err(|_| "Cannot update db version".to_string())?;
-	return Ok(sp_database::as_database(db));
+	return Ok(sp_database::as_database(db))
 }
 
 #[cfg(not(feature = "rocksdb"))]

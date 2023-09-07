@@ -98,9 +98,7 @@ pub mod frontier_backend_client {
 			balance: Option<U256>,
 			nonce: Option<U256>,
 		) {
-			let mut key = [twox_128(b"System"), twox_128(b"Account")]
-				.concat()
-				.to_vec();
+			let mut key = [twox_128(b"System"), twox_128(b"Account")].concat().to_vec();
 			let account_id = Self::into_account_id_bytes(address);
 			key.extend(blake2_128(&account_id));
 			key.extend(&account_id);
@@ -151,9 +149,7 @@ pub mod frontier_backend_client {
 			balance: Option<U256>,
 			nonce: Option<U256>,
 		) {
-			let mut key = [twox_128(b"System"), twox_128(b"Account")]
-				.concat()
-				.to_vec();
+			let mut key = [twox_128(b"System"), twox_128(b"Account")].concat().to_vec();
 			let account_id = Self::into_account_id_bytes(address);
 			key.extend(blake2_128(&account_id));
 			key.extend(&account_id);
@@ -200,7 +196,7 @@ pub mod frontier_backend_client {
 				} else {
 					None
 				}
-			}
+			},
 			BlockNumber::Num(number) => Some(BlockId::Number(number.unique_saturated_into())),
 			BlockNumber::Latest => Some(BlockId::Hash(client.info().best_hash)),
 			BlockNumber::Earliest => Some(BlockId::Number(Zero::zero())),
@@ -227,7 +223,7 @@ pub mod frontier_backend_client {
 		if let Some(substrate_hashes) = substrate_hashes {
 			for substrate_hash in substrate_hashes {
 				if is_canon::<B, C>(client, substrate_hash) {
-					return Ok(Some(substrate_hash));
+					return Ok(Some(substrate_hash))
 				}
 			}
 		}
@@ -241,7 +237,7 @@ pub mod frontier_backend_client {
 	{
 		if let Ok(Some(number)) = client.number(target_hash) {
 			if let Ok(Some(hash)) = client.hash(number) {
-				return hash == target_hash;
+				return hash == target_hash
 			}
 		}
 		false
@@ -299,11 +295,7 @@ pub fn internal_err<T: ToString>(message: T) -> jsonrpsee::core::Error {
 }
 
 pub fn internal_err_with_data<T: ToString>(message: T, data: &[u8]) -> jsonrpsee::core::Error {
-	err(
-		jsonrpsee::types::error::INTERNAL_ERROR_CODE,
-		message,
-		Some(data),
-	)
+	err(jsonrpsee::types::error::INTERNAL_ERROR_CODE, message, Some(data))
 }
 
 pub fn public_key(transaction: &EthereumTransaction) -> Result<[u8; 64], sp_io::EcdsaVerifyError> {
@@ -315,19 +307,19 @@ pub fn public_key(transaction: &EthereumTransaction) -> Result<[u8; 64], sp_io::
 			sig[32..64].copy_from_slice(&t.signature.s()[..]);
 			sig[64] = t.signature.standard_v();
 			msg.copy_from_slice(&ethereum::LegacyTransactionMessage::from(t.clone()).hash()[..]);
-		}
+		},
 		EthereumTransaction::EIP2930(t) => {
 			sig[0..32].copy_from_slice(&t.r[..]);
 			sig[32..64].copy_from_slice(&t.s[..]);
 			sig[64] = t.odd_y_parity as u8;
 			msg.copy_from_slice(&ethereum::EIP2930TransactionMessage::from(t.clone()).hash()[..]);
-		}
+		},
 		EthereumTransaction::EIP1559(t) => {
 			sig[0..32].copy_from_slice(&t.r[..]);
 			sig[32..64].copy_from_slice(&t.s[..]);
 			sig[64] = t.odd_y_parity as u8;
 			msg.copy_from_slice(&ethereum::EIP1559TransactionMessage::from(t.clone()).hash()[..]);
-		}
+		},
 	}
 	sp_io::crypto::secp256k1_ecdsa_recover(&sig, &msg)
 }
@@ -359,10 +351,7 @@ mod tests {
 		Ok(Arc::new(fc_db::kv::Backend::<Block>::new(
 			client,
 			&fc_db::kv::DatabaseSettings {
-				source: sc_client_db::DatabaseSource::RocksDb {
-					path,
-					cache_size: 0,
-				},
+				source: sc_client_db::DatabaseSource::RocksDb { path, cache_size: 0 },
 			},
 		)?))
 	}
@@ -392,9 +381,7 @@ mod tests {
 		executor::block_on(client.import(BlockOrigin::Own, a1)).unwrap();
 
 		// A1 -> B1
-		let mut builder = client
-			.new_block_at(a1_hash, Default::default(), false)
-			.unwrap();
+		let mut builder = client.new_block_at(a1_hash, Default::default(), false).unwrap();
 		builder.push_storage_change(vec![1], None).unwrap();
 		let b1 = builder.build().unwrap().block;
 		let b1_hash = b1.header.hash();
@@ -421,9 +408,7 @@ mod tests {
 		);
 
 		// A1 -> B2
-		let mut builder = client
-			.new_block_at(a1_hash, Default::default(), false)
-			.unwrap();
+		let mut builder = client.new_block_at(a1_hash, Default::default(), false).unwrap();
 		builder.push_storage_change(vec![2], None).unwrap();
 		let b2 = builder.build().unwrap().block;
 		let b2_hash = b2.header.hash();
@@ -450,9 +435,7 @@ mod tests {
 		);
 
 		// B2 -> C1. B2 branch is now canon.
-		let mut builder = client
-			.new_block_at(b2_hash, Default::default(), false)
-			.unwrap();
+		let mut builder = client.new_block_at(b2_hash, Default::default(), false).unwrap();
 		builder.push_storage_change(vec![1], None).unwrap();
 		let c1 = builder.build().unwrap().block;
 		executor::block_on(client.import(BlockOrigin::Own, c1)).unwrap();

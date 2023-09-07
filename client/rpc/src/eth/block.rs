@@ -66,9 +66,7 @@ where
 		let schema = fc_storage::onchain_storage_schema(client.as_ref(), substrate_hash);
 
 		let block = block_data_cache.current_block(schema, substrate_hash).await;
-		let statuses = block_data_cache
-			.current_transaction_statuses(schema, substrate_hash)
-			.await;
+		let statuses = block_data_cache.current_transaction_statuses(schema, substrate_hash).await;
 
 		let base_fee = client.runtime_api().gas_price(substrate_hash).ok();
 
@@ -93,7 +91,7 @@ where
 				}
 
 				Ok(Some(rich_block))
-			}
+			},
 			_ => Ok(None),
 		}
 	}
@@ -123,9 +121,8 @@ where
 				let schema = fc_storage::onchain_storage_schema(client.as_ref(), substrate_hash);
 
 				let block = block_data_cache.current_block(schema, substrate_hash).await;
-				let statuses = block_data_cache
-					.current_transaction_statuses(schema, substrate_hash)
-					.await;
+				let statuses =
+					block_data_cache.current_transaction_statuses(schema, substrate_hash).await;
 
 				let base_fee = client.runtime_api().gas_price(substrate_hash).ok();
 
@@ -151,10 +148,10 @@ where
 						}
 
 						Ok(Some(rich_block))
-					}
+					},
 					_ => Ok(None),
 				}
-			}
+			},
 			None if number == BlockNumber::Pending => {
 				let api = client.runtime_api();
 				let best_hash = client.info().best_hash;
@@ -197,7 +194,7 @@ where
 					))),
 					_ => Ok(None),
 				}
-			}
+			},
 			None => Ok(None),
 		}
 	}
@@ -234,9 +231,7 @@ where
 	) -> RpcResult<Option<U256>> {
 		if let BlockNumber::Pending = number {
 			// get the pending transactions count
-			return Ok(Some(U256::from(
-				self.graph.validated_pool().ready().count(),
-			)));
+			return Ok(Some(U256::from(self.graph.validated_pool().ready().count())))
 		}
 
 		let id = match frontier_backend_client::native_block_id::<B, C>(

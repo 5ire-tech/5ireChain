@@ -57,11 +57,7 @@ where
 		client: Arc<C>,
 		backend: Arc<fc_db::kv::Backend<B>>,
 	) -> Self {
-		Self {
-			cmd,
-			client,
-			backend,
-		}
+		Self { cmd, client, backend }
 	}
 
 	pub fn query(
@@ -76,23 +72,15 @@ where
 				(
 					MappingKey::EthBlockOrTransactionHash(ethereum_block_hash),
 					Some(MappingValue::SubstrateBlockHash(substrate_block_hash)),
-				) => {
-					if self
-						.backend
-						.mapping()
-						.block_hash(ethereum_block_hash)?
-						.is_none()
-					{
+				) =>
+					if self.backend.mapping().block_hash(ethereum_block_hash)?.is_none() {
 						let existing_transaction_hashes: Vec<H256> = if let Some(statuses) = self
 							.client
 							.runtime_api()
 							.current_transaction_statuses(*substrate_block_hash)
 							.map_err(|e| format!("{:?}", e))?
 						{
-							statuses
-								.iter()
-								.map(|t| t.transaction_hash)
-								.collect::<Vec<H256>>()
+							statuses.iter().map(|t| t.transaction_hash).collect::<Vec<H256>>()
 						} else {
 							vec![]
 						};
@@ -105,9 +93,8 @@ where
 
 						self.backend.mapping().write_hashes(commitment)?;
 					} else {
-						return Err(self.key_not_empty_error(key));
-					}
-				}
+						return Err(self.key_not_empty_error(key))
+					},
 				_ => return Err(self.key_value_error(key, value)),
 			},
 			Operation::Read => match (column, key) {
@@ -115,18 +102,16 @@ where
 				(Column::Block, MappingKey::EthBlockOrTransactionHash(ethereum_block_hash)) => {
 					let value = self.backend.mapping().block_hash(ethereum_block_hash)?;
 					println!("{:?}", value);
-				}
+				},
 				// Given ethereum transaction hash, get transaction metadata.
 				(
 					Column::Transaction,
 					MappingKey::EthBlockOrTransactionHash(ethereum_transaction_hash),
 				) => {
-					let value = self
-						.backend
-						.mapping()
-						.transaction_metadata(ethereum_transaction_hash)?;
+					let value =
+						self.backend.mapping().transaction_metadata(ethereum_transaction_hash)?;
 					println!("{:?}", value);
-				}
+				},
 				_ => return Err(self.key_column_error(key, value)),
 			},
 			Operation::Update => match (key, value) {
@@ -134,23 +119,15 @@ where
 				(
 					MappingKey::EthBlockOrTransactionHash(ethereum_block_hash),
 					Some(MappingValue::SubstrateBlockHash(substrate_block_hash)),
-				) => {
-					if self
-						.backend
-						.mapping()
-						.block_hash(ethereum_block_hash)?
-						.is_some()
-					{
+				) =>
+					if self.backend.mapping().block_hash(ethereum_block_hash)?.is_some() {
 						let existing_transaction_hashes: Vec<H256> = if let Some(statuses) = self
 							.client
 							.runtime_api()
 							.current_transaction_statuses(*substrate_block_hash)
 							.map_err(|e| format!("{:?}", e))?
 						{
-							statuses
-								.iter()
-								.map(|t| t.transaction_hash)
-								.collect::<Vec<H256>>()
+							statuses.iter().map(|t| t.transaction_hash).collect::<Vec<H256>>()
 						} else {
 							vec![]
 						};
@@ -162,15 +139,13 @@ where
 						};
 
 						self.backend.mapping().write_hashes(commitment)?;
-					}
-				}
+					},
 				_ => return Err(self.key_value_error(key, value)),
 			},
-			Operation::Delete => {
+			Operation::Delete =>
 				return Err("Delete operation is not supported for non-static keys"
 					.to_string()
-					.into())
-			}
+					.into()),
 		}
 		Ok(())
 	}

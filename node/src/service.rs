@@ -19,17 +19,16 @@
 #![warn(unused_extern_crates)]
 
 //! Service implementation. Specialized wrapper over substrate service.
-use crate::rpc::{create_full, BabeDeps, FullDeps, GrandpaDeps, DenyUnsafe};
+use crate::rpc::{create_full, BabeDeps, DenyUnsafe, FullDeps, GrandpaDeps};
 // use fc_db::Backend as FrontierBackend;
 use firechain_runtime::TransactionConverter;
 
-
 // use crate::cli::Cli;
 use codec::Encode;
+use firechain_runtime::RuntimeApi;
 use frame_benchmarking_cli::SUBSTRATE_REFERENCE_HARDWARE;
 use frame_system_rpc_runtime_api::AccountNonceApi;
 use futures::prelude::*;
-use firechain_runtime::RuntimeApi;
 use node_executor::ExecutorDispatch;
 use node_primitives::Block;
 use sc_client_api::{Backend, BlockBackend};
@@ -38,7 +37,7 @@ use sc_executor::NativeElseWasmExecutor;
 use sc_network::{event::Event, NetworkEventStream, NetworkService};
 use sc_network_common::sync::warp::WarpSyncParams;
 use sc_network_sync::SyncingService;
-use sc_service::{config::Configuration, error::Error as ServiceError, RpcHandlers, TaskManager,};
+use sc_service::{config::Configuration, error::Error as ServiceError, RpcHandlers, TaskManager};
 use sc_statement_store::Store as StatementStore;
 use sc_telemetry::{Telemetry, TelemetryWorker};
 use sc_transaction_pool_api::OffchainTransactionPoolFactory;
@@ -57,8 +56,6 @@ use std::{
 // Frontier
 //
 // use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
-use fc_rpc::{EthTask, OverrideHandle};
-use fc_rpc_core::types::{FeeHistoryCache, FeeHistoryCacheLimit, FilterPool};
 use crate::{
 	client::{BaseRuntimeApiCollection, RuntimeApiCollection},
 	eth::{
@@ -70,15 +67,17 @@ pub use crate::{
 	client::{Client, TemplateRuntimeExecutor},
 	eth::{db_config_dir, EthConfiguration},
 };
+use fc_rpc::{EthTask, OverrideHandle};
+use fc_rpc_core::types::{FeeHistoryCache, FeeHistoryCacheLimit, FilterPool};
 pub use fc_storage::overrides_handle;
 
 /// The full client type definition.
 pub type FullClient =
-sc_service::TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<ExecutorDispatch>>;
+	sc_service::TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<ExecutorDispatch>>;
 type FullBackend = sc_service::TFullBackend<Block>;
 type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
 type FullGrandpaBlockImport =
-grandpa::GrandpaBlockImport<FullBackend, Block, FullClient, FullSelectChain>;
+	grandpa::GrandpaBlockImport<FullBackend, Block, FullClient, FullSelectChain>;
 
 /// The transaction pool type defintion.
 pub type TransactionPool = sc_transaction_pool::FullPool<Block, FullClient>;
@@ -93,7 +92,6 @@ pub fn fetch_nonce(client: &FullClient, account: sp_core::sr25519::Pair) -> u32 
 		.account_nonce(best_hash, account.public().into())
 		.expect("Fetching account nonce works; qed")
 }
-
 
 /// Create a transaction using the given `call`.
 ///
@@ -232,7 +230,6 @@ pub fn new_partial(
 	)?;
 	let justification_import = grandpa_block_import.clone();
 
-
 	// let frontier_backend =
 	// 	fc_db::kv::Backend::open(client.clone(), &config.database, &db_config_dir(config))?;
 
@@ -285,7 +282,7 @@ pub fn new_partial(
 		config.prometheus_registry(),
 		&task_manager.spawn_handle(),
 	)
-		.map_err(|e| ServiceError::Other(format!("Statement store error: {:?}", e)))?;
+	.map_err(|e| ServiceError::Other(format!("Statement store error: {:?}", e)))?;
 
 	Ok(sc_service::PartialComponents {
 		client,
@@ -295,7 +292,7 @@ pub fn new_partial(
 		select_chain,
 		import_queue,
 		transaction_pool,
-		other: (import_setup,babe_worker_handle , telemetry, statement_store, frontier_backend),
+		other: (import_setup, babe_worker_handle, telemetry, statement_store, frontier_backend),
 	})
 }
 
@@ -340,15 +337,11 @@ pub fn new_full_base(
 		keystore_container,
 		select_chain,
 		transaction_pool,
-		other: ( import_setup,babe_worker_handle, mut telemetry, statement_store, frontier_backend),
+		other: (import_setup, babe_worker_handle, mut telemetry, statement_store, frontier_backend),
 	} = new_partial(&config, eth_config.clone())?;
 
-	let FrontierPartialComponents {
-		filter_pool,
-		fee_history_cache,
-		fee_history_cache_limit,
-	} = new_frontier_partial(&eth_config)?;
-
+	let FrontierPartialComponents { filter_pool, fee_history_cache, fee_history_cache_limit } =
+		new_frontier_partial(&eth_config)?;
 
 	let auth_disc_publish_non_global_ips = config.network.allow_non_globals_in_dht;
 	let mut net_config = sc_network::config::FullNetworkConfiguration::new(&config.network);
@@ -398,13 +391,11 @@ pub fn new_full_base(
 	let prometheus_registry = config.prometheus_registry().cloned();
 	let enable_offchain_worker = config.offchain_worker.enabled;
 
-
-
-
-// Sinks for pubsub notifications.
+	// Sinks for pubsub notifications.
 	// Everytime a new subscription is created, a new mpsc channel is added to the sink pool.
-	// The MappingSyncWorker sends through the channel on block import and the subscription emits a notification to the subscriber on receiving a message through this channel.
-	// This way we avoid race conditions when using native substrate block import notification stream.
+	// The MappingSyncWorker sends through the channel on block import and the subscription emits a
+	// notification to the subscriber on receiving a message through this channel. This way we avoid
+	// race conditions when using native substrate block import notification stream.
 	let pubsub_notification_sinks: fc_mapping_sync::EthereumBlockNotificationSinks<
 		fc_mapping_sync::EthereumBlockNotification<Block>,
 	> = Default::default();
@@ -415,8 +406,8 @@ pub fn new_full_base(
 	let fee_history_cache_limit: FeeHistoryCacheLimit = 1000;
 	let overrides = overrides_handle(client.clone());
 
-// for ethereum-compatibility rpc.
-// 	config.rpc_id_provider = Some(Box::new(fc_rpc::EthereumSubIdProvider));   // Need to check??
+	// for ethereum-compatibility rpc.
+	// 	config.rpc_id_provider = Some(Box::new(fc_rpc::EthereumSubIdProvider));   // Need to check??
 	let eth_rpc_params = crate::rpc::EthDeps {
 		client: client.clone(),
 		pool: transaction_pool.clone(),
@@ -445,7 +436,6 @@ pub fn new_full_base(
 		forced_parent_hashes: None,
 	};
 
-
 	let (rpc_extensions_builder, rpc_setup) = {
 		let (_, grandpa_link, _) = &import_setup;
 
@@ -464,7 +454,6 @@ pub fn new_full_base(
 		let select_chain = select_chain.clone();
 		let keystore = keystore_container.keystore();
 		let chain_spec = config.chain_spec.cloned_box();
-
 
 		let rpc_backend = backend.clone();
 		let rpc_statement_store = statement_store.clone();
@@ -492,14 +481,12 @@ pub fn new_full_base(
 				eth: eth_rpc_params.clone(),
 			};
 
-			create_full(deps, subscription_task_executor.clone(),
-						pubsub_notification_sinks.clone(),).map_err(Into::into)
+			create_full(deps, subscription_task_executor.clone(), pubsub_notification_sinks.clone())
+				.map_err(Into::into)
 		};
 
 		(rpc_extensions_builder, shared_voter_state2)
 	};
-
-
 
 	let rpc_handlers = sc_service::spawn_tasks(sc_service::SpawnTasksParams {
 		config,
@@ -540,7 +527,6 @@ pub fn new_full_base(
 		sync_service.clone(),
 		pubsub_notification_sinks,
 	);
-
 
 	if let Some(hwbench) = hwbench {
 		sc_sysinfo::print_hwbench(&hwbench);
@@ -732,8 +718,8 @@ pub fn new_full_base(
 					vec![Box::new(statement_store.clone().as_statement_store_ext()) as Box<_>]
 				},
 			})
-				.run(client.clone(), task_manager.spawn_handle())
-				.boxed(),
+			.run(client.clone(), task_manager.spawn_handle())
+			.boxed(),
 		);
 	}
 
@@ -747,9 +733,6 @@ pub fn new_full_base(
 		rpc_handlers,
 	})
 }
-
-
-
 
 /// Builds a new service for a full client.
 pub fn new_full(
@@ -767,7 +750,7 @@ mod tests {
 	use codec::Encode;
 	use firechain_runtime::{
 		constants::{currency::CENTS, time::SLOT_DURATION},
-		Address, BalancesCall, RuntimeCall, UncheckedExtrinsic,TransactionConverter,
+		Address, BalancesCall, RuntimeCall, TransactionConverter, UncheckedExtrinsic,
 	};
 	use node_primitives::{Block, DigestItem, Signature};
 	use sc_client_api::BlockBackend;
@@ -903,7 +886,7 @@ mod tests {
 					)
 						.create_inherent_data(),
 				)
-					.expect("Creates inherent data");
+				.expect("Creates inherent data");
 
 				digest.push(<DigestItem as CompatibleDigestItem>::babe_pre_digest(babe_pre_digest));
 
@@ -914,8 +897,8 @@ mod tests {
 						.propose(inherent_data, digest, std::time::Duration::from_secs(1), None)
 						.await
 				})
-					.expect("Error making test block")
-					.block;
+				.expect("Error making test block")
+				.block;
 
 				let (new_header, new_body) = new_block.deconstruct();
 				let pre_hash = new_header.hash();

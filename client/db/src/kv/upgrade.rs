@@ -70,21 +70,14 @@ impl fmt::Display for UpgradeError {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		match self {
 			UpgradeError::UnknownDatabaseVersion => {
-				write!(
-					f,
-					"Database version cannot be read from existing db_version file"
-				)
-			}
+				write!(f, "Database version cannot be read from existing db_version file")
+			},
 			UpgradeError::UnsupportedVersion(version) => {
 				write!(f, "Database version no longer supported: {}", version)
-			}
+			},
 			UpgradeError::FutureDatabaseVersion(version) => {
-				write!(
-					f,
-					"Database version comes from future version of the client: {}",
-					version
-				)
-			}
+				write!(f, "Database version comes from future version of the client: {}", version)
+			},
 			UpgradeError::Io(err) => write!(f, "Io error: {}", err),
 		}
 	}
@@ -101,22 +94,18 @@ pub(crate) fn upgrade_db<Block: BlockT, C: HeaderBackend<Block>>(
 		0 => return Err(UpgradeError::UnsupportedVersion(db_version)),
 		1 => {
 			let summary: UpgradeVersion1To2Summary = match source {
-				DatabaseSource::ParityDb { .. } => {
-					migrate_1_to_2_parity_db::<Block, C>(client, db_path)?
-				}
+				DatabaseSource::ParityDb { .. } =>
+					migrate_1_to_2_parity_db::<Block, C>(client, db_path)?,
 				#[cfg(feature = "rocksdb")]
 				DatabaseSource::RocksDb { .. } => migrate_1_to_2_rocks_db::<Block, C>(client, db_path)?,
 				_ => panic!("DatabaseSource required for upgrade ParityDb | RocksDb"),
 			};
 			if !summary.error.is_empty() {
-				panic!(
-					"Inconsistent migration from version 1 to 2. Failed on {:?}",
-					summary.error
-				);
+				panic!("Inconsistent migration from version 1 to 2. Failed on {:?}", summary.error);
 			} else {
 				log::info!("✔️ Successful Frontier DB migration from version 1 to version 2 ({:?} entries).", summary.success);
 			}
-		}
+		},
 		CURRENT_VERSION => (),
 		_ => return Err(UpgradeError::FutureDatabaseVersion(db_version)),
 	}
@@ -133,15 +122,13 @@ pub(crate) fn current_version(path: &Path) -> UpgradeResult<u32> {
 			let mut file = fs::File::create(version_file_path(path))?;
 			file.write_all(format!("{}", CURRENT_VERSION).as_bytes())?;
 			Ok(CURRENT_VERSION)
-		}
+		},
 		Err(_) => Err(UpgradeError::UnknownDatabaseVersion),
 		Ok(mut file) => {
 			let mut s = String::new();
-			file.read_to_string(&mut s)
-				.map_err(|_| UpgradeError::UnknownDatabaseVersion)?;
-			s.parse::<u32>()
-				.map_err(|_| UpgradeError::UnknownDatabaseVersion)
-		}
+			file.read_to_string(&mut s).map_err(|_| UpgradeError::UnknownDatabaseVersion)?;
+			s.parse::<u32>().map_err(|_| UpgradeError::UnknownDatabaseVersion)
+		},
 	}
 }
 
@@ -170,10 +157,7 @@ pub(crate) fn migrate_1_to_2_rocks_db<Block: BlockT, C: HeaderBackend<Block>>(
 	db_path: &Path,
 ) -> UpgradeResult<UpgradeVersion1To2Summary> {
 	log::info!("🔨 Running Frontier DB migration from version 1 to version 2. Please wait.");
-	let mut res = UpgradeVersion1To2Summary {
-		success: 0,
-		error: vec![],
-	};
+	let mut res = UpgradeVersion1To2Summary { success: 0, error: vec![] };
 	// Process a batch of hashes in a single db transaction
 	#[rustfmt::skip]
 	let mut process_chunk = |
@@ -251,10 +235,7 @@ pub(crate) fn migrate_1_to_2_parity_db<Block: BlockT, C: HeaderBackend<Block>>(
 	db_path: &Path,
 ) -> UpgradeResult<UpgradeVersion1To2Summary> {
 	log::info!("🔨 Running Frontier DB migration from version 1 to version 2. Please wait.");
-	let mut res = UpgradeVersion1To2Summary {
-		success: 0,
-		error: vec![],
-	};
+	let mut res = UpgradeVersion1To2Summary { success: 0, error: vec![] };
 	// Process a batch of hashes in a single db transaction
 	#[rustfmt::skip]
 	let mut process_chunk = |
@@ -307,7 +288,7 @@ pub(crate) fn migrate_1_to_2_parity_db<Block: BlockT, C: HeaderBackend<Block>>(
 				hashes.push(k);
 			}
 			hashes
-		}
+		},
 		Err(_) => vec![],
 	};
 	// Read and update each entry in db transaction batches
@@ -361,20 +342,14 @@ mod tests {
 			#[cfg(feature = "rocksdb")]
 			crate::kv::DatabaseSettings {
 				source: sc_client_db::DatabaseSource::RocksDb {
-					path: tempdir()
-						.expect("create a temporary directory")
-						.path()
-						.to_owned(),
+					path: tempdir().expect("create a temporary directory").path().to_owned(),
 					cache_size: 0,
 				},
 			},
 			// Parity db
 			crate::kv::DatabaseSettings {
 				source: sc_client_db::DatabaseSource::ParityDb {
-					path: tempdir()
-						.expect("create a temporary directory")
-						.path()
-						.to_owned(),
+					path: tempdir().expect("create a temporary directory").path().to_owned(),
 				},
 			},
 		];
@@ -436,9 +411,9 @@ mod tests {
 						&ethhash.encode(),
 						&orphan_block_hash.encode(),
 					);
-					// Test also that one-to-many transaction data is not affected by the migration logic.
-					// Map a transaction to both canon and orphan block hashes. This is what would have
-					// happened in case of fork or equivocation.
+					// Test also that one-to-many transaction data is not affected by the migration
+					// logic. Map a transaction to both canon and orphan block hashes. This is what
+					// would have happened in case of fork or equivocation.
 					let eth_tx_hash = H256::random();
 					let mut metadata = vec![];
 					for hash in vec![next_canon_block_hash, orphan_block_hash].iter() {
@@ -465,9 +440,7 @@ mod tests {
 			version_path.push("db_version");
 			let mut version_file =
 				std::fs::File::create(version_path).expect("db version file path created");
-			version_file
-				.write_all(format!("{}", 1).as_bytes())
-				.expect("write version 1");
+			version_file.write_all(format!("{}", 1).as_bytes()).expect("write version 1");
 
 			// Upgrade database from version 1 to 2
 			let _ = super::upgrade_db::<OpaqueBlock, _>(client.clone(), &path, &setting.source);
@@ -477,11 +450,8 @@ mod tests {
 				.expect("a temporary db was created");
 			for (i, original_ethereum_hash) in ethereum_hashes.iter().enumerate() {
 				let canon_substrate_block_hash = substrate_hashes.get(i).expect("Block hash");
-				let mapped_block = backend
-					.mapping()
-					.block_hash(original_ethereum_hash)
-					.unwrap()
-					.unwrap();
+				let mapped_block =
+					backend.mapping().block_hash(original_ethereum_hash).unwrap().unwrap();
 				// All entries now hold a single element Vec
 				assert_eq!(mapped_block.len(), 1);
 				// The Vec holds the canon block hash

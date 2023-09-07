@@ -281,8 +281,7 @@ where
 		number: BlockNumber,
 		index: Index,
 	) -> RpcResult<Option<Transaction>> {
-		self.transaction_by_block_number_and_index(number, index)
-			.await
+		self.transaction_by_block_number_and_index(number, index).await
 	}
 
 	async fn transaction_receipt(&self, hash: H256) -> RpcResult<Option<Receipt>> {
@@ -353,8 +352,7 @@ where
 		newest_block: BlockNumber,
 		reward_percentiles: Option<Vec<f64>>,
 	) -> RpcResult<FeeHistory> {
-		self.fee_history(block_count, newest_block, reward_percentiles)
-			.await
+		self.fee_history(block_count, newest_block, reward_percentiles).await
 	}
 
 	fn max_priority_fee_per_gas(&self) -> RpcResult<U256> {
@@ -458,11 +456,7 @@ fn rich_block_build(
 					)
 				} else {
 					BlockTransactions::Hashes(
-						block
-							.transactions
-							.iter()
-							.map(|transaction| transaction.hash())
-							.collect(),
+						block.transactions.iter().map(|transaction| transaction.hash()).collect(),
 					)
 				}
 			},
@@ -505,16 +499,13 @@ fn transaction_build(
 	};
 
 	// Block hash.
-	transaction.block_hash = block
-		.as_ref()
-		.map(|block| H256::from(keccak_256(&rlp::encode(&block.header))));
+	transaction.block_hash =
+		block.as_ref().map(|block| H256::from(keccak_256(&rlp::encode(&block.header))));
 	// Block number.
 	transaction.block_number = block.as_ref().map(|block| block.header.number);
 	// Transaction index.
 	transaction.transaction_index = status.as_ref().map(|status| {
-		U256::from(UniqueSaturatedInto::<u32>::unique_saturated_into(
-			status.transaction_index,
-		))
+		U256::from(UniqueSaturatedInto::<u32>::unique_saturated_into(status.transaction_index))
 	});
 	// From.
 	transaction.from = status.as_ref().map_or(
@@ -581,9 +572,6 @@ where
 		}
 		Ok(api)
 	} else {
-		Err(internal_err(format!(
-			"Cannot get header for block {:?}",
-			best_hash
-		)))
+		Err(internal_err(format!("Cannot get header for block {:?}", best_hash)))
 	}
 }

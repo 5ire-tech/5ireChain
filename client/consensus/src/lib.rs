@@ -86,11 +86,7 @@ where
 	C::Api: BlockBuilderApi<B> + EthereumRuntimeRPCApi<B>,
 {
 	pub fn new(inner: I, client: Arc<C>) -> Self {
-		Self {
-			inner,
-			client,
-			_marker: PhantomData,
-		}
+		Self { inner, client, _marker: PhantomData }
 	}
 }
 

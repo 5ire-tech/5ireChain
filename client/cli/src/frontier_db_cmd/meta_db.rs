@@ -73,13 +73,11 @@ impl<'a, B: BlockT> MetaDb<'a, B> {
 				// Insert data to the meta column, static tips key.
 				(MetaKey::Tips, Some(MetaValue::Tips(hashes))) => {
 					if self.backend.meta().current_syncing_tips()?.is_empty() {
-						self.backend
-							.meta()
-							.write_current_syncing_tips(hashes.clone())?;
+						self.backend.meta().write_current_syncing_tips(hashes.clone())?;
 					} else {
-						return Err(self.key_not_empty_error(key));
+						return Err(self.key_not_empty_error(key))
 					}
-				}
+				},
 				// Insert data to the meta column, static schema cache key.
 				(MetaKey::Schema, Some(MetaValue::Schema(schema_map))) => {
 					if self.backend.meta().ethereum_schema()?.is_none() {
@@ -89,9 +87,9 @@ impl<'a, B: BlockT> MetaDb<'a, B> {
 							.collect::<Vec<(fp_storage::EthereumStorageSchema, H256)>>();
 						self.backend.meta().write_ethereum_schema(data)?;
 					} else {
-						return Err(self.key_not_empty_error(key));
+						return Err(self.key_not_empty_error(key))
 					}
-				}
+				},
 				_ => return Err(self.key_value_error(key, value)),
 			},
 			Operation::Read => match key {
@@ -99,22 +97,20 @@ impl<'a, B: BlockT> MetaDb<'a, B> {
 				MetaKey::Tips => {
 					let value = self.backend.meta().current_syncing_tips()?;
 					println!("{:?}", value);
-				}
+				},
 				// Read meta column, static schema cache key.
 				MetaKey::Schema => {
 					let value = self.backend.meta().ethereum_schema()?;
 					println!("{:?}", value);
-				}
+				},
 			},
 			Operation::Update => match (key, value) {
 				// Update the static tips key's value.
 				(MetaKey::Tips, Some(MetaValue::Tips(new_value))) => {
 					let value = self.backend.meta().current_syncing_tips()?;
 					self.confirmation_prompt(&self.cmd.operation, key, &value, new_value)?;
-					self.backend
-						.meta()
-						.write_current_syncing_tips(new_value.clone())?;
-				}
+					self.backend.meta().write_current_syncing_tips(new_value.clone())?;
+				},
 				// Update the static schema cache key's value.
 				(MetaKey::Schema, Some(MetaValue::Schema(schema_map))) => {
 					let value = self.backend.meta().ethereum_schema()?;
@@ -129,7 +125,7 @@ impl<'a, B: BlockT> MetaDb<'a, B> {
 						&Some(new_value.clone()),
 					)?;
 					self.backend.meta().write_ethereum_schema(new_value)?;
-				}
+				},
 				_ => return Err(self.key_value_error(key, value)),
 			},
 			Operation::Delete => match key {
@@ -138,13 +134,13 @@ impl<'a, B: BlockT> MetaDb<'a, B> {
 					let value = self.backend.meta().current_syncing_tips()?;
 					self.confirmation_prompt(&self.cmd.operation, key, &value, &vec![])?;
 					self.backend.meta().write_current_syncing_tips(vec![])?;
-				}
+				},
 				// Deletes the static schema cache key's value.
 				MetaKey::Schema => {
 					let value = self.backend.meta().ethereum_schema()?;
 					self.confirmation_prompt(&self.cmd.operation, key, &value, &Some(vec![]))?;
 					self.backend.meta().write_ethereum_schema(vec![])?;
-				}
+				},
 			},
 		}
 		Ok(())

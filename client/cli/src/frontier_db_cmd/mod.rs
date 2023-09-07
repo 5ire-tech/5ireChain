@@ -125,7 +125,7 @@ impl FrontierDbCmd {
 				};
 				// Run the query
 				meta_db.query(&key, &value)?
-			}
+			},
 			Column::Block | Column::Transaction => {
 				// New mapping db handler
 				let mapping_db = MappingDb::new(self, client, backend);
@@ -144,7 +144,7 @@ impl FrontierDbCmd {
 				};
 				// Run the query
 				mapping_db.query(&self.column, &key, &value)?
-			}
+			},
 		}
 		Ok(())
 	}

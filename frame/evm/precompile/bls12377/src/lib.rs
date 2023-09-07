@@ -40,7 +40,8 @@ const BLS12377_MULTIEXP_DISCOUNT_TABLE: [u16; 128] = [
 	184, 183, 182, 182, 181, 180, 179, 179, 178, 177, 176, 176, 175, 174,
 ];
 
-/// Encode Fq as `64` bytes by performing Big-Endian encoding of the corresponding (unsigned) integer (top 16 bytes are always zeroes).
+/// Encode Fq as `64` bytes by performing Big-Endian encoding of the corresponding (unsigned)
+/// integer (top 16 bytes are always zeroes).
 fn encode_fq(field: Fq) -> [u8; 64] {
 	let mut result = [0u8; 64];
 	let rep = field.into_bigint().0;
@@ -96,7 +97,7 @@ fn decode_fq(bytes: [u8; 64]) -> Option<Fq> {
 	// check top bytes
 	for b in bytes.iter().take(16) {
 		if b.ne(&0u8) {
-			return None;
+			return None
 		}
 	}
 
@@ -117,9 +118,8 @@ fn decode_fq(bytes: [u8; 64]) -> Option<Fq> {
 fn extract_fq(bytes: [u8; 64]) -> Result<Fq, PrecompileFailure> {
 	let fq = decode_fq(bytes);
 	match fq {
-		None => Err(PrecompileFailure::Error {
-			exit_status: ExitError::Other("invalid Fq".into()),
-		}),
+		None =>
+			Err(PrecompileFailure::Error { exit_status: ExitError::Other("invalid Fq".into()) }),
 		Some(c) => Ok(c),
 	}
 }
@@ -194,7 +194,8 @@ impl Bls12377G1Add {
 
 impl Precompile for Bls12377G1Add {
 	/// Implements EIP-2539 G1Add precompile.
-	/// > G1 addition call expects `256` bytes as an input that is interpreted as byte concatenation of two G1 points (`128` bytes each).
+	/// > G1 addition call expects `256` bytes as an input that is interpreted as byte concatenation
+	/// > of two G1 points (`128` bytes each).
 	/// > Output is an encoding of addition operation result - single G1 point (`128` bytes).
 	fn execute(handle: &mut impl PrecompileHandle) -> PrecompileResult {
 		handle.record_cost(Bls12377G1Add::GAS_COST)?;
@@ -203,7 +204,7 @@ impl Precompile for Bls12377G1Add {
 		if input.len() != 256 {
 			return Err(PrecompileFailure::Error {
 				exit_status: ExitError::Other("invalid input length".into()),
-			});
+			})
 		}
 
 		// Decode G1 point p_0
@@ -215,10 +216,7 @@ impl Precompile for Bls12377G1Add {
 		// Encode the G1 point into 128 bytes output
 		let output = encode_g1(r.into_affine());
 
-		Ok(PrecompileOutput {
-			exit_status: ExitSucceed::Returned,
-			output: output.to_vec(),
-		})
+		Ok(PrecompileOutput { exit_status: ExitSucceed::Returned, output: output.to_vec() })
 	}
 }
 
@@ -232,7 +230,9 @@ impl Bls12377G1Mul {
 
 impl Precompile for Bls12377G1Mul {
 	/// Implements EIP-2539 G1Mul precompile.
-	/// > G1 multiplication call expects `160` bytes as an input that is interpreted as byte concatenation of encoding of G1 point (`128` bytes) and encoding of a scalar value (`32` bytes).
+	/// > G1 multiplication call expects `160` bytes as an input that is interpreted as byte
+	/// > concatenation of encoding of G1 point (`128` bytes) and encoding of a scalar value (`32`
+	/// > bytes).
 	/// > Output is an encoding of multiplication operation result - single G1 point (`128` bytes).
 	fn execute(handle: &mut impl PrecompileHandle) -> PrecompileResult {
 		handle.record_cost(Bls12377G1Mul::GAS_COST)?;
@@ -241,7 +241,7 @@ impl Precompile for Bls12377G1Mul {
 		if input.len() != 160 {
 			return Err(PrecompileFailure::Error {
 				exit_status: ExitError::Other("invalid input length".into()),
-			});
+			})
 		}
 
 		// Decode G1 point
@@ -253,10 +253,7 @@ impl Precompile for Bls12377G1Mul {
 		// Encode the G1 point into 128 bytes output
 		let output = encode_g1(r.into_affine());
 
-		Ok(PrecompileOutput {
-			exit_status: ExitSucceed::Returned,
-			output: output.to_vec(),
-		})
+		Ok(PrecompileOutput { exit_status: ExitSucceed::Returned, output: output.to_vec() })
 	}
 }
 
@@ -271,7 +268,7 @@ impl Bls12377G1MultiExp {
 		// Calculate G1 point, scalar value pair length
 		let k = input_len / 160;
 		if k == 0 {
-			return 0;
+			return 0
 		}
 		// Lookup discount value for G1 point, scalar value pair length
 		let d_len = BLS12377_MULTIEXP_DISCOUNT_TABLE.len();
@@ -287,8 +284,10 @@ impl Bls12377G1MultiExp {
 
 impl Precompile for Bls12377G1MultiExp {
 	/// Implements EIP-2539 G1MultiExp precompile.
-	/// G1 multiplication call expects `160*k` bytes as an input that is interpreted as byte concatenation of `k` slices each of them being a byte concatenation of encoding of G1 point (`128` bytes) and encoding of a scalar value (`32` bytes).
-	/// Output is an encoding of multiexponentiation operation result - single G1 point (`128` bytes).
+	/// G1 multiplication call expects `160*k` bytes as an input that is interpreted as byte
+	/// concatenation of `k` slices each of them being a byte concatenation of encoding of G1 point
+	/// (`128` bytes) and encoding of a scalar value (`32` bytes). Output is an encoding of
+	/// multiexponentiation operation result - single G1 point (`128` bytes).
 	fn execute(handle: &mut impl PrecompileHandle) -> PrecompileResult {
 		let gas_cost = Bls12377G1MultiExp::calculate_gas_cost(handle.input().len());
 		handle.record_cost(gas_cost)?;
@@ -297,7 +296,7 @@ impl Precompile for Bls12377G1MultiExp {
 		if handle.input().is_empty() || handle.input().len() % 160 != 0 {
 			return Err(PrecompileFailure::Error {
 				exit_status: ExitError::Other("invalid input length".into()),
-			});
+			})
 		}
 
 		let input = handle.input();
@@ -317,17 +316,12 @@ impl Precompile for Bls12377G1MultiExp {
 
 		// Compute r = e_0 * p_0 + e_1 * p_1 + ... + e_(k-1) * p_(k-1)
 		let r = G1Projective::msm(&points.to_vec(), &scalars.to_vec()).map_err(|_| {
-			PrecompileFailure::Error {
-				exit_status: ExitError::Other("MSM failed".into()),
-			}
+			PrecompileFailure::Error { exit_status: ExitError::Other("MSM failed".into()) }
 		})?;
 
 		// Encode the G1 point into 128 bytes output
 		let output = encode_g1(r.into_affine());
-		Ok(PrecompileOutput {
-			exit_status: ExitSucceed::Returned,
-			output: output.to_vec(),
-		})
+		Ok(PrecompileOutput { exit_status: ExitSucceed::Returned, output: output.to_vec() })
 	}
 }
 
@@ -341,7 +335,8 @@ impl Bls12377G2Add {
 
 impl Precompile for Bls12377G2Add {
 	/// Implements EIP-2539 G2Add precompile.
-	/// > G2 addition call expects `512` bytes as an input that is interpreted as byte concatenation of two G2 points (`256` bytes each).
+	/// > G2 addition call expects `512` bytes as an input that is interpreted as byte concatenation
+	/// > of two G2 points (`256` bytes each).
 	/// > Output is an encoding of addition operation result - single G2 point (`256` bytes).
 	fn execute(handle: &mut impl PrecompileHandle) -> PrecompileResult {
 		handle.record_cost(Bls12377G2Add::GAS_COST)?;
@@ -350,7 +345,7 @@ impl Precompile for Bls12377G2Add {
 		if input.len() != 512 {
 			return Err(PrecompileFailure::Error {
 				exit_status: ExitError::Other("invalid input length".into()),
-			});
+			})
 		}
 
 		// Decode G2 point p_0
@@ -362,10 +357,7 @@ impl Precompile for Bls12377G2Add {
 		// Encode the G2 point into 256 bytes output
 		let output = encode_g2(r.into_affine());
 
-		Ok(PrecompileOutput {
-			exit_status: ExitSucceed::Returned,
-			output: output.to_vec(),
-		})
+		Ok(PrecompileOutput { exit_status: ExitSucceed::Returned, output: output.to_vec() })
 	}
 }
 
@@ -379,7 +371,9 @@ impl Bls12377G2Mul {
 
 impl Precompile for Bls12377G2Mul {
 	/// Implements EIP-2539 G2MUL precompile logic.
-	/// > G2 multiplication call expects `288` bytes as an input that is interpreted as byte concatenation of encoding of G2 point (`256` bytes) and encoding of a scalar value (`32` bytes).
+	/// > G2 multiplication call expects `288` bytes as an input that is interpreted as byte
+	/// > concatenation of encoding of G2 point (`256` bytes) and encoding of a scalar value (`32`
+	/// > bytes).
 	/// > Output is an encoding of multiplication operation result - single G2 point (`256` bytes).
 	fn execute(handle: &mut impl PrecompileHandle) -> PrecompileResult {
 		handle.record_cost(Bls12377G2Mul::GAS_COST)?;
@@ -388,7 +382,7 @@ impl Precompile for Bls12377G2Mul {
 		if input.len() != 288 {
 			return Err(PrecompileFailure::Error {
 				exit_status: ExitError::Other("invalid input length".into()),
-			});
+			})
 		}
 
 		// Decode G2 point
@@ -400,10 +394,7 @@ impl Precompile for Bls12377G2Mul {
 		// Encode the G2 point into 256 bytes output
 		let output = encode_g2(r.into_affine());
 
-		Ok(PrecompileOutput {
-			exit_status: ExitSucceed::Returned,
-			output: output.to_vec(),
-		})
+		Ok(PrecompileOutput { exit_status: ExitSucceed::Returned, output: output.to_vec() })
 	}
 }
 
@@ -418,7 +409,7 @@ impl Bls12377G2MultiExp {
 		// Calculate G2 point, scalar value pair length
 		let k = input_len / 288;
 		if k == 0 {
-			return 0;
+			return 0
 		}
 		// Lookup discount value for G2 point, scalar value pair length
 		let d_len = BLS12377_MULTIEXP_DISCOUNT_TABLE.len();
@@ -434,8 +425,11 @@ impl Bls12377G2MultiExp {
 
 impl Precompile for Bls12377G2MultiExp {
 	/// Implements EIP-2539 G2MultiExp precompile logic
-	/// > G2 multiplication call expects `288*k` bytes as an input that is interpreted as byte concatenation of `k` slices each of them being a byte concatenation of encoding of G2 point (`256` bytes) and encoding of a scalar value (`32` bytes).
-	/// > Output is an encoding of multiexponentiation operation result - single G2 point (`256` bytes).
+	/// > G2 multiplication call expects `288*k` bytes as an input that is interpreted as byte
+	/// > concatenation of `k` slices each of them being a byte concatenation of encoding of G2
+	/// > point (`256` bytes) and encoding of a scalar value (`32` bytes).
+	/// > Output is an encoding of multiexponentiation operation result - single G2 point (`256`
+	/// > bytes).
 	fn execute(handle: &mut impl PrecompileHandle) -> PrecompileResult {
 		let gas_cost = Bls12377G2MultiExp::calculate_gas_cost(handle.input().len());
 		handle.record_cost(gas_cost)?;
@@ -444,7 +438,7 @@ impl Precompile for Bls12377G2MultiExp {
 		if handle.input().is_empty() || handle.input().len() % 288 != 0 {
 			return Err(PrecompileFailure::Error {
 				exit_status: ExitError::Other("invalid input length".into()),
-			});
+			})
 		}
 
 		let input = handle.input();
@@ -464,17 +458,12 @@ impl Precompile for Bls12377G2MultiExp {
 
 		// Compute r = e_0 * p_0 + e_1 * p_1 + ... + e_(k-1) * p_(k-1)
 		let r = G2Projective::msm(&points.to_vec(), &scalars.to_vec()).map_err(|_| {
-			PrecompileFailure::Error {
-				exit_status: ExitError::Other("MSM failed".into()),
-			}
+			PrecompileFailure::Error { exit_status: ExitError::Other("MSM failed".into()) }
 		})?;
 
 		// Encode the G2 point to 256 bytes output
 		let output = encode_g2(r.into_affine());
-		Ok(PrecompileOutput {
-			exit_status: ExitSucceed::Returned,
-			output: output.to_vec(),
-		})
+		Ok(PrecompileOutput { exit_status: ExitSucceed::Returned, output: output.to_vec() })
 	}
 }
 
@@ -489,16 +478,19 @@ impl Bls12377Pairing {
 
 impl Precompile for Bls12377Pairing {
 	/// Implements EIP-2539 Pairing precompile logic.
-	/// > Pairing call expects `384*k` bytes as an inputs that is interpreted as byte concatenation of `k` slices. Each slice has the following structure:
+	/// > Pairing call expects `384*k` bytes as an inputs that is interpreted as byte concatenation
+	/// > of `k` slices. Each slice has the following structure:
 	/// > - `128` bytes of G1 point encoding
 	/// > - `256` bytes of G2 point encoding
-	/// > Output is a `32` bytes where last single byte is `0x01` if pairing result is equal to multiplicative identity in a pairing target field and `0x00` otherwise
-	/// > (which is equivalent of Big Endian encoding of Solidity values `uint256(1)` and `uin256(0)` respectively).
+	/// > Output is a `32` bytes where last single byte is `0x01` if pairing result is equal to
+	/// > multiplicative identity in a pairing target field and `0x00` otherwise
+	/// > (which is equivalent of Big Endian encoding of Solidity values `uint256(1)` and
+	/// > `uin256(0)` respectively).
 	fn execute(handle: &mut impl PrecompileHandle) -> PrecompileResult {
 		if handle.input().is_empty() || handle.input().len() % 384 != 0 {
 			return Err(PrecompileFailure::Error {
 				exit_status: ExitError::Other("invalid input length".into()),
-			});
+			})
 		}
 
 		let k = handle.input().len() / 384;
@@ -523,12 +515,12 @@ impl Precompile for Bls12377Pairing {
 			if !g1.into_affine().is_in_correct_subgroup_assuming_on_curve() {
 				return Err(PrecompileFailure::Error {
 					exit_status: ExitError::Other("g1 point is not on correct subgroup".into()),
-				});
+				})
 			}
 			if !g2.into_affine().is_in_correct_subgroup_assuming_on_curve() {
 				return Err(PrecompileFailure::Error {
 					exit_status: ExitError::Other("g2 point is not on correct subgroup".into()),
-				});
+				})
 			}
 
 			a.push(g1);
@@ -541,10 +533,7 @@ impl Precompile for Bls12377Pairing {
 			output[31] = 1;
 		}
 
-		Ok(PrecompileOutput {
-			exit_status: ExitSucceed::Returned,
-			output: output.to_vec(),
-		})
+		Ok(PrecompileOutput { exit_status: ExitSucceed::Returned, output: output.to_vec() })
 	}
 }
 

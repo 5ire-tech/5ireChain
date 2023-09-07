@@ -27,10 +27,7 @@ use sp_core::{H160, U256};
 use sp_runtime::BuildStorage;
 
 pub fn new_test_ext() -> sp_io::TestExternalities {
-	frame_system::GenesisConfig::<Test>::default()
-		.build_storage()
-		.unwrap()
-		.into()
+	frame_system::GenesisConfig::<Test>::default().build_storage().unwrap().into()
 }
 
 #[test]
@@ -58,9 +55,7 @@ fn decode_limit_too_high() {
 
 		assert_eq!(
 			Dispatch::<Test>::execute(&mut handle),
-			Err(PrecompileFailure::Error {
-				exit_status: ExitError::Other("decode failed".into())
-			})
+			Err(PrecompileFailure::Error { exit_status: ExitError::Other("decode failed".into()) })
 		);
 	});
 }
@@ -112,11 +107,10 @@ fn dispatch_validator_works_well() {
 				call: &RuntimeCall,
 			) -> Option<PrecompileFailure> {
 				match call {
-					RuntimeCall::System(frame_system::Call::remark { remark: _ }) => {
+					RuntimeCall::System(frame_system::Call::remark { remark: _ }) =>
 						return Some(PrecompileFailure::Error {
 							exit_status: ExitError::Other("This call is not allowed".into()),
-						})
-					}
+						}),
 					_ => None,
 				}
 			}

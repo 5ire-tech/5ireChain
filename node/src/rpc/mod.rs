@@ -33,15 +33,21 @@
 
 use std::sync::Arc;
 
-use jsonrpsee::RpcModule;
-use node_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Nonce};
-use sc_client_api::AuxStore;
-use sc_consensus_babe::BabeWorkerHandle;
+use fp_storage::EthereumStorageSchema;
 use grandpa::{
 	FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState,
 };
+use jsonrpsee::RpcModule;
+use node_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Nonce};
+use sc_client_api::{
+	backend::{Backend, StorageProvider},
+	client::BlockchainEvents,
+	AuxStore,
+};
+use sc_consensus_babe::BabeWorkerHandle;
 use sc_rpc::SubscriptionTaskExecutor;
 pub use sc_rpc_api::DenyUnsafe;
+use sc_transaction_pool::ChainApi;
 use sc_transaction_pool_api::TransactionPool;
 use sp_api::{CallApiAt, ProvideRuntimeApi};
 use sp_block_builder::BlockBuilder;
@@ -49,12 +55,6 @@ use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
 use sp_consensus_babe::BabeApi;
 use sp_keystore::KeystorePtr;
-use fp_storage::EthereumStorageSchema;
-use sc_client_api::{
-	backend::{Backend, StorageProvider},
-	client::BlockchainEvents,
-};
-use sc_transaction_pool::ChainApi;
 use sp_runtime::traits::Block as BlockT;
 
 mod eth;
@@ -109,17 +109,17 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi, CT> {
 pub struct DefaultEthConfig<C, BE>(std::marker::PhantomData<(C, BE)>);
 
 impl<C, BE> fc_rpc::EthConfig<Block, C> for DefaultEthConfig<C, BE>
-	where
-		C: sc_client_api::StorageProvider<Block, BE> + Sync + Send + 'static,
-		BE: Backend<Block> + 'static,
+where
+	C: sc_client_api::StorageProvider<Block, BE> + Sync + Send + 'static,
+	BE: Backend<Block> + 'static,
 {
 	type EstimateGasAdapter = ();
 	type RuntimeStorageOverride =
-	fc_rpc::frontier_backend_client::SystemAccountId20StorageOverride<Block, C, BE>;
+		fc_rpc::frontier_backend_client::SystemAccountId20StorageOverride<Block, C, BE>;
 }
 
 /// Instantiate all Full RPC extensions.
-pub fn create_full<C, P, BE,SC, B, A, CT>(
+pub fn create_full<C, P, BE, SC, B, A, CT>(
 	FullDeps {
 		client,
 		pool,
@@ -139,8 +139,8 @@ pub fn create_full<C, P, BE,SC, B, A, CT>(
 		>,
 	>,
 ) -> Result<RpcModule<()>, Box<dyn std::error::Error + Send + Sync>>
-	where
-		C: ProvideRuntimeApi<Block>
+where
+	C: ProvideRuntimeApi<Block>
 		+ sc_client_api::BlockBackend<Block>
 		+ HeaderBackend<Block>
 		+ AuxStore
@@ -148,26 +148,26 @@ pub fn create_full<C, P, BE,SC, B, A, CT>(
 		+ Sync
 		+ Send
 		+ 'static,
-		C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Nonce>,
-		C::Api: mmr_rpc::MmrRuntimeApi<Block, <Block as sp_runtime::traits::Block>::Hash, BlockNumber>,
-		C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
-		C::Api: fp_rpc::ConvertTransactionRuntimeApi<Block>,
-		C::Api: fp_rpc::EthereumRuntimeRPCApi<Block>,
-		C: BlockchainEvents<Block> + 'static,
-		C: HeaderBackend<Block>
+	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Nonce>,
+	C::Api: mmr_rpc::MmrRuntimeApi<Block, <Block as sp_runtime::traits::Block>::Hash, BlockNumber>,
+	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
+	C::Api: fp_rpc::ConvertTransactionRuntimeApi<Block>,
+	C::Api: fp_rpc::EthereumRuntimeRPCApi<Block>,
+	C: BlockchainEvents<Block> + 'static,
+	C: HeaderBackend<Block>
 		+ HeaderMetadata<Block, Error = BlockChainError>
 		+ StorageProvider<Block, BE>,
-		C: CallApiAt<Block> + ProvideRuntimeApi<Block>,
-		C::Api: BabeApi<Block>,
-		C::Api: BlockBuilder<Block>,
-		P: TransactionPool + 'static,
-		SC: SelectChain<Block> + 'static,
-		BE: Backend<Block> + 'static,
-		B: sc_client_api::Backend<Block> + Send + Sync + 'static,
-		B::State: sc_client_api::backend::StateBackend<sp_runtime::traits::HashFor<Block>>,
-		P: TransactionPool<Block = Block> + 'static,
-		A: ChainApi<Block = Block> + 'static,
-		CT: fp_rpc::ConvertTransaction<<Block as BlockT>::Extrinsic> + Send + Sync + 'static,
+	C: CallApiAt<Block> + ProvideRuntimeApi<Block>,
+	C::Api: BabeApi<Block>,
+	C::Api: BlockBuilder<Block>,
+	P: TransactionPool + 'static,
+	SC: SelectChain<Block> + 'static,
+	BE: Backend<Block> + 'static,
+	B: sc_client_api::Backend<Block> + Send + Sync + 'static,
+	B::State: sc_client_api::backend::StateBackend<sp_runtime::traits::HashFor<Block>>,
+	P: TransactionPool<Block = Block> + 'static,
+	A: ChainApi<Block = Block> + 'static,
+	CT: fp_rpc::ConvertTransaction<<Block as BlockT>::Extrinsic> + Send + Sync + 'static,
 {
 	use mmr_rpc::{Mmr, MmrApiServer};
 	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApiServer};
@@ -209,7 +209,7 @@ pub fn create_full<C, P, BE,SC, B, A, CT>(
 				.offchain_storage()
 				.ok_or_else(|| "Backend doesn't provide an offchain storage")?,
 		)
-			.into_rpc(),
+		.into_rpc(),
 	)?;
 	io.merge(TransactionPayment::new(client.clone()).into_rpc())?;
 	io.merge(
@@ -224,7 +224,7 @@ pub fn create_full<C, P, BE,SC, B, A, CT>(
 			justification_stream,
 			finality_provider,
 		)
-			.into_rpc(),
+		.into_rpc(),
 	)?;
 
 	io.merge(

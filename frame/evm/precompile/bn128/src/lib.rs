@@ -31,7 +31,7 @@ use sp_core::U256;
 fn read_input(source: &[u8], target: &mut [u8], offset: usize) {
 	// Out of bounds, nothing to copy.
 	if source.len() <= offset {
-		return;
+		return
 	}
 
 	// Find len to copy up to target len, but not out of bounds.
@@ -96,26 +96,15 @@ impl Precompile for Bn128Add {
 		let mut buf = [0u8; 64];
 		if let Some(sum) = AffineG1::from_jacobian(p1 + p2) {
 			// point not at infinity
-			sum.x()
-				.to_big_endian(&mut buf[0..32])
-				.map_err(|_| PrecompileFailure::Error {
-					exit_status: ExitError::Other(
-						"Cannot fail since 0..32 is 32-byte length".into(),
-					),
-				})?;
-			sum.y()
-				.to_big_endian(&mut buf[32..64])
-				.map_err(|_| PrecompileFailure::Error {
-					exit_status: ExitError::Other(
-						"Cannot fail since 32..64 is 32-byte length".into(),
-					),
-				})?;
+			sum.x().to_big_endian(&mut buf[0..32]).map_err(|_| PrecompileFailure::Error {
+				exit_status: ExitError::Other("Cannot fail since 0..32 is 32-byte length".into()),
+			})?;
+			sum.y().to_big_endian(&mut buf[32..64]).map_err(|_| PrecompileFailure::Error {
+				exit_status: ExitError::Other("Cannot fail since 32..64 is 32-byte length".into()),
+			})?;
 		}
 
-		Ok(PrecompileOutput {
-			exit_status: ExitSucceed::Returned,
-			output: buf.to_vec(),
-		})
+		Ok(PrecompileOutput { exit_status: ExitSucceed::Returned, output: buf.to_vec() })
 	}
 }
 
@@ -140,26 +129,15 @@ impl Precompile for Bn128Mul {
 		let mut buf = [0u8; 64];
 		if let Some(sum) = AffineG1::from_jacobian(p * fr) {
 			// point not at infinity
-			sum.x()
-				.to_big_endian(&mut buf[0..32])
-				.map_err(|_| PrecompileFailure::Error {
-					exit_status: ExitError::Other(
-						"Cannot fail since 0..32 is 32-byte length".into(),
-					),
-				})?;
-			sum.y()
-				.to_big_endian(&mut buf[32..64])
-				.map_err(|_| PrecompileFailure::Error {
-					exit_status: ExitError::Other(
-						"Cannot fail since 32..64 is 32-byte length".into(),
-					),
-				})?;
+			sum.x().to_big_endian(&mut buf[0..32]).map_err(|_| PrecompileFailure::Error {
+				exit_status: ExitError::Other("Cannot fail since 0..32 is 32-byte length".into()),
+			})?;
+			sum.y().to_big_endian(&mut buf[32..64]).map_err(|_| PrecompileFailure::Error {
+				exit_status: ExitError::Other("Cannot fail since 32..64 is 32-byte length".into()),
+			})?;
 		}
 
-		Ok(PrecompileOutput {
-			exit_status: ExitSucceed::Returned,
-			output: buf.to_vec(),
-		})
+		Ok(PrecompileOutput { exit_status: ExitSucceed::Returned, output: buf.to_vec() })
 	}
 }
 
@@ -183,14 +161,14 @@ impl Precompile for Bn128Pairing {
 			if handle.input().len() % 192 > 0 {
 				return Err(PrecompileFailure::Error {
 					exit_status: ExitError::Other("bad elliptic curve pairing size".into()),
-				});
+				})
 			}
 
 			// (a, b_a, b_b - each 64-byte affine coordinates)
 			let elements = handle.input().len() / 192;
 
-			let gas_cost: u64 = Bn128Pairing::BASE_GAS_COST
-				+ (elements as u64 * Bn128Pairing::GAS_COST_PER_PAIRING);
+			let gas_cost: u64 = Bn128Pairing::BASE_GAS_COST +
+				(elements as u64 * Bn128Pairing::GAS_COST_PER_PAIRING);
 
 			handle.record_cost(gas_cost)?;
 
@@ -251,24 +229,16 @@ impl Precompile for Bn128Pairing {
 				let b = if b_a.is_zero() && b_b.is_zero() {
 					G2::zero()
 				} else {
-					G2::from(
-						AffineG2::new(b_a, b_b).map_err(|_| PrecompileFailure::Error {
-							exit_status: ExitError::Other(
-								"Invalid b argument - not on curve".into(),
-							),
-						})?,
-					)
+					G2::from(AffineG2::new(b_a, b_b).map_err(|_| PrecompileFailure::Error {
+						exit_status: ExitError::Other("Invalid b argument - not on curve".into()),
+					})?)
 				};
 				let a = if a_x.is_zero() && a_y.is_zero() {
 					G1::zero()
 				} else {
-					G1::from(
-						AffineG1::new(a_x, a_y).map_err(|_| PrecompileFailure::Error {
-							exit_status: ExitError::Other(
-								"Invalid a argument - not on curve".into(),
-							),
-						})?,
-					)
+					G1::from(AffineG1::new(a_x, a_y).map_err(|_| PrecompileFailure::Error {
+						exit_status: ExitError::Other("Invalid a argument - not on curve".into()),
+					})?)
 				};
 				vals.push((a, b));
 			}
@@ -285,10 +255,7 @@ impl Precompile for Bn128Pairing {
 		let mut buf = [0u8; 32];
 		ret_val.to_big_endian(&mut buf);
 
-		Ok(PrecompileOutput {
-			exit_status: ExitSucceed::Returned,
-			output: buf.to_vec(),
-		})
+		Ok(PrecompileOutput { exit_status: ExitSucceed::Returned, output: buf.to_vec() })
 	}
 }
 

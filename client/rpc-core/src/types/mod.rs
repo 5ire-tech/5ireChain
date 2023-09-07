@@ -77,15 +77,12 @@ pub(crate) fn deserialize_data_or_input<'d, D: Deserializer<'d>>(
 ) -> Result<Option<Bytes>, D::Error> {
 	let CallOrInputData { data, input } = CallOrInputData::deserialize(d)?;
 	match (&data, &input) {
-		(Some(data), Some(input)) => {
+		(Some(data), Some(input)) =>
 			if data == input {
 				Ok(Some(data.clone()))
 			} else {
-				Err(D::Error::custom(
-					"Ambiguous value for `data` and `input`".to_string(),
-				))
-			}
-		}
+				Err(D::Error::custom("Ambiguous value for `data` and `input`".to_string()))
+			},
 		(_, _) => Ok(data.or(input)),
 	}
 }

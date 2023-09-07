@@ -53,10 +53,7 @@ pub fn open_frontier_backend<Block: BlockT, C: HeaderBackend<Block>>(
 	Ok(Arc::new(fc_db::kv::Backend::<Block>::new(
 		client,
 		&fc_db::kv::DatabaseSettings {
-			source: sc_client_db::DatabaseSource::RocksDb {
-				path,
-				cache_size: 0,
-			},
+			source: sc_client_db::DatabaseSource::RocksDb { path, cache_size: 0 },
 		},
 	)?))
 }
@@ -109,11 +106,8 @@ fn tips_test_value() -> TestValue {
 
 fn test_json_file(tmp: &tempfile::TempDir, value: &TestValue) -> PathBuf {
 	let test_value_path = tmp.path().join("test.json");
-	std::fs::write(
-		test_value_path.clone(),
-		serde_json::to_string_pretty(value).unwrap(),
-	)
-	.expect("write test value json file");
+	std::fs::write(test_value_path.clone(), serde_json::to_string_pretty(value).unwrap())
+		.expect("write test value json file");
 	test_value_path
 }
 
@@ -202,14 +196,9 @@ fn schema_read_works() {
 		.expect("data inserted in temporary db");
 
 	// Run the command
-	assert!(cmd(
-		":ethereum_schema_cache".to_string(),
-		None,
-		Operation::Read,
-		Column::Meta
-	)
-	.run(client, backend.clone())
-	.is_ok());
+	assert!(cmd(":ethereum_schema_cache".to_string(), None, Operation::Read, Column::Meta)
+		.run(client, backend.clone())
+		.is_ok());
 }
 
 #[test]
@@ -258,14 +247,9 @@ fn schema_delete_works() {
 		.write_ethereum_schema(data.clone())
 		.expect("data inserted in temporary db");
 	// Run the command
-	assert!(cmd(
-		":ethereum_schema_cache".to_string(),
-		None,
-		Operation::Delete,
-		Column::Meta
-	)
-	.run(client, backend.clone())
-	.is_ok());
+	assert!(cmd(":ethereum_schema_cache".to_string(), None, Operation::Delete, Column::Meta)
+		.run(client, backend.clone())
+		.is_ok());
 
 	assert_eq!(backend.meta().ethereum_schema(), Ok(Some(vec![])));
 }
@@ -293,10 +277,7 @@ fn tips_create_success_if_value_is_empty() {
 	.run(client, backend.clone())
 	.is_ok());
 
-	assert_eq!(
-		backend.meta().current_syncing_tips(),
-		Ok(vec![H256::default()])
-	);
+	assert_eq!(backend.meta().current_syncing_tips(), Ok(vec![H256::default()]));
 }
 
 #[test]
@@ -350,14 +331,9 @@ fn tips_read_works() {
 		.write_current_syncing_tips(data.clone())
 		.expect("data inserted in temporary db");
 	// Run the command
-	assert!(cmd(
-		"CURRENT_SYNCING_TIPS".to_string(),
-		None,
-		Operation::Read,
-		Column::Meta
-	)
-	.run(client, backend.clone())
-	.is_ok());
+	assert!(cmd("CURRENT_SYNCING_TIPS".to_string(), None, Operation::Read, Column::Meta)
+		.run(client, backend.clone())
+		.is_ok());
 }
 
 #[test]
@@ -383,10 +359,7 @@ fn tips_update_works() {
 	.run(client, backend.clone())
 	.is_ok());
 
-	assert_eq!(
-		backend.meta().current_syncing_tips(),
-		Ok(vec![H256::default()])
-	);
+	assert_eq!(backend.meta().current_syncing_tips(), Ok(vec![H256::default()]));
 }
 
 #[test]
@@ -406,14 +379,9 @@ fn tips_delete_works() {
 		.write_current_syncing_tips(data.clone())
 		.expect("data inserted in temporary db");
 	// Run the command
-	assert!(cmd(
-		"CURRENT_SYNCING_TIPS".to_string(),
-		None,
-		Operation::Delete,
-		Column::Meta
-	)
-	.run(client, backend.clone())
-	.is_ok());
+	assert!(cmd("CURRENT_SYNCING_TIPS".to_string(), None, Operation::Delete, Column::Meta)
+		.run(client, backend.clone())
+		.is_ok());
 
 	assert_eq!(backend.meta().current_syncing_tips(), Ok(vec![]));
 }
@@ -459,14 +427,9 @@ fn non_existent_meta_static_keys_are_no_op() {
 		.is_err());
 
 	// Run the Update command
-	assert!(cmd(
-		":foo".to_string(),
-		Some(test_value_path),
-		Operation::Update,
-		Column::Meta
-	)
-	.run(Arc::clone(&client), backend.clone())
-	.is_err());
+	assert!(cmd(":foo".to_string(), Some(test_value_path), Operation::Update, Column::Meta)
+		.run(Arc::clone(&client), backend.clone())
+		.is_err());
 
 	assert_eq!(
 		backend.meta().ethereum_schema(),
@@ -474,11 +437,9 @@ fn non_existent_meta_static_keys_are_no_op() {
 	);
 
 	// Run the Delete command
-	assert!(
-		cmd(":foo".to_string(), None, Operation::Delete, Column::Meta)
-			.run(Arc::clone(&client), backend.clone())
-			.is_err()
-	);
+	assert!(cmd(":foo".to_string(), None, Operation::Delete, Column::Meta)
+		.run(Arc::clone(&client), backend.clone())
+		.is_err());
 
 	assert_eq!(
 		backend.meta().ethereum_schema(),
@@ -492,11 +453,8 @@ fn not_deserializable_input_value_is_no_op() {
 	// Write some data in a temp file.
 	let test_value_path = tmp.path().join("test.json");
 
-	std::fs::write(
-		test_value_path.clone(),
-		serde_json::to_string("im_not_allowed_here").unwrap(),
-	)
-	.expect("write test value json file");
+	std::fs::write(test_value_path.clone(), serde_json::to_string("im_not_allowed_here").unwrap())
+		.expect("write test value json file");
 	// Test client.
 	let (client, _) = TestClientBuilder::new().build_with_native_executor::<RuntimeApi, _>(None);
 	let client = Arc::new(client);
@@ -547,9 +505,7 @@ fn commitment_create() {
 	// Build a block and fill the pallet-ethereum status.
 	let key = storage_prefix_build(PALLET_ETHEREUM, ETHEREUM_CURRENT_TRANSACTION_STATUS);
 	let mut builder = client.new_block(Default::default()).unwrap();
-	builder
-		.push_storage_change(key, Some(statuses.encode()))
-		.unwrap();
+	builder.push_storage_change(key, Some(statuses.encode())).unwrap();
 	let block = builder.build().unwrap().block;
 	let block_hash = block.header.hash();
 	executor::block_on(client.import(BlockOrigin::Own, block)).unwrap();
@@ -573,17 +529,11 @@ fn commitment_create() {
 	.is_ok());
 
 	// Expect the ethereum and substrate block hashes to be mapped.
-	assert_eq!(
-		backend.mapping().block_hash(&ethereum_block_hash),
-		Ok(Some(vec![block_hash]))
-	);
+	assert_eq!(backend.mapping().block_hash(&ethereum_block_hash), Ok(Some(vec![block_hash])));
 
 	// Expect the offchain-stored transaction metadata to match the one we stored in the runtime.
-	let expected_transaction_metadata = fc_db::TransactionMetadata {
-		block_hash,
-		ethereum_block_hash,
-		ethereum_index: 0,
-	};
+	let expected_transaction_metadata =
+		fc_db::TransactionMetadata { block_hash, ethereum_block_hash, ethereum_index: 0 };
 	assert_eq!(
 		backend.mapping().transaction_metadata(&t1_hash),
 		Ok(vec![expected_transaction_metadata])
@@ -625,12 +575,9 @@ fn commitment_update() {
 	// First we create block and insert data in the offchain db.
 
 	// Build a block A1 and fill the pallet-ethereum status.
-	let mut builder = client
-		.new_block_at(client.genesis_hash(), Default::default(), false)
-		.unwrap();
-	builder
-		.push_storage_change(key.clone(), Some(statuses_a1.encode()))
-		.unwrap();
+	let mut builder =
+		client.new_block_at(client.genesis_hash(), Default::default(), false).unwrap();
+	builder.push_storage_change(key.clone(), Some(statuses_a1.encode())).unwrap();
 	let block_a1 = builder.build().unwrap().block;
 	let block_a1_hash = block_a1.header.hash();
 	executor::block_on(client.import(BlockOrigin::Own, block_a1)).unwrap();
@@ -654,10 +601,7 @@ fn commitment_update() {
 	.is_ok());
 
 	// Expect the ethereum and substrate block hashes to be mapped.
-	assert_eq!(
-		backend.mapping().block_hash(&ethereum_block_hash),
-		Ok(Some(vec![block_a1_hash]))
-	);
+	assert_eq!(backend.mapping().block_hash(&ethereum_block_hash), Ok(Some(vec![block_a1_hash])));
 
 	// Expect the offchain-stored transaction metadata to match the one we stored in the runtime.
 	let expected_transaction_metadata_a1_t1 = fc_db::TransactionMetadata {
@@ -675,12 +619,9 @@ fn commitment_update() {
 	// Build a block A2 and fill the pallet-ethereum status.
 	let tmp = tempdir().expect("create a temporary directory");
 
-	let mut builder = client
-		.new_block_at(client.genesis_hash(), Default::default(), false)
-		.unwrap();
-	builder
-		.push_storage_change(key, Some(statuses_a2.encode()))
-		.unwrap();
+	let mut builder =
+		client.new_block_at(client.genesis_hash(), Default::default(), false).unwrap();
+	builder.push_storage_change(key, Some(statuses_a2.encode())).unwrap();
 	let block_a2 = builder.build().unwrap().block;
 	let block_a2_hash = block_a2.header.hash();
 	executor::block_on(client.import(BlockOrigin::Own, block_a2)).unwrap();
@@ -718,10 +659,7 @@ fn commitment_update() {
 	};
 	assert_eq!(
 		backend.mapping().transaction_metadata(&t1_hash),
-		Ok(vec![
-			expected_transaction_metadata_a1_t1,
-			expected_transaction_metadata_a2_t1
-		])
+		Ok(vec![expected_transaction_metadata_a1_t1, expected_transaction_metadata_a2_t1])
 	);
 	assert_eq!(
 		backend.mapping().transaction_metadata(&t2_hash),
@@ -746,9 +684,7 @@ fn mapping_read_works() {
 	// Build a block and fill the pallet-ethereum status.
 	let key = storage_prefix_build(PALLET_ETHEREUM, ETHEREUM_CURRENT_TRANSACTION_STATUS);
 	let mut builder = client.new_block(Default::default()).unwrap();
-	builder
-		.push_storage_change(key, Some(statuses.encode()))
-		.unwrap();
+	builder.push_storage_change(key, Some(statuses.encode())).unwrap();
 	let block = builder.build().unwrap().block;
 	let block_hash = block.header.hash();
 	executor::block_on(client.import(BlockOrigin::Own, block)).unwrap();
@@ -772,22 +708,12 @@ fn mapping_read_works() {
 	.is_ok());
 
 	// Read block command.
-	assert!(cmd(
-		format!("{:?}", ethereum_block_hash),
-		None,
-		Operation::Read,
-		Column::Block
-	)
-	.run(Arc::clone(&client), backend.clone())
-	.is_ok());
+	assert!(cmd(format!("{:?}", ethereum_block_hash), None, Operation::Read, Column::Block)
+		.run(Arc::clone(&client), backend.clone())
+		.is_ok());
 
 	// Read transaction command.
-	assert!(cmd(
-		format!("{:?}", t1_hash),
-		None,
-		Operation::Read,
-		Column::Transaction
-	)
-	.run(Arc::clone(&client), backend.clone())
-	.is_ok());
+	assert!(cmd(format!("{:?}", t1_hash), None, Operation::Read, Column::Transaction)
+		.run(Arc::clone(&client), backend.clone())
+		.is_ok());
 }

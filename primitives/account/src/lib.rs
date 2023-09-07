@@ -27,8 +27,9 @@ use sp_runtime_interface::pass_by::PassByInner;
 /// A fully Ethereum-compatible `AccountId`.
 /// Conforms to H160 address and ECDSA key standards.
 /// Alternative to H256->H160 mapping.
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Default)]
-#[derive(Encode, Decode, MaxEncodedLen, TypeInfo)]
+#[derive(
+	Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Default, Encode, Decode, MaxEncodedLen, TypeInfo,
+)]
 pub struct AccountId20(pub [u8; 20]);
 
 #[cfg(feature = "serde")]
@@ -39,9 +40,7 @@ impl std::str::FromStr for AccountId20 {
 	type Err = &'static str;
 
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		H160::from_str(s)
-			.map(Into::into)
-			.map_err(|_| "invalid hex address.")
+		H160::from_str(s).map(Into::into).map_err(|_| "invalid hex address.")
 	}
 }
 
@@ -127,15 +126,15 @@ impl sp_runtime::traits::Verify for EthereumSignature {
 			Err(sp_io::EcdsaVerifyError::BadRS) => {
 				log::error!(target: "evm", "Error recovering: Incorrect value of R or S");
 				false
-			}
+			},
 			Err(sp_io::EcdsaVerifyError::BadV) => {
 				log::error!(target: "evm", "Error recovering: Incorrect value of V");
 				false
-			}
+			},
 			Err(sp_io::EcdsaVerifyError::BadSignature) => {
 				log::error!(target: "evm", "Error recovering: Invalid signature");
 				false
-			}
+			},
 		}
 	}
 }
@@ -146,8 +145,20 @@ impl EthereumSignature {
 	}
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-#[derive(RuntimeDebug, Encode, Decode, MaxEncodedLen, TypeInfo, PassByInner)]
+#[derive(
+	Clone,
+	Copy,
+	PartialEq,
+	Eq,
+	PartialOrd,
+	Ord,
+	RuntimeDebug,
+	Encode,
+	Decode,
+	MaxEncodedLen,
+	TypeInfo,
+	PassByInner,
+)]
 pub struct EthereumSigner([u8; 20]);
 
 impl From<[u8; 20]> for EthereumSigner {

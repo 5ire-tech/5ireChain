@@ -86,10 +86,7 @@ pub struct RuntimeApiStorageOverride<B: BlockT, C> {
 
 impl<B: BlockT, C> RuntimeApiStorageOverride<B, C> {
 	pub fn new(client: Arc<C>) -> Self {
-		Self {
-			client,
-			_marker: PhantomData,
-		}
+		Self { client, _marker: PhantomData }
 	}
 }
 
@@ -101,18 +98,12 @@ where
 {
 	/// For a given account address, returns pallet_evm::AccountCodes.
 	fn account_code_at(&self, block_hash: Block::Hash, address: H160) -> Option<Vec<u8>> {
-		self.client
-			.runtime_api()
-			.account_code_at(block_hash, address)
-			.ok()
+		self.client.runtime_api().account_code_at(block_hash, address).ok()
 	}
 
 	/// For a given account address and index, returns pallet_evm::AccountStorages.
 	fn storage_at(&self, block_hash: Block::Hash, address: H160, index: U256) -> Option<H256> {
-		self.client
-			.runtime_api()
-			.storage_at(block_hash, address, index)
-			.ok()
+		self.client.runtime_api().storage_at(block_hash, address, index).ok()
 	}
 
 	/// Return the current block.
@@ -124,7 +115,7 @@ where
 		{
 			api_version
 		} else {
-			return None;
+			return None
 		};
 		if api_version == 1 {
 			#[allow(deprecated)]
@@ -144,7 +135,7 @@ where
 		{
 			api_version
 		} else {
-			return None;
+			return None
 		};
 		if api_version < 4 {
 			#[allow(deprecated)]
@@ -163,10 +154,7 @@ where
 					.collect()
 			})
 		} else {
-			self.client
-				.runtime_api()
-				.current_receipts(block_hash)
-				.ok()?
+			self.client.runtime_api().current_receipts(block_hash).ok()?
 		}
 	}
 
@@ -175,10 +163,7 @@ where
 		&self,
 		block_hash: Block::Hash,
 	) -> Option<Vec<TransactionStatus>> {
-		self.client
-			.runtime_api()
-			.current_transaction_statuses(block_hash)
-			.ok()?
+		self.client.runtime_api().current_transaction_statuses(block_hash).ok()?
 	}
 
 	/// Return the elasticity multiplier at the give post-eip1559 height.
@@ -196,7 +181,7 @@ where
 			.runtime_api()
 			.api_version::<dyn EthereumRuntimeRPCApi<Block>>(block_hash)
 		{
-			return api_version >= 2;
+			return api_version >= 2
 		}
 		false
 	}

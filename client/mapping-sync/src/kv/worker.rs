@@ -115,7 +115,7 @@ where
 				Poll::Pending => break,
 				Poll::Ready(Some(_)) => {
 					fire = true;
-				}
+				},
 				Poll::Ready(None) => return Poll::Ready(None),
 			}
 		}
@@ -127,7 +127,7 @@ where
 			Poll::Pending => (),
 			Poll::Ready(()) => {
 				fire = true;
-			}
+			},
 		}
 
 		if self.have_next {
@@ -151,12 +151,12 @@ where
 				Ok(have_next) => {
 					self.have_next = have_next;
 					Poll::Ready(Some(()))
-				}
+				},
 				Err(e) => {
 					self.have_next = false;
 					debug!(target: "mapping-sync", "Syncing failed with error {:?}, retrying.", e);
 					Poll::Ready(Some(()))
-				}
+				},
 			}
 		} else {
 			Poll::Pending
@@ -319,14 +319,7 @@ mod tests {
 			let _res = client.import(BlockOrigin::Own, block).await;
 
 			// Receive
-			assert_eq!(
-				block_notification_stream
-					.next()
-					.await
-					.expect("a message")
-					.hash,
-				block_hash
-			);
+			assert_eq!(block_notification_stream.next().await.expect("a message").hash, block_hash);
 		}
 
 		{
@@ -356,14 +349,7 @@ mod tests {
 			let _res = client.import(BlockOrigin::Own, block).await;
 
 			// Receive
-			assert_eq!(
-				block_notification_stream
-					.next()
-					.await
-					.expect("a message")
-					.hash,
-				block_hash
-			);
+			assert_eq!(block_notification_stream.next().await.expect("a message").hash, block_hash);
 
 			// So we expect the pool to hold one sink only after cleanup
 			let sinks = &mut pubsub_notification_sinks.lock();

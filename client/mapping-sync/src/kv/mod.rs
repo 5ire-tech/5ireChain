@@ -66,16 +66,16 @@ where
 				Log::Pre(PreLog::Block(block)) => {
 					let mapping_commitment = gen_from_block(block);
 					backend.mapping().write_hashes(mapping_commitment)
-				}
+				},
 				Log::Post(post_log) => match post_log {
 					PostLog::Hashes(hashes) => {
 						let mapping_commitment = gen_from_hashes(hashes);
 						backend.mapping().write_hashes(mapping_commitment)
-					}
+					},
 					PostLog::Block(block) => {
 						let mapping_commitment = gen_from_block(block);
 						backend.mapping().write_hashes(mapping_commitment)
-					}
+					},
 					PostLog::BlockHash(expect_eth_block_hash) => {
 						let schema =
 							fc_storage::onchain_storage_schema(client, substrate_block_hash);
@@ -97,13 +97,13 @@ where
 									let mapping_commitment = gen_from_block(block);
 									backend.mapping().write_hashes(mapping_commitment)
 								}
-							}
+							},
 							None => backend.mapping().write_none(substrate_block_hash),
 						}
-					}
+					},
 				},
 			}
-		}
+		},
 		Err(FindLogError::NotFound) => backend.mapping().write_none(substrate_block_hash),
 		Err(FindLogError::MultipleLogs) => Err("Multiple logs found".to_string()),
 	}
@@ -176,56 +176,44 @@ where
 	let mut current_syncing_tips = frontier_backend.meta().current_syncing_tips()?;
 
 	if current_syncing_tips.is_empty() {
-		let mut leaves = substrate_backend
-			.blockchain()
-			.leaves()
-			.map_err(|e| format!("{:?}", e))?;
+		let mut leaves = substrate_backend.blockchain().leaves().map_err(|e| format!("{:?}", e))?;
 		if leaves.is_empty() {
-			return Ok(false);
+			return Ok(false)
 		}
 		current_syncing_tips.append(&mut leaves);
 	}
 
 	let mut operating_header = None;
 	while let Some(checking_tip) = current_syncing_tips.pop() {
-		if let Some(checking_header) = fetch_header(
-			substrate_backend.blockchain(),
-			frontier_backend,
-			checking_tip,
-			sync_from,
-		)? {
+		if let Some(checking_header) =
+			fetch_header(substrate_backend.blockchain(), frontier_backend, checking_tip, sync_from)?
+		{
 			operating_header = Some(checking_header);
-			break;
+			break
 		}
 	}
 	let operating_header = match operating_header {
 		Some(operating_header) => operating_header,
 		None => {
-			frontier_backend
-				.meta()
-				.write_current_syncing_tips(current_syncing_tips)?;
-			return Ok(false);
-		}
+			frontier_backend.meta().write_current_syncing_tips(current_syncing_tips)?;
+			return Ok(false)
+		},
 	};
 
 	if operating_header.number() == &Zero::zero() {
 		sync_genesis_block(client, frontier_backend, &operating_header)?;
 
-		frontier_backend
-			.meta()
-			.write_current_syncing_tips(current_syncing_tips)?;
+		frontier_backend.meta().write_current_syncing_tips(current_syncing_tips)?;
 	} else {
-		if SyncStrategy::Parachain == strategy
-			&& operating_header.number() > &client.info().best_number
+		if SyncStrategy::Parachain == strategy &&
+			operating_header.number() > &client.info().best_number
 		{
-			return Ok(false);
+			return Ok(false)
 		}
 		sync_block(client, overrides, frontier_backend, &operating_header)?;
 
 		current_syncing_tips.push(*operating_header.parent_hash());
-		frontier_backend
-			.meta()
-			.write_current_syncing_tips(current_syncing_tips)?;
+		frontier_backend.meta().write_current_syncing_tips(current_syncing_tips)?;
 	}
 	// Notify on import and remove closed channels.
 	// Only notify when the node is node in major syncing.
@@ -234,8 +222,7 @@ where
 		if !sync_oracle.is_major_syncing() {
 			let hash = operating_header.hash();
 			let is_new_best = client.info().best_hash == hash;
-			sink.unbounded_send(EthereumBlockNotification { is_new_best, hash })
-				.is_ok()
+			sink.unbounded_send(EthereumBlockNotification { is_new_best, hash }).is_ok()
 		} else {
 			// Remove from the pool if in major syncing.
 			false
@@ -266,8 +253,8 @@ where
 	let mut synced_any = false;
 
 	for _ in 0..limit {
-		synced_any = synced_any
-			|| sync_one_block(
+		synced_any = synced_any ||
+			sync_one_block(
 				client,
 				substrate_backend,
 				overrides.clone(),
@@ -292,13 +279,12 @@ where
 	BE: HeaderBackend<Block>,
 {
 	if frontier_backend.mapping().is_synced(&checking_tip)? {
-		return Ok(None);
+		return Ok(None)
 	}
 
 	match substrate_backend.header(checking_tip) {
-		Ok(Some(checking_header)) if checking_header.number() >= &sync_from => {
-			Ok(Some(checking_header))
-		}
+		Ok(Some(checking_header)) if checking_header.number() >= &sync_from =>
+			Ok(Some(checking_header)),
 		Ok(Some(_)) => Ok(None),
 		Ok(None) | Err(_) => Err("Header not found".to_string()),
 	}

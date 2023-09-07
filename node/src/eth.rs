@@ -110,20 +110,20 @@ pub fn new_frontier_partial(
 
 /// A set of APIs that ethereum-compatible runtimes must implement.
 pub trait EthCompatRuntimeApiCollection:
-sp_api::ApiExt<Block>
-+ fp_rpc::ConvertTransactionRuntimeApi<Block>
-+ fp_rpc::EthereumRuntimeRPCApi<Block>
-	where
-		<Self as sp_api::ApiExt<Block>>::StateBackend: sp_api::StateBackend<BlakeTwo256>,
+	sp_api::ApiExt<Block>
+	+ fp_rpc::ConvertTransactionRuntimeApi<Block>
+	+ fp_rpc::EthereumRuntimeRPCApi<Block>
+where
+	<Self as sp_api::ApiExt<Block>>::StateBackend: sp_api::StateBackend<BlakeTwo256>,
 {
 }
 
 impl<Api> EthCompatRuntimeApiCollection for Api
-	where
-		Api: sp_api::ApiExt<Block>
+where
+	Api: sp_api::ApiExt<Block>
 		+ fp_rpc::ConvertTransactionRuntimeApi<Block>
 		+ fp_rpc::EthereumRuntimeRPCApi<Block>,
-		<Self as sp_api::ApiExt<Block>>::StateBackend: sp_api::StateBackend<BlakeTwo256>,
+	<Self as sp_api::ApiExt<Block>>::StateBackend: sp_api::StateBackend<BlakeTwo256>,
 {
 }
 
@@ -146,7 +146,7 @@ pub fn spawn_frontier_tasks<RuntimeApi, Executor>(
 	RuntimeApi: ConstructRuntimeApi<Block, FullClient<RuntimeApi, Executor>>,
 	RuntimeApi: Send + Sync + 'static,
 	RuntimeApi::RuntimeApi:
-	EthCompatRuntimeApiCollection<StateBackend = StateBackendFor<FullBackend, Block>>,
+		EthCompatRuntimeApiCollection<StateBackend = StateBackendFor<FullBackend, Block>>,
 	Executor: NativeExecutionDispatch + 'static,
 {
 	// Spawn main mapping sync worker background task.
@@ -168,28 +168,27 @@ pub fn spawn_frontier_tasks<RuntimeApi, Executor>(
 					sync,
 					pubsub_notification_sinks,
 				)
-					.for_each(|()| future::ready(())),
+				.for_each(|()| future::ready(())),
 			);
-		}
-		// fc_db::Backend::Sql(b) => {
-		// 	task_manager.spawn_essential_handle().spawn_blocking(
-		// 		"frontier-mapping-sync-worker",
-		// 		Some("frontier"),
-		// 		fc_mapping_sync::sql::SyncWorker::run(
-		// 			client.clone(),
-		// 			backend,
-		// 			Arc::new(b),
-		// 			client.import_notification_stream(),
-		// 			fc_mapping_sync::sql::SyncWorkerConfig {
-		// 				read_notification_timeout: Duration::from_secs(10),
-		// 				check_indexed_blocks_interval: Duration::from_secs(60),
-		// 			},
-		// 			fc_mapping_sync::SyncStrategy::Parachain,
-		// 			sync,
-		// 			pubsub_notification_sinks,
-		// 		),
-		// 	);
-		// }
+		}, /* fc_db::Backend::Sql(b) => {
+		    * 	task_manager.spawn_essential_handle().spawn_blocking(
+		    * 		"frontier-mapping-sync-worker",
+		    * 		Some("frontier"),
+		    * 		fc_mapping_sync::sql::SyncWorker::run(
+		    * 			client.clone(),
+		    * 			backend,
+		    * 			Arc::new(b),
+		    * 			client.import_notification_stream(),
+		    * 			fc_mapping_sync::sql::SyncWorkerConfig {
+		    * 				read_notification_timeout: Duration::from_secs(10),
+		    * 				check_indexed_blocks_interval: Duration::from_secs(60),
+		    * 			},
+		    * 			fc_mapping_sync::SyncStrategy::Parachain,
+		    * 			sync,
+		    * 			pubsub_notification_sinks,
+		    * 		),
+		    * 	);
+		    * } */
 	}
 
 	// Spawn Frontier EthFilterApi maintenance task.
@@ -207,11 +206,6 @@ pub fn spawn_frontier_tasks<RuntimeApi, Executor>(
 	task_manager.spawn_essential_handle().spawn(
 		"frontier-fee-history",
 		Some("frontier"),
-		EthTask::fee_history_task(
-			client,
-			overrides,
-			fee_history_cache,
-			fee_history_cache_limit,
-		),
+		EthTask::fee_history_task(client, overrides, fee_history_cache, fee_history_cache_limit),
 	);
 }

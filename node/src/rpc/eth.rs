@@ -96,16 +96,16 @@ pub fn create_eth<C, BE, P, A, CT, B, EC: EthConfig<B, C>>(
 		>,
 	>,
 ) -> Result<RpcModule<()>, Box<dyn std::error::Error + Send + Sync>>
-	where
-		B: BlockT<Hash = sp_core::H256>,
-		C: CallApiAt<B> + ProvideRuntimeApi<B>,
-		C::Api: BlockBuilderApi<B> + ConvertTransactionRuntimeApi<B> + EthereumRuntimeRPCApi<B>,
-		C: BlockchainEvents<B> + 'static,
-		C: HeaderBackend<B> + HeaderMetadata<B, Error = BlockChainError> + StorageProvider<B, BE>,
-		BE: Backend<B> + 'static,
-		P: TransactionPool<Block = B> + 'static,
-		A: ChainApi<Block = B> + 'static,
-		CT: ConvertTransaction<<B as BlockT>::Extrinsic> + Send + Sync + 'static,
+where
+	B: BlockT<Hash = sp_core::H256>,
+	C: CallApiAt<B> + ProvideRuntimeApi<B>,
+	C::Api: BlockBuilderApi<B> + ConvertTransactionRuntimeApi<B> + EthereumRuntimeRPCApi<B>,
+	C: BlockchainEvents<B> + 'static,
+	C: HeaderBackend<B> + HeaderMetadata<B, Error = BlockChainError> + StorageProvider<B, BE>,
+	BE: Backend<B> + 'static,
+	P: TransactionPool<Block = B> + 'static,
+	A: ChainApi<Block = B> + 'static,
+	CT: ConvertTransaction<<B as BlockT>::Extrinsic> + Send + Sync + 'static,
 {
 	use fc_rpc::{
 		Eth, EthApiServer, EthDevSigner, EthFilter, EthFilterApiServer, EthPubSub,
@@ -156,8 +156,8 @@ pub fn create_eth<C, BE, P, A, CT, B, EC: EthConfig<B, C>>(
 			execute_gas_limit_multiplier,
 			forced_parent_hashes,
 		)
-			.replace_config::<EC>()
-			.into_rpc(),
+		.replace_config::<EC>()
+		.into_rpc(),
 	)?;
 
 	if let Some(filter_pool) = filter_pool {
@@ -171,7 +171,7 @@ pub fn create_eth<C, BE, P, A, CT, B, EC: EthConfig<B, C>>(
 				max_past_logs,
 				block_data_cache,
 			)
-				.into_rpc(),
+			.into_rpc(),
 		)?;
 	}
 
@@ -184,7 +184,7 @@ pub fn create_eth<C, BE, P, A, CT, B, EC: EthConfig<B, C>>(
 			overrides,
 			pubsub_notification_sinks,
 		)
-			.into_rpc(),
+		.into_rpc(),
 	)?;
 
 	io.merge(
@@ -194,7 +194,7 @@ pub fn create_eth<C, BE, P, A, CT, B, EC: EthConfig<B, C>>(
 			// Whether to format the `peer_count` response as Hex (default) or not.
 			true,
 		)
-			.into_rpc(),
+		.into_rpc(),
 	)?;
 
 	io.merge(Web3::new(client.clone()).into_rpc())?;

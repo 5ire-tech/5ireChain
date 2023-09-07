@@ -18,12 +18,13 @@
 
 use super::benchmarking::{inherent_benchmark_data, RemarkBuilder, TransferKeepAliveBuilder};
 use crate::{
-	chain_spec, service,
-	service::{new_partial, FullClient},
+	chain_spec,
 	cli::{Cli, Subcommand},
+	service,
+	service::{new_partial, FullClient},
 };
-use frame_benchmarking_cli::*;
 use firechain_runtime::{ExistentialDeposit, RuntimeApi};
+use frame_benchmarking_cli::*;
 use node_executor::ExecutorDispatch;
 use node_primitives::Block;
 use sc_cli::{Result, SubstrateCli};
@@ -48,7 +49,6 @@ macro_rules! construct_async_run {
 		})
 	}}
 }
-
 
 impl SubstrateCli for Cli {
 	fn impl_name() -> String {
@@ -101,7 +101,8 @@ pub fn run() -> Result<()> {
 		None => {
 			let runner = cli.create_runner(&cli.run)?;
 			runner.run_node_until_exit(|config| async move {
-				service::new_full(config, cli.no_hardware_benchmarks, cli.eth.clone()).map_err(sc_cli::Error::Service)
+				service::new_full(config, cli.no_hardware_benchmarks, cli.eth.clone())
+					.map_err(sc_cli::Error::Service)
 			})
 		},
 		// Some(Subcommand::Inspect(cmd)) => {
@@ -203,14 +204,16 @@ pub fn run() -> Result<()> {
 		Some(Subcommand::ExportBlocks(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
-				let PartialComponents { client, task_manager, .. } = new_partial(&config, cli.eth.clone())?;
+				let PartialComponents { client, task_manager, .. } =
+					new_partial(&config, cli.eth.clone())?;
 				Ok((cmd.run(client, config.database), task_manager))
 			})
 		},
 		Some(Subcommand::ExportState(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
-				let PartialComponents { client, task_manager, .. } = new_partial(&config, cli.eth.clone())?;
+				let PartialComponents { client, task_manager, .. } =
+					new_partial(&config, cli.eth.clone())?;
 				Ok((cmd.run(client, config.chain_spec), task_manager))
 			})
 		},
@@ -229,7 +232,8 @@ pub fn run() -> Result<()> {
 		Some(Subcommand::Revert(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
-				let PartialComponents { client, task_manager, backend, .. } = new_partial(&config, cli.eth.clone())?;
+				let PartialComponents { client, task_manager, backend, .. } =
+					new_partial(&config, cli.eth.clone())?;
 				let aux_revert = Box::new(|client: Arc<FullClient>, backend, blocks| {
 					sc_consensus_babe::revert(client.clone(), backend, blocks)?;
 					grandpa::revert(client, blocks)?;

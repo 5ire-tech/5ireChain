@@ -86,9 +86,7 @@ where
 		let number = number.unwrap_or(BlockNumber::Latest);
 		if number == BlockNumber::Pending {
 			let api = pending_runtime_api(self.client.as_ref(), self.graph.as_ref())?;
-			Ok(api
-				.storage_at(self.client.info().best_hash, address, index)
-				.unwrap_or_default())
+			Ok(api.storage_at(self.client.info().best_hash, address, index).unwrap_or_default())
 		} else if let Ok(Some(id)) = frontier_backend_client::native_block_id::<B, C>(
 			self.client.as_ref(),
 			self.backend.as_ref(),
@@ -141,7 +139,7 @@ where
 				}
 			}
 
-			return Ok(current_nonce);
+			return Ok(current_nonce)
 		}
 
 		let id = match frontier_backend_client::native_block_id::<B, C>(

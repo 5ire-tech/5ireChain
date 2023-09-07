@@ -46,11 +46,7 @@ pub struct TxPool<B, C, A: ChainApi> {
 
 impl<B, C, A: ChainApi> Clone for TxPool<B, C, A> {
 	fn clone(&self) -> Self {
-		Self {
-			client: self.client.clone(),
-			graph: self.graph.clone(),
-			_marker: PhantomData,
-		}
+		Self { client: self.client.clone(), graph: self.graph.clone(), _marker: PhantomData }
 	}
 }
 
@@ -143,11 +139,7 @@ where
 
 impl<B, C, A: ChainApi> TxPool<B, C, A> {
 	pub fn new(client: Arc<C>, graph: Arc<Pool<A>>) -> Self {
-		Self {
-			client,
-			graph,
-			_marker: PhantomData,
-		}
+		Self { client, graph, _marker: PhantomData }
 	}
 }
 
@@ -169,9 +161,6 @@ where
 
 	fn status(&self) -> RpcResult<TxPoolResult<U256>> {
 		let status = self.graph.validated_pool().status();
-		Ok(TxPoolResult {
-			pending: U256::from(status.ready),
-			queued: U256::from(status.future),
-		})
+		Ok(TxPoolResult { pending: U256::from(status.ready), queued: U256::from(status.future) })
 	}
 }

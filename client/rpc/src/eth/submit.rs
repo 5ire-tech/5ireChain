@@ -62,7 +62,7 @@ where
 					Some(account) => *account,
 					None => return Err(internal_err("no signer available")),
 				}
-			}
+			},
 		};
 
 		let nonce = match request.nonce {
@@ -89,9 +89,9 @@ where
 				if let Ok(Some(block)) = block {
 					block.header.gas_limit
 				} else {
-					return Err(internal_err("block unavailable, cannot query gas limit"));
+					return Err(internal_err("block unavailable, cannot query gas limit"))
 				}
-			}
+			},
 		};
 		let max_fee_per_gas = request.max_fee_per_gas;
 		let message: Option<TransactionMessage> = request.into();
@@ -104,7 +104,7 @@ where
 					m.gas_price = self.gas_price().unwrap_or_default();
 				}
 				TransactionMessage::Legacy(m)
-			}
+			},
 			Some(TransactionMessage::EIP2930(mut m)) => {
 				m.nonce = nonce;
 				m.chain_id = chain_id;
@@ -113,7 +113,7 @@ where
 					m.gas_price = self.gas_price().unwrap_or_default();
 				}
 				TransactionMessage::EIP2930(m)
-			}
+			},
 			Some(TransactionMessage::EIP1559(mut m)) => {
 				m.nonce = nonce;
 				m.chain_id = chain_id;
@@ -122,7 +122,7 @@ where
 					m.max_fee_per_gas = self.gas_price().unwrap_or_default();
 				}
 				TransactionMessage::EIP1559(m)
-			}
+			},
 			_ => return Err(internal_err("invalid transaction parameters")),
 		};
 
@@ -134,7 +134,7 @@ where
 					Ok(t) => transaction = Some(t),
 					Err(e) => return Err(e),
 				}
-				break;
+				break
 			}
 		}
 
@@ -155,10 +155,7 @@ where
 		};
 
 		let extrinsic = match api_version {
-			Some(2) => match self
-				.client
-				.runtime_api()
-				.convert_transaction(block_hash, transaction)
+			Some(2) => match self.client.runtime_api().convert_transaction(block_hash, transaction)
 			{
 				Ok(extrinsic) => extrinsic,
 				Err(_) => return Err(internal_err("cannot access runtime api")),
@@ -176,31 +173,22 @@ where
 						Err(_) => return Err(internal_err("cannot access runtime api")),
 					}
 				} else {
-					return Err(internal_err("This runtime not support eth transactions v2"));
+					return Err(internal_err("This runtime not support eth transactions v2"))
 				}
-			}
-			None => {
+			},
+			None =>
 				if let Some(ref convert_transaction) = self.convert_transaction {
 					convert_transaction.convert_transaction(transaction.clone())
 				} else {
 					return Err(internal_err(
 						"No TransactionConverter is provided and the runtime api ConvertTransactionRuntimeApi is not found"
 					));
-				}
-			}
-			_ => {
-				return Err(internal_err(
-					"ConvertTransactionRuntimeApi version not supported",
-				))
-			}
+				},
+			_ => return Err(internal_err("ConvertTransactionRuntimeApi version not supported")),
 		};
 
 		self.pool
-			.submit_one(
-				&BlockId::Hash(block_hash),
-				TransactionSource::Local,
-				extrinsic,
-			)
+			.submit_one(&BlockId::Hash(block_hash), TransactionSource::Local, extrinsic)
 			.map_ok(move |_| transaction_hash)
 			.map_err(|err| internal_err(format::Geth::pool_error(err)))
 			.await
@@ -209,7 +197,7 @@ where
 	pub async fn send_raw_transaction(&self, bytes: Bytes) -> RpcResult<H256> {
 		let slice = &bytes.0[..];
 		if slice.is_empty() {
-			return Err(internal_err("transaction data is empty"));
+			return Err(internal_err("transaction data is empty"))
 		}
 		let transaction: ethereum::TransactionV2 = match ethereum::EnvelopedDecodable::decode(slice)
 		{
@@ -230,10 +218,7 @@ where
 		};
 
 		let extrinsic = match api_version {
-			Some(2) => match self
-				.client
-				.runtime_api()
-				.convert_transaction(block_hash, transaction)
+			Some(2) => match self.client.runtime_api().convert_transaction(block_hash, transaction)
 			{
 				Ok(extrinsic) => extrinsic,
 				Err(_) => return Err(internal_err("cannot access runtime api")),
@@ -249,35 +234,26 @@ where
 					{
 						Ok(extrinsic) => extrinsic,
 						Err(_) => {
-							return Err(internal_err("cannot access runtime api"));
-						}
+							return Err(internal_err("cannot access runtime api"))
+						},
 					}
 				} else {
-					return Err(internal_err("This runtime not support eth transactions v2"));
+					return Err(internal_err("This runtime not support eth transactions v2"))
 				}
-			}
-			None => {
+			},
+			None =>
 				if let Some(ref convert_transaction) = self.convert_transaction {
 					convert_transaction.convert_transaction(transaction.clone())
 				} else {
 					return Err(internal_err(
 						"No TransactionConverter is provided and the runtime api ConvertTransactionRuntimeApi is not found"
 					));
-				}
-			}
-			_ => {
-				return Err(internal_err(
-					"ConvertTransactionRuntimeApi version not supported",
-				))
-			}
+				},
+			_ => return Err(internal_err("ConvertTransactionRuntimeApi version not supported")),
 		};
 
 		self.pool
-			.submit_one(
-				&BlockId::Hash(block_hash),
-				TransactionSource::Local,
-				extrinsic,
-			)
+			.submit_one(&BlockId::Hash(block_hash), TransactionSource::Local, extrinsic)
 			.map_ok(move |_| transaction_hash)
 			.map_err(|err| internal_err(format::Geth::pool_error(err)))
 			.await

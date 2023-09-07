@@ -41,11 +41,7 @@ pub enum WorkerCommand {
 	/// Index the best block known so far via import notifications.
 	IndexBestBlock(H256),
 	/// Canonicalize the enacted and retracted blocks reported via import notifications.
-	Canonicalize {
-		common: H256,
-		enacted: Vec<H256>,
-		retracted: Vec<H256>,
-	},
+	Canonicalize { common: H256, enacted: Vec<H256>, retracted: Vec<H256> },
 	/// Verify indexed blocks' consistency.
 	/// Check for any canon blocks that haven't had their logs indexed.
 	/// Check for any missing parent blocks from the latest canon block.
@@ -73,7 +69,8 @@ where
 	Backend::State: StateBackend<BlakeTwo256>,
 {
 	/// Spawn the indexing worker. The worker can be given commands via the sender channel.
-	/// Once the buffer is full, attempts to send new messages will wait until a message is read from the channel.
+	/// Once the buffer is full, attempts to send new messages will wait until a message is read
+	/// from the channel.
 	pub async fn spawn_worker(
 		client: Arc<Client>,
 		substrate_backend: Arc<Backend>,
@@ -88,7 +85,8 @@ where
 				log::debug!(target: "frontier-sql", "💬 Recv Worker Command {cmd:?}");
 				match cmd {
 					WorkerCommand::ResumeSync => {
-						// Attempt to resume from last indexed block. If there is no data in the db, sync genesis.
+						// Attempt to resume from last indexed block. If there is no data in the db,
+						// sync genesis.
 						match indexer_backend.get_last_indexed_canon_block().await.ok() {
 							Some(last_block_hash) => {
 								log::debug!(target: "frontier-sql", "Resume from last block {last_block_hash:?}");
@@ -106,13 +104,13 @@ where
 									)
 									.await;
 								}
-							}
+							},
 							None => {
 								index_genesis_block(client.clone(), indexer_backend.clone()).await;
-							}
+							},
 						};
-					}
-					WorkerCommand::IndexLeaves(leaves) => {
+					},
+					WorkerCommand::IndexLeaves(leaves) =>
 						for leaf in leaves {
 							index_block_and_ancestors(
 								client.clone(),
@@ -121,8 +119,7 @@ where
 								leaf,
 							)
 							.await;
-						}
-					}
+						},
 					WorkerCommand::IndexBestBlock(block_hash) => {
 						index_canonical_block_and_ancestors(
 							client.clone(),
@@ -138,24 +135,18 @@ where
 								hash: block_hash,
 							});
 						}
-					}
-					WorkerCommand::Canonicalize {
-						common,
-						enacted,
-						retracted,
-					} => {
+					},
+					WorkerCommand::Canonicalize { common, enacted, retracted } => {
 						canonicalize_blocks(indexer_backend.clone(), common, enacted, retracted)
 							.await;
-					}
+					},
 					WorkerCommand::CheckIndexedBlocks => {
 						// Fix any indexed blocks that did not have their logs indexed
 						if let Some(block_hash) =
 							indexer_backend.get_first_pending_canon_block().await
 						{
 							log::debug!(target: "frontier-sql", "Indexing pending canonical block {block_hash:?}");
-							indexer_backend
-								.index_block_logs(client.clone(), block_hash)
-								.await;
+							indexer_backend.index_block_logs(client.clone(), block_hash).await;
 						}
 
 						// Fix any missing blocks
@@ -165,7 +156,7 @@ where
 							indexer_backend.clone(),
 						)
 						.await;
-					}
+					},
 				}
 			}
 		});
@@ -287,22 +278,19 @@ async fn index_block_and_ancestors<Block, Backend, Client>(
 	while let Some(hash) = hashes.pop() {
 		// exit if genesis block is reached
 		if hash == H256::default() {
-			break;
+			break
 		}
 
 		// exit if block is already imported
 		if indexer_backend.is_block_indexed(hash).await {
 			log::debug!(target: "frontier-sql", "🔴 Block {hash:?} already imported");
-			break;
+			break
 		}
 
 		log::debug!(target: "frontier-sql", "🛠️  Importing {hash:?}");
-		let _ = indexer_backend
-			.insert_block_metadata(client.clone(), hash)
-			.await
-			.map_err(|e| {
-				log::error!(target: "frontier-sql", "{e}");
-			});
+		let _ = indexer_backend.insert_block_metadata(client.clone(), hash).await.map_err(|e| {
+			log::error!(target: "frontier-sql", "{e}");
+		});
 		log::debug!(target: "frontier-sql", "Inserted block metadata");
 		indexer_backend.index_block_logs(client.clone(), hash).await;
 
@@ -313,8 +301,8 @@ async fn index_block_and_ancestors<Block, Backend, Client>(
 	}
 }
 
-/// Index the provided known canonical blocks. The function loops over the ancestors of the provided nodes
-/// until it encounters the genesis block, or a block that has already been imported, or
+/// Index the provided known canonical blocks. The function loops over the ancestors of the provided
+/// nodes until it encounters the genesis block, or a block that has already been imported, or
 /// is already in the active set. The `hashes` parameter is populated with any parent blocks
 /// that is scheduled to be indexed.
 async fn index_canonical_block_and_ancestors<Block, Backend, Client>(
@@ -335,7 +323,7 @@ async fn index_canonical_block_and_ancestors<Block, Backend, Client>(
 	while let Some(hash) = hashes.pop() {
 		// exit if genesis block is reached
 		if hash == H256::default() {
-			break;
+			break
 		}
 
 		let status = indexer_backend.block_indexed_and_canon_status(hash).await;
@@ -343,14 +331,14 @@ async fn index_canonical_block_and_ancestors<Block, Backend, Client>(
 		// exit if canonical block is already imported
 		if status.indexed && status.canon {
 			log::debug!(target: "frontier-sql", "🔴 Block {hash:?} already imported");
-			break;
+			break
 		}
 
 		// If block was previously indexed as non-canon then mark it as canon
 		if status.indexed && !status.canon {
 			if let Err(err) = indexer_backend.set_block_as_canon(hash).await {
 				log::error!(target: "frontier-sql", "Failed setting block {hash:?} as canon: {err:?}");
-				continue;
+				continue
 			}
 
 			log::debug!(target: "frontier-sql", "🛠️  Marked block as canon {hash:?}");
@@ -360,17 +348,14 @@ async fn index_canonical_block_and_ancestors<Block, Backend, Client>(
 				let parent_hash = header.parent_hash();
 				hashes.push(*parent_hash);
 			}
-			continue;
+			continue
 		}
 
 		// Else, import the new block
 		log::debug!(target: "frontier-sql", "🛠️  Importing {hash:?}");
-		let _ = indexer_backend
-			.insert_block_metadata(client.clone(), hash)
-			.await
-			.map_err(|e| {
-				log::error!(target: "frontier-sql", "{e}");
-			});
+		let _ = indexer_backend.insert_block_metadata(client.clone(), hash).await.map_err(|e| {
+			log::error!(target: "frontier-sql", "{e}");
+		});
 		log::debug!(target: "frontier-sql", "Inserted block metadata  {hash:?}");
 		indexer_backend.index_block_logs(client.clone(), hash).await;
 
@@ -571,11 +556,7 @@ mod test {
 		// Indexer backend
 		let indexer_backend = fc_db::sql::Backend::new(
 			fc_db::sql::BackendConfig::Sqlite(fc_db::sql::SqliteBackendConfig {
-				path: Path::new("sqlite:///")
-					.join(tmp.path())
-					.join("test.db3")
-					.to_str()
-					.unwrap(),
+				path: Path::new("sqlite:///").join(tmp.path()).join("test.db3").to_str().unwrap(),
 				create_if_missing: true,
 				cache_size: 204800,
 				thread_count: 4,
@@ -594,9 +575,7 @@ mod test {
 		for block_number in 1..11 {
 			// New block including pallet ethereum block digest
 			let mut builder = client.new_block(Default::default()).unwrap();
-			builder
-				.push_deposit_log_digest_item(ethereum_digest())
-				.expect("deposit log");
+			builder.push_deposit_log_digest_item(ethereum_digest()).expect("deposit log");
 			// Addresses
 			let address_1 = H160::repeat_byte(0x01);
 			let address_2 = H160::repeat_byte(0x02);
@@ -777,11 +756,7 @@ mod test {
 		// Indexer backend
 		let indexer_backend = fc_db::sql::Backend::new(
 			fc_db::sql::BackendConfig::Sqlite(fc_db::sql::SqliteBackendConfig {
-				path: Path::new("sqlite:///")
-					.join(tmp.path())
-					.join("test.db3")
-					.to_str()
-					.unwrap(),
+				path: Path::new("sqlite:///").join(tmp.path()).join("test.db3").to_str().unwrap(),
 				create_if_missing: true,
 				cache_size: 204800,
 				thread_count: 4,
@@ -830,9 +805,7 @@ mod test {
 		for block_number in 1..11 {
 			// New block including pallet ethereum block digest
 			let mut builder = client.new_block(Default::default()).unwrap();
-			builder
-				.push_deposit_log_digest_item(ethereum_digest())
-				.expect("deposit log");
+			builder.push_deposit_log_digest_item(ethereum_digest()).expect("deposit log");
 			// Addresses
 			let address_1 = H160::random();
 			let address_2 = H160::random();
@@ -984,11 +957,7 @@ mod test {
 		// Indexer backend
 		let indexer_backend = fc_db::sql::Backend::new(
 			fc_db::sql::BackendConfig::Sqlite(fc_db::sql::SqliteBackendConfig {
-				path: Path::new("sqlite:///")
-					.join(tmp.path())
-					.join("test.db3")
-					.to_str()
-					.unwrap(),
+				path: Path::new("sqlite:///").join(tmp.path()).join("test.db3").to_str().unwrap(),
 				create_if_missing: true,
 				cache_size: 204800,
 				thread_count: 4,
@@ -1032,20 +1001,14 @@ mod test {
 		});
 
 		// Create 10 blocks saving the common ancestor for branching.
-		let mut parent_hash = client
-			.hash(sp_runtime::traits::Zero::zero())
-			.unwrap()
-			.expect("genesis hash");
+		let mut parent_hash =
+			client.hash(sp_runtime::traits::Zero::zero()).unwrap().expect("genesis hash");
 		let mut common_ancestor = parent_hash;
 		let mut hashes_to_be_orphaned: Vec<H256> = vec![];
 		for block_number in 1..11 {
 			// New block including pallet ethereum block digest
-			let mut builder = client
-				.new_block_at(parent_hash, Default::default(), false)
-				.unwrap();
-			builder
-				.push_deposit_log_digest_item(ethereum_digest())
-				.expect("deposit log");
+			let mut builder = client.new_block_at(parent_hash, Default::default(), false).unwrap();
+			builder.push_deposit_log_digest_item(ethereum_digest()).expect("deposit log");
 			let block = builder.build().unwrap().block;
 			let block_hash = block.header.hash();
 			executor::block_on(client.import(BlockOrigin::Own, block)).unwrap();
@@ -1077,12 +1040,8 @@ mod test {
 		parent_hash = common_ancestor;
 		for _ in 1..11 {
 			// New block including pallet ethereum block digest
-			let mut builder = client
-				.new_block_at(parent_hash, Default::default(), false)
-				.unwrap();
-			builder
-				.push_deposit_log_digest_item(ethereum_digest())
-				.expect("deposit log");
+			let mut builder = client.new_block_at(parent_hash, Default::default(), false).unwrap();
+			builder.push_deposit_log_digest_item(ethereum_digest()).expect("deposit log");
 			let block = builder.build().unwrap().block;
 			let block_hash = block.header.hash();
 			executor::block_on(client.import(BlockOrigin::Own, block)).unwrap();
@@ -1153,11 +1112,7 @@ mod test {
 		// Indexer backend
 		let indexer_backend = fc_db::sql::Backend::new(
 			fc_db::sql::BackendConfig::Sqlite(fc_db::sql::SqliteBackendConfig {
-				path: Path::new("sqlite:///")
-					.join(tmp.path())
-					.join("test.db3")
-					.to_str()
-					.unwrap(),
+				path: Path::new("sqlite:///").join(tmp.path()).join("test.db3").to_str().unwrap(),
 				create_if_missing: true,
 				cache_size: 204800,
 				thread_count: 4,
@@ -1173,18 +1128,12 @@ mod test {
 		let pool = indexer_backend.pool().clone();
 
 		// Create 5 blocks, storing them newest first.
-		let mut parent_hash = client
-			.hash(sp_runtime::traits::Zero::zero())
-			.unwrap()
-			.expect("genesis hash");
+		let mut parent_hash =
+			client.hash(sp_runtime::traits::Zero::zero()).unwrap().expect("genesis hash");
 		let mut best_block_hashes: Vec<H256> = vec![];
 		for _block_number in 1..=5 {
-			let mut builder = client
-				.new_block_at(parent_hash, Default::default(), false)
-				.unwrap();
-			builder
-				.push_deposit_log_digest_item(ethereum_digest())
-				.expect("deposit log");
+			let mut builder = client.new_block_at(parent_hash, Default::default(), false).unwrap();
+			builder.push_deposit_log_digest_item(ethereum_digest()).expect("deposit log");
 			let block = builder.build().unwrap().block;
 			let block_hash = block.header.hash();
 			executor::block_on(client.import(BlockOrigin::Own, block)).unwrap();
@@ -1269,9 +1218,7 @@ mod test {
 		fn new() -> Self {
 			let sync_status = Arc::new(Mutex::new(false));
 			TestSyncOracleWrapper {
-				oracle: Arc::new(TestSyncOracle {
-					sync_status: sync_status.clone(),
-				}),
+				oracle: Arc::new(TestSyncOracle { sync_status: sync_status.clone() }),
 				sync_status,
 			}
 		}
@@ -1302,11 +1249,7 @@ mod test {
 		});
 		let indexer_backend = fc_db::sql::Backend::new(
 			fc_db::sql::BackendConfig::Sqlite(fc_db::sql::SqliteBackendConfig {
-				path: Path::new("sqlite:///")
-					.join(tmp.path())
-					.join("test.db3")
-					.to_str()
-					.unwrap(),
+				path: Path::new("sqlite:///").join(tmp.path()).join("test.db3").to_str().unwrap(),
 				create_if_missing: true,
 				cache_size: 204800,
 				thread_count: 4,
@@ -1350,18 +1293,12 @@ mod test {
 
 		// Import 3 blocks as part of normal operation, storing them oldest first.
 		sync_oracle_wrapper.set_sync_status(false);
-		let mut parent_hash = client
-			.hash(sp_runtime::traits::Zero::zero())
-			.unwrap()
-			.expect("genesis hash");
+		let mut parent_hash =
+			client.hash(sp_runtime::traits::Zero::zero()).unwrap().expect("genesis hash");
 		let mut best_block_hashes: Vec<H256> = vec![];
 		for _block_number in 1..=3 {
-			let mut builder = client
-				.new_block_at(parent_hash, Default::default(), false)
-				.unwrap();
-			builder
-				.push_deposit_log_digest_item(ethereum_digest())
-				.expect("deposit log");
+			let mut builder = client.new_block_at(parent_hash, Default::default(), false).unwrap();
+			builder.push_deposit_log_digest_item(ethereum_digest()).expect("deposit log");
 			let block = builder.build().unwrap().block;
 			let block_hash = block.header.hash();
 
@@ -1408,11 +1345,7 @@ mod test {
 		});
 		let indexer_backend = fc_db::sql::Backend::new(
 			fc_db::sql::BackendConfig::Sqlite(fc_db::sql::SqliteBackendConfig {
-				path: Path::new("sqlite:///")
-					.join(tmp.path())
-					.join("test.db3")
-					.to_str()
-					.unwrap(),
+				path: Path::new("sqlite:///").join(tmp.path()).join("test.db3").to_str().unwrap(),
 				create_if_missing: true,
 				cache_size: 204800,
 				thread_count: 4,
@@ -1456,18 +1389,12 @@ mod test {
 
 		// Import 3 blocks as part of normal operation, storing them oldest first.
 		sync_oracle_wrapper.set_sync_status(false);
-		let mut parent_hash = client
-			.hash(sp_runtime::traits::Zero::zero())
-			.unwrap()
-			.expect("genesis hash");
+		let mut parent_hash =
+			client.hash(sp_runtime::traits::Zero::zero()).unwrap().expect("genesis hash");
 		let mut best_block_hashes: Vec<H256> = vec![];
 		for _block_number in 1..=3 {
-			let mut builder = client
-				.new_block_at(parent_hash, Default::default(), false)
-				.unwrap();
-			builder
-				.push_deposit_log_digest_item(ethereum_digest())
-				.expect("deposit log");
+			let mut builder = client.new_block_at(parent_hash, Default::default(), false).unwrap();
+			builder.push_deposit_log_digest_item(ethereum_digest()).expect("deposit log");
 			let block = builder.build().unwrap().block;
 			let block_hash = block.header.hash();
 
@@ -1477,12 +1404,9 @@ mod test {
 		}
 
 		// create non-best block
-		let mut builder = client
-			.new_block_at(best_block_hashes[0], Default::default(), false)
-			.unwrap();
-		builder
-			.push_deposit_log_digest_item(ethereum_digest())
-			.expect("deposit log");
+		let mut builder =
+			client.new_block_at(best_block_hashes[0], Default::default(), false).unwrap();
+		builder.push_deposit_log_digest_item(ethereum_digest()).expect("deposit log");
 		let block = builder.build().unwrap().block;
 
 		executor::block_on(client.import(BlockOrigin::Own, block)).unwrap();
@@ -1525,11 +1449,7 @@ mod test {
 		});
 		let indexer_backend = fc_db::sql::Backend::new(
 			fc_db::sql::BackendConfig::Sqlite(fc_db::sql::SqliteBackendConfig {
-				path: Path::new("sqlite:///")
-					.join(tmp.path())
-					.join("test.db3")
-					.to_str()
-					.unwrap(),
+				path: Path::new("sqlite:///").join(tmp.path()).join("test.db3").to_str().unwrap(),
 				create_if_missing: true,
 				cache_size: 204800,
 				thread_count: 4,
@@ -1573,18 +1493,12 @@ mod test {
 
 		// Import 3 blocks as part of normal operation, storing them oldest first.
 		sync_oracle_wrapper.set_sync_status(false);
-		let mut parent_hash = client
-			.hash(sp_runtime::traits::Zero::zero())
-			.unwrap()
-			.expect("genesis hash");
+		let mut parent_hash =
+			client.hash(sp_runtime::traits::Zero::zero()).unwrap().expect("genesis hash");
 		let mut best_block_hashes: Vec<H256> = vec![];
 		for _block_number in 1..=3 {
-			let mut builder = client
-				.new_block_at(parent_hash, Default::default(), false)
-				.unwrap();
-			builder
-				.push_deposit_log_digest_item(ethereum_digest())
-				.expect("deposit log");
+			let mut builder = client.new_block_at(parent_hash, Default::default(), false).unwrap();
+			builder.push_deposit_log_digest_item(ethereum_digest()).expect("deposit log");
 			let block = builder.build().unwrap().block;
 			let block_hash = block.header.hash();
 
@@ -1631,11 +1545,7 @@ mod test {
 		});
 		let indexer_backend = fc_db::sql::Backend::new(
 			fc_db::sql::BackendConfig::Sqlite(fc_db::sql::SqliteBackendConfig {
-				path: Path::new("sqlite:///")
-					.join(tmp.path())
-					.join("test.db3")
-					.to_str()
-					.unwrap(),
+				path: Path::new("sqlite:///").join(tmp.path()).join("test.db3").to_str().unwrap(),
 				create_if_missing: true,
 				cache_size: 204800,
 				thread_count: 4,
@@ -1679,18 +1589,12 @@ mod test {
 
 		// Import 3 blocks as part of normal operation, storing them oldest first.
 		sync_oracle_wrapper.set_sync_status(false);
-		let mut parent_hash = client
-			.hash(sp_runtime::traits::Zero::zero())
-			.unwrap()
-			.expect("genesis hash");
+		let mut parent_hash =
+			client.hash(sp_runtime::traits::Zero::zero()).unwrap().expect("genesis hash");
 		let mut best_block_hashes: Vec<H256> = vec![];
 		for _block_number in 1..=3 {
-			let mut builder = client
-				.new_block_at(parent_hash, Default::default(), false)
-				.unwrap();
-			builder
-				.push_deposit_log_digest_item(ethereum_digest())
-				.expect("deposit log");
+			let mut builder = client.new_block_at(parent_hash, Default::default(), false).unwrap();
+			builder.push_deposit_log_digest_item(ethereum_digest()).expect("deposit log");
 			let block = builder.build().unwrap().block;
 			let block_hash = block.header.hash();
 
@@ -1700,12 +1604,9 @@ mod test {
 		}
 
 		// create non-best block
-		let mut builder = client
-			.new_block_at(best_block_hashes[0], Default::default(), false)
-			.unwrap();
-		builder
-			.push_deposit_log_digest_item(ethereum_digest())
-			.expect("deposit log");
+		let mut builder =
+			client.new_block_at(best_block_hashes[0], Default::default(), false).unwrap();
+		builder.push_deposit_log_digest_item(ethereum_digest()).expect("deposit log");
 		let block = builder.build().unwrap().block;
 
 		executor::block_on(client.import(BlockOrigin::Own, block)).unwrap();
@@ -1748,11 +1649,7 @@ mod test {
 		});
 		let indexer_backend = fc_db::sql::Backend::new(
 			fc_db::sql::BackendConfig::Sqlite(fc_db::sql::SqliteBackendConfig {
-				path: Path::new("sqlite:///")
-					.join(tmp.path())
-					.join("test.db3")
-					.to_str()
-					.unwrap(),
+				path: Path::new("sqlite:///").join(tmp.path()).join("test.db3").to_str().unwrap(),
 				create_if_missing: true,
 				cache_size: 204800,
 				thread_count: 4,
@@ -1796,18 +1693,12 @@ mod test {
 
 		// Import 3 blocks as part of initial network sync, storing them oldest first.
 		sync_oracle_wrapper.set_sync_status(true);
-		let mut parent_hash = client
-			.hash(sp_runtime::traits::Zero::zero())
-			.unwrap()
-			.expect("genesis hash");
+		let mut parent_hash =
+			client.hash(sp_runtime::traits::Zero::zero()).unwrap().expect("genesis hash");
 		let mut best_block_hashes: Vec<H256> = vec![];
 		for _block_number in 1..=3 {
-			let mut builder = client
-				.new_block_at(parent_hash, Default::default(), false)
-				.unwrap();
-			builder
-				.push_deposit_log_digest_item(ethereum_digest())
-				.expect("deposit log");
+			let mut builder = client.new_block_at(parent_hash, Default::default(), false).unwrap();
+			builder.push_deposit_log_digest_item(ethereum_digest()).expect("deposit log");
 			let block = builder.build().unwrap().block;
 			let block_hash = block.header.hash();
 
@@ -1854,11 +1745,7 @@ mod test {
 		});
 		let indexer_backend = fc_db::sql::Backend::new(
 			fc_db::sql::BackendConfig::Sqlite(fc_db::sql::SqliteBackendConfig {
-				path: Path::new("sqlite:///")
-					.join(tmp.path())
-					.join("test.db3")
-					.to_str()
-					.unwrap(),
+				path: Path::new("sqlite:///").join(tmp.path()).join("test.db3").to_str().unwrap(),
 				create_if_missing: true,
 				cache_size: 204800,
 				thread_count: 4,
@@ -1902,18 +1789,12 @@ mod test {
 
 		// Import 3 blocks as part of initial network sync, storing them oldest first.
 		sync_oracle_wrapper.set_sync_status(true);
-		let mut parent_hash = client
-			.hash(sp_runtime::traits::Zero::zero())
-			.unwrap()
-			.expect("genesis hash");
+		let mut parent_hash =
+			client.hash(sp_runtime::traits::Zero::zero()).unwrap().expect("genesis hash");
 		let mut best_block_hashes: Vec<H256> = vec![];
 		for _block_number in 1..=3 {
-			let mut builder = client
-				.new_block_at(parent_hash, Default::default(), false)
-				.unwrap();
-			builder
-				.push_deposit_log_digest_item(ethereum_digest())
-				.expect("deposit log");
+			let mut builder = client.new_block_at(parent_hash, Default::default(), false).unwrap();
+			builder.push_deposit_log_digest_item(ethereum_digest()).expect("deposit log");
 			let block = builder.build().unwrap().block;
 			let block_hash = block.header.hash();
 

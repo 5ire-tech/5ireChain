@@ -91,14 +91,12 @@ impl WeightInfo {
 			(None, _) => None,
 			(Some(weight_limit), Some(proof_size_base_cost))
 				if weight_limit.proof_size() >= proof_size_base_cost =>
-			{
 				Some(WeightInfo {
 					ref_time_limit: Some(weight_limit.ref_time()),
 					proof_size_limit: Some(weight_limit.proof_size()),
 					ref_time_usage: Some(0u64),
 					proof_size_usage: Some(proof_size_base_cost),
-				})
-			}
+				}),
 			(Some(weight_limit), None) => Some(WeightInfo {
 				ref_time_limit: Some(weight_limit.ref_time()),
 				proof_size_limit: None,
@@ -111,7 +109,7 @@ impl WeightInfo {
 	fn try_consume(&self, cost: u64, limit: u64, usage: u64) -> Result<u64, ExitError> {
 		let usage = usage.checked_add(cost).ok_or(ExitError::OutOfGas)?;
 		if usage > limit {
-			return Err(ExitError::OutOfGas);
+			return Err(ExitError::OutOfGas)
 		}
 		Ok(usage)
 	}
@@ -121,7 +119,7 @@ impl WeightInfo {
 		{
 			let ref_time_usage = self.try_consume(cost, ref_time_limit, ref_time_usage)?;
 			if ref_time_usage > ref_time_limit {
-				return Err(ExitError::OutOfGas);
+				return Err(ExitError::OutOfGas)
 			}
 			self.ref_time_usage = Some(ref_time_usage);
 		}
@@ -133,7 +131,7 @@ impl WeightInfo {
 		{
 			let proof_size_usage = self.try_consume(cost, proof_size_limit, proof_size_usage)?;
 			if proof_size_usage > proof_size_limit {
-				return Err(ExitError::OutOfGas);
+				return Err(ExitError::OutOfGas)
 			}
 			self.proof_size_usage = Some(proof_size_usage);
 		}
@@ -223,8 +221,9 @@ impl FeeCalculator for () {
 ///
 /// `GAS_PER_MILLIS * WEIGHT_MILLIS_PER_BLOCK * TXN_RATIO ~= BLOCK_GAS_LIMIT`
 /// `WEIGHT_PER_GAS = WEIGHT_REF_TIME_PER_MILLIS / GAS_PER_MILLIS
-///                 = WEIGHT_REF_TIME_PER_MILLIS / (BLOCK_GAS_LIMIT / TXN_RATIO / WEIGHT_MILLIS_PER_BLOCK)
-///                 = TXN_RATIO * (WEIGHT_REF_TIME_PER_MILLIS * WEIGHT_MILLIS_PER_BLOCK) / BLOCK_GAS_LIMIT`
+///                 = WEIGHT_REF_TIME_PER_MILLIS / (BLOCK_GAS_LIMIT / TXN_RATIO /
+/// WEIGHT_MILLIS_PER_BLOCK)                 = TXN_RATIO * (WEIGHT_REF_TIME_PER_MILLIS *
+/// WEIGHT_MILLIS_PER_BLOCK) / BLOCK_GAS_LIMIT`
 ///
 /// For example, given the 2000ms Weight, from which 75% only are used for transactions,
 /// the total EVM execution gas limit is `GAS_PER_MILLIS * 2000 * 75% = BLOCK_GAS_LIMIT`.
@@ -235,10 +234,7 @@ pub fn weight_per_gas(
 ) -> u64 {
 	let weight_per_block = WEIGHT_REF_TIME_PER_MILLIS.saturating_mul(weight_millis_per_block);
 	let weight_per_gas = (txn_ratio * weight_per_block).saturating_div(block_gas_limit);
-	assert!(
-		weight_per_gas >= 1,
-		"WeightPerGas must greater than or equal with 1"
-	);
+	assert!(weight_per_gas >= 1, "WeightPerGas must greater than or equal with 1");
 	weight_per_gas
 }
 
@@ -248,17 +244,8 @@ mod tests {
 
 	#[test]
 	fn test_weight_per_gas() {
-		assert_eq!(
-			weight_per_gas(15_000_000, Perbill::from_percent(75), 500),
-			25_000
-		);
-		assert_eq!(
-			weight_per_gas(75_000_000, Perbill::from_percent(75), 2_000),
-			20_000
-		);
-		assert_eq!(
-			weight_per_gas(1_500_000_000_000, Perbill::from_percent(75), 2_000),
-			1
-		);
+		assert_eq!(weight_per_gas(15_000_000, Perbill::from_percent(75), 500), 25_000);
+		assert_eq!(weight_per_gas(75_000_000, Perbill::from_percent(75), 2_000), 20_000);
+		assert_eq!(weight_per_gas(1_500_000_000_000, Perbill::from_percent(75), 2_000), 1);
 	}
 }

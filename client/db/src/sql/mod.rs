@@ -154,7 +154,7 @@ where
 					// https://www.sqlite.org/pragma.html#pragma_synchronous
 					.synchronous(sqlx::sqlite::SqliteSynchronous::Normal);
 				Ok(config)
-			}
+			},
 		}
 	}
 
@@ -296,18 +296,17 @@ where
 											"Ethereum block hash mismatch: \
 											frontier consensus digest ({expect_eth_block_hash:?}), \
 											db state ({got_eth_block_hash:?})"
-										)));
+										)))
 									} else {
 										Hashes::from_block(block)
 									}
-								}
-								None => {
+								},
+								None =>
 									return Err(Error::Protocol(format!(
 										"Missing ethereum block for hash mismatch {expect_eth_block_hash:?}"
-									)))
-								}
+									))),
 							}
-						}
+						},
 						ConsensusLog::Pre(PreLog::Block(block)) => Hashes::from_block(block),
 					};
 
@@ -319,14 +318,14 @@ where
 						Ok(None) => {
 							log::debug!(target: "frontier-sql", "[Metadata] Missing header for block #{block_number} ({hash:?})");
 							0
-						}
+						},
 						Err(err) => {
 							log::debug!(
 								target: "frontier-sql",
 								"[Metadata] Failed to retrieve header for block #{block_number} ({hash:?}): {err:?}",
 							);
 							0
-						}
+						},
 					};
 
 					log::trace!(
@@ -340,18 +339,15 @@ where
 						schema,
 						is_canon,
 					})
-				}
-				Err(FindLogError::NotFound) => Err(Error::Protocol(format!(
-					"[Metadata] No logs found for hash {hash:?}",
-				))),
+				},
+				Err(FindLogError::NotFound) =>
+					Err(Error::Protocol(format!("[Metadata] No logs found for hash {hash:?}",))),
 				Err(FindLogError::MultipleLogs) => Err(Error::Protocol(format!(
 					"[Metadata] Multiple logs found for hash {hash:?}",
 				))),
 			}
 		} else {
-			Err(Error::Protocol(format!(
-				"[Metadata] Failed retrieving header for hash {hash:?}"
-			)))
+			Err(Error::Protocol(format!("[Metadata] Failed retrieving header for hash {hash:?}")))
 		}
 	}
 
@@ -500,7 +496,7 @@ where
 						.await?;
 					}
 					Ok(tx.commit().await?)
-				}
+				},
 				Err(e) => Err(e),
 			}
 		}
@@ -527,21 +523,16 @@ where
 		let mut transaction_count: usize = 0;
 		let mut log_count: usize = 0;
 		let schema = Self::onchain_storage_schema(client.as_ref(), substrate_block_hash);
-		let handler = overrides
-			.schemas
-			.get(&schema)
-			.unwrap_or(&overrides.fallback);
+		let handler = overrides.schemas.get(&schema).unwrap_or(&overrides.fallback);
 
-		let receipts = handler
-			.current_receipts(substrate_block_hash)
-			.unwrap_or_default();
+		let receipts = handler.current_receipts(substrate_block_hash).unwrap_or_default();
 
 		transaction_count += receipts.len();
 		for (transaction_index, receipt) in receipts.iter().enumerate() {
 			let receipt_logs = match receipt {
-				ethereum::ReceiptV3::Legacy(d)
-				| ethereum::ReceiptV3::EIP2930(d)
-				| ethereum::ReceiptV3::EIP1559(d) => &d.logs,
+				ethereum::ReceiptV3::Legacy(d) |
+				ethereum::ReceiptV3::EIP2930(d) |
+				ethereum::ReceiptV3::EIP1559(d) => &d.logs,
 			};
 			let transaction_index = transaction_index as i32;
 			log_count += receipt_logs.len();
@@ -607,10 +598,7 @@ where
 			result
 				.map(|row| {
 					let is_canon: i32 = row.get(0);
-					BlockIndexedStatus {
-						indexed: true,
-						canon: is_canon != 0,
-					}
+					BlockIndexedStatus { indexed: true, canon: is_canon != 0 }
 				})
 				.unwrap_or_default()
 		})
@@ -625,9 +613,9 @@ where
 			.await
 	}
 
-	/// Retrieves the first missing canonical block number in decreasing order that hasn't been indexed yet.
-	/// If no unindexed block exists or the table or the rows do not exist, then the function
-	/// returns `None`.
+	/// Retrieves the first missing canonical block number in decreasing order that hasn't been
+	/// indexed yet. If no unindexed block exists or the table or the rows do not exist, then the
+	/// function returns `None`.
 	pub async fn get_first_missing_canon_block(&self) -> Option<u32> {
 		match sqlx::query(
 			"SELECT b1.block_number-1
@@ -643,15 +631,14 @@ where
 		.fetch_optional(self.pool())
 		.await
 		{
-			Ok(result) => {
+			Ok(result) =>
 				if let Some(row) = result {
 					let block_number: u32 = row.get(0);
-					return Some(block_number);
-				}
-			}
+					return Some(block_number)
+				},
 			Err(err) => {
 				log::debug!(target: "frontier-sql", "Failed retrieving missing block {err:?}");
-			}
+			},
 		}
 
 		None
@@ -671,16 +658,15 @@ where
 		.fetch_optional(self.pool())
 		.await
 		{
-			Ok(result) => {
+			Ok(result) =>
 				if let Some(row) = result {
 					let block_hash_bytes: Vec<u8> = row.get(0);
 					let block_hash = H256::from_slice(&block_hash_bytes[..]);
-					return Some(block_hash);
-				}
-			}
+					return Some(block_hash)
+				},
 			Err(err) => {
 				log::debug!(target: "frontier-sql", "Failed retrieving missing block {err:?}");
-			}
+			},
 		}
 
 		None
@@ -697,9 +683,7 @@ where
 		)
 		.fetch_one(self.pool())
 		.await?;
-		Ok(H256::from_slice(
-			&row.try_get::<Vec<u8>, _>(0).unwrap_or_default()[..],
-		))
+		Ok(H256::from_slice(&row.try_get::<Vec<u8>, _>(0).unwrap_or_default()[..]))
 	}
 
 	/// Create the Sqlite database if it does not already exist.
@@ -858,16 +842,12 @@ impl<Block: BlockT<Hash = H256>> BackendReader<Block> for Backend<Block> {
 		addresses: Vec<H160>,
 		topics: Vec<Vec<Option<H256>>>,
 	) -> Result<Vec<FilteredLog<Block>>, String> {
-		let mut unique_topics: [HashSet<H256>; 4] = [
-			HashSet::new(),
-			HashSet::new(),
-			HashSet::new(),
-			HashSet::new(),
-		];
+		let mut unique_topics: [HashSet<H256>; 4] =
+			[HashSet::new(), HashSet::new(), HashSet::new(), HashSet::new()];
 		for topic_combination in topics.into_iter() {
 			for (topic_index, topic) in topic_combination.into_iter().enumerate() {
 				if topic_index == MAX_TOPIC_COUNT as usize {
-					return Err("Invalid topic input. Maximum length is 4.".to_string());
+					return Err("Invalid topic input. Maximum length is 4.".to_string())
 				}
 
 				if let Some(topic) = topic {
@@ -876,10 +856,7 @@ impl<Block: BlockT<Hash = H256>> BackendReader<Block> for Backend<Block> {
 			}
 		}
 
-		let log_key = format!(
-			"{}-{}-{:?}-{:?}",
-			from_block, to_block, addresses, unique_topics
-		);
+		let log_key = format!("{}-{}-{:?}-{:?}", from_block, to_block, addresses, unique_topics);
 		let mut qb = QueryBuilder::new("");
 		let query = build_query(&mut qb, from_block, to_block, addresses, unique_topics);
 		let sql = query.sql();
@@ -930,7 +907,7 @@ impl<Block: BlockT<Hash = H256>> BackendReader<Block> for Backend<Block> {
 						transaction_index,
 						log_index,
 					});
-				}
+				},
 				Ok(None) => break None, // no more rows
 				Err(err) => break Some(err),
 			};
@@ -943,7 +920,7 @@ impl<Block: BlockT<Hash = H256>> BackendReader<Block> for Backend<Block> {
 
 		if let Some(err) = maybe_err {
 			log::error!(target: "frontier-sql", "Failed to query sql db: {err:?} - {log_key}");
-			return Err("Failed to query sql db with statement".to_string());
+			return Err("Failed to query sql db with statement".to_string())
 		}
 
 		log::info!(target: "frontier-sql", "FILTER remove handler - {log_key}");
@@ -1002,7 +979,7 @@ ON (b.block_number BETWEEN ",
 					qb_topic.push_bind(t.as_bytes().to_owned());
 				});
 				qb_topic.push_unseparated(")");
-			}
+			},
 			Ordering::Equal => {
 				qb.push(format!(" AND l.topic_{} = ", i + 1)).push_bind(
 					topic_options
@@ -1012,8 +989,8 @@ ON (b.block_number BETWEEN ",
 						.as_bytes()
 						.to_owned(),
 				);
-			}
-			Ordering::Less => {}
+			},
+			Ordering::Less => {},
 		}
 	}
 
@@ -1137,11 +1114,7 @@ mod test {
 		// Indexer backend
 		let indexer_backend = super::Backend::new(
 			super::BackendConfig::Sqlite(super::SqliteBackendConfig {
-				path: Path::new("sqlite:///")
-					.join(tmp.path())
-					.join("test.db3")
-					.to_str()
-					.unwrap(),
+				path: Path::new("sqlite:///").join(tmp.path()).join("test.db3").to_str().unwrap(),
 				create_if_missing: true,
 				cache_size: 20480,
 				thread_count: 4,
@@ -1175,26 +1148,11 @@ mod test {
 
 		let block_entries = vec![
 			// Block 1
-			(
-				1i32,
-				ethereum_hash_1,
-				substrate_hash_1,
-				ethereum_storage_schema,
-			),
+			(1i32, ethereum_hash_1, substrate_hash_1, ethereum_storage_schema),
 			// Block 2
-			(
-				2i32,
-				ethereum_hash_2,
-				substrate_hash_2,
-				ethereum_storage_schema,
-			),
+			(2i32, ethereum_hash_2, substrate_hash_2, ethereum_storage_schema),
 			// Block 3
-			(
-				3i32,
-				ethereum_hash_3,
-				substrate_hash_3,
-				ethereum_storage_schema,
-			),
+			(3i32, ethereum_hash_3, substrate_hash_3, ethereum_storage_schema),
 		];
 		let mut builder = QueryBuilder::new(
 			"INSERT INTO blocks(
@@ -1218,10 +1176,7 @@ mod test {
 			b.push_bind(1i32);
 		});
 		let query = builder.build();
-		let _ = query
-			.execute(indexer_backend.pool())
-			.await
-			.expect("insert should succeed");
+		let _ = query.execute(indexer_backend.pool()).await.expect("insert should succeed");
 
 		// log_{BLOCK}_{TOPICS}_{LOG_INDEX}_{TX_INDEX}
 		let log_1_abcd_0_0_alice = Log {
@@ -1436,9 +1391,7 @@ mod test {
 
 	#[tokio::test]
 	async fn invalid_topic_input_size_fails() {
-		let TestData {
-			backend, topics_a, ..
-		} = prepare().await;
+		let TestData { backend, topics_a, .. } = prepare().await;
 		let filter = TestFilter {
 			from_block: 0,
 			to_block: 0,
@@ -1456,14 +1409,8 @@ mod test {
 
 	#[tokio::test]
 	async fn test_malformed_topic_cleans_invalid_options() {
-		let TestData {
-			backend,
-			topics_a,
-			topics_b,
-			topics_d,
-			log_1_badc_2_0_alice,
-			..
-		} = prepare().await;
+		let TestData { backend, topics_a, topics_b, topics_d, log_1_badc_2_0_alice, .. } =
+			prepare().await;
 
 		// [(a,null,b), (a, null), (d,null), null] -> [(a,b), a, d]
 		let filter = TestFilter {
@@ -1565,14 +1512,8 @@ mod test {
 
 	#[tokio::test]
 	async fn test_filters_address_and_topic() {
-		let TestData {
-			backend,
-			bob,
-			topics_b,
-			log_2_badc_2_0_bob,
-			log_3_badc_2_0_bob,
-			..
-		} = prepare().await;
+		let TestData { backend, bob, topics_b, log_2_badc_2_0_bob, log_3_badc_2_0_bob, .. } =
+			prepare().await;
 		let filter = TestFilter {
 			from_block: 0,
 			to_block: 3,
@@ -1669,13 +1610,7 @@ mod test {
 
 	#[tokio::test]
 	async fn trailing_wildcard_is_useless_but_works() {
-		let TestData {
-			alice,
-			backend,
-			topics_b,
-			log_1_dcba_1_0_alice,
-			..
-		} = prepare().await;
+		let TestData { alice, backend, topics_b, log_1_dcba_1_0_alice, .. } = prepare().await;
 		let filter = TestFilter {
 			from_block: 0,
 			to_block: 1,
@@ -1762,13 +1697,8 @@ mod test {
 
 	#[tokio::test]
 	async fn test_canonicalize_sets_canon_flag_for_redacted_and_enacted_blocks_correctly() {
-		let TestData {
-			backend,
-			substrate_hash_1,
-			substrate_hash_2,
-			substrate_hash_3,
-			..
-		} = prepare().await;
+		let TestData { backend, substrate_hash_1, substrate_hash_2, substrate_hash_3, .. } =
+			prepare().await;
 
 		// set block #1 to non canon
 		sqlx::query("UPDATE blocks SET is_canon = 0 WHERE substrate_block_hash = ?")
@@ -1778,11 +1708,7 @@ mod test {
 			.expect("sql query must succeed");
 		assert_blocks_canon(
 			backend.pool(),
-			vec![
-				(substrate_hash_1, 0),
-				(substrate_hash_2, 1),
-				(substrate_hash_3, 1),
-			],
+			vec![(substrate_hash_1, 0), (substrate_hash_2, 1), (substrate_hash_3, 1)],
 		)
 		.await;
 
@@ -1793,11 +1719,7 @@ mod test {
 
 		assert_blocks_canon(
 			backend.pool(),
-			vec![
-				(substrate_hash_1, 1),
-				(substrate_hash_2, 0),
-				(substrate_hash_3, 1),
-			],
+			vec![(substrate_hash_1, 1), (substrate_hash_2, 0), (substrate_hash_3, 1)],
 		)
 		.await;
 	}
@@ -1808,17 +1730,10 @@ mod test {
 
 		let from_block: u64 = 100;
 		let to_block: u64 = 500;
-		let addresses: Vec<H160> = vec![
-			H160::repeat_byte(0x01),
-			H160::repeat_byte(0x02),
-			H160::repeat_byte(0x03),
-		];
+		let addresses: Vec<H160> =
+			vec![H160::repeat_byte(0x01), H160::repeat_byte(0x02), H160::repeat_byte(0x03)];
 		let topics = [
-			hashset![
-				H256::repeat_byte(0x01),
-				H256::repeat_byte(0x02),
-				H256::repeat_byte(0x03),
-			],
+			hashset![H256::repeat_byte(0x01), H256::repeat_byte(0x02), H256::repeat_byte(0x03),],
 			hashset![H256::repeat_byte(0x04), H256::repeat_byte(0x05),],
 			hashset![],
 			hashset![H256::repeat_byte(0x06)],

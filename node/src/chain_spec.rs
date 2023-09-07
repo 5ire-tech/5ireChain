@@ -18,14 +18,14 @@
 
 //! Substrate chain configurations.
 
-use fp_evm::GenesisAccount;
-use sp_consensus_grandpa::AuthorityId as GrandpaId;
 use firechain_runtime::{
-	constants::currency::*, wasm_binary_unwrap, BabeConfig, BalancesConfig, Block, CouncilConfig,
-	DemocracyConfig, ElectionsConfig, ImOnlineConfig, IndicesConfig, MaxNominations,
-	NominationPoolsConfig, SessionConfig, SessionKeys, SocietyConfig, StakerStatus, StakingConfig,
-	SudoConfig, SystemConfig, TechnicalCommitteeConfig,GrandpaConfig,AuthorityDiscoveryConfig,EthereumConfig,
+	constants::currency::*, wasm_binary_unwrap, AuthorityDiscoveryConfig, BabeConfig,
+	BalancesConfig, Block, CouncilConfig, DemocracyConfig, ElectionsConfig, EthereumConfig,
+	GrandpaConfig, ImOnlineConfig, IndicesConfig, MaxNominations, NominationPoolsConfig,
+	SessionConfig, SessionKeys, SocietyConfig, StakerStatus, StakingConfig, SudoConfig,
+	SystemConfig, TechnicalCommitteeConfig,
 };
+use fp_evm::GenesisAccount;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sc_chain_spec::ChainSpecExtension;
 use sc_service::ChainType;
@@ -33,14 +33,15 @@ use sc_telemetry::TelemetryEndpoints;
 use serde::{Deserialize, Serialize};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
-use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public, H160, U256, storage::Storage};
+use sp_consensus_grandpa::AuthorityId as GrandpaId;
+use sp_core::{crypto::UncheckedInto, sr25519, storage::Storage, Pair, Public, H160, U256};
 use sp_runtime::{
 	traits::{IdentifyAccount, Verify},
 	Perbill,
 };
 use std::{collections::BTreeMap, str::FromStr};
 
-pub use firechain_runtime::{RuntimeGenesisConfig, EVMConfig, GenesisConfig};
+pub use firechain_runtime::{EVMConfig, GenesisConfig, RuntimeGenesisConfig};
 pub use node_primitives::{AccountId, Balance, Signature};
 
 type AccountPublic = <Signature as Verify>::Signer;
@@ -213,8 +214,8 @@ pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Pu
 
 /// Helper function to generate an account ID from seed
 pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
-	where
-		AccountPublic: From<<TPublic::Pair as Pair>::Public>,
+where
+	AccountPublic: From<<TPublic::Pair as Pair>::Public>,
 {
 	AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
 }
@@ -489,14 +490,8 @@ pub fn development_genesis(
 			..Default::default()
 		},
 		im_online: ImOnlineConfig { keys: vec![] },
-		authority_discovery: AuthorityDiscoveryConfig {
-			keys: vec![],
-			..Default::default()
-		},
-		grandpa: GrandpaConfig {
-			authorities: vec![],
-			..Default::default()
-		},
+		authority_discovery: AuthorityDiscoveryConfig { keys: vec![], ..Default::default() },
+		grandpa: GrandpaConfig { authorities: vec![], ..Default::default() },
 		technical_membership: Default::default(),
 		treasury: Default::default(),
 
@@ -575,9 +570,7 @@ pub fn development_genesis(
 			},
 			_marker: Default::default(),
 		},
-		ethereum: EthereumConfig {
-			_marker: Default::default(),
-		},
+		ethereum: EthereumConfig { _marker: Default::default() },
 		dynamic_fee: Default::default(),
 		base_fee: Default::default(),
 	}
@@ -589,7 +582,7 @@ fn development_config_genesis() -> RuntimeGenesisConfig {
 		vec![],
 		get_account_id_from_seed::<sr25519::Public>("Alice"),
 		None,
-		42,   //passing chain_id = 42.  Need to change??
+		42, //passing chain_id = 42.  Need to change??
 	)
 }
 

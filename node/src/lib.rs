@@ -17,10 +17,9 @@
 // #[cfg(feature = "cli")]
 // pub use command::*;
 
-
 pub mod chain_spec;
-pub mod rpc;
-pub mod service;
+pub mod cli;
 pub mod client;
 pub mod eth;
-pub mod cli;
+pub mod rpc;
+pub mod service;
