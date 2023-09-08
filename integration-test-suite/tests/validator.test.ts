@@ -117,9 +117,7 @@ describe('Validator tests', function () {
     // @ts-ignore
     expect(validators.length == 2).true;
     // @ts-ignore
-    expect(validators[1] == bob.address).true;
-
-
+    expect(validators.toHuman()[0] == bob.address).true;
   });
 
   it('Should chill a validator', async () => {
