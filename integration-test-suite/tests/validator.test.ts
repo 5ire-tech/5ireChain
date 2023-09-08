@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { BLOCK_TIME } from '../utils/constants';
 import {killNodes, polkadotApi as api, polkadotApi, spawnNodes} from "../utils/util";
 import {Keyring} from "@polkadot/api";
-import {waitForEvent, waitForTheNextSession} from "../utils/setup";
+import {sleep, waitForEvent, waitForTheNextSession} from "../utils/setup";
 import {BN} from "@polkadot/util";
 import {WeightV2} from "@polkadot/types/interfaces";
 
@@ -10,7 +10,7 @@ import {WeightV2} from "@polkadot/types/interfaces";
 // Keyring needed to sign using Alice account
 const keyring = new Keyring({ type: 'sr25519' });
 
-describe.only('Validator tests', function () {
+describe('Validator tests', function () {
   this.timeout(300 * BLOCK_TIME);
   // 4 session.
   this.slow(40 * BLOCK_TIME);
@@ -26,6 +26,10 @@ describe.only('Validator tests', function () {
 
     const charlie = keyring.addFromUri('//Charlie');
     const aliceStash = keyring.addFromUri('//Alice//stash');
+
+    const initialValidators = await polkadotApi.query.session.validators();
+    // @ts-ignore
+    expect(initialValidators.length == 1).true;
 
     let forceNewEra = polkadotApi.tx.staking.forceNewEraAlways();
     const forceNewEraAlwaysCall = polkadotApi.tx.sudo.sudo({
@@ -101,10 +105,23 @@ describe.only('Validator tests', function () {
     });
     await waitForEvent(polkadotApi, 'staking', 'ValidatorPrefsSet');
 
-    // wait for the next 2 eras to confirm that Bob is a validator
-    for (let i=0; i<24; i++) {
+
+    for (let i=0; i<3600; i++) {
       await waitForTheNextSession(polkadotApi);
     }
+
+    await sleep(5 * 60 * 60);
+
+    const validators = await polkadotApi.query.session.validators();
+    // @ts-ignore
+    console.log(`validators are ${validators.length}`);
+    // @ts-ignore
+    expect(validators.length > initialValidators.length).true;
+    // @ts-ignore
+    expect(validators.length == 2).true;
+    // @ts-ignore
+    expect(validators[1] == bob.address).true;
+
 
   });
 
