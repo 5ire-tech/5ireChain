@@ -1,16 +1,14 @@
 import { expect } from 'chai';
 import { BLOCK_TIME } from '../utils/constants';
-import {killNodes, polkadotApi as api, polkadotApi, spawnNodes} from "../utils/util";
+import {killNodes,  polkadotApi, spawnNodes} from "../utils/util";
 import {Keyring} from "@polkadot/api";
-import {sleep, waitForEvent, waitForTheNextSession} from "../utils/setup";
-import {BN} from "@polkadot/util";
-import {WeightV2} from "@polkadot/types/interfaces";
+import {waitForEvent} from "../utils/setup";
 
 
 // Keyring needed to sign
 const keyring = new Keyring({ type: 'sr25519' });
 
-describe.only('Nominator tests', function () {
+describe('Nominator tests', function () {
   this.timeout(300 * BLOCK_TIME);
   // 4 session.
   this.slow(40 * BLOCK_TIME);

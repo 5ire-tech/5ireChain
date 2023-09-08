@@ -24,9 +24,6 @@ describe('Validator tests', function () {
     const alice = keyring.addFromUri('//Alice');
     const bob = keyring.addFromUri('//Bob');
 
-    const charlie = keyring.addFromUri('//Charlie');
-    const aliceStash = keyring.addFromUri('//Alice//stash');
-
     const initialValidators = await polkadotApi.query.session.validators();
     // @ts-ignore
     expect(initialValidators.length == 1).true;
@@ -126,11 +123,7 @@ describe('Validator tests', function () {
   });
 
   it('Should chill a validator', async () => {
-    const alice = keyring.addFromUri('//Alice');
     const bob = keyring.addFromUri('//Bob');
-
-    const charlie = keyring.addFromUri('//Charlie');
-    const aliceStash = keyring.addFromUri('//Alice//stash');
 
     let call = polkadotApi.tx.staking.chill();
     const callTransaction = new Promise<{ block: string, address: string }>(async (resolve, reject) => {
@@ -147,11 +140,6 @@ describe('Validator tests', function () {
       });
     });
     await waitForEvent(polkadotApi, 'staking', 'Chilled');
-
-    // wait for the next 2 eras to confirm that Bob is a validator
-    for (let i=0; i<24; i++) {
-      await waitForTheNextSession(polkadotApi);
-    }
 
   });
 
