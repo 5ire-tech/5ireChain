@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { BLOCK_TIME } from '../utils/constants';
 import {killNodes,  polkadotApi, spawnNodes} from "../utils/util";
 import {Keyring} from "@polkadot/api";
-import {waitForEvent} from "../utils/setup";
+import {sleep, waitForEvent} from "../utils/setup";
 
 
 // Keyring needed to sign
@@ -30,7 +30,7 @@ describe('Nominator tests', function () {
     const controller = polkadotApi.registry.createType("PalletStakingRewardDestination", "Staked");
 
     const amount = polkadotApi.createType('Balance', '900000000000000000000');
-    let bondValidator = polkadotApi.tx.staking.bond(ferdie.address, amount, controller);
+    let bondValidator = polkadotApi.tx.staking.bond(amount, controller);
     const bondValidatorTransaction = new Promise<{ block: string, address: string }>(async (resolve, reject) => {
       const unsub = await bondValidator.signAndSend(ferdie, {tip: 200, nonce: -1}, (result) => {
         console.log(`bond nominator transaction is ${result.status}`);
@@ -63,7 +63,7 @@ describe('Nominator tests', function () {
         }
       });
     });
-    await waitForEvent(polkadotApi, 'staking', 'NominatorPrefsSet');
+    await sleep(5000);
 
     const validatorsNominated = await polkadotApi.query.staking.nominators(ferdie.address);
     console.log(JSON.stringify(validatorsNominated.toHuman()))

@@ -187,8 +187,7 @@ export function start5ireChainNode(
       `--${authority}`,
       options.printLogs ? '-linfo' : '-lerror',
       `--dev`,
-      `--ws-port=${ports[authority].ws}`,
-      `--rpc-port=${ports[authority].http}`,
+      `--rpc-port=${ports[authority].ws}`,
       `--port=${ports[authority].p2p}`,
       ...(authority == 'alice'
         ? [
@@ -207,7 +206,6 @@ export function start5ireChainNode(
           'all',
           '--rpc-methods=unsafe',
           '--unsafe-rpc-external',
-          '--unsafe-ws-external'
         ]
         : []),
     ],
