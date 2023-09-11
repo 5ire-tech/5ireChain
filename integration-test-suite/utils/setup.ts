@@ -187,8 +187,7 @@ export function start5ireChainNode(
       `--${authority}`,
       options.printLogs ? '-linfo' : '-lerror',
       `--dev`,
-      `--ws-port=${ports[authority].ws}`,
-      `--rpc-port=${ports[authority].http}`,
+      `--rpc-port=${ports[authority].ws}`,
       `--port=${ports[authority].p2p}`,
       ...(authority == 'alice'
         ? [
@@ -205,7 +204,8 @@ export function start5ireChainNode(
           '-lruntime::offchain=debug',
           '--rpc-cors',
           'all',
-          '--ws-external',
+          '--rpc-methods=unsafe',
+          '--unsafe-rpc-external',
         ]
         : []),
     ],
