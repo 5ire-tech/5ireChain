@@ -125,9 +125,7 @@ mod tests {
 				assert_eq!(output[2], 0u8);
 				assert_eq!(output[3], 0u8);
 			},
-			Err(e) => {
-				return Err(e)
-			},
+			Err(e) => return Err(e),
 		};
 
 		// try again with a different message
@@ -147,9 +145,7 @@ mod tests {
 				assert_eq!(output[2], 0u8);
 				assert_eq!(output[3], 1u8); // non-zero indicates error (in our case, 1)
 			},
-			Err(e) => {
-				return Err(e)
-			},
+			Err(e) => return Err(e),
 		};
 
 		Ok(())
