@@ -172,6 +172,10 @@ substrate-rpc-client = { git = "ssh://git@github.com/5ire-tech/5ire-substrate.gi
 pallet-timestamp = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 
 
+[dev-dependencies]
+sp-tracing = { version = "6.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
+sc-service-test  = { version = "2.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
+pallet-asset-tx-payment = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA" }
 
 [features]
 #  default = []

@@ -10,6 +10,7 @@ use pallet_evm_precompile_simple::{ECRecover, ECRecoverPublicKey, Identity, Ripe
 
 pub struct FrontierPrecompiles<R>(PhantomData<R>);
 
+#[allow(clippy::new_without_default)]
 impl<R> FrontierPrecompiles<R>
 where
 	R: pallet_evm::Config,

@@ -53,6 +53,7 @@ pub mod pallet {
 		type WeightInfo: WeightInfo;
 	}
 
+	#[allow(clippy::redundant_closure_call)]
 	#[pallet::error]
 	pub enum Error<T> {
 		/// Maximum address count exceeded
