@@ -1120,11 +1120,8 @@ where
 		ref_time: Option<u64>,
 		proof_size: Option<u64>,
 	) -> Result<(), ExitError> {
-		let weight_info = if let (Some(weight_info), _) = self.info_mut() {
-			weight_info
-		} else {
-			return Ok(())
-		};
+		let weight_info =
+			if let (Some(weight_info), _) = self.info_mut() { weight_info } else { return Ok(()) };
 		// Record ref_time first
 		// TODO benchmark opcodes, until this is done we do used_gas to weight conversion for
 		// ref_time

@@ -100,6 +100,7 @@ pub mod pallet {
 	#[pallet::storage]
 	pub type Elasticity<T> = StorageValue<_, Permill, ValueQuery, DefaultElasticity<T>>;
 
+	#[allow(clippy::redundant_closure_call)]
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event {

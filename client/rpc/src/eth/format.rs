@@ -48,7 +48,7 @@ impl Geth {
 				},
 				_ => "unknown error".into(),
 			},
-			err => format!("submit transaction to pool failed: {:?}", err),
+			err => format!("submit transaction to pool failed: {err:?}"),
 		}
 	}
 }
