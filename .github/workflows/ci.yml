@@ -71,9 +71,6 @@ jobs:
       - name: Test
         run: cargo test
 
-      - name: Clippy
-        run: cargo clippy -- -D warnings
-
       - name: Build Node for Integration Tests (Release)
         run: cargo build --release
 
@@ -88,6 +85,9 @@ jobs:
 
       - name: Run Integration Tests
         run: cd integration-test-suite && yarn test
+
+      - name: Clippy
+        run: cargo clippy -- -D warnings
 
       - name: Save Cache
         if: ${{ !cancelled() }}
