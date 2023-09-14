@@ -10,7 +10,7 @@ import {bytesToHex} from "web3-utils";
 const keyring = new Keyring({ type: 'sr25519' });
 
 
-describe.only('Negative Swap Native to EVM', function () {
+describe('Negative Swap Native to EVM', function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {
