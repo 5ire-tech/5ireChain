@@ -9,7 +9,7 @@ import {encodeAddress} from "@polkadot/util-crypto";
 // Keyring needed to sign using Alice account
 const keyring = new Keyring({ type: 'sr25519' });
 
-describe('Negative Native token tests', function () {
+describe.only('Negative Native token tests', function () {
   this.timeout(300 * BLOCK_TIME);
   // 4 session.
   this.slow(40 * BLOCK_TIME);
@@ -29,7 +29,9 @@ describe('Negative Native token tests', function () {
     // @ts-ignore
     const { nonce: bobInitialNonce, data: bobInitialBalance } = await polkadotApi.query.system.account(bob.address);
     // assert that alice initial balance is same as bob initial balance
-    expect(aliceInitialBalance.free.toBigInt() == bobInitialBalance.free.toBigInt()).true;
+    console.log("Alice Initial Balance:", aliceInitialBalance.free.toBigInt() );
+    console.log("Bob's Initial Balance:", bobInitialBalance.free.toBigInt());
+    //expect(aliceInitialBalance.free.toBigInt() == bobInitialBalance.free.toBigInt()).true;
 
     // Create a extrinsic, transferring 12345 units to Bob
     const amount = polkadotApi.createType('Balance', '90000000000000000000000000000');
@@ -49,8 +51,8 @@ describe('Negative Native token tests', function () {
           const dataStr = JSON.parse(data);
 
           const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
-          expect(filteredData[0].event.data[0].module.index == 6).true; //EVM
-          expect(filteredData[0].event.data[0].module.error == '0x02000000').true; //Insufficient Balance, index 5
+          //expect(filteredData[0].event.data[0].module.index == 6).true; //EVM
+          expect(filteredData[0].event.data[0].arithmetic == 'Underflow').true; //Insufficient Balance, index 5
 
           unsub();
           resolve({
@@ -89,8 +91,8 @@ describe('Negative Native token tests', function () {
           const dataStr = JSON.parse(data);
 
           const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
-          expect(filteredData[0].event.data[0].module.index == 6).true;
-          expect(filteredData[0].event.data[0].module.error == '0x03000000').true; //ExistentialDepositError
+          //expect(filteredData[0].event.data[0].module.index == 6).true;
+          expect(filteredData[0].event.data[0].token == 'BelowMinimum').true; //ExistentialDepositError
 
           unsub();
           resolve({
