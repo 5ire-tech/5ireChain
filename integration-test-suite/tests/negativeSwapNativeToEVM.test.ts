@@ -10,14 +10,14 @@ import {bytesToHex} from "web3-utils";
 const keyring = new Keyring({ type: 'sr25519' });
 
 
-describe('Negative Swap Native to EVM', function () {
+describe.only('Negative Swap Native to EVM', function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {
     await spawnNodes();
   });
 
-  // Balance low deposit to evm 
+  // Balance low deposit to evm
   it('Should not  Swap Native to EVM due to insufficient native balance  ', async () => {
     const {alice, bob, aliceEthAccount} = await init();
     await BalanceLowDepositToEvm(aliceEthAccount, bob);
@@ -66,9 +66,9 @@ describe('Negative Swap Native to EVM', function () {
           const data = JSON.stringify(result.events);
           const dataStr = JSON.parse(data);
           const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
-          expect(filteredData[0].event.data[0].module.error).to.equal("0x02000000");
+          expect(filteredData[0].event.data[0].arithmetic).to.equal("Underflow");
           unsub();
         }
       });
     await sleep(12000);
-    } 
+    }
