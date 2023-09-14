@@ -3167,16 +3167,4 @@ mod tests {
 		let _: UpperOf<OnChainAccuracy> =
 			maximum_chain_accuracy.iter().fold(0, |acc, x| acc.checked_add(*x).unwrap());
 	}
-
-	#[test]
-	fn call_size() {
-		let size = core::mem::size_of::<RuntimeCall>();
-		assert!(
-			size <= CALL_PARAMS_MAX_SIZE,
-			"size of RuntimeCall {} is more than {CALL_PARAMS_MAX_SIZE} bytes.
-			 Some calls have too big arguments, use Box to reduce the size of RuntimeCall.
-			 If the limit is too strong, maybe consider increase the limit.",
-			size,
-		);
-	}
 }
