@@ -61,7 +61,7 @@ where
 		from_value(v.clone())
 			.map(VariadicValue::Single)
 			.or_else(|_| from_value(v).map(VariadicValue::Multiple))
-			.map_err(|err| D::Error::custom(format!("Invalid variadic value type: {}", err)))
+			.map_err(|err| D::Error::custom(format!("Invalid variadic value type: {err}")))
 	}
 }
 
