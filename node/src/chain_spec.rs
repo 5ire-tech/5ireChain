@@ -34,14 +34,14 @@ use serde::{Deserialize, Serialize};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
 use sp_consensus_grandpa::AuthorityId as GrandpaId;
-use sp_core::{crypto::UncheckedInto, sr25519, storage::Storage, Pair, Public, H160, U256};
+use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public, H160, U256};
 use sp_runtime::{
 	traits::{IdentifyAccount, Verify},
 	Perbill,
 };
 use std::{collections::BTreeMap, str::FromStr};
 
-pub use firechain_runtime::{EVMConfig, GenesisConfig, RuntimeGenesisConfig};
+pub use firechain_runtime::{EVMConfig, RuntimeGenesisConfig};
 pub use node_primitives::{AccountId, Balance, Signature};
 
 type AccountPublic = <Signature as Verify>::Signer;
@@ -285,9 +285,7 @@ pub fn testnet_genesis(
 			let limit = (MaxNominations::get() as usize).min(initial_authorities.len());
 			let count = rng.gen::<usize>() % limit;
 			let nominations = initial_authorities
-				.as_slice()
 				.choose_multiple(&mut rng, count)
-				.into_iter()
 				.map(|choice| choice.0.clone())
 				.collect::<Vec<_>>();
 			(x.clone(), x.clone(), STASH, StakerStatus::Nominator(nominations))
@@ -363,7 +361,7 @@ pub fn testnet_genesis(
 		alliance_motion: Default::default(),
 		nomination_pools: NominationPoolsConfig {
 			min_create_bond: 10 * DOLLARS,
-			min_join_bond: 1 * DOLLARS,
+			min_join_bond: DOLLARS,
 			..Default::default()
 		},
 		glutton: Default::default(),

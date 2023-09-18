@@ -29,11 +29,9 @@
 //! be placed here or imported from corresponding FRAME RPC definitions.
 
 #![warn(missing_docs)]
-#![warn(unused_crate_dependencies)]
 
 use std::sync::Arc;
 
-use fp_storage::EthereumStorageSchema;
 use grandpa::{
 	FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState,
 };
@@ -106,6 +104,7 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi, CT> {
 	pub eth: EthDeps<C, P, A, CT, Block>,
 }
 
+/// Default Eth Config
 pub struct DefaultEthConfig<C, BE>(std::marker::PhantomData<(C, BE)>);
 
 impl<C, BE> fc_rpc::EthConfig<Block, C> for DefaultEthConfig<C, BE>
@@ -202,6 +201,7 @@ where
 	// Making synchronous calls in light client freezes the browser currently,
 	// more context: https://github.com/paritytech/substrate/pull/3480
 	// These RPCs should use an asynchronous caller instead.
+	#[allow(clippy::unnecessary_lazy_evaluations)]
 	io.merge(
 		Mmr::new(
 			client.clone(),

@@ -210,7 +210,7 @@ pub mod pallet {
 
 		/// Deposit balance from EVM into currency/balances pallet.
 		#[pallet::call_index(4)]
-		#[pallet::weight(0)]
+		#[pallet::weight((0, DispatchClass::Normal,Pays::No))]
 		pub fn deposit(origin: OriginFor<T>, address: H160, value: BalanceOf<T>) -> DispatchResult {
 			let destination = ensure_signed(origin.clone())?;
 			let address_account_id = T::AddressMapping::into_account_id(address);

@@ -1,6 +1,5 @@
 // Substrate
 use sc_executor::{NativeElseWasmExecutor, NativeExecutionDispatch, NativeVersion};
-use sp_consensus_babe::{AuthorityId as BabeId, BabeApi};
 use sp_runtime::traits::BlakeTwo256;
 // Local
 use firechain_runtime::{opaque::Block, AccountId, Balance, Nonce};
@@ -13,6 +12,7 @@ pub type FullBackend = sc_service::TFullBackend<Block>;
 pub type FullClient<RuntimeApi, Executor> =
 	sc_service::TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>;
 
+#[allow(dead_code)]
 pub type Client = FullClient<firechain_runtime::RuntimeApi, TemplateRuntimeExecutor>;
 
 /// Only enable the benchmarking host functions when we actually want to benchmark.
