@@ -23,7 +23,7 @@ use crate::{
 	service,
 	service::{new_partial, FullClient},
 };
-use firechain_runtime::{ExistentialDeposit};
+use firechain_runtime::ExistentialDeposit;
 use frame_benchmarking_cli::*;
 use node_primitives::Block;
 use sc_cli::{Result, SubstrateCli};

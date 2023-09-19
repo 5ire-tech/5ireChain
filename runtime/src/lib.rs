@@ -93,8 +93,8 @@ use sp_runtime::{
 	generic, impl_opaque_keys,
 	traits::{
 		self, AccountIdConversion, BlakeTwo256, Block as BlockT, Bounded, ConvertInto,
-		DispatchInfoOf, Dispatchable, NumberFor, OpaqueKeys,
-		PostDispatchInfoOf, SaturatedConversion, StaticLookup, UniqueSaturatedInto,
+		DispatchInfoOf, Dispatchable, NumberFor, OpaqueKeys, PostDispatchInfoOf,
+		SaturatedConversion, StaticLookup, UniqueSaturatedInto,
 	},
 	transaction_validity::{
 		TransactionPriority, TransactionSource, TransactionValidity, TransactionValidityError,
