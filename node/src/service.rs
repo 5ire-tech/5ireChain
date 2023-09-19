@@ -19,7 +19,7 @@
 #![warn(unused_extern_crates)]
 
 //! Service implementation. Specialized wrapper over substrate service.
-use crate::rpc::{create_full, BabeDeps, DenyUnsafe, FullDeps, GrandpaDeps};
+use crate::rpc::{create_full, BabeDeps, FullDeps, GrandpaDeps};
 // use fc_db::Backend as FrontierBackend;
 use firechain_runtime::TransactionConverter;
 
@@ -48,26 +48,22 @@ use sp_runtime::{generic, traits::Block as BlockT, SaturatedConversion};
 
 use std::{
 	collections::BTreeMap,
-	path::PathBuf,
 	sync::{Arc, Mutex},
-	time::Duration,
 };
 
 // Frontier
 //
 // use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
 use crate::{
-	client::{BaseRuntimeApiCollection, RuntimeApiCollection},
 	eth::{
-		new_frontier_partial, spawn_frontier_tasks, BackendType, EthCompatRuntimeApiCollection,
-		FrontierBackend, FrontierBlockImport, FrontierPartialComponents,
+		new_frontier_partial, spawn_frontier_tasks, BackendType,
+		FrontierBackend,
 	},
 };
 pub use crate::{
 	client::{Client, TemplateRuntimeExecutor},
 	eth::{db_config_dir, EthConfiguration},
 };
-use fc_rpc::{EthTask, OverrideHandle};
 use fc_rpc_core::types::{FeeHistoryCache, FeeHistoryCacheLimit, FilterPool};
 pub use fc_storage::overrides_handle;
 
@@ -157,6 +153,7 @@ pub fn create_extrinsic(
 }
 
 /// Creates a new partial node.
+#[allow(clippy::type_complexity)]
 pub fn new_partial(
 	config: &Configuration,
 	eth_config: EthConfiguration,
@@ -197,7 +194,7 @@ pub fn new_partial(
 		})
 		.transpose()?;
 
-	let executor = sc_service::new_native_or_wasm_executor(&config);
+	let executor = sc_service::new_native_or_wasm_executor(config);
 
 	let (client, backend, keystore_container, task_manager) =
 		sc_service::new_full_parts::<Block, RuntimeApi, _>(
@@ -233,7 +230,7 @@ pub fn new_partial(
 	// let frontier_backend =
 	// 	fc_db::kv::Backend::open(client.clone(), &config.database, &db_config_dir(config))?;
 
-	let overrides = overrides_handle(client.clone());
+	let _overrides = overrides_handle(client.clone());
 	let frontier_backend = match eth_config.frontier_backend_type {
 		BackendType::KeyValue => FrontierBackend::KeyValue(fc_db::kv::Backend::open(
 			Arc::clone(&client),
@@ -324,7 +321,7 @@ pub fn new_full_base(
 ) -> Result<NewFullBase, ServiceError> {
 	let hwbench = (!disable_hardware_benchmarks)
 		.then_some(config.database.path().map(|database_path| {
-			let _ = std::fs::create_dir_all(&database_path);
+			let _ = std::fs::create_dir_all(database_path);
 			sc_sysinfo::gather_hwbench(Some(database_path))
 		}))
 		.flatten();
@@ -340,8 +337,7 @@ pub fn new_full_base(
 		other: (import_setup, babe_worker_handle, mut telemetry, statement_store, frontier_backend),
 	} = new_partial(&config, eth_config.clone())?;
 
-	let FrontierPartialComponents { filter_pool, fee_history_cache, fee_history_cache_limit } =
-		new_frontier_partial(&eth_config)?;
+	new_frontier_partial(&eth_config)?;
 
 	let auth_disc_publish_non_global_ips = config.network.allow_non_globals_in_dht;
 	let mut net_config = sc_network::config::FullNetworkConfiguration::new(&config.network);
@@ -356,7 +352,7 @@ pub fn new_full_base(
 
 	let statement_handler_proto = sc_network_statement::StatementHandlerPrototype::new(
 		client
-			.block_hash(0u32.into())
+			.block_hash(0u32)
 			.ok()
 			.flatten()
 			.expect("Genesis block exists; qed"),
@@ -388,7 +384,7 @@ pub fn new_full_base(
 		Some(sc_consensus_slots::BackoffAuthoringOnFinalizedHeadLagging::default());
 	let name = config.network.node_name.clone();
 	let enable_grandpa = !config.disable_grandpa;
-	let prometheus_registry = config.prometheus_registry().cloned();
+	let _prometheus_registry = config.prometheus_registry().cloned();
 	let enable_offchain_worker = config.offchain_worker.enabled;
 
 	// Sinks for pubsub notifications.

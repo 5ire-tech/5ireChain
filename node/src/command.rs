@@ -23,9 +23,8 @@ use crate::{
 	service,
 	service::{new_partial, FullClient},
 };
-use firechain_runtime::{ExistentialDeposit, RuntimeApi};
+use firechain_runtime::{ExistentialDeposit};
 use frame_benchmarking_cli::*;
-use node_executor::ExecutorDispatch;
 use node_primitives::Block;
 use sc_cli::{Result, SubstrateCli};
 use sc_service::PartialComponents;
@@ -38,17 +37,6 @@ use {
 	firechain_runtime::constants::time::SLOT_DURATION,
 	try_runtime_cli::block_building_info::substrate_info,
 };
-
-macro_rules! construct_async_run {
-	(|$components:ident, $cli:ident, $cmd:ident, $config:ident, $eth_config:ident| $( $code:tt )* ) => {{
-		let runner = $cli.create_runner($cmd)?;
-		runner.async_run(|$config| {
-			let $components = new_partial(&$config, &$eth_config)?;
-			let task_manager = $components.task_manager;
-			{ $( $code )* }.map(|v| (v, task_manager))
-		})
-	}}
-}
 
 impl SubstrateCli for Cli {
 	fn impl_name() -> String {
