@@ -58,7 +58,7 @@ describe('Negative EVM withdraw test', function () {
         const data = JSON.stringify(result.events);
         const dataStr = JSON.parse(data);
         const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
-        expect(filteredData[0].event.data[0].module.error).to.equal("0x02000000");
+        expect(filteredData[0].event.data[0].arithmetic).to.equal("Underflow");
 
         unsub();
       }

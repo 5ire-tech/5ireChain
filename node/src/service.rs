@@ -54,12 +54,7 @@ use std::{
 // Frontier
 //
 // use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
-use crate::{
-	eth::{
-		new_frontier_partial, spawn_frontier_tasks, BackendType,
-		FrontierBackend,
-	},
-};
+use crate::eth::{new_frontier_partial, spawn_frontier_tasks, BackendType, FrontierBackend};
 pub use crate::{
 	client::{Client, TemplateRuntimeExecutor},
 	eth::{db_config_dir, EthConfiguration},
@@ -351,11 +346,7 @@ pub fn new_full_base(
 	));
 
 	let statement_handler_proto = sc_network_statement::StatementHandlerPrototype::new(
-		client
-			.block_hash(0u32)
-			.ok()
-			.flatten()
-			.expect("Genesis block exists; qed"),
+		client.block_hash(0u32).ok().flatten().expect("Genesis block exists; qed"),
 		config.chain_spec.fork_id(),
 	);
 	net_config.add_notification_protocol(statement_handler_proto.set_config());

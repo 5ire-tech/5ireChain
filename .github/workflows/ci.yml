@@ -65,14 +65,8 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@v0.0.3
 
-      - name: Clippy
-        run: cargo clippy -- -D warnings
-
       - name: Check
         run: cargo check
-
-      - name: Test
-        run: cargo test
 
       - name: Build Node for Integration Tests (Release)
         run: cargo build --release
@@ -88,6 +82,12 @@ jobs:
 
       - name: Run Integration Tests
         run: cd integration-test-suite && yarn test
+
+      - name: Test
+        run: cargo test
+
+      - name: Clippy
+        run: cargo clippy -- -D warnings
 
       - name: Save Cache
         if: ${{ !cancelled() }}

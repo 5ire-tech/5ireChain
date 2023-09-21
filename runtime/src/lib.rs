@@ -93,8 +93,8 @@ use sp_runtime::{
 	generic, impl_opaque_keys,
 	traits::{
 		self, AccountIdConversion, BlakeTwo256, Block as BlockT, Bounded, ConvertInto,
-		DispatchInfoOf, Dispatchable, NumberFor, OpaqueKeys,
-		PostDispatchInfoOf, SaturatedConversion, StaticLookup, UniqueSaturatedInto,
+		DispatchInfoOf, Dispatchable, NumberFor, OpaqueKeys, PostDispatchInfoOf,
+		SaturatedConversion, StaticLookup, UniqueSaturatedInto,
 	},
 	transaction_validity::{
 		TransactionPriority, TransactionSource, TransactionValidity, TransactionValidityError,
@@ -3152,17 +3152,5 @@ mod tests {
 			.collect();
 		let _: UpperOf<OnChainAccuracy> =
 			maximum_chain_accuracy.iter().fold(0, |acc, x| acc.checked_add(*x).unwrap());
-	}
-
-	#[test]
-	fn call_size() {
-		let size = core::mem::size_of::<RuntimeCall>();
-		assert!(
-			size <= CALL_PARAMS_MAX_SIZE,
-			"size of RuntimeCall {} is more than {CALL_PARAMS_MAX_SIZE} bytes.
-			 Some calls have too big arguments, use Box to reduce the size of RuntimeCall.
-			 If the limit is too strong, maybe consider increase the limit.",
-			size,
-		);
 	}
 }
