@@ -1930,19 +1930,6 @@ impl pallet_esg::Config for Runtime {
 	type WeightInfo = pallet_esg::weights::SubstrateWeight<Runtime>;
 }
 
-// pub struct FindAuthorTruncated<F>(PhantomData<F>);
-// impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
-// 	fn find_author<'a, I>(digests: I) -> Option<H160>
-// 		where
-// 			I: 'a + IntoIterator<Item = (ConsensusEngineId, &'a [u8])>,
-// 	{
-// 		if let Some(author_index) = F::find_author(digests) {
-// 			let authority_id = Babe::authorities()[author_index as usize].clone().0;
-// 			return Some(H160::from_slice(&authority_id.to_raw_vec()[4..24]));
-// 		}
-// 		None
-// 	}
-// }
 pub struct FindAuthorTruncated<F>(PhantomData<F>);
 impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 	fn find_author<'a, I>(digests: I) -> Option<H160>
@@ -1958,11 +1945,11 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 		None
 	}
 }
-const BLOCK_GAS_LIMIT: u64 = 75_000_000_000;
+const BLOCK_GAS_LIMIT: u64 = 75_000_000;
 const MAX_POV_SIZE: u64 = 5 * 1024 * 1024;
 parameter_types! {
 	pub const ChainId: u64 = 997;
-	pub BlockGasLimit: U256 = U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT.ref_time() / WEIGHT_PER_GAS);
+	pub BlockGasLimit: U256 = U256::from(BLOCK_GAS_LIMIT);
 	pub const GasLimitPovSizeRatio: u64 = BLOCK_GAS_LIMIT.saturating_div(MAX_POV_SIZE);
 	pub PrecompilesValue: FrontierPrecompiles<Runtime> = FrontierPrecompiles::<_>::new();
 	pub WeightPerGas: Weight = Weight::from_parts(weight_per_gas(BLOCK_GAS_LIMIT, NORMAL_DISPATCH_RATIO, WEIGHT_PER_GAS), 0);
@@ -2114,49 +2101,6 @@ construct_runtime!(
 		BaseFee: pallet_base_fee,
 	}
 );
-
-// /// The address format for describing accounts.
-// pub type Address = sp_runtime::MultiAddress<AccountId, AccountIndex>;
-// /// Block header type as expected by this runtime.
-// pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
-// /// Block type as expected by this runtime.
-// pub type Block = generic::Block<Header, UncheckedExtrinsic>;
-// /// A Block signed with a Justification
-// pub type SignedBlock = generic::SignedBlock<Block>;
-// /// BlockId type as expected by this runtime.
-// pub type BlockId = generic::BlockId<Block>;
-// /// The SignedExtension to the basic transaction logic.
-// ///
-// /// When you change this, you **MUST** modify [`sign`] in `bin/node/testing/src/keyring.rs`!
-// ///
-// /// [`sign`]: <../../testing/src/keyring.rs.html>
-// pub type SignedExtra = (
-// 	frame_system::CheckNonZeroSender<Runtime>,
-// 	frame_system::CheckSpecVersion<Runtime>,
-// 	frame_system::CheckTxVersion<Runtime>,
-// 	frame_system::CheckGenesis<Runtime>,
-// 	frame_system::CheckEra<Runtime>,
-// 	frame_system::CheckNonce<Runtime>,
-// 	frame_system::CheckWeight<Runtime>,
-// 	pallet_asset_conversion_tx_payment::ChargeAssetTxPayment<Runtime>,
-// );
-//
-// /// Unchecked extrinsic type as expected by this runtime.
-// pub type UncheckedExtrinsic =
-// generic::UncheckedExtrinsic<Address, RuntimeCall, Signature, SignedExtra>;
-// /// The payload being signed in transactions.
-// pub type SignedPayload = generic::SignedPayload<RuntimeCall, SignedExtra>;
-// /// Extrinsic type that has already been checked.
-// pub type CheckedExtrinsic = generic::CheckedExtrinsic<AccountId, RuntimeCall, SignedExtra>;
-// /// Executive: handles dispatch to the various modules.
-// pub type Executive = frame_executive::Executive<
-// 	Runtime,
-// 	Block,
-// 	frame_system::ChainContext<Runtime>,
-// 	Runtime,
-// 	AllPalletsWithSystem,
-// 	Migrations,
-// >;
 
 type EventRecord = frame_system::EventRecord<
 	<Runtime as frame_system::Config>::RuntimeEvent,
