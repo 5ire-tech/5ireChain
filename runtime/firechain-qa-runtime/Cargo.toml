@@ -1,10 +1,10 @@
 [package]
-name = "firechain-runtime"
+name = "firechain-qa-runtime"
 version = "4.0.0-dev"
 authors = ["5ire Team <admin@5ire.org>"]
 description = "5ire chain node runtime"
 edition = "2021"
-build = "firechain-qa-runtime/build.rs"
+build = "build.rs"
 license = "Apache-2.0"
 homepage = "https://www.5ire.org/"
 repository = "https://github.com/5ire-tech/5ire-evm-base/"

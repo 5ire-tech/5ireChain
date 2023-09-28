@@ -131,6 +131,7 @@ fc-storage = { workspace = true }
 
 # Local Dependencies
 firechain-runtime = { version = "4.0.0-dev", path = "../runtime" }
+firechain-qa-runtime = { version = "4.0.0-dev", path = "../runtime/firechain-qa-runtime" }
 node-primitives = { version = "2.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0", default-features = false  }
 
 [build-dependencies]
@@ -170,8 +171,7 @@ pallet-timestamp = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tec
 
 
 [features]
-#  default = []
-default = ["cli"]
+default = ["cli", "firechain-qa"]
 cli = [
 	"node-inspect",
 	"sc-cli",
@@ -183,6 +183,7 @@ cli = [
 	"substrate-build-script-utils",
 	"try-runtime-cli",
 ]
+firechain-qa = ["firechain-qa-runtime/default"]
 
 # Dependencies that are only required if runtime benchmarking should be build.
 runtime-benchmarks = [

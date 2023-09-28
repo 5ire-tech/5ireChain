@@ -37,6 +37,7 @@ use {
 	firechain_runtime::constants::time::SLOT_DURATION,
 	try_runtime_cli::block_building_info::substrate_info,
 };
+use firechain_node::chain_specs::{qa_chain_spec};
 
 impl SubstrateCli for Cli {
 	fn impl_name() -> String {
@@ -64,19 +65,21 @@ impl SubstrateCli for Cli {
 	}
 
 	fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
-		let spec = match id {
+		#[cfg(feature = "firechain-qa")]
+			let spec = match id {
 			"" =>
 				return Err(
 					"Please specify which chain you want to run, e.g. --dev or --chain=local"
 						.into(),
 				),
-			"dev" => Box::new(chain_spec::development_config()),
-			"local" => Box::new(chain_spec::local_testnet_config()),
+			"dev" => Box::new(qa_chain_spec::development_config()),
+			"local" => Box::new(qa_chain_spec::local_testnet_config()),
 			// "fir" | "flaming-fir" => Box::new(chain_spec::flaming_fir_config()?),
-			"staging" => Box::new(chain_spec::staging_testnet_config()),
+			"staging" => Box::new(qa_chain_spec::staging_testnet_config()),
 			path =>
-				Box::new(chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
+				Box::new(qa_chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
 		};
+
 		Ok(spec)
 	}
 }
