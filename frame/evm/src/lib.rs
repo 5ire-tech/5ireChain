@@ -192,6 +192,7 @@ pub mod pallet {
 		/// Withdraw balance from EVM into currency/balances pallet.
 		#[pallet::call_index(0)]
 		#[pallet::weight((0, DispatchClass::Normal,Pays::No))]
+		//#[pallet::weight(<T as pallet::Config>::WeightInfo::withdraw())]
 		pub fn withdraw(
 			origin: OriginFor<T>,
 			address: H160,
@@ -210,7 +211,7 @@ pub mod pallet {
 
 		/// Deposit balance from EVM into currency/balances pallet.
 		#[pallet::call_index(4)]
-		#[pallet::weight((0, DispatchClass::Normal,Pays::No))]
+		#[pallet::weight(<T as pallet::Config>::WeightInfo::deposit())]
 		pub fn deposit(origin: OriginFor<T>, address: H160, value: BalanceOf<T>) -> DispatchResult {
 			let destination = ensure_signed(origin.clone())?;
 			let address_account_id = T::AddressMapping::into_account_id(address);
@@ -850,7 +851,7 @@ impl<T: Config> Pallet<T> {
 		// keepalive `true` takes into account ExistentialDeposit as part of what's considered
 		// liquid balance.
 		let balance =
-			T::Currency::reducible_balance(&account_id, Preservation::Preserve, Fortitude::Polite);
+			T::Currency::reducible_balance(&account_id, Preservation::Expendable, Fortitude::Polite);
 
 		(
 			Account {
@@ -952,7 +953,7 @@ where
 				.unwrap_or_else(|_| C::PositiveImbalance::zero());
 
 			// Make sure this works with 0 ExistentialDeposit
-			// ssh://git@github.com/5ire-tech/5ire-substrate.git/issues/10117
+			// https://github.com/paritytech/substrate/issues/10117
 			// If we tried to refund something, the account still empty and the ED is set to 0,
 			// we call `make_free_balance_be` with the refunded amount.
 			let refund_imbalance = if C::minimum_balance().is_zero() &&
