@@ -68,7 +68,8 @@ pub trait FrontierDbMessage {
 		key: K,
 		value: &V,
 	) -> sc_cli::Error {
-		format!("Key `{key:?}` and Value `{value:?}` are not compatible with this operation").into()
+		format!("Key `{:?}` and Value `{:?}` are not compatible with this operation", key, value)
+			.into()
 	}
 
 	fn key_column_error<K: core::fmt::Debug, V: core::fmt::Debug>(
@@ -76,12 +77,12 @@ pub trait FrontierDbMessage {
 		key: K,
 		value: &V,
 	) -> sc_cli::Error {
-		format!("Key `{key:?}` and Column `{value:?}` are not compatible with this operation")
+		format!("Key `{:?}` and Column `{:?}` are not compatible with this operation", key, value)
 			.into()
 	}
 
 	fn key_not_empty_error<K: core::fmt::Debug>(&self, key: K) -> sc_cli::Error {
-		format!("Operation not allowed for non-empty Key `{key:?}`").into()
+		format!("Operation not allowed for non-empty Key `{:?}`", key).into()
 	}
 
 	fn one_to_many_error(&self) -> sc_cli::Error {
@@ -101,13 +102,14 @@ pub trait FrontierDbMessage {
 			format!(
 				r#"
 			---------------------------------------------
-			Operation: {operation:?}
-			Key: {key:?}
-			Existing value: {existing_value:?}
-			New value: {new_value:?}
+			Operation: {:?}
+			Key: {:?}
+			Existing value: {:?}
+			New value: {:?}
 			---------------------------------------------
 			Type `confirm` and press [Enter] to confirm:
-		"#
+		"#,
+				operation, key, existing_value, new_value
 			)
 		);
 

@@ -2,18 +2,20 @@
 name = "pallet-evm-precompile-modexp"
 version = "2.0.0-dev"
 license = "Apache-2.0"
-edition = "2021"
 description = "MODEXP precompiles for EVM pallet."
+authors = { workspace = true }
+edition = { workspace = true }
+repository = { workspace = true }
 
 [dependencies]
 num = { version = "0.4", default-features = false, features = ["alloc"] }
 # Frontier
-fp-evm = { version = "3.0.0-dev", path = "../../../../primitives/evm", default-features = false }
+fp-evm = { workspace = true }
 
 [dev-dependencies]
-hex = "0.4.3"
+hex = { workspace = true }
 # Frontier
-pallet-evm-test-vector-support = { version = "1.0.0-dev", path = "../../../../frame/evm/test-vector-support", default-features = false  }
+pallet-evm-test-vector-support = { workspace = true }
 
 [features]
 default = ["std"]

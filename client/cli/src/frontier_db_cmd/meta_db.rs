@@ -47,23 +47,23 @@ impl FromStr for MetaKey {
 
 	// A convenience function to verify the user input is known.
 	fn from_str(input: &str) -> Result<MetaKey, Self::Err> {
-		let tips = str::from_utf8(fc_db::static_keys::CURRENT_SYNCING_TIPS).unwrap();
+		let tips = str::from_utf8(fc_db::kv::static_keys::CURRENT_SYNCING_TIPS).unwrap();
 		let schema = str::from_utf8(fp_storage::PALLET_ETHEREUM_SCHEMA_CACHE).unwrap();
 		match input {
 			x if x == tips => Ok(MetaKey::Tips),
 			y if y == schema => Ok(MetaKey::Schema),
-			_ => Err(format!("`{input:?}` is not a meta column static key").into()),
+			_ => Err(format!("`{:?}` is not a meta column static key", input).into()),
 		}
 	}
 }
 
 pub struct MetaDb<'a, B: BlockT> {
 	cmd: &'a FrontierDbCmd,
-	backend: Arc<fc_db::Backend<B>>,
+	backend: Arc<fc_db::kv::Backend<B>>,
 }
 
 impl<'a, B: BlockT> MetaDb<'a, B> {
-	pub fn new(cmd: &'a FrontierDbCmd, backend: Arc<fc_db::Backend<B>>) -> Self {
+	pub fn new(cmd: &'a FrontierDbCmd, backend: Arc<fc_db::kv::Backend<B>>) -> Self {
 		Self { cmd, backend }
 	}
 
@@ -81,7 +81,7 @@ impl<'a, B: BlockT> MetaDb<'a, B> {
 				// Insert data to the meta column, static schema cache key.
 				(MetaKey::Schema, Some(MetaValue::Schema(schema_map))) => {
 					if self.backend.meta().ethereum_schema()?.is_none() {
-						let data: Vec<(fp_storage::EthereumStorageSchema, H256)> = schema_map
+						let data = schema_map
 							.iter()
 							.map(|(key, value)| (*value, *key))
 							.collect::<Vec<(fp_storage::EthereumStorageSchema, H256)>>();
@@ -96,12 +96,12 @@ impl<'a, B: BlockT> MetaDb<'a, B> {
 				// Read meta column, static tips key.
 				MetaKey::Tips => {
 					let value = self.backend.meta().current_syncing_tips()?;
-					println!("{value:?}");
+					println!("{:?}", value);
 				},
 				// Read meta column, static schema cache key.
 				MetaKey::Schema => {
 					let value = self.backend.meta().ethereum_schema()?;
-					println!("{value:?}");
+					println!("{:?}", value);
 				},
 			},
 			Operation::Update => match (key, value) {

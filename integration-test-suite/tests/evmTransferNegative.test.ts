@@ -17,7 +17,6 @@ describe('EVM related tests', function () {
   before(async () => {
     await spawnNodes();
   });
-
   it('Execution of contracts transfer should fail with invalid nonce', async () => {
     const {  alice, bob, aliceEthAccount, bobEthAccount } = await init();
 
@@ -69,7 +68,7 @@ async function createContract(nonce: number, evmAddress:any, alice: KeyringPair)
   const source = evmAddress;
   const init = ERC20_BYTECODES;
   const value = 0;
-  const gasLimit = 100_000_00;
+  const gasLimit = 100_000_0;
   const maxFeePerGas = 100_000_000_0000;
   const maxPriorityFeePerGas: BigInt =  BigInt(100_000_000);
   const accessList = null;
@@ -88,7 +87,7 @@ async function createContract(nonce: number, evmAddress:any, alice: KeyringPair)
 
         const dataStr = JSON.parse(data);
 
-        const filteredData = dataStr.filter((item: any) => item.event.index === "0x3a01");
+        const filteredData = dataStr.filter((item: any) => item.event.index === "0x4601");
         const contractAddress = filteredData[0].event.data[0];
         expect(contractAddress).not.undefined;
 
@@ -117,7 +116,7 @@ async function transferTokenShouldFailWithNonceFailure(nonce: number, aliceEthAc
   const tokensToTransfer = `00000000000000000000000000000000000000000000000000000000000000dd`;
   const inputCode = `0x${transferFnCode}${bobEthAccount.substring(2)}${tokensToTransfer}`;
   console.log(`Sending call input: ${inputCode}`);
-  const gasLimit = 100_000_00;
+  const gasLimit = 100_000_0;
   const maxFeePerGas = 100_000_000_0000;
   const maxPriorityFeePerGas: BigInt =  BigInt(100_000_000);
   const accessList = null;
@@ -154,7 +153,7 @@ async function transferTokenShouldFailWithGasPriceTooLowFailure(nonce: number, a
   const tokensToTransfer = `00000000000000000000000000000000000000000000000000000000000000dd`;
   const inputCode = `0x${transferFnCode}${bobEthAccount.substring(2)}${tokensToTransfer}`;
   console.log(`Sending call input: ${inputCode}`);
-  const gasLimit = polkadotApi.createType("Balance", "10000000");
+  const gasLimit = polkadotApi.createType("Balance", "1000000");
   const maxFeePerGas = polkadotApi.createType("Balance", "100000000000000");
   const maxPriorityFeePerGas: BigInt =  BigInt(100_000_000_000_000_000);
   const accessList = null;

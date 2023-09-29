@@ -18,41 +18,38 @@
 
 use ethereum_types::H256;
 use futures::future::TryFutureExt;
-use jsonrpsee::core::RpcResult as Result;
+use jsonrpsee::core::RpcResult;
 // Substrate
-use sc_client_api::backend::{Backend, StateBackend, StorageProvider};
-use sc_network_common::ExHashT;
+use sc_client_api::backend::{Backend, StorageProvider};
 use sc_transaction_pool::ChainApi;
 use sc_transaction_pool_api::TransactionPool;
 use sp_api::{ApiExt, ProvideRuntimeApi};
 use sp_block_builder::BlockBuilder as BlockBuilderApi;
 use sp_blockchain::HeaderBackend;
 use sp_runtime::{
-	generic::BlockId,
-	traits::{BlakeTwo256, Block as BlockT},
-	transaction_validity::TransactionSource,
+	generic::BlockId, traits::Block as BlockT, transaction_validity::TransactionSource,
 };
 // Frontier
-use crate::{
-	eth::{format, Eth},
-	internal_err,
-};
 use fc_rpc_core::types::*;
 use fp_rpc::{ConvertTransaction, ConvertTransactionRuntimeApi, EthereumRuntimeRPCApi};
 
-impl<B, C, P, CT, BE, H: ExHashT, A: ChainApi, EGA> Eth<B, C, P, CT, BE, H, A, EGA>
+use crate::{
+	eth::{format, Eth, EthConfig},
+	internal_err,
+};
+
+impl<B, C, P, CT, BE, A: ChainApi, EC: EthConfig<B, C>> Eth<B, C, P, CT, BE, A, EC>
 where
-	B: BlockT<Hash = H256> + Send + Sync + 'static,
-	C: ProvideRuntimeApi<B> + StorageProvider<B, BE>,
-	C: HeaderBackend<B> + Send + Sync + 'static,
+	B: BlockT,
+	C: ProvideRuntimeApi<B>,
 	C::Api: BlockBuilderApi<B> + ConvertTransactionRuntimeApi<B> + EthereumRuntimeRPCApi<B>,
+	C: HeaderBackend<B> + StorageProvider<B, BE> + 'static,
 	BE: Backend<B> + 'static,
-	BE::State: StateBackend<BlakeTwo256>,
-	P: TransactionPool<Block = B> + Send + Sync + 'static,
-	CT: ConvertTransaction<<B as BlockT>::Extrinsic> + Send + Sync + 'static,
+	P: TransactionPool<Block = B> + 'static,
+	CT: ConvertTransaction<<B as BlockT>::Extrinsic> + 'static,
 	A: ChainApi<Block = B> + 'static,
 {
-	pub async fn send_transaction(&self, request: TransactionRequest) -> Result<H256> {
+	pub async fn send_transaction(&self, request: TransactionRequest) -> RpcResult<H256> {
 		let from = match request.from {
 			Some(from) => from,
 			None => {
@@ -70,7 +67,7 @@ where
 
 		let nonce = match request.nonce {
 			Some(nonce) => nonce,
-			None => match self.transaction_count(from, None) {
+			None => match self.transaction_count(from, None).await {
 				Ok(nonce) => nonce,
 				Err(e) => return Err(e),
 			},
@@ -88,7 +85,7 @@ where
 		let gas_limit = match request.gas {
 			Some(gas_limit) => gas_limit,
 			None => {
-				let block = self.client.runtime_api().current_block(&BlockId::Hash(hash));
+				let block = self.client.runtime_api().current_block(hash);
 				if let Ok(Some(block)) = block {
 					block.header.gas_limit
 				} else {
@@ -147,22 +144,22 @@ where
 		};
 		let transaction_hash = transaction.hash();
 
-		let block_hash = BlockId::hash(self.client.info().best_hash);
+		let block_hash = self.client.info().best_hash;
 		let api_version = match self
 			.client
 			.runtime_api()
-			.api_version::<dyn ConvertTransactionRuntimeApi<B>>(&block_hash)
+			.api_version::<dyn ConvertTransactionRuntimeApi<B>>(block_hash)
 		{
 			Ok(api_version) => api_version,
 			_ => return Err(internal_err("cannot access runtime api")),
 		};
 
 		let extrinsic = match api_version {
-			Some(2) =>
-				match self.client.runtime_api().convert_transaction(&block_hash, transaction) {
-					Ok(extrinsic) => extrinsic,
-					Err(_) => return Err(internal_err("cannot access runtime api")),
-				},
+			Some(2) => match self.client.runtime_api().convert_transaction(block_hash, transaction)
+			{
+				Ok(extrinsic) => extrinsic,
+				Err(_) => return Err(internal_err("cannot access runtime api")),
+			},
 			Some(1) => {
 				if let ethereum::TransactionV2::Legacy(legacy_transaction) = transaction {
 					// To be compatible with runtimes that do not support transactions v2
@@ -170,7 +167,7 @@ where
 					match self
 						.client
 						.runtime_api()
-						.convert_transaction_before_version_2(&block_hash, legacy_transaction)
+						.convert_transaction_before_version_2(block_hash, legacy_transaction)
 					{
 						Ok(extrinsic) => extrinsic,
 						Err(_) => return Err(internal_err("cannot access runtime api")),
@@ -191,13 +188,13 @@ where
 		};
 
 		self.pool
-			.submit_one(&block_hash, TransactionSource::Local, extrinsic)
+			.submit_one(&BlockId::Hash(block_hash), TransactionSource::Local, extrinsic)
 			.map_ok(move |_| transaction_hash)
 			.map_err(|err| internal_err(format::Geth::pool_error(err)))
 			.await
 	}
 
-	pub async fn send_raw_transaction(&self, bytes: Bytes) -> Result<H256> {
+	pub async fn send_raw_transaction(&self, bytes: Bytes) -> RpcResult<H256> {
 		let slice = &bytes.0[..];
 		if slice.is_empty() {
 			return Err(internal_err("transaction data is empty"))
@@ -210,22 +207,22 @@ where
 
 		let transaction_hash = transaction.hash();
 
-		let block_hash = BlockId::hash(self.client.info().best_hash);
+		let block_hash = self.client.info().best_hash;
 		let api_version = match self
 			.client
 			.runtime_api()
-			.api_version::<dyn ConvertTransactionRuntimeApi<B>>(&block_hash)
+			.api_version::<dyn ConvertTransactionRuntimeApi<B>>(block_hash)
 		{
 			Ok(api_version) => api_version,
 			_ => return Err(internal_err("cannot access runtime api")),
 		};
 
 		let extrinsic = match api_version {
-			Some(2) =>
-				match self.client.runtime_api().convert_transaction(&block_hash, transaction) {
-					Ok(extrinsic) => extrinsic,
-					Err(_) => return Err(internal_err("cannot access runtime api")),
-				},
+			Some(2) => match self.client.runtime_api().convert_transaction(block_hash, transaction)
+			{
+				Ok(extrinsic) => extrinsic,
+				Err(_) => return Err(internal_err("cannot access runtime api")),
+			},
 			Some(1) => {
 				if let ethereum::TransactionV2::Legacy(legacy_transaction) = transaction {
 					// To be compatible with runtimes that do not support transactions v2
@@ -233,7 +230,7 @@ where
 					match self
 						.client
 						.runtime_api()
-						.convert_transaction_before_version_2(&block_hash, legacy_transaction)
+						.convert_transaction_before_version_2(block_hash, legacy_transaction)
 					{
 						Ok(extrinsic) => extrinsic,
 						Err(_) => return Err(internal_err("cannot access runtime api")),
@@ -254,7 +251,7 @@ where
 		};
 
 		self.pool
-			.submit_one(&block_hash, TransactionSource::Local, extrinsic)
+			.submit_one(&BlockId::Hash(block_hash), TransactionSource::Local, extrinsic)
 			.map_ok(move |_| transaction_hash)
 			.map_err(|err| internal_err(format::Geth::pool_error(err)))
 			.await

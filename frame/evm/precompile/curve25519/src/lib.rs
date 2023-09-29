@@ -16,8 +16,10 @@
 // limitations under the License.
 
 #![cfg_attr(not(feature = "std"), no_std)]
+#![deny(unused_crate_dependencies)]
 
 extern crate alloc;
+
 use alloc::vec::Vec;
 use curve25519_dalek::{
 	ristretto::{CompressedRistretto, RistrettoPoint},
@@ -37,7 +39,7 @@ impl LinearCostPrecompile for Curve25519Add {
 		if input.len() % 32 != 0 {
 			return Err(PrecompileFailure::Error {
 				exit_status: ExitError::Other("input must contain multiple of 32 bytes".into()),
-			});
+			})
 		};
 
 		if input.len() > 320 {
@@ -45,7 +47,7 @@ impl LinearCostPrecompile for Curve25519Add {
 				exit_status: ExitError::Other(
 					"input cannot be greater than 320 bytes (10 compressed points)".into(),
 				),
-			});
+			})
 		};
 
 		let mut points = Vec::new();
@@ -53,17 +55,15 @@ impl LinearCostPrecompile for Curve25519Add {
 		while !temp_buf.is_empty() {
 			let mut buf = [0; 32];
 			buf.copy_from_slice(&temp_buf[0..32]);
-			let point = CompressedRistretto::from_slice(&buf);
+			let point = CompressedRistretto(buf);
 			points.push(point);
 			temp_buf = &temp_buf[32..];
 		}
 
-		let sum = points
-			.iter()
-			.fold(RistrettoPoint::identity(), |acc, point| {
-				let pt = point.decompress().unwrap_or_else(RistrettoPoint::identity);
-				acc + pt
-			});
+		let sum = points.iter().fold(RistrettoPoint::identity(), |acc, point| {
+			let pt = point.decompress().unwrap_or_else(RistrettoPoint::identity);
+			acc + pt
+		});
 
 		Ok((ExitSucceed::Returned, sum.compress().to_bytes().to_vec()))
 	}
@@ -82,7 +82,7 @@ impl LinearCostPrecompile for Curve25519ScalarMul {
 				exit_status: ExitError::Other(
 					"input must contain 64 bytes (scalar - 32 bytes, point - 32 bytes)".into(),
 				),
-			});
+			})
 		};
 
 		// first 32 bytes is for the scalar value
@@ -93,15 +93,12 @@ impl LinearCostPrecompile for Curve25519ScalarMul {
 		// second 32 bytes is for the compressed ristretto point bytes
 		let mut pt_buf = [0; 32];
 		pt_buf.copy_from_slice(&input[32..64]);
-		let point: RistrettoPoint = CompressedRistretto::from_slice(&pt_buf)
+		let point = CompressedRistretto(pt_buf)
 			.decompress()
 			.unwrap_or_else(RistrettoPoint::identity);
 
 		let scalar_mul = scalar * point;
-		Ok((
-			ExitSucceed::Returned,
-			scalar_mul.compress().to_bytes().to_vec(),
-		))
+		Ok((ExitSucceed::Returned, scalar_mul.compress().to_bytes().to_vec()))
 	}
 }
 
@@ -130,10 +127,10 @@ mod tests {
 			Ok((_, out)) => {
 				assert_eq!(out, sum.compress().to_bytes());
 				Ok(())
-			}
+			},
 			Err(e) => {
 				panic!("Test not expected to fail: {:?}", e);
-			}
+			},
 		}
 	}
 
@@ -148,10 +145,10 @@ mod tests {
 			Ok((_, out)) => {
 				assert_eq!(out, RistrettoPoint::identity().compress().to_bytes());
 				Ok(())
-			}
+			},
 			Err(e) => {
 				panic!("Test not expected to fail: {:?}", e);
-			}
+			},
 		}
 	}
 
@@ -173,10 +170,10 @@ mod tests {
 				assert_eq!(out, p1.compress().to_bytes());
 				assert_ne!(out, p2.compress().to_bytes());
 				Ok(())
-			}
+			},
 			Err(e) => {
 				panic!("Test not expected to fail: {:?}", e);
-			}
+			},
 		}
 	}
 
@@ -189,7 +186,7 @@ mod tests {
 		match Curve25519ScalarMul::execute(&input, cost) {
 			Ok((_, _out)) => {
 				panic!("Test not expected to work");
-			}
+			},
 			Err(e) => {
 				assert_eq!(
 					e,
@@ -201,7 +198,7 @@ mod tests {
 					}
 				);
 				Ok(())
-			}
+			},
 		}
 	}
 
@@ -214,7 +211,7 @@ mod tests {
 		match Curve25519Add::execute(&input, cost) {
 			Ok((_, _out)) => {
 				panic!("Test not expected to work");
-			}
+			},
 			Err(e) => {
 				assert_eq!(
 					e,
@@ -225,7 +222,7 @@ mod tests {
 					}
 				);
 				Ok(())
-			}
+			},
 		}
 	}
 
@@ -249,7 +246,7 @@ mod tests {
 		match Curve25519Add::execute(&input, cost) {
 			Ok((_, _out)) => {
 				panic!("Test not expected to work");
-			}
+			},
 			Err(e) => {
 				assert_eq!(
 					e,
@@ -260,7 +257,7 @@ mod tests {
 					}
 				);
 				Ok(())
-			}
+			},
 		}
 	}
 }

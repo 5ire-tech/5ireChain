@@ -16,6 +16,7 @@
 // limitations under the License.
 
 #![cfg_attr(not(feature = "std"), no_std)]
+#![deny(unused_crate_dependencies)]
 
 extern crate alloc;
 
@@ -34,7 +35,8 @@ impl Blake2F {
 
 impl Precompile for Blake2F {
 	/// Format of `input`:
-	/// [4 bytes for rounds][64 bytes for h][128 bytes for m][8 bytes for t_0][8 bytes for t_1][1 byte for f]
+	/// [4 bytes for rounds][64 bytes for h][128 bytes for m][8 bytes for t_0][8 bytes for t_1][1
+	/// byte for f]
 	fn execute(handle: &mut impl PrecompileHandle) -> PrecompileResult {
 		const BLAKE2_F_ARG_LEN: usize = 213;
 
@@ -45,7 +47,7 @@ impl Precompile for Blake2F {
 				exit_status: ExitError::Other(
 					"input length for Blake2 F precompile should be exactly 213 bytes".into(),
 				),
-			});
+			})
 		}
 
 		let mut rounds_buf: [u8; 4] = [0; 4];
@@ -96,7 +98,7 @@ impl Precompile for Blake2F {
 		} else {
 			return Err(PrecompileFailure::Error {
 				exit_status: ExitError::Other("incorrect final block indicator flag".into()),
-			});
+			})
 		};
 
 		crate::eip_152::compress(&mut h, m, [t_0, t_1], f, rounds as usize);
@@ -106,10 +108,7 @@ impl Precompile for Blake2F {
 			output_buf[i * 8..(i + 1) * 8].copy_from_slice(&state_word.to_le_bytes());
 		}
 
-		Ok(PrecompileOutput {
-			exit_status: ExitSucceed::Returned,
-			output: output_buf.to_vec(),
-		})
+		Ok(PrecompileOutput { exit_status: ExitSucceed::Returned, output: output_buf.to_vec() })
 	}
 }
 

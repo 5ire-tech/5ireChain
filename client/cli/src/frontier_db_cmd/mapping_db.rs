@@ -21,7 +21,9 @@ use std::sync::Arc;
 use ethereum_types::H256;
 use serde::Deserialize;
 // Substrate
-use sp_runtime::{generic::BlockId, traits::Block as BlockT};
+use sp_api::ProvideRuntimeApi;
+use sp_blockchain::HeaderBackend;
+use sp_runtime::traits::Block as BlockT;
 // Frontier
 use fp_rpc::EthereumRuntimeRPCApi;
 
@@ -41,16 +43,20 @@ pub enum MappingKey {
 pub struct MappingDb<'a, C, B: BlockT> {
 	cmd: &'a FrontierDbCmd,
 	client: Arc<C>,
-	backend: Arc<fc_db::Backend<B>>,
+	backend: Arc<fc_db::kv::Backend<B>>,
 }
 
 impl<'a, C, B: BlockT> MappingDb<'a, C, B>
 where
-	C: sp_api::ProvideRuntimeApi<B>,
+	C: ProvideRuntimeApi<B>,
 	C::Api: EthereumRuntimeRPCApi<B>,
-	C: sp_blockchain::HeaderBackend<B>,
+	C: HeaderBackend<B>,
 {
-	pub fn new(cmd: &'a FrontierDbCmd, client: Arc<C>, backend: Arc<fc_db::Backend<B>>) -> Self {
+	pub fn new(
+		cmd: &'a FrontierDbCmd,
+		client: Arc<C>,
+		backend: Arc<fc_db::kv::Backend<B>>,
+	) -> Self {
 		Self { cmd, client, backend }
 	}
 
@@ -68,19 +74,18 @@ where
 					Some(MappingValue::SubstrateBlockHash(substrate_block_hash)),
 				) =>
 					if self.backend.mapping().block_hash(ethereum_block_hash)?.is_none() {
-						let id = BlockId::Hash(*substrate_block_hash);
 						let existing_transaction_hashes: Vec<H256> = if let Some(statuses) = self
 							.client
 							.runtime_api()
-							.current_transaction_statuses(&id)
-							.map_err(|e| format!("{e:?}"))?
+							.current_transaction_statuses(*substrate_block_hash)
+							.map_err(|e| format!("{:?}", e))?
 						{
 							statuses.iter().map(|t| t.transaction_hash).collect::<Vec<H256>>()
 						} else {
 							vec![]
 						};
 
-						let commitment = fc_db::MappingCommitment::<B> {
+						let commitment = fc_db::kv::MappingCommitment::<B> {
 							block_hash: *substrate_block_hash,
 							ethereum_block_hash: *ethereum_block_hash,
 							ethereum_transaction_hashes: existing_transaction_hashes,
@@ -96,7 +101,7 @@ where
 				// Given ethereum block hash, get substrate block hash.
 				(Column::Block, MappingKey::EthBlockOrTransactionHash(ethereum_block_hash)) => {
 					let value = self.backend.mapping().block_hash(ethereum_block_hash)?;
-					println!("{value:?}");
+					println!("{:?}", value);
 				},
 				// Given ethereum transaction hash, get transaction metadata.
 				(
@@ -105,7 +110,7 @@ where
 				) => {
 					let value =
 						self.backend.mapping().transaction_metadata(ethereum_transaction_hash)?;
-					println!("{value:?}");
+					println!("{:?}", value);
 				},
 				_ => return Err(self.key_column_error(key, value)),
 			},
@@ -116,19 +121,18 @@ where
 					Some(MappingValue::SubstrateBlockHash(substrate_block_hash)),
 				) =>
 					if self.backend.mapping().block_hash(ethereum_block_hash)?.is_some() {
-						let id = BlockId::Hash(*substrate_block_hash);
 						let existing_transaction_hashes: Vec<H256> = if let Some(statuses) = self
 							.client
 							.runtime_api()
-							.current_transaction_statuses(&id)
-							.map_err(|e| format!("{e:?}"))?
+							.current_transaction_statuses(*substrate_block_hash)
+							.map_err(|e| format!("{:?}", e))?
 						{
 							statuses.iter().map(|t| t.transaction_hash).collect::<Vec<H256>>()
 						} else {
 							vec![]
 						};
 
-						let commitment = fc_db::MappingCommitment::<B> {
+						let commitment = fc_db::kv::MappingCommitment::<B> {
 							block_hash: *substrate_block_hash,
 							ethereum_block_hash: *ethereum_block_hash,
 							ethereum_transaction_hashes: existing_transaction_hashes,

@@ -17,6 +17,7 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 #![allow(clippy::comparison_chain)]
+#![warn(unused_crate_dependencies)]
 
 #[cfg(test)]
 mod tests;
@@ -40,8 +41,6 @@ pub mod pallet {
 	use frame_system::pallet_prelude::*;
 
 	#[pallet::pallet]
-	#[pallet::generate_store(pub(super) trait Store)]
-	#[pallet::without_storage_info]
 	pub struct Pallet<T>(PhantomData<T>);
 
 	#[pallet::config]
@@ -57,17 +56,16 @@ pub mod pallet {
 	pub struct GenesisConfig<T: Config> {
 		pub base_fee_per_gas: U256,
 		pub elasticity: Permill,
-		_marker: PhantomData<T>,
+		#[serde(skip)]
+		pub _marker: PhantomData<T>,
 	}
 
-	#[cfg(feature = "std")]
 	impl<T: Config> GenesisConfig<T> {
 		pub fn new(base_fee_per_gas: U256, elasticity: Permill) -> Self {
 			Self { base_fee_per_gas, elasticity, _marker: PhantomData }
 		}
 	}
 
-	#[cfg(feature = "std")]
 	impl<T: Config> Default for GenesisConfig<T> {
 		fn default() -> Self {
 			Self {
@@ -79,7 +77,7 @@ pub mod pallet {
 	}
 
 	#[pallet::genesis_build]
-	impl<T: Config> GenesisBuild<T> for GenesisConfig<T> {
+	impl<T: Config> BuildGenesisConfig for GenesisConfig<T> {
 		fn build(&self) {
 			<BaseFeePerGas<T>>::put(self.base_fee_per_gas);
 			<Elasticity<T>>::put(self.elasticity);
@@ -92,7 +90,6 @@ pub mod pallet {
 	}
 
 	#[pallet::storage]
-	#[pallet::getter(fn base_fee_per_gas)]
 	pub type BaseFeePerGas<T> = StorageValue<_, U256, ValueQuery, DefaultBaseFeePerGas<T>>;
 
 	#[pallet::type_value]
@@ -101,7 +98,6 @@ pub mod pallet {
 	}
 
 	#[pallet::storage]
-	#[pallet::getter(fn elasticity)]
 	pub type Elasticity<T> = StorageValue<_, Permill, ValueQuery, DefaultElasticity<T>>;
 
 	#[allow(clippy::redundant_closure_call)]
@@ -115,7 +111,7 @@ pub mod pallet {
 
 	#[pallet::hooks]
 	impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
-		fn on_initialize(_: T::BlockNumber) -> Weight {
+		fn on_initialize(_: BlockNumberFor<T>) -> Weight {
 			// Register the Weight used on_finalize.
 			// 	- One storage read to get the block_weight.
 			// 	- One storage read to get the Elasticity.
@@ -124,7 +120,7 @@ pub mod pallet {
 			db_weight.reads_writes(2, 1)
 		}
 
-		fn on_finalize(_n: <T as frame_system::Config>::BlockNumber) {
+		fn on_finalize(_n: BlockNumberFor<T>) {
 			if <Elasticity<T>>::get().is_zero() {
 				// Zero elasticity means constant BaseFeePerGas.
 				return
@@ -181,7 +177,18 @@ pub mod pallet {
 						let decrease = scaled_basefee
 							.checked_div(U256::from(1_000_000))
 							.unwrap_or_else(U256::zero);
-						*bf = bf.saturating_sub(decrease);
+						let default_base_fee = T::DefaultBaseFeePerGas::get();
+						// lowest fee is norm(DefaultBaseFeePerGas * Threshold::ideal()):
+						let lowest_base_fee = default_base_fee
+							.checked_mul(U256::from(T::Threshold::ideal().deconstruct()))
+							.unwrap_or(default_base_fee)
+							.checked_div(U256::from(1_000_000))
+							.unwrap_or(default_base_fee);
+						if bf.saturating_sub(decrease) >= lowest_base_fee {
+							*bf = bf.saturating_sub(decrease);
+						} else {
+							*bf = lowest_base_fee;
+						}
 					} else {
 						Self::deposit_event(Event::BaseFeeOverflow);
 					}

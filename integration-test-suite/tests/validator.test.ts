@@ -48,7 +48,7 @@ describe('Validator tests', function () {
     const controller = polkadotApi.registry.createType("PalletStakingRewardDestination", "Staked");
 
     const amount = polkadotApi.createType('Balance', '900000000000000000000');
-    let bondValidator = polkadotApi.tx.staking.bond(bob.address, amount, controller);
+    let bondValidator = polkadotApi.tx.staking.bond(amount, controller);
     const bondValidatorTransaction = new Promise<{ block: string, address: string }>(async (resolve, reject) => {
       const unsub = await bondValidator.signAndSend(bob, {tip: 200, nonce: -1}, (result) => {
         console.log(`bond validator transaction is ${result.status}`);
@@ -66,7 +66,7 @@ describe('Validator tests', function () {
 
 
     const prefs = polkadotApi.registry.createType("PalletStakingValidatorPrefs", {
-      commission: 100,
+      commission: 100_000_000,
       blocked: false
     });
 
@@ -86,6 +86,7 @@ describe('Validator tests', function () {
     });
     await waitForEvent(polkadotApi, 'staking', 'ValidatorPrefsSet');
 
+
     let setKeys = polkadotApi.tx.session.setKeys(currentKey, currentKey);
     const setKeysTransaction = new Promise<{ block: string, address: string }>(async (resolve, reject) => {
       const unsub = await setKeys.signAndSend(bob, {tip: 200, nonce: -1}, (result) => {
@@ -100,8 +101,6 @@ describe('Validator tests', function () {
         }
       });
     });
-    await waitForEvent(polkadotApi, 'staking', 'ValidatorPrefsSet');
-
 
     for (let i=0; i<3600; i++) {
       await waitForTheNextSession(polkadotApi);

@@ -18,12 +18,13 @@
 
 //! Serializable wrapper around vector of bytes
 
+use std::fmt;
+
 use rustc_hex::{FromHex, ToHex};
 use serde::{
 	de::{Error, Visitor},
 	Deserialize, Deserializer, Serialize, Serializer,
 };
-use std::fmt;
 
 /// Wrapper structure around vector of bytes.
 #[derive(Clone, Debug, Default, Eq, PartialEq, Hash)]
@@ -88,7 +89,7 @@ impl<'a> Visitor<'a> for BytesVisitor {
 		if value.len() >= 2 && value.starts_with("0x") && value.len() & 1 == 0 {
 			Ok(Bytes::new(
 				FromHex::from_hex(&value[2..])
-					.map_err(|e| Error::custom(format!("Invalid hex: {e}")))?,
+					.map_err(|e| Error::custom(format!("Invalid hex: {}", e)))?,
 			))
 		} else {
 			Err(Error::custom(

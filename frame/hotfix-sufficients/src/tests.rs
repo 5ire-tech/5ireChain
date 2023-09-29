@@ -56,8 +56,10 @@ fn test_hotfix_inc_account_sufficients_increments_if_nonce_nonzero() {
 	new_test_ext().execute_with(|| {
 		let addr_1 = "1230000000000000000000000000000000000001".parse::<H160>().unwrap();
 		let addr_2 = "1234000000000000000000000000000000000001".parse::<H160>().unwrap();
-		let substrate_addr_1 = <Test as Config>::AddressMapping::into_account_id(addr_1);
-		let substrate_addr_2 = <Test as Config>::AddressMapping::into_account_id(addr_2);
+		let substrate_addr_1: <Test as frame_system::Config>::AccountId =
+			<Test as Config>::AddressMapping::into_account_id(addr_1);
+		let substrate_addr_2: <Test as frame_system::Config>::AccountId =
+			<Test as Config>::AddressMapping::into_account_id(addr_2);
 
 		frame_system::Pallet::<Test>::inc_account_nonce(&substrate_addr_1);
 
@@ -87,7 +89,8 @@ fn test_hotfix_inc_account_sufficients_increments_if_nonce_nonzero() {
 fn test_hotfix_inc_account_sufficients_increments_with_saturation_if_nonce_nonzero() {
 	new_test_ext().execute_with(|| {
 		let addr = "1230000000000000000000000000000000000001".parse::<H160>().unwrap();
-		let substrate_addr = <Test as Config>::AddressMapping::into_account_id(addr);
+		let substrate_addr: <Test as frame_system::Config>::AccountId =
+			<Test as Config>::AddressMapping::into_account_id(addr);
 
 		frame_system::Account::<Test>::mutate(substrate_addr, |x| {
 			x.nonce = 1;
@@ -115,7 +118,8 @@ fn test_hotfix_inc_account_sufficients_increments_with_saturation_if_nonce_nonze
 fn test_hotfix_inc_account_sufficients_does_not_increment_if_both_nonce_and_refs_nonzero() {
 	new_test_ext().execute_with(|| {
 		let addr = "1230000000000000000000000000000000000001".parse::<H160>().unwrap();
-		let substrate_addr = <Test as Config>::AddressMapping::into_account_id(addr);
+		let substrate_addr: <Test as frame_system::Config>::AccountId =
+			<Test as Config>::AddressMapping::into_account_id(addr);
 
 		frame_system::Account::<Test>::mutate(substrate_addr, |x| {
 			x.nonce = 1;

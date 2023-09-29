@@ -2,21 +2,17 @@
 name = "pallet-evm-test-vector-support"
 version = "1.0.0-dev"
 license = "Apache-2.0"
-edition = "2021"
 description = "Test vector support for EVM pallet."
- 
-[dependencies]
-evm = { version = "0.37.0", default-features = false }
-hex = "0.4.3"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-# Substrate
-sp-core = { version = "7.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "QA", default-features = false  }
-# Frontier
-fp-evm = { version = "3.0.0-dev", path = "../../../primitives/evm", default-features = false }
+authors = { workspace = true }
+edition = { workspace = true }
+repository = { workspace = true }
 
-[features]
-default = ["std"]
-std = [
-    "fp-evm/std"
-]
+[dependencies]
+evm = { workspace = true, features = ["with-codec"] }
+hex = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+# Substrate
+sp-core = { workspace = true, features = ["default"] }
+# Frontier
+fp-evm = { workspace = true, features = ["default"] }

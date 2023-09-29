@@ -5,7 +5,7 @@ import { CodePromise, Abi, ContractPromise } from "@polkadot/api-contract";
 import {Keyring} from "@polkadot/api";
 import abiFile from "./contracts/psp22_token.json";
 import {WeightV2} from "@polkadot/types/interfaces";
-import { waitForEvent } from "../utils/setup";
+import {sleep, waitForEvent, waitNfinalizedBlocks} from "../utils/setup";
 import {BN, BN_ONE} from "@polkadot/util";
 
 let contractAddress: string;
@@ -28,8 +28,9 @@ describe("Wasm test with psp22 token old ink! version 3", function () {
     // deploy contract
     await deployContract();
 
-    // execute contract
+    console.log(`Beginning executing wasm contract ${contractAddress}`);
     await executeContract();
+
   });
 
   after(async () => {
@@ -50,12 +51,13 @@ const deployContract = async () => {
   const tokenSymbol = 0;
   const tokenDecimal = 1;
 
-  const MAX_CALL_WEIGHT = new BN(5_000_000_000).isub(BN_ONE);
+  const MAX_CALL_WEIGHT = new BN(10_000_000_000);
   const gasLimit = polkadotApi.registry.createType('WeightV2', {
-    refTime: MAX_CALL_WEIGHT,
-    proofSize: new BN(1_000_000),
+    refTime: 5908108255,
+    proofSize: 131072,
   }) as WeightV2;
 
+  //const storageDepositLimit = new BN( 2_003_435_700_000_000_000);
   const storageDepositLimit = null;
 
   const tx = code.tx.new(
@@ -65,7 +67,6 @@ const deployContract = async () => {
     tokenSymbol,
     tokenDecimal
   );
-
   let address: string;
 
   address = await new Promise(async (resolve, reject) => {
@@ -76,6 +77,7 @@ const deployContract = async () => {
       ({ contract, status, dispatchError }) => {
         if (status.isInBlock || status.isFinalized) {
           address = contract.address.toString();
+        //  console.log(`Block finalized  ${status.asFinalized}`);
           resolve(address);
         }
 
@@ -97,12 +99,14 @@ const deployContract = async () => {
 };
 
 const executeContract = async () =>  {
-  console.log("Beginning executing wasm contract");
 
-  const gasLimitForCallAndQuery = polkadotApi.registry.createType('WeightV2', {
-    refTime: 5908108255,
-    proofSize: new BN(131072),
-  }) as WeightV2;
+  const refTime = polkadotApi.registry.createType('Compact<u64>', 9691415738);
+  const proofSize = polkadotApi.registry.createType('Compact<u64>', 66536);
+
+  const gasLimitForCallAndQuery = polkadotApi.registry.createType('SpWeightsWeightV2Weight', {
+    refTime: refTime,
+    proofSize: proofSize,
+  });
   const storageDepositLimitForCallAndQuery = null;
 
   const keyring = new Keyring({ type: "sr25519" });
@@ -110,10 +114,11 @@ const executeContract = async () =>  {
 
   const bob = keyring.addFromUri("//Bob");
   const contract = new ContractPromise(polkadotApi, contractAbi, contractAddress);
-
+  console.log(`new contract promise is ${contract}`)
   const { output:initialBobBalance } = await contract.query["psp22::balanceOf"](
     alice.address,
     {
+      // @ts-ignore
       gasLimit: gasLimitForCallAndQuery,
       storageDepositLimit: storageDepositLimitForCallAndQuery,
     },
@@ -122,27 +127,32 @@ const executeContract = async () =>  {
 
   // Sign transaction
   const transfer = contract.tx["psp22::transfer"]({
+    // @ts-ignore
     gasLimit: gasLimitForCallAndQuery,
     storageDepositLimit: storageDepositLimitForCallAndQuery,
   },bob.address, '400',[]);
 
-  await transfer.signAndSend(
-    alice,
-    // @ts-ignore
-    result => {
-      if (result.status.isInBlock || result.status.isFinalized) {
-        console.log("Block finalized");
+  console.log(`trying to execute transaction`)
+  const transferTransaction = new Promise<{ block: string, address: string }>(async (resolve, reject) => {
+    const unsub = await transfer.signAndSend(alice, {tip: 200, nonce: -1}, (result) => {
+      console.log(`execute contract transfer transaction is ${result.status}`);
+      if (result.status.isInBlock) {
+        console.log(`execute contract transfer transaction included at blockHash ${result.status.asInBlock}`);
+        console.log(`execute contract transfer transaction waiting for finalization... (can take a minute)`);
+      } else if (result.status.isFinalized) {
+        console.log( `execute contract transfer transaction events are ${result.events}`)
+        console.log(`execute contract transfer transaction finalized at blockHash ${result.status.asFinalized}`);
+        unsub();
       }
+    });
+  });
 
-    }
-  );
-
-  // wait for contract called event
-  await waitForEvent(polkadotApi, 'contracts', 'Called')
+  await waitForEvent(polkadotApi, "contracts", "Called");
 
   const { output:finalBobBalance } = await contract.query["psp22::balanceOf"](
     alice.address,
     {
+      // @ts-ignore
       gasLimit: gasLimitForCallAndQuery,
       storageDepositLimit: storageDepositLimitForCallAndQuery,
     },
