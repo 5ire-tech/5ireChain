@@ -2,7 +2,8 @@
 members = [
 	"node",
 	"runtime",
-	"runtime/firechain-qa-runtime"
+	"runtime/firechain-qa-runtime",
+	"runtime/firechain-uat-runtime"
 ]
 resolver = "2"
 
