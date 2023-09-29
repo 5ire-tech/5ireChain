@@ -73,7 +73,7 @@ async function createContract(nonce: number, evmAddress:any, alice: KeyringPair)
   const source = evmAddress;
   const init = ERC20_BYTECODES;
   const value = 0;
-  const gasLimit = 100_000_00;
+  const gasLimit = 100_000;
   const maxFeePerGas = 100_000_000_000;
   const maxPriorityFeePerGas: BigInt =  BigInt(100_000_000);
   //const nonce = 0;
@@ -120,7 +120,7 @@ async function createContractWithInvalidNonceFailure(evmAddress:any, alice: Keyr
   const source = evmAddress;
   const init = ERC20_BYTECODES;
   const value = 0;
-  const gasLimit = 100_000_00;
+  const gasLimit = 100_000;
   const maxFeePerGas = 100_000_000_000_000;
   const maxPriorityFeePerGas: BigInt =  BigInt(100_000_000);
   const nonce = 1;

@@ -51,8 +51,8 @@ async function createContract(evmAddress:any, alice: KeyringPair) {
   const source = evmAddress;
   const init = ERC20_BYTECODES;
   const value = 0;
-  const gasLimit = 100_000_00;
-  const maxFeePerGas = 100_000_000_0000;
+  const gasLimit = 100_000_0;
+  const maxFeePerGas = 100_000_000_000;
   const maxPriorityFeePerGas: BigInt =  BigInt(100_000_000);
   const nonce = 0;
   const accessList = null;
@@ -97,8 +97,8 @@ async function transferToken(aliceEthAccount: string, bobEthAccount: string, bob
   const tokensToTransfer = `00000000000000000000000000000000000000000000000000000000000000dd`;
   const inputCode = `0x${transferFnCode}${bobEthAccount.substring(2)}${tokensToTransfer}`;
   console.log(`Sending call input: ${inputCode}`);
-  const gasLimit = 100_000_00;
-  const maxFeePerGas = 100_000_000_0000;
+  const gasLimit = 100_000_0;
+  const maxFeePerGas = 100_000_000_000;
   const maxPriorityFeePerGas: BigInt =  BigInt(100_000_000);
   const nonce = 1;
   const accessList = null;
