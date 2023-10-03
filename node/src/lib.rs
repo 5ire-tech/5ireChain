@@ -23,4 +23,3 @@ pub mod client;
 pub mod eth;
 pub mod rpc;
 pub mod service;
-pub mod chain_specs;

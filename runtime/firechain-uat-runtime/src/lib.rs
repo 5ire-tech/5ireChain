@@ -23,6 +23,9 @@
 #![recursion_limit = "1024"]
 
 use codec::{Decode, Encode, MaxEncodedLen};
+use firechain_runtime_core_primitives::opaque::{
+	AccountId, AccountIndex, Balance, BlockNumber, Hash, Header, Moment, Nonce, Signature,
+};
 use frame_election_provider_support::{
 	onchain, BalancingConfig, ElectionDataProvider, SequentialPhragmen, VoteWeight,
 };
@@ -51,9 +54,6 @@ use frame_support::{
 use frame_system::{
 	limits::{BlockLength, BlockWeights},
 	EnsureRoot, EnsureRootWithSuccess, EnsureSigned, EnsureSignedBy, EnsureWithSuccess,
-};
-pub use node_primitives::{
-	AccountId, AccountIndex, Balance, BlockNumber, Hash, Moment, Nonce, Signature,
 };
 use pallet_asset_conversion::{NativeOrAssetId, NativeOrAssetIdConverter};
 #[cfg(feature = "runtime-benchmarks")]
@@ -562,17 +562,6 @@ impl_opaque_keys! {
 		pub im_online: ImOnline,
 		pub authority_discovery: AuthorityDiscovery,
 	}
-}
-
-pub mod opaque {
-	use super::*;
-	pub use sp_runtime::OpaqueExtrinsic as UncheckedExtrinsic;
-	/// Opaque block header type.
-	pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
-	/// Opaque block type.
-	pub type Block = generic::Block<Header, UncheckedExtrinsic>;
-	/// Opaque block identifier type.
-	pub type BlockId = generic::BlockId<Block>;
 }
 
 impl pallet_session::Config for Runtime {
@@ -2961,24 +2950,24 @@ impl fp_rpc::ConvertTransaction<UncheckedExtrinsic> for TransactionConverter {
 	}
 }
 
-impl fp_rpc::ConvertTransaction<opaque::UncheckedExtrinsic> for TransactionConverter {
+impl fp_rpc::ConvertTransaction<firechain_runtime_core_primitives::opaque::UncheckedExtrinsic>
+	for TransactionConverter
+{
 	fn convert_transaction(
 		&self,
 		transaction: pallet_ethereum::Transaction,
-	) -> opaque::UncheckedExtrinsic {
+	) -> firechain_runtime_core_primitives::opaque::UncheckedExtrinsic {
 		let extrinsic = UncheckedExtrinsic::new_unsigned(
 			pallet_ethereum::Call::<Runtime>::transact { transaction }.into(),
 		);
 		let encoded = extrinsic.encode();
-		opaque::UncheckedExtrinsic::decode(&mut &encoded[..])
+		firechain_runtime_core_primitives::opaque::UncheckedExtrinsic::decode(&mut &encoded[..])
 			.expect("Encoded extrinsic is always valid")
 	}
 }
 
 /// The address format for describing accounts.
 pub type Address = sp_runtime::MultiAddress<AccountId, AccountIndex>;
-/// Block header type as expected by this runtime.
-pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
 /// Block type as expected by this runtime.
 pub type Block = generic::Block<Header, UncheckedExtrinsic>;
 /// A Block signed with a Justification

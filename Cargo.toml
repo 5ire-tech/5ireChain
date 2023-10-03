@@ -1,7 +1,7 @@
 [workspace]
 members = [
 	"node",
-	"runtime",
+	"runtime/core-primitives",
 	"runtime/firechain-qa-runtime",
 	"runtime/firechain-uat-runtime"
 ]
@@ -137,7 +137,8 @@ pallet-evm-precompile-simple = { version = "2.0.0-dev", path = "frame/evm/precom
 pallet-evm-test-vector-support = { version = "1.0.0-dev", path = "frame/evm/test-vector-support" }
 pallet-hotfix-sufficients = { version = "1.0.0", path = "frame/hotfix-sufficients", default-features = false }
 # Frontier Template
-firechain-runtime = { path = "runtime", default-features = false }
+firechain-qa-runtime = { path = "runtime/firechain-qa-runtime", default-features = false }
+firechain-uat-runtime = { path = "runtime/firechain-uat-runtime", default-features = false }
 # Arkworks
 ark-bls12-377 = { version = "0.4.0", default-features = false, features = ["curve"] }
 ark-bw6-761 = { version = "0.4.0", default-features = false }

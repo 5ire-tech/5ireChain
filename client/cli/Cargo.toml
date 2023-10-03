@@ -37,7 +37,8 @@ sp-io = { workspace = true }
 substrate-test-runtime-client = { workspace = true }
 # Frontier
 fc-db = { workspace = true, features = ["rocksdb"] }
-firechain-runtime = { workspace = true, features = ["default"] }
+firechain-qa-runtime = { workspace = true, features = ["default"] }
+firechain-uat-runtime = { workspace = true, features = ["default"] }
 
 [features]
 default = ["rocksdb"]
