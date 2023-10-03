@@ -18,15 +18,12 @@
 use crate::{
 	cli::{Cli, Subcommand},
 	service,
-	service::{new_partial, FullClient},
+	service::new_partial,
 };
 use frame_benchmarking_cli::*;
 use node_primitives::Block;
-use sc_cli::{ChainSpec, Result, SubstrateCli};
+use sc_cli::{Result, SubstrateCli};
 use sc_service::PartialComponents;
-use sp_keyring::Sr25519Keyring;
-
-use std::sync::Arc;
 
 use firechain_node::{
 	chain_spec::{qa_chain_spec, uat_chain_spec},
@@ -64,6 +61,7 @@ impl SubstrateCli for Cli {
 	}
 
 	fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
+		#[allow(unused)]
 		#[cfg(feature = "firechain-qa")]
 		let spec = match id {
 			"" =>
@@ -169,7 +167,7 @@ pub fn run() -> Result<()> {
 									firechain_qa_runtime::RuntimeApi,
 									FirechainQaRuntimeExecutor,
 								>(&config, cli.eth.clone())?;
-								return cmd.run(partial.client)
+								cmd.run(partial.client)
 							},
 
 							#[cfg(feature = "firechain-uat")]
@@ -178,7 +176,7 @@ pub fn run() -> Result<()> {
 									firechain_uat_runtime::RuntimeApi,
 									FirechainUatRuntimeExecutor,
 								>(&config, cli.eth.clone())?;
-								return cmd.run(partial.client)
+								cmd.run(partial.client)
 							},
 
 							_ => {
@@ -186,7 +184,7 @@ pub fn run() -> Result<()> {
 									firechain_qa_runtime::RuntimeApi,
 									FirechainQaRuntimeExecutor,
 								>(&config, cli.eth.clone())?;
-								return cmd.run(partial.client)
+								cmd.run(partial.client)
 							},
 						}
 					},
@@ -254,7 +252,6 @@ pub fn run() -> Result<()> {
 		},
 		Some(Subcommand::CheckBlock(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
-			let chain_spec = &runner.config().chain_spec;
 
 			runner.async_run(|mut config| {
 				let (client, _, import_queue, task_manager) =
@@ -264,7 +261,6 @@ pub fn run() -> Result<()> {
 		},
 		Some(Subcommand::ExportBlocks(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
-			let chain_spec = &runner.config().chain_spec;
 			runner.async_run(|mut config| {
 				let (client, _, _, task_manager) =
 					service::new_chain_ops(&mut config, cli.eth.clone())?;
@@ -282,7 +278,6 @@ pub fn run() -> Result<()> {
 		},
 		Some(Subcommand::ImportBlocks(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
-			let chain_spec = &runner.config().chain_spec;
 			runner.async_run(|mut config| {
 				let (client, _, import_queue, task_manager) =
 					service::new_chain_ops(&mut config, cli.eth.clone())?;

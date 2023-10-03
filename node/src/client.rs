@@ -1,6 +1,6 @@
 use std::sync::Arc;
 // Substrate
-use sc_executor::{NativeElseWasmExecutor, NativeExecutionDispatch, NativeVersion};
+use sc_executor::{NativeElseWasmExecutor, NativeVersion};
 use sc_service::ChainSpec;
 // Local
 use firechain_runtime_core_primitives::opaque::{
@@ -178,23 +178,14 @@ macro_rules! match_client {
 /// Trivial enum representing runtime variant
 #[derive(Clone)]
 pub enum RuntimeVariant {
+	#[allow(dead_code)]
 	#[cfg(feature = "firechain-qa")]
 	Qa,
+	#[allow(dead_code)]
 	#[cfg(feature = "firechain-uat")]
 	Uat,
+	#[allow(dead_code)]
 	Unrecognized,
-}
-
-impl RuntimeVariant {
-	pub fn from_chain_spec(chain_spec: &Box<dyn ChainSpec>) -> Self {
-		match chain_spec {
-			#[cfg(feature = "firechain-qa")]
-			spec if spec.is_qa() => Self::Qa,
-			#[cfg(feature = "firechain-uat")]
-			spec if spec.is_uat() => Self::Uat,
-			_ => Self::Qa,
-		}
-	}
 }
 
 /// Can be called for a `Configuration` to check if it is a configuration for

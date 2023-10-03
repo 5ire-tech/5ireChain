@@ -22,28 +22,19 @@
 use crate::rpc::{create_full, BabeDeps, FullDeps, GrandpaDeps};
 // use fc_db::Backend as FrontierBackend;
 // use crate::cli::Cli;
-use codec::Encode;
 use firechain_runtime_core_primitives::opaque::{Block, BlockNumber, Hash};
 use frame_benchmarking_cli::SUBSTRATE_REFERENCE_HARDWARE;
-use frame_system_rpc_runtime_api::AccountNonceApi;
 use futures::prelude::*;
-use node_executor::ExecutorDispatch;
 use sc_client_api::{Backend, BlockBackend};
 use sc_consensus_babe::{self, BabeWorkerHandle, SlotProportion};
 use sc_executor::NativeElseWasmExecutor;
-use sc_network::{event::Event, NetworkEventStream, NetworkService};
+use sc_network::{event::Event, NetworkEventStream};
 use sc_network_common::sync::warp::WarpSyncParams;
-use sc_network_sync::SyncingService;
-use sc_service::{
-	config::Configuration, error::Error as ServiceError, LocalCallExecutor, RpcHandlers,
-	TaskManager,
-};
+use sc_service::{config::Configuration, error::Error as ServiceError, TaskManager};
 use sc_statement_store::Store as StatementStore;
 use sc_telemetry::{Telemetry, TelemetryWorker};
 use sc_transaction_pool_api::OffchainTransactionPoolFactory;
-use sp_api::{ConstructRuntimeApi, ProvideRuntimeApi};
-use sp_core::crypto::Pair;
-use sp_runtime::{generic, traits::Block as BlockT, OpaqueExtrinsic, SaturatedConversion};
+use sp_api::ConstructRuntimeApi;
 use sp_trie::PrefixedMemoryDB;
 // use std::sync::Arc;
 
@@ -81,32 +72,6 @@ type FullGrandpaBlockImport<RuntimeApi, Executor> = grandpa::GrandpaBlockImport<
 	FullClient<RuntimeApi, Executor>,
 	FullSelectChain,
 >;
-
-/// The transaction pool type defintion.
-pub type TransactionPool<RuntimeApi, Executor> =
-	sc_transaction_pool::FullPool<Block, FullClient<RuntimeApi, Executor>>;
-
-/// Fetch the nonce of the given `account` from the chain state.
-///
-/// Note: Should only be used for tests.
-pub fn fetch_nonce<RuntimeApi, Executor>(
-	client: &FullClient<RuntimeApi, Executor>,
-	account: sp_core::sr25519::Pair,
-) -> u32
-where
-	RuntimeApi:
-		ConstructRuntimeApi<Block, FullClient<RuntimeApi, Executor>> + Send + Sync + 'static,
-	RuntimeApi::RuntimeApi:
-		RuntimeApiCollection<StateBackend = sc_client_api::StateBackendFor<FullBackend, Block>>,
-	Executor: sc_executor::NativeExecutionDispatch + 'static,
-{
-	let best_hash = client.chain_info().best_hash;
-	client
-		.runtime_api()
-		.account_nonce(best_hash, account.public().into())
-		.expect("Fetching account nonce works; qed")
-}
-
 /// Creates a new partial node.
 #[allow(clippy::type_complexity)]
 pub fn new_partial<RuntimeApi, Executor>(
@@ -366,6 +331,7 @@ where
 
 	// for ethereum-compatibility rpc.
 	// 	config.rpc_id_provider = Some(Box::new(fc_rpc::EthereumSubIdProvider));   // Need to check??
+	#[allow(unused)]
 	#[cfg(feature = "firechain-qa")]
 	let eth_rpc_params = crate::rpc::EthDeps {
 		client: client.clone(),
@@ -476,6 +442,7 @@ where
 		(rpc_extensions_builder, shared_voter_state2)
 	};
 
+	#[allow(unused)]
 	let rpc_handlers = sc_service::spawn_tasks(sc_service::SpawnTasksParams {
 		config,
 		backend: backend.clone(),
