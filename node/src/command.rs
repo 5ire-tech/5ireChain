@@ -1,6 +1,6 @@
 // This file is part of Substrate.
 
-// Copyright (C) Parity Technologies (UK) Ltd.
+// Copyright (C) 2017-2022 Parity Technologies (UK) Ltd.
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 
 // This program is free software: you can redistribute it and/or modify
@@ -15,23 +15,20 @@
 
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-use super::benchmarking::{inherent_benchmark_data, RemarkBuilder, TransferKeepAliveBuilder};
 use crate::{
-	chain_spec,
 	cli::{Cli, Subcommand},
 	service,
-	service::{new_partial, FullClient},
+	service::new_partial,
 };
-use firechain_runtime::ExistentialDeposit;
 use frame_benchmarking_cli::*;
 use node_primitives::Block;
 use sc_cli::{Result, SubstrateCli};
 use sc_service::PartialComponents;
-use sp_keyring::Sr25519Keyring;
 
-use std::sync::Arc;
-
+use firechain_node::{
+	chain_spec::{qa_chain_spec, uat_chain_spec},
+	client::{FirechainQaRuntimeExecutor, FirechainUatRuntimeExecutor, IdentifyVariant},
+};
 #[cfg(feature = "try-runtime")]
 use {
 	firechain_runtime::constants::time::SLOT_DURATION,
@@ -64,19 +61,37 @@ impl SubstrateCli for Cli {
 	}
 
 	fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
+		#[allow(unused)]
+		#[cfg(feature = "firechain-qa")]
 		let spec = match id {
 			"" =>
 				return Err(
 					"Please specify which chain you want to run, e.g. --dev or --chain=local"
 						.into(),
 				),
-			"dev" => Box::new(chain_spec::development_config()),
-			"local" => Box::new(chain_spec::local_testnet_config()),
+			"dev" => Box::new(qa_chain_spec::development_config()),
+			"local" => Box::new(qa_chain_spec::local_testnet_config()),
 			// "fir" | "flaming-fir" => Box::new(chain_spec::flaming_fir_config()?),
-			"staging" => Box::new(chain_spec::staging_testnet_config()),
+			"staging" => Box::new(qa_chain_spec::staging_testnet_config()),
 			path =>
-				Box::new(chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
+				Box::new(qa_chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
 		};
+
+		#[cfg(feature = "firechain-uat")]
+		let spec = match id {
+			"" =>
+				return Err(
+					"Please specify which chain you want to run, e.g. --dev or --chain=local"
+						.into(),
+				),
+			"dev" => Box::new(uat_chain_spec::development_config()),
+			"local" => Box::new(uat_chain_spec::local_testnet_config()),
+			// "fir" | "flaming-fir" => Box::new(chain_spec::flaming_fir_config()?),
+			"staging" => Box::new(uat_chain_spec::staging_testnet_config()),
+			path =>
+				Box::new(uat_chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
+		};
+
 		Ok(spec)
 	}
 }
@@ -88,10 +103,34 @@ pub fn run() -> Result<()> {
 	match &cli.subcommand {
 		None => {
 			let runner = cli.create_runner(&cli.run)?;
-			runner.run_node_until_exit(|config| async move {
-				service::new_full(config, cli.no_hardware_benchmarks, cli.eth.clone())
+			let chain_spec = &runner.config().chain_spec;
+			match chain_spec {
+				#[cfg(feature = "firechain-qa")]
+				spec if spec.is_qa() => runner.run_node_until_exit(|config| async move {
+					service::new_full::<
+							firechain_qa_runtime::RuntimeApi,
+							FirechainQaRuntimeExecutor,
+						>(config, cli.no_hardware_benchmarks, cli.eth.clone())
+						.map_err(sc_cli::Error::Service)
+				}),
+
+				#[cfg(feature = "firechain-uat")]
+				spec if spec.is_uat() => runner.run_node_until_exit(|config| async move {
+					service::new_full::<
+						firechain_uat_runtime::RuntimeApi,
+						FirechainUatRuntimeExecutor,
+					>(config, cli.no_hardware_benchmarks, cli.eth.clone())
 					.map_err(sc_cli::Error::Service)
-			})
+				}),
+
+				_ => runner.run_node_until_exit(|config| async move {
+					service::new_full::<
+							firechain_qa_runtime::RuntimeApi,
+							FirechainQaRuntimeExecutor,
+						>(config, cli.no_hardware_benchmarks, cli.eth.clone())
+						.map_err(sc_cli::Error::Service)
+				}),
+			}
 		},
 		// Some(Subcommand::Inspect(cmd)) => {
 		// 	let runner = cli.create_runner(cmd)?;
@@ -117,9 +156,37 @@ pub fn run() -> Result<()> {
 						cmd.run::<Block, sp_statement_store::runtime_api::HostFunctions>(config)
 					},
 					BenchmarkCmd::Block(cmd) => {
+						let runner = cli.create_runner(cmd)?;
+						let chain_spec = &runner.config().chain_spec;
+
 						// ensure that we keep the task manager alive
-						let partial = new_partial(&config, cli.eth.clone())?;
-						cmd.run(partial.client)
+						match chain_spec {
+							#[cfg(feature = "firechain-qa")]
+							spec if spec.is_qa() => {
+								let partial = new_partial::<
+									firechain_qa_runtime::RuntimeApi,
+									FirechainQaRuntimeExecutor,
+								>(&config, cli.eth.clone())?;
+								cmd.run(partial.client)
+							},
+
+							#[cfg(feature = "firechain-uat")]
+							spec if spec.is_uat() => {
+								let partial = new_partial::<
+									firechain_uat_runtime::RuntimeApi,
+									FirechainUatRuntimeExecutor,
+								>(&config, cli.eth.clone())?;
+								cmd.run(partial.client)
+							},
+
+							_ => {
+								let partial = new_partial::<
+									firechain_qa_runtime::RuntimeApi,
+									FirechainQaRuntimeExecutor,
+								>(&config, cli.eth.clone())?;
+								cmd.run(partial.client)
+							},
+						}
 					},
 					#[cfg(not(feature = "runtime-benchmarks"))]
 					BenchmarkCmd::Storage(_) => Err(
@@ -129,47 +196,49 @@ pub fn run() -> Result<()> {
 					#[cfg(feature = "runtime-benchmarks")]
 					BenchmarkCmd::Storage(cmd) => {
 						// ensure that we keep the task manager alive
-						let partial = new_partial(&config, cli.eth.clone())?;
-						let db = partial.backend.expose_db();
-						let storage = partial.backend.expose_storage();
+						let runner = cli.create_runner(cmd)?;
+						let chain_spec = &runner.config().chain_spec;
 
-						cmd.run(config, partial.client, db, storage)
-					},
-					BenchmarkCmd::Overhead(cmd) => {
-						// ensure that we keep the task manager alive
-						let partial = new_partial(&config, cli.eth.clone())?;
-						let ext_builder = RemarkBuilder::new(partial.client.clone());
+						match chain_spec {
+							#[cfg(feature = "firechain-qa")]
+							spec if spec.is_qa() => {
+								let partial = new_partial::<
+									firechain_qa_runtime::RuntimeApi,
+									FirechainQaRuntimeExecutor,
+								>(&config, cli.eth.clone())?;
+								let db = partial.backend.expose_db();
+								let storage = partial.backend.expose_storage();
 
-						cmd.run(
-							config,
-							partial.client,
-							inherent_benchmark_data()?,
-							Vec::new(),
-							&ext_builder,
-						)
-					},
-					BenchmarkCmd::Extrinsic(cmd) => {
-						// ensure that we keep the task manager alive
-						let partial = service::new_partial(&config, cli.eth.clone())?;
-						// Register the *Remark* and *TKA* builders.
-						let ext_factory = ExtrinsicFactory(vec![
-							Box::new(RemarkBuilder::new(partial.client.clone())),
-							Box::new(TransferKeepAliveBuilder::new(
-								partial.client.clone(),
-								Sr25519Keyring::Alice.to_account_id(),
-								ExistentialDeposit::get(),
-							)),
-						]);
+								return cmd.run(config, partial.client, db, storage)
+							},
 
-						cmd.run(
-							partial.client,
-							inherent_benchmark_data()?,
-							Vec::new(),
-							&ext_factory,
-						)
+							#[cfg(feature = "firechain-uat")]
+							spec if spec.is_uat() => {
+								let partial = new_partial::<
+									firechain_uat_runtime::RuntimeApi,
+									FirechainUatRuntimeExecutor,
+								>(&config, cli.eth.clone())?;
+								let db = partial.backend.expose_db();
+								let storage = partial.backend.expose_storage();
+
+								return cmd.run(config, partial.client, db, storage)
+							},
+
+							_ => {
+								let partial = new_partial::<
+									firechain_qa_runtime::RuntimeApi,
+									FirechainQaRuntimeExecutor,
+								>(&config, cli.eth.clone())?;
+								let db = partial.backend.expose_db();
+								let storage = partial.backend.expose_storage();
+
+								return cmd.run(config, partial.client, db, storage)
+							},
+						}
 					},
-					BenchmarkCmd::Machine(cmd) =>
-						cmd.run(&config, SUBSTRATE_REFERENCE_HARDWARE.clone()),
+					BenchmarkCmd::Overhead(_) |
+					BenchmarkCmd::Extrinsic(_) |
+					BenchmarkCmd::Machine(_) => Err("Unsupported benchmarking command".into()),
 				}
 			})
 		},
@@ -183,33 +252,35 @@ pub fn run() -> Result<()> {
 		},
 		Some(Subcommand::CheckBlock(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
-			runner.async_run(|config| {
-				let PartialComponents { client, task_manager, import_queue, .. } =
-					new_partial(&config, cli.eth.clone())?;
+
+			runner.async_run(|mut config| {
+				let (client, _, import_queue, task_manager) =
+					service::new_chain_ops(&mut config, cli.eth.clone())?;
 				Ok((cmd.run(client, import_queue), task_manager))
 			})
 		},
 		Some(Subcommand::ExportBlocks(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
-			runner.async_run(|config| {
-				let PartialComponents { client, task_manager, .. } =
-					new_partial(&config, cli.eth.clone())?;
+			runner.async_run(|mut config| {
+				let (client, _, _, task_manager) =
+					service::new_chain_ops(&mut config, cli.eth.clone())?;
+
 				Ok((cmd.run(client, config.database), task_manager))
 			})
 		},
 		Some(Subcommand::ExportState(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
-			runner.async_run(|config| {
-				let PartialComponents { client, task_manager, .. } =
-					new_partial(&config, cli.eth.clone())?;
+			runner.async_run(|mut config| {
+				let (client, _, _, task_manager) =
+					service::new_chain_ops(&mut config, cli.eth.clone())?;
 				Ok((cmd.run(client, config.chain_spec), task_manager))
 			})
 		},
 		Some(Subcommand::ImportBlocks(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
-			runner.async_run(|config| {
-				let PartialComponents { client, task_manager, import_queue, .. } =
-					new_partial(&config, cli.eth.clone())?;
+			runner.async_run(|mut config| {
+				let (client, _, import_queue, task_manager) =
+					service::new_chain_ops(&mut config, cli.eth.clone())?;
 				Ok((cmd.run(client, import_queue), task_manager))
 			})
 		},
@@ -219,16 +290,42 @@ pub fn run() -> Result<()> {
 		},
 		Some(Subcommand::Revert(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
-			runner.async_run(|config| {
-				let PartialComponents { client, task_manager, backend, .. } =
-					new_partial(&config, cli.eth.clone())?;
-				let aux_revert = Box::new(|client: Arc<FullClient>, backend, blocks| {
-					sc_consensus_babe::revert(client.clone(), backend, blocks)?;
-					grandpa::revert(client, blocks)?;
-					Ok(())
-				});
-				Ok((cmd.run(client, backend, Some(aux_revert)), task_manager))
-			})
+			let chain_spec = &runner.config().chain_spec;
+			match chain_spec {
+				#[cfg(feature = "firechain-qa")]
+				spec if spec.is_qa() =>
+					runner.async_run(|config| {
+						let PartialComponents { client, task_manager, backend, .. } =
+							new_partial::<
+								firechain_qa_runtime::RuntimeApi,
+								FirechainQaRuntimeExecutor,
+							>(&config, cli.eth.clone())?;
+
+						Ok((cmd.run(client, backend, None), task_manager))
+					}),
+
+				#[cfg(feature = "firechain-uat")]
+				spec if spec.is_uat() => runner.async_run(|config| {
+					let PartialComponents { client, task_manager, backend, .. } =
+						new_partial::<
+							firechain_uat_runtime::RuntimeApi,
+							FirechainUatRuntimeExecutor,
+						>(&config, cli.eth.clone())?;
+
+					Ok((cmd.run(client, backend, None), task_manager))
+				}),
+
+				_ =>
+					runner.async_run(|config| {
+						let PartialComponents { client, task_manager, backend, .. } =
+							new_partial::<
+								firechain_qa_runtime::RuntimeApi,
+								FirechainQaRuntimeExecutor,
+							>(&config, cli.eth.clone())?;
+
+						Ok((cmd.run(client, backend, None), task_manager))
+					}),
+			}
 		},
 		#[cfg(feature = "try-runtime")]
 		Some(Subcommand::TryRuntime(cmd)) => {
@@ -242,7 +339,11 @@ pub fn run() -> Result<()> {
 					sc_service::TaskManager::new(config.tokio_handle.clone(), registry)
 						.map_err(|e| sc_cli::Error::Service(sc_service::Error::Prometheus(e)))?;
 
-				let info_provider = substrate_info(SLOT_DURATION);
+				#[cfg(feature = "firechain-qa")]
+				let info_provider = substrate_info(firechain_qa_runtime::constants::time::SLOT_DURATION);
+
+				#[cfg(feature = "firechain-uat")]
+				let info_provider = substrate_info(firechain_uat_runtime::constants::time::SLOT_DURATION);
 
 				Ok((
 					cmd.run::<Block, ExtendedHostFunctions<

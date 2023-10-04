@@ -18,7 +18,7 @@ pub use fc_consensus::FrontierBlockImport;
 use fc_rpc::{EthTask, OverrideHandle};
 pub use fc_rpc_core::types::{FeeHistoryCache, FeeHistoryCacheLimit, FilterPool};
 // Local
-use firechain_runtime::opaque::Block;
+use firechain_runtime_core_primitives::opaque::Block;
 
 use crate::client::{FullBackend, FullClient};
 

@@ -18,7 +18,7 @@
 
 //! Substrate chain configurations.
 
-use firechain_runtime::{
+use firechain_qa_runtime::{
 	constants::currency::*, wasm_binary_unwrap, AuthorityDiscoveryConfig, BabeConfig,
 	BalancesConfig, Block, CouncilConfig, DemocracyConfig, ElectionsConfig, EthereumConfig,
 	GrandpaConfig, ImOnlineConfig, IndicesConfig, MaxNominations, NominationPoolsConfig,
@@ -41,7 +41,7 @@ use sp_runtime::{
 };
 use std::{collections::BTreeMap, str::FromStr};
 
-pub use firechain_runtime::{EVMConfig, RuntimeGenesisConfig};
+pub use firechain_qa_runtime::{EVMConfig, RuntimeGenesisConfig};
 pub use node_primitives::{AccountId, Balance, Signature};
 
 type AccountPublic = <Signature as Verify>::Signer;
@@ -343,7 +343,7 @@ pub fn testnet_genesis(
 		},
 		sudo: SudoConfig { key: Some(root_key) },
 		babe: BabeConfig {
-			epoch_config: Some(firechain_runtime::BABE_GENESIS_EPOCH_CONFIG),
+			epoch_config: Some(firechain_qa_runtime::BABE_GENESIS_EPOCH_CONFIG),
 			..Default::default()
 		},
 		im_online: ImOnlineConfig { keys: vec![] },
@@ -484,7 +484,7 @@ pub fn development_genesis(
 		},
 		sudo: SudoConfig { key: Some(root_key) },
 		babe: BabeConfig {
-			epoch_config: Some(firechain_runtime::BABE_GENESIS_EPOCH_CONFIG),
+			epoch_config: Some(firechain_qa_runtime::BABE_GENESIS_EPOCH_CONFIG),
 			..Default::default()
 		},
 		im_online: ImOnlineConfig { keys: vec![] },

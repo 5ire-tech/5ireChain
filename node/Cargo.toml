@@ -98,6 +98,8 @@ sc-authority-discovery = { version = "0.10.0-dev", git = "ssh://git@github.com/5
 pallet-assets = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"}
 pallet-asset-tx-payment = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-asset-conversion-tx-payment = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
+sp-storage = { version = "13.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
+sp-trie= { version = "22.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 
 mmr-rpc = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 
@@ -130,8 +132,10 @@ fc-storage = { workspace = true }
 
 
 # Local Dependencies
-firechain-runtime = { version = "4.0.0-dev", path = "../runtime" }
+firechain-qa-runtime = { version = "4.0.0-dev", path = "../runtime/firechain-qa-runtime" }
+firechain-uat-runtime = { version = "4.0.0-dev", path = "../runtime/firechain-uat-runtime" }
 node-primitives = { version = "2.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0", default-features = false  }
+firechain-runtime-core-primitives = {path="../runtime/core-primitives"}
 
 [build-dependencies]
 substrate-build-script-utils = { version = "3.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0", optional = true}
@@ -168,10 +172,8 @@ wait-timeout = "0.2"
 substrate-rpc-client = { git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-timestamp = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 
-
 [features]
-#  default = []
-default = ["cli"]
+default = ["cli", "firechain-qa", "firechain-uat"]
 cli = [
 	"node-inspect",
 	"sc-cli",
@@ -183,13 +185,19 @@ cli = [
 	"substrate-build-script-utils",
 	"try-runtime-cli",
 ]
+firechain-qa = ["firechain-qa-runtime/default"]
+firechain-uat = ["firechain-qa-runtime/default"]
 
 # Dependencies that are only required if runtime benchmarking should be build.
 runtime-benchmarks = [
-	"firechain-runtime/runtime-benchmarks",
+	"firechain-qa-runtime/runtime-benchmarks",
+	"firechain-uat-runtime/runtime-benchmarks",
 	"frame-benchmarking/runtime-benchmarks",
 	"frame-benchmarking-cli/runtime-benchmarks",
 ]
 # Enable features that allow the runtime to be tried and debugged. Name might be subject to change
 # in the near future.
-try-runtime = ["firechain-runtime/try-runtime", "try-runtime-cli/try-runtime"]
+try-runtime = [
+	"firechain-qa-runtime/try-runtime",
+	"firechain-uat-runtime/try-runtime",
+	"try-runtime-cli/try-runtime"]
