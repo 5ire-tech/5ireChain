@@ -48,7 +48,6 @@ substrate-test-runtime-client = { workspace = true }
 fp-consensus = { workspace = true, features = ["default"] }
 fp-storage = { workspace = true, features = ["default"] }
 firechain-qa-runtime = { workspace = true, features = ["default"] }
-firechain-uat-runtime = { workspace = true, features = ["default"] }
 
 [features]
 default = ["rocksdb"]
