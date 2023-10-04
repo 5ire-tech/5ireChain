@@ -23,7 +23,7 @@ describe("Wasm runtime upgrade", function () {
   before(async () => {
     await spawnNodes();
 
-    const wasm_dir = path.join(__dirname, "/blobs/firechain_runtime.compact.compressed.wasm");
+    const wasm_dir = path.join(__dirname, "/blobs/firechain_qa_runtime.compact.compressed.wasm");
     code = fs.readFileSync(wasm_dir).toString("hex");
   });
 
