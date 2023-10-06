@@ -67,7 +67,7 @@ pub struct Extensions {
 pub type ChainSpec = sc_service::GenericChainSpec<RuntimeGenesisConfig, Extensions>;
 /// QA generator
 pub fn qa_config() -> Result<ChainSpec, String> {
-	ChainSpec::from_json_bytes(&include_bytes!("../../../specs/5ire-qa-chain-spec-raw.json")[..])
+	ChainSpec::from_json_bytes(&include_bytes!("../../../specs/stagingChainSpecRaw.json")[..])
 }
 
 fn session_keys(

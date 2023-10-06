@@ -61,44 +61,38 @@ impl SubstrateCli for Cli {
 	}
 
 	fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
-		if cfg!(feature = "firechain-qa") {
-			#[cfg(feature = "firechain-qa")]
-			{
+		#[allow(unused)]
+		#[cfg(feature = "firechain-qa")]
+		let spec = match id {
+			"" =>
+				return Err(
+					"Please specify which chain you want to run, e.g. --dev or --chain=local"
+						.into(),
+				),
+			"qa-dev" => Box::new(qa_chain_spec::development_config()),
+			"qa-local" => Box::new(qa_chain_spec::local_testnet_config()),
+			"qa-staging" => Box::new(qa_chain_spec::staging_testnet_config()),
+			"qa" => Box::new(qa_chain_spec::qa_config()?),
+			path =>
+				Box::new(qa_chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
+		};
 
-				println!("go to here");
-				Ok(match id {
-					"qa-dev" => Box::new(qa_chain_spec::development_config()),
-					"qa-local" => Box::new(qa_chain_spec::local_testnet_config()),
-					"qa-staging" => Box::new(qa_chain_spec::staging_testnet_config()),
-					"qa" => Box::new(qa_chain_spec::qa_config()?),
-					path => Box::new(qa_chain_spec::ChainSpec::from_json_file(
-						std::path::PathBuf::from(path),
-					)?),
-				})
-			}
-			#[cfg(not(feature = "firechain-qa"))]
-			return Err("Chain spec for firechain-qa doesn't exist".into())
-		} else if cfg!(feature = "firechain-uat") {
-			#[cfg(feature = "firechain-uat")]
-			{
-				println!("go to here uat");
-				Ok(match id {
-					"uat-dev" => Box::new(uat_chain_spec::development_config()),
-					"uat-local" => Box::new(uat_chain_spec::local_testnet_config()),
-					"uat-staging" => Box::new(uat_chain_spec::staging_testnet_config()),
-					"uat" => Box::new(uat_chain_spec::uat_config()?),
-					path => Box::new(uat_chain_spec::ChainSpec::from_json_file(
-						std::path::PathBuf::from(path),
-					)?),
-				})
-			}
+		#[cfg(feature = "firechain-uat")]
+		let spec = match id {
+			"" =>
+				return Err(
+					"Please specify which chain you want to run, e.g. --dev or --chain=local"
+						.into(),
+				),
+			"uat-dev" => Box::new(uat_chain_spec::development_config()),
+			"uat-local" => Box::new(uat_chain_spec::local_testnet_config()),
+			"uat-staging" => Box::new(uat_chain_spec::staging_testnet_config()),
+			"uat" => Box::new(uat_chain_spec::uat_config()?),
+			path =>
+				Box::new(uat_chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
+		};
 
-			#[cfg(not(feature = "firechain-uat"))]
-			return Err("Chain spec for firechain-uat doesn't exist".into())
-		} else {
-			Err("Chain spec qa, uat, thunder, 5ire must be specified".into())
-		}
-
+		Ok(spec)
 	}
 }
 
