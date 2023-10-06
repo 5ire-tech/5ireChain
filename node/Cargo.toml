@@ -173,7 +173,7 @@ substrate-rpc-client = { git = "ssh://git@github.com/5ire-tech/5ire-substrate.gi
 pallet-timestamp = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 
 [features]
-default = ["cli", "firechain-qa", "firechain-uat"]
+default = []
 cli = [
 	"node-inspect",
 	"sc-cli",
@@ -185,8 +185,8 @@ cli = [
 	"substrate-build-script-utils",
 	"try-runtime-cli",
 ]
-firechain-qa = ["firechain-qa-runtime/default"]
-firechain-uat = ["firechain-qa-runtime/default"]
+firechain-qa = ["cli", "firechain-qa-runtime/default"]
+firechain-uat = ["cli", "firechain-uat-runtime/default"]
 
 # Dependencies that are only required if runtime benchmarking should be build.
 runtime-benchmarks = [
