@@ -69,10 +69,10 @@ impl SubstrateCli for Cli {
 					"Please specify which chain you want to run, e.g. --dev or --chain=local"
 						.into(),
 				),
-			"dev" => Box::new(qa_chain_spec::development_config()),
-			"local" => Box::new(qa_chain_spec::local_testnet_config()),
-			// "fir" | "flaming-fir" => Box::new(chain_spec::flaming_fir_config()?),
-			"staging" => Box::new(qa_chain_spec::staging_testnet_config()),
+			"qa-dev" => Box::new(qa_chain_spec::development_config()),
+			"qa-local" => Box::new(qa_chain_spec::local_testnet_config()),
+			"qa-staging" => Box::new(qa_chain_spec::staging_testnet_config()),
+			"qa" => Box::new(qa_chain_spec::qa_config()?),
 			path =>
 				Box::new(qa_chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
 		};
@@ -84,10 +84,10 @@ impl SubstrateCli for Cli {
 					"Please specify which chain you want to run, e.g. --dev or --chain=local"
 						.into(),
 				),
-			"dev" => Box::new(uat_chain_spec::development_config()),
-			"local" => Box::new(uat_chain_spec::local_testnet_config()),
-			// "fir" | "flaming-fir" => Box::new(chain_spec::flaming_fir_config()?),
-			"staging" => Box::new(uat_chain_spec::staging_testnet_config()),
+			"uat-dev" => Box::new(uat_chain_spec::development_config()),
+			"uat-local" => Box::new(uat_chain_spec::local_testnet_config()),
+			"uat-staging" => Box::new(uat_chain_spec::staging_testnet_config()),
+			"uat" => Box::new(uat_chain_spec::uat_config()?),
 			path =>
 				Box::new(uat_chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
 		};

@@ -65,10 +65,10 @@ pub struct Extensions {
 
 /// Specialized `ChainSpec`.
 pub type ChainSpec = sc_service::GenericChainSpec<RuntimeGenesisConfig, Extensions>;
-/// Flaming Fir testnet generator
-// pub fn flaming_fir_config() -> Result<ChainSpec, String> {
-// 	ChainSpec::from_json_bytes(&include_bytes!("../res/flaming-fir.json")[..])
-// }
+/// QA generator
+pub fn qa_config() -> Result<ChainSpec, String> {
+	ChainSpec::from_json_bytes(&include_bytes!("../../../specs/stagingChainSpecRaw.json")[..])
+}
 
 fn session_keys(
 	grandpa: GrandpaId,
@@ -197,12 +197,12 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 	testnet_genesis(initial_authorities, vec![], root_key, Some(endowed_accounts))
 }
 
-/// Staging testnet config.
+///  QA config.
 pub fn staging_testnet_config() -> ChainSpec {
 	let boot_nodes = vec![];
 	ChainSpec::from_genesis(
-		"Firechain Staging",
-		"firechain_staging_network",
+		"Firechain QA",
+		"firechain_qa_network",
 		ChainType::Live,
 		staging_testnet_config_genesis,
 		boot_nodes,

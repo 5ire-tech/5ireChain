@@ -18,7 +18,7 @@
 
 //! Substrate chain configurations.
 
-use firechain_qa_runtime::{
+use firechain_uat_runtime::{
 	constants::currency::*, wasm_binary_unwrap, AuthorityDiscoveryConfig, BabeConfig,
 	BalancesConfig, Block, CouncilConfig, DemocracyConfig, ElectionsConfig, EthereumConfig,
 	GrandpaConfig, ImOnlineConfig, IndicesConfig, MaxNominations, NominationPoolsConfig,
@@ -41,7 +41,7 @@ use sp_runtime::{
 };
 use std::{collections::BTreeMap, str::FromStr};
 
-pub use firechain_qa_runtime::{EVMConfig, RuntimeGenesisConfig};
+pub use firechain_uat_runtime::{EVMConfig, RuntimeGenesisConfig};
 pub use node_primitives::{AccountId, Balance, Signature};
 
 type AccountPublic = <Signature as Verify>::Signer;
@@ -65,10 +65,10 @@ pub struct Extensions {
 
 /// Specialized `ChainSpec`.
 pub type ChainSpec = sc_service::GenericChainSpec<RuntimeGenesisConfig, Extensions>;
-/// Flaming Fir testnet generator
-// pub fn flaming_fir_config() -> Result<ChainSpec, String> {
-// 	ChainSpec::from_json_bytes(&include_bytes!("../res/flaming-fir.json")[..])
-// }
+/// QA generator
+pub fn uat_config() -> Result<ChainSpec, String> {
+	ChainSpec::from_json_bytes(&include_bytes!("../../../specs/stagingChainSpecRaw.json")[..])
+}
 
 fn session_keys(
 	grandpa: GrandpaId,
