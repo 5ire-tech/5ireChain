@@ -47,7 +47,7 @@ pub use node_primitives::{AccountId, Balance, Signature};
 type AccountPublic = <Signature as Verify>::Signer;
 
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
-
+const DEFAULT_PROTOCOL_ID: &str = "5ire-uat";
 /// Node `ChainSpec` extensions.
 ///
 /// Additional parameters for some Substrate core modules,
@@ -67,7 +67,7 @@ pub struct Extensions {
 pub type ChainSpec = sc_service::GenericChainSpec<RuntimeGenesisConfig, Extensions>;
 /// QA generator
 pub fn uat_config() -> Result<ChainSpec, String> {
-	ChainSpec::from_json_bytes(&include_bytes!("../../../specs/stagingChainSpecRaw.json")[..])
+	ChainSpec::from_json_bytes(&include_bytes!("../../../specs/5ire-uat-chain-spec-raw.json")[..])
 }
 
 fn session_keys(
@@ -210,7 +210,7 @@ pub fn staging_testnet_config() -> ChainSpec {
 			TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
 				.expect("Staging telemetry url is valid; qed"),
 		),
-		None,
+		Some(DEFAULT_PROTOCOL_ID),
 		None,
 		Some(
 			serde_json::from_str("{\"tokenDecimals\": 18, \"tokenSymbol\": \"5IRE\"}")
