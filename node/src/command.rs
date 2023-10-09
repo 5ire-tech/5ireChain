@@ -71,7 +71,6 @@ impl SubstrateCli for Cli {
 	}
 
 	fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
-		log::info!("Id is {}", id);
 		#[allow(unused)]
 		#[cfg(feature = "firechain-qa")]
 		let spec = match id {

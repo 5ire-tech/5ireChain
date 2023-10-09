@@ -31,89 +31,88 @@ log = "0.4.17"
 
 
 futures = "0.3.21"
-sc-cli = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sp-core = { version = "21.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-executor = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-service = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-telemetry = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-keystore = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sp-keystore = { git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-transaction-pool = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-transaction-pool-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-consensus-babe = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-consensus-slots = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sp-consensus-babe = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
+sc-cli = {  workspace = true }
+sp-core = { workspace = true }
+sc-executor = {  workspace = true }
+sc-service = {  workspace = true }
+sc-telemetry = {  workspace = true }
+sc-keystore = {  workspace = true }
+sp-keystore = { workspace = true }
+sc-transaction-pool = {  workspace = true }
+sc-transaction-pool-api = {  workspace = true }
+sc-consensus-babe = {  workspace = true }
+sc-consensus-slots = {  workspace = true }
+sp-consensus-babe = {  workspace = true }
 sp-consensus-grandpa = { workspace = true, features = ["default"] }
-#sc-consensus-uncles = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sp-consensus = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-consensus = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-consensus-epochs = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-# sc-finality-grandpa = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-#sc-consensus-grandpa = { version = "0.10.0-dev",  git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"  }
-# sp-finality-grandpa = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-client-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-chain-spec = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-network = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-network-common = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sp-runtime = { version = "24.0.0",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0", default-features = false }
-sp-timestamp = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-#sp-authorship = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sp-inherents = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
+#sc-consensus-uncles = {  workspace = true }
+sp-consensus = {  workspace = true }
+sc-consensus = {  workspace = true }
+sc-consensus-epochs = {  workspace = true }
+# sc-finality-grandpa = {  workspace = true }
+#sc-consensus-grandpa = {   workspace = true  }
+# sp-finality-grandpa = {  workspace = true }
+sc-client-api = {  workspace = true }
+sc-chain-spec = {  workspace = true }
+sc-network = {  workspace = true }
+sc-network-common = {  workspace = true }
+sp-runtime = { workspace = true, default-features = false }
+sp-timestamp = {  workspace = true }
+#sp-authorship = {  workspace = true }
+sp-inherents = {  workspace = true }
 sp-offchain = { workspace = true, features = ["default"] }
 sp-session = { workspace = true, features = ["default"] }
-sp-keyring = { version = "24.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sp-transaction-storage-proof = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sp-authority-discovery = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-sync-state-rpc = { version = "0.10.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-sysinfo = { version = "6.0.0-dev",  git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-network-sync = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"  }
-sc-statement-store = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-offchain = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-storage-monitor = { version = "0.1.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"  }
-sc-network-statement = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sp-statement-store = { git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-rpc-spec-v2 = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
+sp-keyring = {  workspace = true }
+sp-transaction-storage-proof = {  workspace = true }
+sp-authority-discovery = {  default-features = false, workspace = true }
+sc-sync-state-rpc = {  default-features = false, workspace = true }
+sc-sysinfo = {   workspace = true }
+sc-network-sync = {  workspace = true  }
+sc-statement-store = {  workspace = true }
+sc-offchain = {  workspace = true }
+sc-storage-monitor = {  workspace = true  }
+sc-network-statement = {  workspace = true }
+sp-statement-store = { workspace = true }
+sc-rpc-spec-v2 = {  workspace = true }
 sp-transaction-pool = { workspace = true, features = ["default"] }
-grandpa = { version = "0.10.0-dev", package = "sc-consensus-grandpa", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-#grandpa-primitives = { version = "4.0.0-dev", package = "sp-consensus-grandpa" , git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
+grandpa = { workspace = true }
+#grandpa-primitives = {  package = "sp-consensus-grandpa" , workspace = true }
 # These dependencies are used for the node template's RPCs
 jsonrpc-core = "18.0.0"
-sc-rpc = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sp-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-rpc-api = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-service-test = { version = "2.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-block-builder = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sp-tracing = { version = "10.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"  }
-sp-blockchain = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sp-block-builder = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-basic-authorship = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-consensus-babe-rpc = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sc-consensus-grandpa-rpc = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-substrate-frame-rpc-system = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-pallet-transaction-payment-rpc = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
+sc-rpc = {  workspace = true }
+sp-api = {  workspace = true }
+sc-rpc-api = {  workspace = true }
+sc-service-test = {  workspace = true }
+sc-block-builder = {  workspace = true }
+sp-tracing = {  workspace = true  }
+sp-blockchain = {  workspace = true }
+sp-block-builder = {  workspace = true }
+sc-basic-authorship = {  workspace = true }
+sc-consensus-babe-rpc = {  workspace = true }
+sc-consensus-grandpa-rpc = {  workspace = true }
+substrate-frame-rpc-system = {  workspace = true }
+pallet-transaction-payment-rpc = {  workspace = true }
 pallet-transaction-payment-rpc-runtime-api = { workspace = true }
-#pallet-contracts-rpc = { version = "4.0.0-dev",  git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"  }
-substrate-state-trie-migration-rpc = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"  }
-sc-authority-discovery = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"  }
-pallet-assets = { version = "4.0.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"}
-pallet-asset-tx-payment = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-pallet-asset-conversion-tx-payment = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sp-storage = { version = "13.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-sp-trie= { version = "22.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
+#pallet-contracts-rpc = {   workspace = true  }
+substrate-state-trie-migration-rpc = {  workspace = true  }
+sc-authority-discovery = {  workspace = true  }
+pallet-assets = { workspace = true}
+pallet-asset-tx-payment = {  workspace = true }
+pallet-asset-conversion-tx-payment = {  workspace = true }
+sp-storage = {  workspace = true }
+sp-trie= {  workspace = true }
 
-mmr-rpc = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
+mmr-rpc = { workspace = true }
 
 # These dependencies are used for runtime benchmarking
-frame-benchmarking = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-frame-benchmarking-cli = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
+frame-benchmarking = {  workspace = true }
+frame-benchmarking-cli = {  workspace = true }
 
 # frame dependencies
-pallet-im-online = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-frame-system = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-pallet-transaction-payment = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-frame-system-rpc-runtime-api = { version = "4.0.0-dev",  git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
+pallet-im-online = {  workspace = true }
+frame-system = {  workspace = true }
+pallet-transaction-payment = {  workspace = true }
+frame-system-rpc-runtime-api = {   workspace = true }
 
-node-executor = { version = "3.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 
 # Frontier
 fc-cli = { path = "../client/cli" }
@@ -132,31 +131,31 @@ fc-storage = { workspace = true }
 
 
 # Local Dependencies
-firechain-qa-runtime = { version = "4.0.0-dev", path = "../runtime/firechain-qa-runtime" }
-firechain-uat-runtime = { version = "4.0.0-dev", path = "../runtime/firechain-uat-runtime" }
-node-primitives = { version = "2.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0", default-features = false  }
+firechain-qa-runtime = {  path = "../runtime/firechain-qa-runtime" }
+firechain-uat-runtime = {  path = "../runtime/firechain-uat-runtime" }
+node-primitives = { workspace = true, default-features = false  }
 firechain-runtime-core-primitives = {path="../runtime/core-primitives"}
 
 [build-dependencies]
-substrate-build-script-utils = { version = "3.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0", optional = true}
+substrate-build-script-utils = { workspace = true, optional = true}
 
 
 clap = { version = "4.2.5", optional = true }
 clap_complete = { version = "4.0.2", optional = true }
-sc-cli = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0", optional = true }
-frame-benchmarking-cli = { version = "4.0.0-dev", optional = true, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-substrate-frame-cli = { version = "4.0.0-dev", optional = true, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-#try-runtime-cli = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v1.0.0" }
+sc-cli = {  workspace = true, optional = true }
+frame-benchmarking-cli = {  optional = true, workspace = true }
+substrate-frame-cli = {  optional = true, workspace = true }
+
 
 
 # CLI-specific dependencies
-try-runtime-cli = { version = "0.10.0-dev", optional = true, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-node-inspect = { version = "0.9.0-dev", optional = true, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
+try-runtime-cli = {  optional = true, workspace = true }
+node-inspect = { optional = true, workspace = true }
 
 [dev-dependencies]
-substrate-cli-test-utils = { git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
+substrate-cli-test-utils = { workspace = true }
 
-sc-client-db = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
+sc-client-db = {  workspace = true }
 futures = "0.3.21"
 tempfile = "3.1.0"
 assert_cmd = "2.0.2"
@@ -169,14 +168,13 @@ criterion = { version = "0.4.0", features = ["async_tokio"] }
 tokio = { version = "1.22.0", features = ["macros", "time", "parking_lot"] }
 tokio-util = { version = "0.7.4", features = ["compat"] }
 wait-timeout = "0.2"
-substrate-rpc-client = { git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-pallet-timestamp = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
+substrate-rpc-client = { workspace = true }
+pallet-timestamp = {  workspace = true }
 
 [features]
 default = []
 all = ["cli", "firechain-qa", "firechain-uat"]
 cli = [
-	"node-inspect",
 	"sc-cli",
 	"frame-benchmarking-cli",
 	"substrate-frame-cli",

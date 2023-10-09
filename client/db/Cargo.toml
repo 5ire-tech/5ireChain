@@ -18,7 +18,7 @@ kvdb-rocksdb = { workspace = true, optional = true }
 log = { workspace = true }
 parity-db = { workspace = true }
 parking_lot = { workspace = true }
-scale-codec = { package = "parity-scale-codec", workspace = true }
+scale-codec = { package = "parity-scale-codec", version = "3.6.1", default-features= false, features = ["derive"] }
 smallvec = { version = "1.10", optional = true }
 sqlx = { workspace = true, features = ["runtime-tokio-native-tls", "sqlite"], optional = true }
 tokio = { workspace = true, features = ["macros", "sync"], optional = true }
