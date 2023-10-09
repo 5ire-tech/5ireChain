@@ -202,7 +202,7 @@ pub fn staging_testnet_config() -> ChainSpec {
 	let boot_nodes = vec![];
 	ChainSpec::from_genesis(
 		"5ireChain QA",
-		"qa_5ireChain",
+		"qa_5ireChain_staging",
 		ChainType::Live,
 		staging_testnet_config_genesis,
 		boot_nodes,
@@ -604,7 +604,7 @@ fn development_config_genesis() -> RuntimeGenesisConfig {
 pub fn development_config() -> ChainSpec {
 	ChainSpec::from_genesis(
 		"Development",
-		"dev",
+		"qa_5ireChain_dev",
 		ChainType::Development,
 		development_config_genesis,
 		vec![],
@@ -632,7 +632,7 @@ fn local_testnet_genesis() -> RuntimeGenesisConfig {
 pub fn local_testnet_config() -> ChainSpec {
 	ChainSpec::from_genesis(
 		"Local Testnet",
-		"local_testnet",
+		"qa_5ireChain_local",
 		ChainType::Local,
 		local_testnet_genesis,
 		vec![],
