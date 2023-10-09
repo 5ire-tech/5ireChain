@@ -1,6 +1,6 @@
 {
-  "name": "Firechain QA",
-  "id": "firechain_qa_network",
+  "name": "5ireChain QA",
+  "id": "qa_5ireChain",
   "chainType": "Live",
   "bootNodes": [],
   "telemetryEndpoints": [
@@ -9,7 +9,7 @@
       0
     ]
   ],
-  "protocolId": "5ire-qa",
+  "protocolId": "qa-5ire",
   "properties": {
     "tokenDecimals": 18,
     "tokenSymbol": "5IRE"

@@ -47,7 +47,7 @@ pub use node_primitives::{AccountId, Balance, Signature};
 type AccountPublic = <Signature as Verify>::Signer;
 
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
-const DEFAULT_PROTOCOL_ID: &str = "5ire-qa";
+const DEFAULT_PROTOCOL_ID: &str = "qa-5ire";
 /// Node `ChainSpec` extensions.
 ///
 /// Additional parameters for some Substrate core modules,
@@ -201,8 +201,8 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 pub fn staging_testnet_config() -> ChainSpec {
 	let boot_nodes = vec![];
 	ChainSpec::from_genesis(
-		"Firechain QA",
-		"firechain_qa_network",
+		"5ireChain QA",
+		"qa_5ireChain",
 		ChainType::Live,
 		staging_testnet_config_genesis,
 		boot_nodes,

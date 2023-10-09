@@ -47,7 +47,7 @@ pub use node_primitives::{AccountId, Balance, Signature};
 type AccountPublic = <Signature as Verify>::Signer;
 
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
-const DEFAULT_PROTOCOL_ID: &str = "5ire-uat";
+const DEFAULT_PROTOCOL_ID: &str = "uat-5ire";
 /// Node `ChainSpec` extensions.
 ///
 /// Additional parameters for some Substrate core modules,
@@ -65,7 +65,7 @@ pub struct Extensions {
 
 /// Specialized `ChainSpec`.
 pub type ChainSpec = sc_service::GenericChainSpec<RuntimeGenesisConfig, Extensions>;
-/// QA generator
+/// UAT generator
 pub fn uat_config() -> Result<ChainSpec, String> {
 	ChainSpec::from_json_bytes(&include_bytes!("../../../specs/5ire-uat-chain-spec-raw.json")[..])
 }
@@ -201,8 +201,8 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 pub fn staging_testnet_config() -> ChainSpec {
 	let boot_nodes = vec![];
 	ChainSpec::from_genesis(
-		"Firechain UAT",
-		"firechain_uat_network",
+		"5ireChain UAT",
+		"uat_5ireChain",
 		ChainType::Live,
 		staging_testnet_config_genesis,
 		boot_nodes,
