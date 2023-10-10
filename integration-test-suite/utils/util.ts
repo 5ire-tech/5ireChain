@@ -3,7 +3,6 @@ import {ApiPromise} from '@polkadot/api';
 import { ChildProcess, execSync } from 'child_process';
 import fs from 'fs';
 import {
-  purgeNode,
   sleep,
   start5ireChainNode,
 } from './setup';
@@ -24,8 +23,7 @@ export const spawnNodes = async () => {
     // @ts-ignore
     fs.rmSync(tmpDir, { recursive: true });
   }
-  purgeNode('state');
-  aliceNode = start5ireChainNode('alice', { tmp: true, printLogs: false });
+  aliceNode = start5ireChainNode('alice', { tmp: true, printLogs: true });
   bobNode = start5ireChainNode('bob', { tmp: true, printLogs: false });
   charlieNode = start5ireChainNode('charlie', { tmp: true, printLogs: false });
 

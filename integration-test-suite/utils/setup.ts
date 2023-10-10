@@ -144,16 +144,6 @@ const __NODE_STATE: {
   ferdie: { isRunning: false, process: null },
 };
 
-// a global variable to check
-const __PURGE_STATE: {
-  [state: string]: {
-    process: child.ChildProcess | null;
-    isRunning: boolean;
-  };
-} = {
-  state: { isRunning: false, process: null }
-};
-
 type StartOption = {
   tmp: boolean;
   printLogs: boolean;
@@ -199,6 +189,7 @@ export function start5ireChainNode(
       `--chain`,
       `qa-dev`,
       `--tmp`,
+      //`--base-path /tmp/${authority}`,
       `--rpc-port=${ports[authority].ws}`,
       `--port=${ports[authority].p2p}`,
       ...(authority == 'alice'
@@ -242,54 +233,6 @@ export function start5ireChainNode(
     __NODE_STATE[authority].isRunning = false;
     __NODE_STATE[authority].process = null;
     console.log(`${authority} node exited with code ${code}`);
-  });
-  return proc;
-}
-
-/**
- * Purges the Full chain DB
- */
-export function purgeNode(
-  state: 'state'
-): child.ChildProcess {
-  //if (__NODE_STATE[state].isRunning) {
-    //return __NODE_STATE[state].process!;
-  //}
-  const gitRoot = child
-  .execSync('git rev-parse --show-toplevel')
-  .toString()
-  .trim();
-  const nodePath = `${gitRoot}/target/release/firechain-node`;
-
-  console.log(`node path ${nodePath}`)
-
-  const command = `
-    yes | ${nodePath} purge-chain --chain qa-dev
-  `;
-
-  const proc = child.spawn(
-    'sh',
-    ['-c', command],
-    {
-      cwd: gitRoot,
-    }
-  );
-
- // __PURGE_STATE[state].isRunning = true;
-  //__PURGE_STATE[state].process = proc;
-
-  proc.stdout.on('data', (data) => {
-    console.log(`purging: ${data}`);
-  });
-  proc.stderr.on('data', (data) => {
-    console.error(`purging error: ${data}`);
-  });
-
-
-  proc.on('close', (code) => {
-    //__PURGE_STATE[state].isRunning = false;
-    //__PURGE_STATE[state].process = null;
-    console.log(` finished purging exited with code ${code}`);
   });
   return proc;
 }
