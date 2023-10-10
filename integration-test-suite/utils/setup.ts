@@ -189,7 +189,7 @@ export function start5ireChainNode(
       `--chain`,
       `qa-dev`,
       `--tmp`,
-      //`--base-path /tmp/${authority}`,
+      `--base-path /tmp/fire/${authority}`,
       `--rpc-port=${ports[authority].ws}`,
       `--port=${ports[authority].p2p}`,
       ...(authority == 'alice'

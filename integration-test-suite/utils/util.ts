@@ -20,6 +20,7 @@ export const spawnNodes = async () => {
   const gitRoot = execSync('git rev-parse --show-toplevel').toString().trim();
   const tmpDir = `${gitRoot}/tmp`;
   if (fs.existsSync(tmpDir)) {
+    console.log(`tmp directory exists ${tmpDir}`);
     // @ts-ignore
     fs.rmSync(tmpDir, { recursive: true });
   }
