@@ -18,7 +18,8 @@ export let charlieNode: ChildProcess;
 export const spawnNodes = async () => {
   // delete the tmp directory if it exists.
   const gitRoot = execSync('git rev-parse --show-toplevel').toString().trim();
-  const tmpDir = `${gitRoot}/tmp`;
+  const tmpDir = `${gitRoot}/tmp/fire`;
+  console.log(`tmp directory is ${tmpDir}`);
   if (fs.existsSync(tmpDir)) {
     console.log(`tmp directory exists ${tmpDir}`);
     // @ts-ignore

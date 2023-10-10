@@ -188,8 +188,8 @@ export function start5ireChainNode(
       options.printLogs ? '-linfo' : '-lerror',
       `--chain`,
       `qa-dev`,
-      `--tmp`,
-      `--base-path /tmp/fire/${authority}`,
+      `--base-path`,
+      `${gitRoot}/tmp/fire/${authority}`,
       `--rpc-port=${ports[authority].ws}`,
       `--port=${ports[authority].p2p}`,
       ...(authority == 'alice'
