@@ -236,6 +236,43 @@ export function start5ireChainNode(
   return proc;
 }
 
+export function purgeNode(
+): child.ChildProcess {
+  const gitRoot = child
+  .execSync('git rev-parse --show-toplevel')
+  .toString()
+  .trim();
+  const nodePath = `${gitRoot}/target/release/firechain-node`;
+
+  const command = `
+    yes | ${nodePath} \
+    --purge-chain \
+    --chain qa-dev
+  `;
+
+  const proc = child.spawn(
+    'sh',
+    ['-c', command], // Execute the command using "sh"
+    {
+      cwd: gitRoot,
+    }
+  );
+
+
+  proc.stdout.on('purge data', (data) => {
+    console.log(`: ${data}`);
+  });
+  proc.stderr.on('purge error data', (data) => {
+    console.error(`: ${data}`);
+  });
+
+
+  proc.on('close', (code) => {
+    console.log(` finished purging exited with code ${code}`);
+  });
+  return proc;
+}
+
 /**
  * Waits until a new session is started.
  */
