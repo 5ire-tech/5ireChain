@@ -186,9 +186,9 @@ export function start5ireChainNode(
     [
       `--${authority}`,
       options.printLogs ? '-linfo' : '-lerror',
-      options.tmp ? '--tmp' : '',
       `--chain`,
       `qa-dev`,
+      `--tmp`,
       `--rpc-port=${ports[authority].ws}`,
       `--port=${ports[authority].p2p}`,
       ...(authority == 'alice'
