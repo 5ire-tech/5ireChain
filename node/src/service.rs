@@ -709,7 +709,7 @@ pub fn new_chain_ops(
 			firechain_uat_runtime::RuntimeApi,
 			FirechainUatRuntimeExecutor,
 		>(config, eth_config),
-		_ => return sc_service::Result::Err(ServiceError::Other(format!("Spec not supported"))),
+		_ => sc_service::Result::Err(ServiceError::Other("Spec not supported".to_string())),
 	}
 }
 

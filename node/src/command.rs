@@ -131,7 +131,7 @@ pub fn run() -> Result<()> {
 					.map_err(sc_cli::Error::Service)
 				}),
 
-				_ => return Err("Chain spec not supported".into()),
+				_ => Err("Chain spec not supported".into()),
 			}
 		},
 		// Some(Subcommand::Inspect(cmd)) => {
@@ -181,7 +181,7 @@ pub fn run() -> Result<()> {
 								cmd.run(partial.client)
 							},
 
-							_ => return Err("Chain spec not supported".into()),
+							_ => Err("Chain spec not supported".into()),
 						}
 					},
 					#[cfg(not(feature = "runtime-benchmarks"))]
@@ -311,7 +311,7 @@ pub fn run() -> Result<()> {
 					Ok((cmd.run(client, backend, None), task_manager))
 				}),
 
-				_ => return Err("Chain spec not supported".into()),
+				_ => Err("Chain spec not supported".into()),
 			}
 		},
 		#[cfg(feature = "try-runtime")]
