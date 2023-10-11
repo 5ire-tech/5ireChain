@@ -18,7 +18,7 @@
 
 //! Substrate chain configurations.
 
-use firechain_qa_runtime::{
+use firechain_uat_runtime::{
 	constants::currency::*, wasm_binary_unwrap, AuthorityDiscoveryConfig, BabeConfig,
 	BalancesConfig, Block, CouncilConfig, DemocracyConfig, ElectionsConfig, EthereumConfig,
 	GrandpaConfig, ImOnlineConfig, IndicesConfig, MaxNominations, NominationPoolsConfig,
@@ -41,13 +41,13 @@ use sp_runtime::{
 };
 use std::{collections::BTreeMap, str::FromStr};
 
-pub use firechain_qa_runtime::{EVMConfig, RuntimeGenesisConfig};
+pub use firechain_uat_runtime::{EVMConfig, RuntimeGenesisConfig};
 pub use node_primitives::{AccountId, Balance, Signature};
 
 type AccountPublic = <Signature as Verify>::Signer;
 
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
-
+const DEFAULT_PROTOCOL_ID: &str = "uat-5ire";
 /// Node `ChainSpec` extensions.
 ///
 /// Additional parameters for some Substrate core modules,
@@ -65,10 +65,10 @@ pub struct Extensions {
 
 /// Specialized `ChainSpec`.
 pub type ChainSpec = sc_service::GenericChainSpec<RuntimeGenesisConfig, Extensions>;
-/// Flaming Fir testnet generator
-// pub fn flaming_fir_config() -> Result<ChainSpec, String> {
-// 	ChainSpec::from_json_bytes(&include_bytes!("../res/flaming-fir.json")[..])
-// }
+/// UAT generator
+pub fn uat_config() -> Result<ChainSpec, String> {
+	ChainSpec::from_json_bytes(&include_bytes!("../../../specs/5ire-uat-chain-spec-raw.json")[..])
+}
 
 fn session_keys(
 	grandpa: GrandpaId,
@@ -201,8 +201,8 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 pub fn staging_testnet_config() -> ChainSpec {
 	let boot_nodes = vec![];
 	ChainSpec::from_genesis(
-		"Firechain Staging",
-		"firechain_staging_network",
+		"5ireChain UAT",
+		"uat_5ireChain_staging",
 		ChainType::Live,
 		staging_testnet_config_genesis,
 		boot_nodes,
@@ -210,7 +210,7 @@ pub fn staging_testnet_config() -> ChainSpec {
 			TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
 				.expect("Staging telemetry url is valid; qed"),
 		),
-		None,
+		Some(DEFAULT_PROTOCOL_ID),
 		None,
 		Some(
 			serde_json::from_str("{\"tokenDecimals\": 18, \"tokenSymbol\": \"5IRE\"}")
@@ -604,7 +604,7 @@ fn development_config_genesis() -> RuntimeGenesisConfig {
 pub fn development_config() -> ChainSpec {
 	ChainSpec::from_genesis(
 		"Development",
-		"dev",
+		"uat_5ireChain_dev",
 		ChainType::Development,
 		development_config_genesis,
 		vec![],
@@ -632,7 +632,7 @@ fn local_testnet_genesis() -> RuntimeGenesisConfig {
 pub fn local_testnet_config() -> ChainSpec {
 	ChainSpec::from_genesis(
 		"Local Testnet",
-		"local_testnet",
+		"uat_5ireChain_local",
 		ChainType::Local,
 		local_testnet_genesis,
 		vec![],

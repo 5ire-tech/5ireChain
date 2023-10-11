@@ -18,11 +18,22 @@ export let charlieNode: ChildProcess;
 export const spawnNodes = async () => {
   // delete the tmp directory if it exists.
   const gitRoot = execSync('git rev-parse --show-toplevel').toString().trim();
-  const tmpDir = `${gitRoot}/tmp`;
+  const tmpDir = `${gitRoot}/tmp/fire`;
+  console.log(`tmp directory is ${tmpDir}`);
   if (fs.existsSync(tmpDir)) {
+    console.log(`tmp directory exists ${tmpDir}`);
     // @ts-ignore
     fs.rmSync(tmpDir, { recursive: true });
   }
+
+  if (fs.existsSync(tmpDir)) {
+    console.log(`tmp directory still exists ${tmpDir}`);
+    // @ts-ignore
+    fs.rmSync(tmpDir, { recursive: true });
+  } else {
+    console.log(`tmp directory doesn't exists anymore ${tmpDir}`);
+  }
+
   aliceNode = start5ireChainNode('alice', { tmp: true, printLogs: false });
   bobNode = start5ireChainNode('bob', { tmp: true, printLogs: false });
   charlieNode = start5ireChainNode('charlie', { tmp: true, printLogs: false });

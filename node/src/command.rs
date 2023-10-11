@@ -25,10 +25,20 @@ use node_primitives::Block;
 use sc_cli::{Result, SubstrateCli};
 use sc_service::PartialComponents;
 
-use firechain_node::{
-	chain_spec::{qa_chain_spec, uat_chain_spec},
-	client::{FirechainQaRuntimeExecutor, FirechainUatRuntimeExecutor, IdentifyVariant},
-};
+use firechain_node::client::IdentifyVariant;
+
+#[cfg(feature = "firechain-qa")]
+use firechain_node::client::FirechainQaRuntimeExecutor;
+
+#[cfg(feature = "firechain-uat")]
+use firechain_node::client::FirechainUatRuntimeExecutor;
+
+#[cfg(feature = "firechain-qa")]
+use firechain_node::chain_spec::qa_chain_spec;
+
+#[cfg(feature = "firechain-uat")]
+use firechain_node::chain_spec::uat_chain_spec;
+
 #[cfg(feature = "try-runtime")]
 use {
 	firechain_runtime::constants::time::SLOT_DURATION,
@@ -69,10 +79,9 @@ impl SubstrateCli for Cli {
 					"Please specify which chain you want to run, e.g. --dev or --chain=local"
 						.into(),
 				),
-			"dev" => Box::new(qa_chain_spec::development_config()),
-			"local" => Box::new(qa_chain_spec::local_testnet_config()),
-			// "fir" | "flaming-fir" => Box::new(chain_spec::flaming_fir_config()?),
-			"staging" => Box::new(qa_chain_spec::staging_testnet_config()),
+			"qa-dev" => Box::new(qa_chain_spec::development_config()),
+			"qa-local" => Box::new(qa_chain_spec::local_testnet_config()),
+			"qa-staging" => Box::new(qa_chain_spec::staging_testnet_config()),
 			path =>
 				Box::new(qa_chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
 		};
@@ -84,10 +93,9 @@ impl SubstrateCli for Cli {
 					"Please specify which chain you want to run, e.g. --dev or --chain=local"
 						.into(),
 				),
-			"dev" => Box::new(uat_chain_spec::development_config()),
-			"local" => Box::new(uat_chain_spec::local_testnet_config()),
-			// "fir" | "flaming-fir" => Box::new(chain_spec::flaming_fir_config()?),
-			"staging" => Box::new(uat_chain_spec::staging_testnet_config()),
+			"uat-dev" => Box::new(uat_chain_spec::development_config()),
+			"uat-local" => Box::new(uat_chain_spec::local_testnet_config()),
+			"uat-staging" => Box::new(uat_chain_spec::staging_testnet_config()),
 			path =>
 				Box::new(uat_chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
 		};
@@ -123,13 +131,7 @@ pub fn run() -> Result<()> {
 					.map_err(sc_cli::Error::Service)
 				}),
 
-				_ => runner.run_node_until_exit(|config| async move {
-					service::new_full::<
-							firechain_qa_runtime::RuntimeApi,
-							FirechainQaRuntimeExecutor,
-						>(config, cli.no_hardware_benchmarks, cli.eth.clone())
-						.map_err(sc_cli::Error::Service)
-				}),
+				_ => Err("Chain spec not supported".into()),
 			}
 		},
 		// Some(Subcommand::Inspect(cmd)) => {
@@ -179,13 +181,7 @@ pub fn run() -> Result<()> {
 								cmd.run(partial.client)
 							},
 
-							_ => {
-								let partial = new_partial::<
-									firechain_qa_runtime::RuntimeApi,
-									FirechainQaRuntimeExecutor,
-								>(&config, cli.eth.clone())?;
-								cmd.run(partial.client)
-							},
+							_ => Err("Chain spec not supported".into()),
 						}
 					},
 					#[cfg(not(feature = "runtime-benchmarks"))]
@@ -315,16 +311,7 @@ pub fn run() -> Result<()> {
 					Ok((cmd.run(client, backend, None), task_manager))
 				}),
 
-				_ =>
-					runner.async_run(|config| {
-						let PartialComponents { client, task_manager, backend, .. } =
-							new_partial::<
-								firechain_qa_runtime::RuntimeApi,
-								FirechainQaRuntimeExecutor,
-							>(&config, cli.eth.clone())?;
-
-						Ok((cmd.run(client, backend, None), task_manager))
-					}),
+				_ => Err("Chain spec not supported".into()),
 			}
 		},
 		#[cfg(feature = "try-runtime")]

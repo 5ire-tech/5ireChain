@@ -43,21 +43,23 @@ use std::{
 	collections::BTreeMap,
 	sync::{Arc, Mutex},
 };
-
 // Frontier
 //
 // use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
+#[cfg(feature = "firechain-qa")]
+use crate::client::FirechainQaRuntimeExecutor;
 pub use crate::{
 	client::Client,
 	eth::{db_config_dir, EthConfiguration},
 };
 use crate::{
-	client::{
-		FirechainQaRuntimeExecutor, FirechainUatRuntimeExecutor, IdentifyVariant,
-		RuntimeApiCollection,
-	},
+	client::{IdentifyVariant, RuntimeApiCollection},
 	eth::{new_frontier_partial, spawn_frontier_tasks, BackendType, FrontierBackend},
 };
+
+#[cfg(feature = "firechain-uat")]
+use crate::client::FirechainUatRuntimeExecutor;
+
 use fc_rpc_core::types::{FeeHistoryCache, FeeHistoryCacheLimit, FilterPool};
 pub use fc_storage::overrides_handle;
 
@@ -707,10 +709,7 @@ pub fn new_chain_ops(
 			firechain_uat_runtime::RuntimeApi,
 			FirechainUatRuntimeExecutor,
 		>(config, eth_config),
-		#[cfg(feature = "firechain-qa")]
-		_ => new_chain_ops_inner::<firechain_qa_runtime::RuntimeApi, FirechainQaRuntimeExecutor>(
-			config, eth_config,
-		),
+		_ => sc_service::Result::Err(ServiceError::Other("Spec not supported".to_string())),
 	}
 }
 

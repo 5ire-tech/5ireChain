@@ -33,7 +33,7 @@ fp-rpc = { workspace = true, features = ["default"] }
 [dev-dependencies]
 ethereum = { workspace = true }
 ethereum-types = { workspace = true }
-scale-codec = { package = "parity-scale-codec", workspace = true }
+scale-codec = { package = "parity-scale-codec", version = "3.6.1", default-features = false, features = ["derive"] }
 sqlx = { workspace = true, features = ["runtime-tokio-native-tls", "sqlite"] }
 tempfile = "3.3.0"
 tokio = { workspace = true, features = ["sync"] }
