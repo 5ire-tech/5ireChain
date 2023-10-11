@@ -25,6 +25,15 @@ export const spawnNodes = async () => {
     // @ts-ignore
     fs.rmSync(tmpDir, { recursive: true });
   }
+
+  if (fs.existsSync(tmpDir)) {
+    console.log(`tmp directory still exists ${tmpDir}`);
+    // @ts-ignore
+    fs.rmSync(tmpDir, { recursive: true });
+  } else {
+    console.log(`tmp directory doesn't exists anymore ${tmpDir}`);
+  }
+
   aliceNode = start5ireChainNode('alice', { tmp: true, printLogs: false });
   bobNode = start5ireChainNode('bob', { tmp: true, printLogs: false });
   charlieNode = start5ireChainNode('charlie', { tmp: true, printLogs: false });

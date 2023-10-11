@@ -84,7 +84,7 @@ jobs:
         run: cd integration-test-suite && yarn test
 
       - name: Test
-        run: cargo test
+        run: cargo test --features all
 
       - name: Clippy
         run: cargo clippy --features all -- -D warnings
