@@ -48,6 +48,10 @@ use std::{
 // use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
 #[cfg(feature = "firechain-qa")]
 use crate::client::FirechainQaRuntimeExecutor;
+#[cfg(feature = "firechain-thunder")]
+use crate::client::FirechainThunderRuntimeExecutor;
+#[cfg(feature = "firechain-uat")]
+use crate::client::FirechainUatRuntimeExecutor;
 pub use crate::{
 	client::Client,
 	eth::{db_config_dir, EthConfiguration},
@@ -56,9 +60,6 @@ use crate::{
 	client::{IdentifyVariant, RuntimeApiCollection},
 	eth::{new_frontier_partial, spawn_frontier_tasks, BackendType, FrontierBackend},
 };
-
-#[cfg(feature = "firechain-uat")]
-use crate::client::FirechainUatRuntimeExecutor;
 
 use fc_rpc_core::types::{FeeHistoryCache, FeeHistoryCacheLimit, FilterPool};
 pub use fc_storage::overrides_handle;
@@ -363,12 +364,42 @@ where
 		forced_parent_hashes: None,
 	};
 
+	#[allow(unused)]
 	#[cfg(feature = "firechain-uat")]
 	let eth_rpc_params = crate::rpc::EthDeps {
 		client: client.clone(),
 		pool: transaction_pool.clone(),
 		graph: transaction_pool.pool().clone(),
 		converter: Some(firechain_uat_runtime::TransactionConverter),
+		is_authority: config.role.is_authority(),
+		enable_dev_signer: eth_config.enable_dev_signer,
+		network: network.clone(),
+		sync: sync_service.clone(),
+		frontier_backend: match frontier_backend.clone() {
+			fc_db::Backend::KeyValue(b) => Arc::new(b),
+		},
+		overrides: overrides.clone(),
+		block_data_cache: Arc::new(fc_rpc::EthBlockDataCacheTask::new(
+			task_manager.spawn_handle(),
+			overrides.clone(),
+			eth_config.eth_log_block_cache,
+			eth_config.eth_statuses_cache,
+			prometheus_registry.clone(),
+		)),
+		filter_pool: filter_pool.clone(),
+		max_past_logs: eth_config.max_past_logs,
+		fee_history_cache: fee_history_cache.clone(),
+		fee_history_cache_limit,
+		execute_gas_limit_multiplier: eth_config.execute_gas_limit_multiplier,
+		forced_parent_hashes: None,
+	};
+
+	#[cfg(feature = "firechain-thunder")]
+	let eth_rpc_params = crate::rpc::EthDeps {
+		client: client.clone(),
+		pool: transaction_pool.clone(),
+		graph: transaction_pool.pool().clone(),
+		converter: Some(firechain_thunder_runtime::TransactionConverter),
 		is_authority: config.role.is_authority(),
 		enable_dev_signer: eth_config.enable_dev_signer,
 		network: network.clone(),
@@ -708,6 +739,11 @@ pub fn new_chain_ops(
 		spec if spec.is_uat() => new_chain_ops_inner::<
 			firechain_uat_runtime::RuntimeApi,
 			FirechainUatRuntimeExecutor,
+		>(config, eth_config),
+		#[cfg(feature = "firechain-thunder")]
+		spec if spec.is_thunder() => new_chain_ops_inner::<
+			firechain_thunder_runtime::RuntimeApi,
+			FirechainThunderRuntimeExecutor,
 		>(config, eth_config),
 		_ => sc_service::Result::Err(ServiceError::Other("Spec not supported".to_string())),
 	}

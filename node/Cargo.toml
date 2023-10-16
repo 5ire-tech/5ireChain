@@ -133,6 +133,7 @@ fc-storage = { workspace = true }
 # Local Dependencies
 firechain-qa-runtime = {  path = "../runtime/firechain-qa-runtime" }
 firechain-uat-runtime = {  path = "../runtime/firechain-uat-runtime" }
+firechain-thunder-runtime = {  path = "../runtime/firechain-thunder-runtime" }
 node-primitives = { workspace = true, default-features = false  }
 firechain-runtime-core-primitives = {path="../runtime/core-primitives"}
 
@@ -172,8 +173,8 @@ substrate-rpc-client = { workspace = true }
 pallet-timestamp = {  workspace = true }
 
 [features]
-default = []
-all = ["cli", "firechain-qa", "firechain-uat"]
+default = ["cli", "firechain-qa", "firechain-uat", "firechain-thunder"]
+all = ["cli", "firechain-qa", "firechain-uat", "firechain-thunder"]
 cli = [
 	"sc-cli",
 	"frame-benchmarking-cli",
@@ -186,6 +187,7 @@ cli = [
 ]
 firechain-qa = ["cli", "firechain-qa-runtime/default"]
 firechain-uat = ["cli", "firechain-uat-runtime/default"]
+firechain-thunder = ["cli", "firechain-thunder-runtime/default"]
 
 # Dependencies that are only required if runtime benchmarking should be build.
 runtime-benchmarks = [
