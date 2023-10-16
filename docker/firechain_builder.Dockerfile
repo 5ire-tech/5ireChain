@@ -20,9 +20,9 @@ RUN set -eux; \
 
 ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 
-RUN apt-get update && apt-get install -y protobuf-compiler
+RUN apt-get update && apt-get install -y protobuf-compiler libclang-dev 
 
-RUN --mount=type=ssh cargo build --release
+RUN --mount=type=ssh cargo build --release --features firechain-qa
 
 
 FROM debian:bullseye-slim
@@ -44,7 +44,12 @@ RUN useradd -m -u 1000 -U -s /bin/sh -d /firechain firechain
 RUN set -eux; \
     mkdir -p /data /firechain/.local/share/firechain; \
     chown -R firechain:firechain /data; \
-    ln -s /data /firechain/.local/share/firechain
+    ln -s /data /firechain/.local/share/firechain; \
+    apt-get update && apt-get install -y libc-bin; \
+    ldd /usr/local/bin/firechain-node && \
+    apt-get remove -y libc-bin && apt-get clean; \
+    rm -rf /usr/bin /usr/sbin; \
+    /usr/local/bin/firechain-node --version
 
 
 EXPOSE 30333 9933 9944 9946
@@ -54,6 +59,3 @@ USER firechain
 
 
 CMD ["firechain-node"]
-
-
-
