@@ -92,6 +92,7 @@ impl SubstrateCli for Cli {
 				Box::new(qa_chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
 		};
 
+		#[allow(unused)]
 		#[cfg(feature = "firechain-uat")]
 		let spec = match id {
 			"" =>

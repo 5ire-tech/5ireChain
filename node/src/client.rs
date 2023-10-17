@@ -221,6 +221,7 @@ pub enum RuntimeVariant {
 	#[allow(dead_code)]
 	#[cfg(feature = "firechain-uat")]
 	Uat,
+	#[allow(dead_code)]
 	#[cfg(feature = "firechain-thunder")]
 	Thunder,
 	#[allow(dead_code)]

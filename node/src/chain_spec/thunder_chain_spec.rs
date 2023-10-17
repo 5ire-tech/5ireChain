@@ -41,13 +41,13 @@ use sp_runtime::{
 };
 use std::{collections::BTreeMap, str::FromStr};
 
-pub use firechain_qa_runtime::{EVMConfig, RuntimeGenesisConfig};
+pub use firechain_thunder_runtime::{EVMConfig, RuntimeGenesisConfig};
 pub use node_primitives::{AccountId, Balance, Signature};
 
 type AccountPublic = <Signature as Verify>::Signer;
 
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
-const DEFAULT_PROTOCOL_ID: &str = "qa-5ire";
+const DEFAULT_PROTOCOL_ID: &str = "thunder-5ire";
 /// Node `ChainSpec` extensions.
 ///
 /// Additional parameters for some Substrate core modules,
@@ -65,12 +65,6 @@ pub struct Extensions {
 
 /// Specialized `ChainSpec`.
 pub type ChainSpec = sc_service::GenericChainSpec<RuntimeGenesisConfig, Extensions>;
-/// Thunder generator
-pub fn thunder_config() -> Result<ChainSpec, String> {
-	ChainSpec::from_json_bytes(
-		&include_bytes!("../../../specs/5ire-thunder-chain-spec-raw.json")[..],
-	)
-}
 
 fn session_keys(
 	grandpa: GrandpaId,
@@ -336,7 +330,7 @@ pub fn testnet_genesis(
 		},
 		sudo: SudoConfig { key: Some(root_key) },
 		babe: BabeConfig {
-			epoch_config: Some(firechain_qa_runtime::BABE_GENESIS_EPOCH_CONFIG),
+			epoch_config: Some(firechain_thunder_runtime::BABE_GENESIS_EPOCH_CONFIG),
 			..Default::default()
 		},
 		im_online: ImOnlineConfig { keys: vec![] },
@@ -357,7 +351,6 @@ pub fn testnet_genesis(
 			min_join_bond: DOLLARS,
 			..Default::default()
 		},
-		glutton: Default::default(),
 		// EVM compatibility
 		evm: Default::default(),
 		ethereum: Default::default(),
@@ -477,7 +470,7 @@ pub fn development_genesis(
 		},
 		sudo: SudoConfig { key: Some(root_key) },
 		babe: BabeConfig {
-			epoch_config: Some(firechain_qa_runtime::BABE_GENESIS_EPOCH_CONFIG),
+			epoch_config: Some(firechain_thunder_runtime::BABE_GENESIS_EPOCH_CONFIG),
 			..Default::default()
 		},
 		im_online: ImOnlineConfig { keys: vec![] },
@@ -500,7 +493,6 @@ pub fn development_genesis(
 			min_join_bond: DOLLARS,
 			..Default::default()
 		},
-		glutton: Default::default(),
 
 		// EVM compatibility
 		evm: EVMConfig {
