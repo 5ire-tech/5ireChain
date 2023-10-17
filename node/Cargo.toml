@@ -173,7 +173,7 @@ substrate-rpc-client = { workspace = true }
 pallet-timestamp = {  workspace = true }
 
 [features]
-default = ["cli", "firechain-qa", "firechain-uat", "firechain-thunder"]
+default = []
 all = ["cli", "firechain-qa", "firechain-uat", "firechain-thunder"]
 cli = [
 	"sc-cli",
@@ -193,6 +193,7 @@ firechain-thunder = ["cli", "firechain-thunder-runtime/default"]
 runtime-benchmarks = [
 	"firechain-qa-runtime/runtime-benchmarks",
 	"firechain-uat-runtime/runtime-benchmarks",
+	"firechain-thunder-runtime/runtime-benchmarks",
 	"frame-benchmarking/runtime-benchmarks",
 	"frame-benchmarking-cli/runtime-benchmarks",
 ]
@@ -201,4 +202,5 @@ runtime-benchmarks = [
 try-runtime = [
 	"firechain-qa-runtime/try-runtime",
 	"firechain-uat-runtime/try-runtime",
+	"firechain-thunder-runtime/try-runtime",
 	"try-runtime-cli/try-runtime"]
