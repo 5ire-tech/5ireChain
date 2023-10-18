@@ -65,10 +65,6 @@ pub struct Extensions {
 
 /// Specialized `ChainSpec`.
 pub type ChainSpec = sc_service::GenericChainSpec<RuntimeGenesisConfig, Extensions>;
-/// UAT generator
-pub fn uat_config() -> Result<ChainSpec, String> {
-	ChainSpec::from_json_bytes(&include_bytes!("../../../specs/5ire-uat-chain-spec-raw.json")[..])
-}
 
 fn session_keys(
 	grandpa: GrandpaId,
