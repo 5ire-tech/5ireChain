@@ -88,7 +88,6 @@ impl SubstrateCli for Cli {
 			"qa-dev" => Box::new(qa_chain_spec::development_config()),
 			"qa-local" => Box::new(qa_chain_spec::local_testnet_config()),
 			"qa-staging" => Box::new(qa_chain_spec::staging_testnet_config()),
-			"qa" => Box::new(qa_chain_spec::qa_config()),
 			path =>
 				Box::new(qa_chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
 		};
@@ -104,7 +103,6 @@ impl SubstrateCli for Cli {
 			"uat-dev" => Box::new(uat_chain_spec::development_config()),
 			"uat-local" => Box::new(uat_chain_spec::local_testnet_config()),
 			"uat-staging" => Box::new(uat_chain_spec::staging_testnet_config()),
-			"uat" => Box::new(uat_chain_spec::uat_config()),
 			path =>
 				Box::new(uat_chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
 		};
@@ -119,7 +117,6 @@ impl SubstrateCli for Cli {
 			"thunder-dev" => Box::new(thunder_chain_spec::development_config()),
 			"thunder-local" => Box::new(thunder_chain_spec::local_testnet_config()),
 			"thunder-staging" => Box::new(thunder_chain_spec::staging_testnet_config()),
-			"thunder" => Box::new(thunder_chain_spec::thunder_config()),
 			path => Box::new(thunder_chain_spec::ChainSpec::from_json_file(
 				std::path::PathBuf::from(path),
 			)?),
