@@ -67,7 +67,9 @@ pub struct Extensions {
 pub type ChainSpec = sc_service::GenericChainSpec<RuntimeGenesisConfig, Extensions>;
 /// Thunder generator
 pub fn thunder_config() -> Result<ChainSpec, String> {
-	ChainSpec::from_json_bytes(&include_bytes!("../../../specs/5ire-thunder-chain-spec-raw.json")[..])
+	ChainSpec::from_json_bytes(
+		&include_bytes!("../../../specs/5ire-thunder-chain-spec-raw.json")[..],
+	)
 }
 
 fn session_keys(
