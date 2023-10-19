@@ -2764,7 +2764,6 @@ dependencies = [
  "pallet-evm-precompile-sha3fips",
  "pallet-evm-precompile-simple",
  "pallet-fast-unstake",
- "pallet-glutton",
  "pallet-grandpa",
  "pallet-hotfix-sufficients",
  "pallet-identity",
@@ -2896,7 +2895,6 @@ dependencies = [
  "pallet-evm-precompile-sha3fips",
  "pallet-evm-precompile-simple",
  "pallet-fast-unstake",
- "pallet-glutton",
  "pallet-grandpa",
  "pallet-hotfix-sufficients",
  "pallet-identity",
@@ -6590,24 +6588,6 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-staking",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-glutton"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#55d432df8daa5e6e28733b84ef605c7417ce5223"
-dependencies = [
- "blake2",
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "log",
- "parity-scale-codec",
- "scale-info",
- "sp-core",
- "sp-io",
- "sp-runtime",
  "sp-std",
 ]
 

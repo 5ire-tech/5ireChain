@@ -379,7 +379,6 @@ pub fn testnet_genesis(
 			min_join_bond: DOLLARS,
 			..Default::default()
 		},
-		glutton: Default::default(),
 		// EVM compatibility
 		evm: Default::default(),
 		ethereum: Default::default(),
@@ -522,7 +521,6 @@ pub fn development_genesis(
 			min_join_bond: DOLLARS,
 			..Default::default()
 		},
-		glutton: Default::default(),
 
 		// EVM compatibility
 		evm: EVMConfig {

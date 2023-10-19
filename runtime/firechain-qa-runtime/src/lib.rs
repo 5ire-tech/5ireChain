@@ -419,12 +419,6 @@ impl pallet_scheduler::Config for Runtime {
 	type Preimages = Preimage;
 }
 
-impl pallet_glutton::Config for Runtime {
-	type RuntimeEvent = RuntimeEvent;
-	type AdminOrigin = EnsureRoot<AccountId>;
-	type WeightInfo = pallet_glutton::weights::SubstrateWeight<Runtime>;
-}
-
 parameter_types! {
 	pub const PreimageMaxSize: u32 = 4096 * 1024;
 	pub const PreimageBaseDeposit: Balance = DOLLARS;
@@ -2047,7 +2041,6 @@ construct_runtime!(
 		Recovery: pallet_recovery,
 		Vesting: pallet_vesting,
 		Scheduler: pallet_scheduler,
-		Glutton: pallet_glutton,
 		Preimage: pallet_preimage,
 		Proxy: pallet_proxy,
 		Multisig: pallet_multisig,
@@ -2148,7 +2141,6 @@ mod benches {
 		[pallet_remark, Remark]
 		[pallet_salary, Salary]
 		[pallet_scheduler, Scheduler]
-		[pallet_glutton, Glutton]
 		[pallet_session, SessionBench::<Runtime>]
 		[pallet_society, Society]
 		[pallet_staking, Staking]
