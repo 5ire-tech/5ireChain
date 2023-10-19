@@ -86,82 +86,106 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 		AuthorityDiscoveryId,
 	)> = vec![
 		(
-			// 5Fbsd6WXDGiLTxunqeK5BATNiocfCqu9bS1yArVjCgeBLkVy
-			array_bytes::hex_n_into_unchecked("9c7a2ee14e565db0c69f78c7b4cd839fbf52b607d867e9e9c5a79042898a0d12"),
-			// 5EnCiV7wSHeNhjW3FSUwiJNkcc2SBkPLn5Nj93FmbLtBjQUq
-			array_bytes::hex_n_into_unchecked("781ead1e2fa9ccb74b44c19d29cb2a7a4b5be3972927ae98cd3877523976a276"),
-			// 5Fb9ayurnxnaXj56CjmyQLBiadfRCqUbL2VWNbbe1nZU6wiC
-			array_bytes::hex2array_unchecked("9becad03e6dcac03cee07edebca5475314861492cdfc96a2144a67bbe9699332")
+			// Stash Account 
+			// 5GMrYp9kF7XfHS9VpnuhR3SQSAHzkN5QA78fG3zZaWSgcRAW
+			array_bytes::hex_n_into_unchecked("be055db8061cc45db6e9d1081e0557ebc227638093753231cfd1c73c20676269"),
+			// Controller Account 
+			// 5CLceuLf2iRDkBa57AdPXHb8FqCVfFNzdBs9b4SZJ3KVKaos
+			array_bytes::hex_n_into_unchecked("0c22697f7bb7a8cb19aed95c8f4c59fb0d9aed8d722e3d705c00d1aa482d144b"),
+			// Grandpa Key
+			// 5CUQhVgneQU45AAaYRwGxB72xdod6qEczLVEvvo35sdrtgz2
+			array_bytes::hex2array_unchecked("12142153d41342889b2d06105ee741a7775cbf57eca364df4f2cb84e57080a07")
 				.unchecked_into(),
-			// 5EZaeQ8djPcq9pheJUhgerXQZt9YaHnMJpiHMRhwQeinqUW8
-			array_bytes::hex2array_unchecked("6e7e4eb42cbd2e0ab4cae8708ce5509580b8c04d11f6758dbf686d50fe9f9106")
+			// Babe Key
+			// 5DbvZ1RMaQ2ALWPE27NKSFcMVrqWgGTJaSAwJjQNnNR5jXbv
+			array_bytes::hex2array_unchecked("440b93ef306bc1ce593a600b976d9f56ef60cfda8e9ce8c515474fa940f7602d")
 				.unchecked_into(),
-			// 5EZaeQ8djPcq9pheJUhgerXQZt9YaHnMJpiHMRhwQeinqUW8
-			array_bytes::hex2array_unchecked("6e7e4eb42cbd2e0ab4cae8708ce5509580b8c04d11f6758dbf686d50fe9f9106")
+			// Imonline Key
+			// 5CFwuUwmkD4vgwXPWD4U3smCgGzMwVa5LrpBxmhp4tXUZYiV
+			array_bytes::hex2array_unchecked("0892fdafdd340a9ff968587bd71e6d8cb9f6fa77960a05ff95c92ddb3a05d77e")
 				.unchecked_into(),
-			// 5EZaeQ8djPcq9pheJUhgerXQZt9YaHnMJpiHMRhwQeinqUW8
-			array_bytes::hex2array_unchecked("6e7e4eb42cbd2e0ab4cae8708ce5509580b8c04d11f6758dbf686d50fe9f9106")
-				.unchecked_into(),
-		),
-		(
-			// 5ERawXCzCWkjVq3xz1W5KGNtVx2VdefvZ62Bw1FEuZW4Vny2
-			array_bytes::hex_n_into_unchecked("68655684472b743e456907b398d3a44c113f189e56d1bbfd55e889e295dfde78"),
-			// 5Gc4vr42hH1uDZc93Nayk5G7i687bAQdHHc9unLuyeawHipF
-			array_bytes::hex_n_into_unchecked("c8dc79e36b29395413399edaec3e20fcca7205fb19776ed8ddb25d6f427ec40e"),
-			// 5EockCXN6YkiNCDjpqqnbcqd4ad35nU4RmA1ikM4YeRN4WcE
-			array_bytes::hex2array_unchecked("7932cff431e748892fa48e10c63c17d30f80ca42e4de3921e641249cd7fa3c2f")
-				.unchecked_into(),
-			// 5DhLtiaQd1L1LU9jaNeeu9HJkP6eyg3BwXA7iNMzKm7qqruQ
-			array_bytes::hex2array_unchecked("482dbd7297a39fa145c570552249c2ca9dd47e281f0c500c971b59c9dcdcd82e")
-				.unchecked_into(),
-			// 5DhLtiaQd1L1LU9jaNeeu9HJkP6eyg3BwXA7iNMzKm7qqruQ
-			array_bytes::hex2array_unchecked("482dbd7297a39fa145c570552249c2ca9dd47e281f0c500c971b59c9dcdcd82e")
-				.unchecked_into(),
-			// 5DhLtiaQd1L1LU9jaNeeu9HJkP6eyg3BwXA7iNMzKm7qqruQ
-			array_bytes::hex2array_unchecked("482dbd7297a39fa145c570552249c2ca9dd47e281f0c500c971b59c9dcdcd82e")
+			// Authority Discovery Key
+			// 5CaL7qhcdhiM1hYKcoR5VeYizQXen8TeVDxfyJgFbS5WfG7b
+			array_bytes::hex2array_unchecked("16982f209446d07ad1b36d6ba3a9c2e90f52db3169c41d608fec08d526ad4744")
 				.unchecked_into(),
 		),
 		(
-			// 5DyVtKWPidondEu8iHZgi6Ffv9yrJJ1NDNLom3X9cTDi98qp
-			array_bytes::hex_n_into_unchecked("547ff0ab649283a7ae01dbc2eb73932eba2fb09075e9485ff369082a2ff38d65"),
-			// 5FeD54vGVNpFX3PndHPXJ2MDakc462vBCD5mgtWRnWYCpZU9
-			array_bytes::hex_n_into_unchecked("9e42241d7cd91d001773b0b616d523dd80e13c6c2cab860b1234ef1b9ffc1526"),
-			// 5E1jLYfLdUQKrFrtqoKgFrRvxM3oQPMbf6DfcsrugZZ5Bn8d
-			array_bytes::hex2array_unchecked("5633b70b80a6c8bb16270f82cca6d56b27ed7b76c8fd5af2986a25a4788ce440")
+			//Stash Account 
+			// 5EJFbw1cBAafHqzx8jbBeBngJgqS5oPwdbwY1qdx9Fz9Nr9x
+			array_bytes::hex_n_into_unchecked("62cd8600e09239f8ccb88ac0ab20dcc580306d273f484980f36bc770f300883c"),
+			// Controller Account 
+			// 5EUJs8i23gsEUsn2WDS7vtg9XnTgTLUXndpoUM9epHpLLUqx
+			array_bytes::hex_n_into_unchecked("6a78f56cfdc02e3af6e71443eb486b51fd58ea570b29f97817ac4fcdc896c565"),
+			// Grandpa Key
+			// 5EkNeM8T7QQQgAWEE2JryYpZNwwXYW7fervHmZ28PhTTQrph
+			array_bytes::hex2array_unchecked("76b99bb825b4eb9e91d29a5546c1a84aec8142e86096ac6b86cb387cd9cc5d4a")
 				.unchecked_into(),
-			// 5DhKqkHRkndJu8vq7pi2Q5S3DfftWJHGxbEUNH43b46qNspH
-			array_bytes::hex2array_unchecked("482a3389a6cf42d8ed83888cfd920fec738ea30f97e44699ada7323f08c3380a")
+			// Babe Key 
+			// 5EvXomXtfsWbWHmCpRHTH7mTzKE2AjqrWhKJENe69YYVmGD7
+			array_bytes::hex2array_unchecked("7e78e7e28d33590d261815eddbc1a68b3bbfbf9606d7123bc564b7ec9ebb956f")
 				.unchecked_into(),
-			// 5DhKqkHRkndJu8vq7pi2Q5S3DfftWJHGxbEUNH43b46qNspH
-			array_bytes::hex2array_unchecked("482a3389a6cf42d8ed83888cfd920fec738ea30f97e44699ada7323f08c3380a")
+			// Imonline Key
+			// 5EPDBBoWkjBQmvobHKN6E75hhzoFPrpNRxhFTQYr8LWeV3Zy
+			array_bytes::hex2array_unchecked("669594e928ed093ec5ef5cf75757cf0eb62f1812347f7d69729213a5a6b9ab3b")
 				.unchecked_into(),
-			// 5DhKqkHRkndJu8vq7pi2Q5S3DfftWJHGxbEUNH43b46qNspH
-			array_bytes::hex2array_unchecked("482a3389a6cf42d8ed83888cfd920fec738ea30f97e44699ada7323f08c3380a")
+			// Authority Discovery Key
+			// 5CdGkE5ESTTNUdo5aNUmzZxpzLJR1czWMUeRfGEdvm5iibMv
+			array_bytes::hex2array_unchecked("18d691219f7cef3e4b5f82d3586ba913a9f00879ea9adc503d111fa2f2ee0b0d")
 				.unchecked_into(),
 		),
 		(
-			// 5HYZnKWe5FVZQ33ZRJK1rG3WaLMztxWrrNDb1JRwaHHVWyP9
-			array_bytes::hex_n_into_unchecked("f26cdb14b5aec7b2789fd5ca80f979cef3761897ae1f37ffb3e154cbcc1c2663"),
-			// 5EPQdAQ39WQNLCRjWsCk5jErsCitHiY5ZmjfWzzbXDoAoYbn
-			array_bytes::hex_n_into_unchecked("66bc1e5d275da50b72b15de072a2468a5ad414919ca9054d2695767cf650012f"),
-			// 5DMa31Hd5u1dwoRKgC4uvqyrdK45RHv3CpwvpUC1EzuwDit4
-			array_bytes::hex2array_unchecked("3919132b851ef0fd2dae42a7e734fe547af5a6b809006100f48944d7fae8e8ef")
+			//Stash Account 
+			// 5Cr6sFdRTmBDjpciMnYxLWonhHvb19gRVvchwbXB2YkJfaLW
+			array_bytes::hex_n_into_unchecked("229f8083a7d8a256bf80fadb21db8ed435b5de311f47db791b706ec450f45111"),
+			// Controller Account 
+			// 5Ccg3RzTzi8awEhoJF3LCE67EqBCjutzfzduq8jhqQ5tpu24
+			array_bytes::hex_n_into_unchecked("1861beb96bb42dcd335155305670755799b514ee62616fc5bede4d49e2647525"),
+			// Grandpa Key
+			// 5HkgqDV2u4kdcygt5ALPVgoc4gMW1KQ9Q1kcvfr2JBGGbYge
+			array_bytes::hex2array_unchecked("fbab8867344acd5ed00428a20a2b2d768ad9381216703a8f1984c544c2f1efca")
 				.unchecked_into(),
-			// 5C4vDQxA8LTck2xJEy4Yg1hM9qjDt4LvTTestnetMo4Y8ne43aU6x
-			array_bytes::hex2array_unchecked("00299981a2b92f878baaf5dbeba5c18d4e70f2a1fcd9c61b32ea18daf38f4378")
+			// Babe key 
+			// 5Cu56oz5BBusV9z2245jN1VX3tcuMzGD2UfToB1iMHpzYbRh
+			array_bytes::hex2array_unchecked("24e34ae24c55945ae248218dc3a4bbe8cd66636eaad4e9ffe4abe10097b7d56f")
 				.unchecked_into(),
-			// 5C4vDQxA8LTck2xJEy4Yg1hM9qjDt4LvTTestnetMo4Y8ne43aU6x
-			array_bytes::hex2array_unchecked("00299981a2b92f878baaf5dbeba5c18d4e70f2a1fcd9c61b32ea18daf38f4378")
+			// Imonline Key
+			// 5D7evaghAUvFZRJvDqpSpdkdJLYNSG2fwrqTr66EVh3jLxkB
+			array_bytes::hex2array_unchecked("2e7c190db0670e800ff44e3dd5668b2d8791b5eae826d7c8a481614a05906277")
 				.unchecked_into(),
-			// 5C4vDQxA8LTck2xJEy4Yg1hM9qjDt4LvTTestnetMo4Y8ne43aU6x
-			array_bytes::hex2array_unchecked("00299981a2b92f878baaf5dbeba5c18d4e70f2a1fcd9c61b32ea18daf38f4378")
+			// Authority Discovery Key
+			// 5F7Rj5DJtFemVZG8FsynWVhGdqa9Rz1EjTbEqgWQn37n8Xyc
+			array_bytes::hex2array_unchecked("86c8228b885484815ede870f35482b34e303af06568bb6ecc30201919e1b6855")
+				.unchecked_into(),
+		),
+		(
+			//Stash Account 
+			// 5EXKXux2FQXmA3V2p972JzLu1yPKKxskVekEoiDTCGzjcEk8
+			array_bytes::hex_n_into_unchecked("6cc4f218867e0ca92a2bf6cec5b916113f1ffee5a541a54d2fd93ba2d388a156"),
+			// Controller Account 
+			// 5HYmh1cQ5mpdV9qV7MG2v5rxdimd17Kr5ueYi1pFmsroJbm3
+			array_bytes::hex_n_into_unchecked("f294f17a6ec64bc040c66e1a1da525864100405cd3297af06abcb150c519ee6d"),
+			// Grandpa Key
+			// 5Gq2LFdGkSJTwGAz47tsrYhZ9xAjoXJFUo2cjdcmcDabhTbS
+			array_bytes::hex2array_unchecked("d2bded0d4d41631fe7244999cdc0bf1f42e77fb3abc1c679be2cd0a594c8a98a")
+				.unchecked_into(),
+			// Babe Key 
+			// 5Gh28tLMzfsxSVWaxNQe12BjMCwe3WX92WyNZvoq9nQVaC7P
+			array_bytes::hex2array_unchecked("cca34d91dded37a9d727c6290ecb16f1ce02226055e2c993bbf4a82f1a7b7c1a")
+				.unchecked_into(),
+			// Imonline Key
+			// 5GQoNDuVaabw2RiY149UN8sL4By247Gt3GiGpkXK9NqGWqxF
+			array_bytes::hex2array_unchecked("c04463843a18840651943d898bbaf5a244129ccaa8978bf874292a54a2a28c5a")
+				.unchecked_into(),
+			// Authority Discovery Key
+			// 5Dktowe4tRC9xfBMd9SZ3VqTd5bLEx9nbuDPeKioD3iQs14p
+			array_bytes::hex2array_unchecked("4ae2ebb43e0cb7af00e38c38b2ef0c2f2fe3d8bbb11d48a7b7fdf54fb9de7e48")
 				.unchecked_into(),
 		),
 	];
 
 	let root_key: AccountId = array_bytes::hex_n_into_unchecked(
 		// 5DiKUSBwCfMHrff87PXK7jb5sQHN22PM2QsRgiQfgj1fMngf
-		"9ee5e5bdc0ec239eb164f865ecc345ce4c88e76ee002e0f7e318097347471809",
+		"08d9167acc03a89754b85bb9d3f5c82a3964c222a7811689a6c852c9f3afed77",
 	);
 
 	let endowed_accounts: Vec<AccountId> = vec![root_key.clone()];
