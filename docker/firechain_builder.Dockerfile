@@ -1,15 +1,13 @@
 # Use BuildKit
+# Specify the Dockerfile syntax
 # syntax=docker/dockerfile:experimental
-# Use the Rust nightly image as the builder stage
-
 FROM rust:1.61.0 AS builder
 
 
-WORKDIR /firechain
+WORKDIR /5ire
 
 
-
-COPY . .
+COPY . /5ire
 
 
 RUN set -eux; \
@@ -20,12 +18,22 @@ RUN set -eux; \
 
 ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 
-RUN apt-get update && apt-get install -y protobuf-compiler libclang-dev 
+
+RUN apt-get update && apt-get install -y protobuf-compiler libclang-dev
 
 RUN --mount=type=ssh cargo build --release --features firechain-qa
 
 
 FROM debian:bullseye-slim
+
+
+WORKDIR /5ire
+
+
+COPY --from=builder /5ire/target/release/firechain-node /5ire/firechain-node
+
+
+COPY --from=builder /5ire/specs/5ire-qa-chain-spec-raw.json /5ire/specs/5ire-qa-chain-spec-raw.json
 
 
 RUN set -eux; \
@@ -35,27 +43,10 @@ RUN set -eux; \
     rm -rf /var/lib/apt/lists/*
 
 
-COPY --from=builder /firechain/target/release/firechain-node /usr/local/bin/firechain-node
+RUN ldd /5ire/firechain-node
+RUN /5ire/firechain-node --version
 
 
-RUN useradd -m -u 1000 -U -s /bin/sh -d /firechain firechain
+VOLUME ["/data"]
 
-
-RUN set -eux; \
-    mkdir -p /data /firechain/.local/share/firechain; \
-    chown -R firechain:firechain /data; \
-    ln -s /data /firechain/.local/share/firechain; \
-    apt-get update && apt-get install -y libc-bin; \
-    ldd /usr/local/bin/firechain-node && \
-    apt-get remove -y libc-bin && apt-get clean; \
-    rm -rf /usr/bin /usr/sbin; \
-    /usr/local/bin/firechain-node --version
-
-
-EXPOSE 30333 9933 9944 9946
-
-
-USER firechain
-
-
-CMD ["firechain-node"]
+ENTRYPOINT ["/5ire/firechain-node", "--chain", "/5ire/specs/5ire-qa-chain-spec-raw.json", "-d", "/data", "--prometheus-external", "--rpc-external", "--rpc-cors", "all", "--rpc-methods=unsafe"]
