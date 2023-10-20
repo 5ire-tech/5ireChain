@@ -2770,7 +2770,6 @@ dependencies = [
  "pallet-im-online",
  "pallet-indices",
  "pallet-insecure-randomness-collective-flip",
- "pallet-lottery",
  "pallet-membership",
  "pallet-message-queue",
  "pallet-mmr",
@@ -2901,7 +2900,6 @@ dependencies = [
  "pallet-im-online",
  "pallet-indices",
  "pallet-insecure-randomness-collective-flip",
- "pallet-lottery",
  "pallet-membership",
  "pallet-message-queue",
  "pallet-mmr",
@@ -6693,20 +6691,6 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "safe-mix",
- "scale-info",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-lottery"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#55d432df8daa5e6e28733b84ef605c7417ce5223"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "parity-scale-codec",
  "scale-info",
  "sp-runtime",
  "sp-std",
