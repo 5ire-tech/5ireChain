@@ -101,7 +101,6 @@ pallet-recovery = { version = "4.0.0-dev", default-features = false, git = "ssh:
 pallet-referenda = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-remark = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"}
 pallet-root-testing = { version = "1.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-pallet-salary = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-session = { version = "4.0.0-dev", features = [ "historical" ], git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0", default-features = false }
 pallet-session-benchmarking = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0", default-features = false, optional = true }
 pallet-staking = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"}
@@ -211,7 +210,6 @@ std = [
 	"pallet-staking-runtime-api/std",
 	"pallet-state-trie-migration/std",
 	"pallet-statement/std",
-	"pallet-salary/std",
 	"sp-session/std",
 	"pallet-sudo/std",
 	"frame-support/std",
@@ -303,7 +301,6 @@ runtime-benchmarks = [
 	"pallet-referenda/runtime-benchmarks",
 	"pallet-recovery/runtime-benchmarks",
 	"pallet-remark/runtime-benchmarks",
-	"pallet-salary/runtime-benchmarks",
 	"pallet-session-benchmarking/runtime-benchmarks",
 	"pallet-society/runtime-benchmarks",
 	"pallet-staking/runtime-benchmarks",
@@ -365,7 +362,6 @@ try-runtime = [
 	"pallet-referenda/try-runtime",
 	"pallet-remark/try-runtime",
 	"pallet-root-testing/try-runtime",
-	"pallet-salary/try-runtime",
 	"pallet-session/try-runtime",
 	"pallet-staking/try-runtime",
 	"pallet-state-trie-migration/try-runtime",

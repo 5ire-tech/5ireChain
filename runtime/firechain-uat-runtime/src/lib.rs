@@ -1636,17 +1636,6 @@ impl GetSalary<u16, AccountId, Balance> for SalaryForRank {
 	}
 }
 
-impl pallet_salary::Config for Runtime {
-	type WeightInfo = ();
-	type RuntimeEvent = RuntimeEvent;
-	type Paymaster = PayFromAccount<Balances, TreasuryAccount>;
-	type Members = RankedCollective;
-	type Salary = SalaryForRank;
-	type RegistrationPeriod = ConstU32<200>;
-	type PayoutPeriod = ConstU32<200>;
-	type Budget = Budget;
-}
-
 impl pallet_core_fellowship::Config for Runtime {
 	type WeightInfo = ();
 	type RuntimeEvent = RuntimeEvent;
@@ -1995,7 +1984,6 @@ construct_runtime!(
 		Uniques: pallet_uniques,
 		Nfts: pallet_nfts,
 		NftFractionalization: pallet_nft_fractionalization,
-		Salary: pallet_salary,
 		CoreFellowship: pallet_core_fellowship,
 		TransactionStorage: pallet_transaction_storage,
 		VoterList: pallet_bags_list::<Instance1>,
@@ -2078,7 +2066,6 @@ mod benches {
 		[pallet_referenda, Referenda]
 		[pallet_recovery, Recovery]
 		[pallet_remark, Remark]
-		[pallet_salary, Salary]
 		[pallet_scheduler, Scheduler]
 		[pallet_session, SessionBench::<Runtime>]
 		[pallet_society, Society]
