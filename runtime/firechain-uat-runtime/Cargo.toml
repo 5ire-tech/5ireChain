@@ -86,7 +86,6 @@ pallet-message-queue = { version = "7.0.0-dev", default-features = false, git = 
 pallet-mmr = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-multisig = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-nfts = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-pallet-nfts-runtime-api = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"}
 pallet-nomination-pools = { version = "1.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"}
 pallet-nomination-pools-benchmarking = { version = "1.0.0", default-features = false, optional = true, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-nomination-pools-runtime-api = { version = "1.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
@@ -236,7 +235,6 @@ std = [
 	"pallet-recovery/std",
 	"pallet-uniques/std",
 	"pallet-nfts/std",
-	"pallet-nfts-runtime-api/std",
 	"pallet-vesting/std",
 	"log/std",
 	"frame-try-runtime?/std",
