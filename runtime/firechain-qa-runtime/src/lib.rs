@@ -60,7 +60,6 @@ use pallet_asset_conversion::{NativeOrAssetId, NativeOrAssetIdConverter};
 use pallet_contracts::NoopMigration;
 use pallet_election_provider_multi_phase::SolutionAccuracyOf;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
-use pallet_nfts::PalletFeatures;
 use pallet_session::historical as pallet_session_historical;
 pub use pallet_transaction_payment::{
 	ConstFeeMultiplier, CurrencyAdapter, Multiplier, TargetedFeeAdjustment,
@@ -353,7 +352,6 @@ impl InstanceFilter<RuntimeCall> for ProxyType {
 				RuntimeCall::Balances(..) |
 					RuntimeCall::Assets(..) |
 					RuntimeCall::Uniques(..) |
-					RuntimeCall::Nfts(..) |
 					RuntimeCall::Vesting(pallet_vesting::Call::vested_transfer { .. }) |
 					RuntimeCall::Indices(pallet_indices::Call::transfer { .. })
 			),
@@ -1649,40 +1647,6 @@ impl pallet_core_fellowship::Config for Runtime {
 }
 
 
-parameter_types! {
-	pub Features: PalletFeatures = PalletFeatures::all_enabled();
-	pub const MaxAttributesPerCall: u32 = 10;
-}
-
-impl pallet_nfts::Config for Runtime {
-	type RuntimeEvent = RuntimeEvent;
-	type CollectionId = u32;
-	type ItemId = u32;
-	type Currency = Balances;
-	type ForceOrigin = frame_system::EnsureRoot<AccountId>;
-	type CollectionDeposit = CollectionDeposit;
-	type ItemDeposit = ItemDeposit;
-	type MetadataDepositBase = MetadataDepositBase;
-	type AttributeDepositBase = MetadataDepositBase;
-	type DepositPerByte = MetadataDepositPerByte;
-	type StringLimit = StringLimit;
-	type KeyLimit = KeyLimit;
-	type ValueLimit = ValueLimit;
-	type ApprovalsLimit = ApprovalsLimit;
-	type ItemAttributesApprovalsLimit = ItemAttributesApprovalsLimit;
-	type MaxTips = MaxTips;
-	type MaxDeadlineDuration = MaxDeadlineDuration;
-	type MaxAttributesPerCall = MaxAttributesPerCall;
-	type Features = Features;
-	type OffchainSignature = Signature;
-	type OffchainPublic = <Signature as traits::Verify>::Signer;
-	type WeightInfo = pallet_nfts::weights::SubstrateWeight<Runtime>;
-	#[cfg(feature = "runtime-benchmarks")]
-	type Helper = ();
-	type CreateOrigin = AsEnsureOriginWithArg<EnsureSigned<AccountId>>;
-	type Locker = ();
-}
-
 impl pallet_transaction_storage::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type Currency = Balances;
@@ -1957,7 +1921,6 @@ construct_runtime!(
 		PoolAssets: pallet_assets::<Instance2>,
 		Mmr: pallet_mmr,
 		Uniques: pallet_uniques,
-		Nfts: pallet_nfts,
 		CoreFellowship: pallet_core_fellowship,
 		TransactionStorage: pallet_transaction_storage,
 		VoterList: pallet_bags_list::<Instance1>,
@@ -2053,7 +2016,6 @@ mod benches {
 		[pallet_treasury, Treasury]
 		[pallet_asset_rate, AssetRate]
 		[pallet_uniques, Uniques]
-		[pallet_nfts, Nfts]
 		[pallet_utility, Utility]
 		[pallet_vesting, Vesting]
 		[pallet_whitelist, Whitelist]

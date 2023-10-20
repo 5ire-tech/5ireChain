@@ -85,7 +85,6 @@ pallet-membership = { version = "4.0.0-dev", default-features = false, git = "ss
 pallet-message-queue = { version = "7.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-mmr = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-multisig = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-pallet-nfts = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-nomination-pools = { version = "1.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"}
 pallet-nomination-pools-benchmarking = { version = "1.0.0", default-features = false, optional = true, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-nomination-pools-runtime-api = { version = "1.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
@@ -233,7 +232,6 @@ std = [
 	"pallet-root-testing/std",
 	"pallet-recovery/std",
 	"pallet-uniques/std",
-	"pallet-nfts/std",
 	"pallet-vesting/std",
 	"log/std",
 	"frame-try-runtime?/std",
@@ -308,7 +306,6 @@ runtime-benchmarks = [
 	"pallet-asset-rate/runtime-benchmarks",
 	"pallet-utility/runtime-benchmarks",
 	"pallet-uniques/runtime-benchmarks",
-	"pallet-nfts/runtime-benchmarks",
 	"pallet-vesting/runtime-benchmarks",
 	"pallet-whitelist/runtime-benchmarks",
 	"frame-system-benchmarking/runtime-benchmarks",
@@ -373,7 +370,6 @@ try-runtime = [
 	"pallet-asset-tx-payment/try-runtime",
 	"pallet-transaction-storage/try-runtime",
 	"pallet-uniques/try-runtime",
-	"pallet-nfts/try-runtime",
 	"pallet-vesting/try-runtime",
 	"pallet-whitelist/try-runtime",
 	"pallet-esg/try-runtime",

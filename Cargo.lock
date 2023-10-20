@@ -2774,7 +2774,6 @@ dependencies = [
  "pallet-message-queue",
  "pallet-mmr",
  "pallet-multisig",
- "pallet-nfts",
  "pallet-nomination-pools",
  "pallet-nomination-pools-benchmarking",
  "pallet-nomination-pools-runtime-api",
@@ -2900,7 +2899,6 @@ dependencies = [
  "pallet-message-queue",
  "pallet-mmr",
  "pallet-multisig",
- "pallet-nfts",
  "pallet-nomination-pools",
  "pallet-nomination-pools-benchmarking",
  "pallet-nomination-pools-runtime-api",
@@ -6752,24 +6750,6 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-nfts"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#55d432df8daa5e6e28733b84ef605c7417ce5223"
-dependencies = [
- "enumflags2",
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "log",
- "parity-scale-codec",
- "scale-info",
- "sp-core",
  "sp-io",
  "sp-runtime",
  "sp-std",
