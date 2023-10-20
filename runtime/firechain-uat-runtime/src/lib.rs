@@ -1659,15 +1659,6 @@ impl pallet_transaction_storage::Config for Runtime {
 		ConstU32<{ pallet_transaction_storage::DEFAULT_MAX_TRANSACTION_SIZE }>;
 }
 
-impl pallet_whitelist::Config for Runtime {
-	type RuntimeEvent = RuntimeEvent;
-	type RuntimeCall = RuntimeCall;
-	type WhitelistOrigin = EnsureRoot<AccountId>;
-	type DispatchWhitelistedOrigin = EnsureRoot<AccountId>;
-	type Preimages = Preimage;
-	type WeightInfo = pallet_whitelist::weights::SubstrateWeight<Runtime>;
-}
-
 parameter_types! {
 	pub const MigrationSignedDepositPerItem: Balance = CENTS;
 	pub const MigrationSignedDepositBase: Balance = 20 * DOLLARS;
@@ -1930,7 +1921,6 @@ construct_runtime!(
 		Remark: pallet_remark,
 		RootTesting: pallet_root_testing,
 		ConvictionVoting: pallet_conviction_voting,
-		Whitelist: pallet_whitelist,
 		AllianceMotion: pallet_collective::<Instance3>,
 		Alliance: pallet_alliance,
 		NominationPools: pallet_nomination_pools,
@@ -2018,7 +2008,6 @@ mod benches {
 		[pallet_uniques, Uniques]
 		[pallet_utility, Utility]
 		[pallet_vesting, Vesting]
-		[pallet_whitelist, Whitelist]
 		[pallet_evm, EVM]
 	);
 }

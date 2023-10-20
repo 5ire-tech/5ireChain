@@ -2805,7 +2805,6 @@ dependencies = [
  "pallet-uniques",
  "pallet-utility",
  "pallet-vesting",
- "pallet-whitelist",
  "parity-scale-codec",
  "primitive-types",
  "scale-info",
@@ -2930,7 +2929,6 @@ dependencies = [
  "pallet-uniques",
  "pallet-utility",
  "pallet-vesting",
- "pallet-whitelist",
  "parity-scale-codec",
  "primitive-types",
  "scale-info",
@@ -7290,21 +7288,6 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-whitelist"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#55d432df8daa5e6e28733b84ef605c7417ce5223"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "scale-info",
- "sp-api",
  "sp-runtime",
  "sp-std",
 ]

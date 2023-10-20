@@ -119,7 +119,6 @@ pallet-asset-tx-payment = { version = "4.0.0-dev", default-features = false, git
 pallet-transaction-storage = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-uniques = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-vesting = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-pallet-whitelist = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-esg = { version = "1.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"}
 
 # Frontier
@@ -147,7 +146,6 @@ default = ["std"]
 runtime-wasm = []
 with-tracing = ["frame-executive/with-tracing"]
 std = [
-	"pallet-whitelist/std",
 	"pallet-offences-benchmarking?/std",
 	"pallet-election-provider-support-benchmarking?/std",
 	"pallet-asset-conversion-tx-payment/std",
@@ -308,7 +306,6 @@ runtime-benchmarks = [
 	"pallet-utility/runtime-benchmarks",
 	"pallet-uniques/runtime-benchmarks",
 	"pallet-vesting/runtime-benchmarks",
-	"pallet-whitelist/runtime-benchmarks",
 	"frame-system-benchmarking/runtime-benchmarks",
 	"pallet-esg/runtime-benchmarks",
 ]
@@ -372,6 +369,5 @@ try-runtime = [
 	"pallet-transaction-storage/try-runtime",
 	"pallet-uniques/try-runtime",
 	"pallet-vesting/try-runtime",
-	"pallet-whitelist/try-runtime",
 	"pallet-esg/try-runtime",
 ]
