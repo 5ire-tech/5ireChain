@@ -33,11 +33,17 @@ use firechain_node::client::FirechainQaRuntimeExecutor;
 #[cfg(feature = "firechain-uat")]
 use firechain_node::client::FirechainUatRuntimeExecutor;
 
+#[cfg(feature = "firechain-thunder")]
+use firechain_node::client::FirechainThunderRuntimeExecutor;
+
 #[cfg(feature = "firechain-qa")]
 use firechain_node::chain_spec::qa_chain_spec;
 
 #[cfg(feature = "firechain-uat")]
 use firechain_node::chain_spec::uat_chain_spec;
+
+#[cfg(feature = "firechain-thunder")]
+use firechain_node::chain_spec::thunder_chain_spec;
 
 #[cfg(feature = "try-runtime")]
 use {
@@ -86,6 +92,7 @@ impl SubstrateCli for Cli {
 				Box::new(qa_chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
 		};
 
+		#[allow(unused)]
 		#[cfg(feature = "firechain-uat")]
 		let spec = match id {
 			"" =>
@@ -98,6 +105,21 @@ impl SubstrateCli for Cli {
 			"uat-staging" => Box::new(uat_chain_spec::staging_testnet_config()),
 			path =>
 				Box::new(uat_chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
+		};
+
+		#[cfg(feature = "firechain-thunder")]
+		let spec = match id {
+			"" =>
+				return Err(
+					"Please specify which chain you want to run, e.g. --dev or --chain=local"
+						.into(),
+				),
+			"thunder-dev" => Box::new(thunder_chain_spec::development_config()),
+			"thunder-local" => Box::new(thunder_chain_spec::local_testnet_config()),
+			"thunder-staging" => Box::new(thunder_chain_spec::staging_testnet_config()),
+			path => Box::new(thunder_chain_spec::ChainSpec::from_json_file(
+				std::path::PathBuf::from(path),
+			)?),
 		};
 
 		Ok(spec)
@@ -127,6 +149,15 @@ pub fn run() -> Result<()> {
 					service::new_full::<
 						firechain_uat_runtime::RuntimeApi,
 						FirechainUatRuntimeExecutor,
+					>(config, cli.no_hardware_benchmarks, cli.eth.clone())
+					.map_err(sc_cli::Error::Service)
+				}),
+
+				#[cfg(feature = "firechain-thunder")]
+				spec if spec.is_thunder() => runner.run_node_until_exit(|config| async move {
+					service::new_full::<
+						firechain_thunder_runtime::RuntimeApi,
+						FirechainThunderRuntimeExecutor,
 					>(config, cli.no_hardware_benchmarks, cli.eth.clone())
 					.map_err(sc_cli::Error::Service)
 				}),
@@ -181,6 +212,15 @@ pub fn run() -> Result<()> {
 								cmd.run(partial.client)
 							},
 
+							#[cfg(feature = "firechain-thunder")]
+							spec if spec.is_thunder() => {
+								let partial = new_partial::<
+									firechain_thunder_runtime::RuntimeApi,
+									FirechainThunderRuntimeExecutor,
+								>(&config, cli.eth.clone())?;
+								cmd.run(partial.client)
+							},
+
 							_ => Err("Chain spec not supported".into()),
 						}
 					},
@@ -220,16 +260,19 @@ pub fn run() -> Result<()> {
 								return cmd.run(config, partial.client, db, storage)
 							},
 
-							_ => {
+							#[cfg(feature = "firechain-thunder")]
+							spec if spec.is_thunder() => {
 								let partial = new_partial::<
-									firechain_qa_runtime::RuntimeApi,
-									FirechainQaRuntimeExecutor,
+									firechain_thunder_runtime::RuntimeApi,
+									FirechainThunderRuntimeExecutor,
 								>(&config, cli.eth.clone())?;
 								let db = partial.backend.expose_db();
 								let storage = partial.backend.expose_storage();
 
 								return cmd.run(config, partial.client, db, storage)
 							},
+
+							_ => Err("Chain spec not supported".into()),
 						}
 					},
 					BenchmarkCmd::Overhead(_) |
@@ -311,6 +354,17 @@ pub fn run() -> Result<()> {
 					Ok((cmd.run(client, backend, None), task_manager))
 				}),
 
+				#[cfg(feature = "firechain-thunder")]
+				spec if spec.is_thunder() => runner.async_run(|config| {
+					let PartialComponents { client, task_manager, backend, .. } =
+						new_partial::<
+							firechain_thunder_runtime::RuntimeApi,
+							FirechainThunderRuntimeExecutor,
+						>(&config, cli.eth.clone())?;
+
+					Ok((cmd.run(client, backend, None), task_manager))
+				}),
+
 				_ => Err("Chain spec not supported".into()),
 			}
 		},
@@ -331,6 +385,9 @@ pub fn run() -> Result<()> {
 
 				#[cfg(feature = "firechain-uat")]
 				let info_provider = substrate_info(firechain_uat_runtime::constants::time::SLOT_DURATION);
+
+				#[cfg(feature = "firechain-thunder")]
+				let info_provider = substrate_info(firechain_thunder_runtime::constants::time::SLOT_DURATION);
 
 				Ok((
 					cmd.run::<Block, ExtendedHostFunctions<

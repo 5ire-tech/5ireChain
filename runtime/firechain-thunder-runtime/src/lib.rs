@@ -160,14 +160,10 @@ pub fn wasm_binary_unwrap() -> &'static [u8] {
 /// Runtime version.
 #[sp_version::runtime_version]
 pub const VERSION: RuntimeVersion = RuntimeVersion {
-	spec_name: create_runtime_str!("firechain-node-uat"),
-	impl_name: create_runtime_str!("5ire"),
+	spec_name: create_runtime_str!("5ire-Node"),
+	impl_name: create_runtime_str!("5ire-Node"),
 	authoring_version: 1,
-	// Per convention: if the runtime behavior changes, increment spec_version
-	// and set impl_version to 0. If only runtime
-	// implementation changes and behavior does not, then leave spec_version as
-	// is and increment impl_version.
-	spec_version: 112,
+	spec_version: 101,
 	impl_version: 0,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
@@ -419,12 +415,6 @@ impl pallet_scheduler::Config for Runtime {
 	type Preimages = Preimage;
 }
 
-impl pallet_glutton::Config for Runtime {
-	type RuntimeEvent = RuntimeEvent;
-	type AdminOrigin = EnsureRoot<AccountId>;
-	type WeightInfo = pallet_glutton::weights::SubstrateWeight<Runtime>;
-}
-
 parameter_types! {
 	pub const PreimageMaxSize: u32 = 4096 * 1024;
 	pub const PreimageBaseDeposit: Balance = DOLLARS;
@@ -596,8 +586,8 @@ pallet_staking_reward_curve::build! {
 }
 
 parameter_types! {
-	pub const SessionsPerEra: sp_staking::SessionIndex = 1;
-	pub const BondingDuration: sp_staking::EraIndex = 1;
+	pub const SessionsPerEra: sp_staking::SessionIndex = 12;
+	pub const BondingDuration: sp_staking::EraIndex = 24 * 28;
 	pub const SlashDeferDuration: sp_staking::EraIndex = 24 * 7; // 1/4 the bonding duration.
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
 	pub const MaxNominatorRewardedPerValidator: u32 = 256;
@@ -1075,7 +1065,7 @@ parameter_types! {
 	pub const DesiredMembers: u32 = 13;
 	pub const DesiredRunnersUp: u32 = 7;
 	pub const MaxVotesPerVoter: u32 = 16;
-	pub const MaxVoters: u32 = 512;
+	pub const MaxVoters: u32 = 10 * 1000;
 	pub const MaxCandidates: u32 = 1000;
 	pub const ElectionsPhragmenPalletId: LockIdentifier = *b"phrelect";
 }
@@ -1285,7 +1275,7 @@ impl pallet_contracts::Config for Runtime {
 	type DepositPerItem = DepositPerItem;
 	type DepositPerByte = DepositPerByte;
 	type DefaultDepositLimit = DefaultDepositLimit;
-	type CallStack = [pallet_contracts::Frame<Self>; 5];
+	type CallStack = [pallet_contracts::Frame<Self>; 31];
 	type WeightPrice = pallet_transaction_payment::Pallet<Self>;
 	type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
 	type ChainExtension = ();
@@ -1936,9 +1926,10 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 }
 const BLOCK_GAS_LIMIT: u64 = 75_000_000;
 const MAX_POV_SIZE: u64 = 5 * 1024 * 1024;
+
 parameter_types! {
 	pub const ChainId: u64 = 997;
-	pub BlockGasLimit: U256 = U256::from(BLOCK_GAS_LIMIT);
+	pub BlockGasLimit: U256 = U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT.ref_time() / WEIGHT_PER_GAS);
 	pub const GasLimitPovSizeRatio: u64 = BLOCK_GAS_LIMIT.saturating_div(MAX_POV_SIZE);
 	pub PrecompilesValue: FrontierPrecompiles<Runtime> = FrontierPrecompiles::<_>::new();
 	pub WeightPerGas: Weight = Weight::from_parts(weight_per_gas(BLOCK_GAS_LIMIT, NORMAL_DISPATCH_RATIO, WEIGHT_PER_GAS), 0);
@@ -2047,7 +2038,6 @@ construct_runtime!(
 		Recovery: pallet_recovery,
 		Vesting: pallet_vesting,
 		Scheduler: pallet_scheduler,
-		Glutton: pallet_glutton,
 		Preimage: pallet_preimage,
 		Proxy: pallet_proxy,
 		Multisig: pallet_multisig,
@@ -2148,7 +2138,6 @@ mod benches {
 		[pallet_remark, Remark]
 		[pallet_salary, Salary]
 		[pallet_scheduler, Scheduler]
-		[pallet_glutton, Glutton]
 		[pallet_session, SessionBench::<Runtime>]
 		[pallet_society, Society]
 		[pallet_staking, Staking]
@@ -2968,12 +2957,8 @@ impl fp_rpc::ConvertTransaction<firechain_runtime_core_primitives::opaque::Unche
 
 /// The address format for describing accounts.
 pub type Address = sp_runtime::MultiAddress<AccountId, AccountIndex>;
-/// Block type as expected by this runtime.
-pub type Block = generic::Block<Header, UncheckedExtrinsic>;
 /// A Block signed with a Justification
 pub type SignedBlock = generic::SignedBlock<Block>;
-/// BlockId type as expected by this runtime.
-pub type BlockId = generic::BlockId<Block>;
 /// The SignedExtension to the basic transaction logic.
 pub type SignedExtra = (
 	frame_system::CheckNonZeroSender<Runtime>,
@@ -2985,6 +2970,10 @@ pub type SignedExtra = (
 	frame_system::CheckWeight<Runtime>,
 	pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
 );
+/// Block type as expected by this runtime.
+pub type Block = generic::Block<Header, UncheckedExtrinsic>;
+/// BlockId type as expected by this runtime.
+pub type BlockId = generic::BlockId<Block>;
 /// Unchecked extrinsic type as expected by this runtime.
 pub type UncheckedExtrinsic =
 	fp_self_contained::UncheckedExtrinsic<Address, RuntimeCall, Signature, SignedExtra>;
