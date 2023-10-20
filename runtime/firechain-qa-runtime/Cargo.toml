@@ -77,7 +77,6 @@ pallet-election-provider-multi-phase = { version = "4.0.0-dev", default-features
 pallet-election-provider-support-benchmarking = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0", optional = true }
 pallet-elections-phragmen = { version = "5.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-fast-unstake = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-pallet-nis = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-grandpa = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-im-online = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-indices = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
@@ -181,7 +180,6 @@ std = [
 	"pallet-elections-phragmen/std",
 	"pallet-fast-unstake/std",
 	"frame-executive/std",
-	"pallet-nis/std",
 	"pallet-grandpa/std",
 	"pallet-im-online/std",
 	"pallet-indices/std",
@@ -287,7 +285,6 @@ runtime-benchmarks = [
 	"pallet-election-provider-support-benchmarking/runtime-benchmarks",
 	"pallet-elections-phragmen/runtime-benchmarks",
 	"pallet-fast-unstake/runtime-benchmarks",
-	"pallet-nis/runtime-benchmarks",
 	"pallet-grandpa/runtime-benchmarks",
 	"pallet-identity/runtime-benchmarks",
 	"pallet-im-online/runtime-benchmarks",
@@ -349,7 +346,6 @@ try-runtime = [
 	"pallet-election-provider-multi-phase/try-runtime",
 	"pallet-elections-phragmen/try-runtime",
 	"pallet-fast-unstake/try-runtime",
-	"pallet-nis/try-runtime",
 	"pallet-grandpa/try-runtime",
 	"pallet-im-online/try-runtime",
 	"pallet-indices/try-runtime",

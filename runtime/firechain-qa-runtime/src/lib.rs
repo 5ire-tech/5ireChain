@@ -61,7 +61,6 @@ use pallet_contracts::NoopMigration;
 use pallet_election_provider_multi_phase::SolutionAccuracyOf;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use pallet_nfts::PalletFeatures;
-use pallet_nis::WithMaximumOf;
 use pallet_session::historical as pallet_session_historical;
 pub use pallet_transaction_payment::{
 	ConstFeeMultiplier, CurrencyAdapter, Multiplier, TargetedFeeAdjustment,
@@ -1592,43 +1591,6 @@ impl pallet_asset_conversion::Config for Runtime {
 	type BenchmarkHelper = ();
 }
 
-parameter_types! {
-	pub const QueueCount: u32 = 300;
-	pub const MaxQueueLen: u32 = 1000;
-	pub const FifoQueueLen: u32 = 500;
-	pub const NisBasePeriod: BlockNumber = 30 * DAYS;
-	pub const MinBid: Balance = 100 * DOLLARS;
-	pub const MinReceipt: Perquintill = Perquintill::from_percent(1);
-	pub const IntakePeriod: BlockNumber = 10;
-	pub MaxIntakeWeight: Weight = MAXIMUM_BLOCK_WEIGHT / 10;
-	pub const ThawThrottle: (Perquintill, BlockNumber) = (Perquintill::from_percent(25), 5);
-	pub Target: Perquintill = Perquintill::zero();
-	pub const NisPalletId: PalletId = PalletId(*b"py/nis  ");
-}
-
-impl pallet_nis::Config for Runtime {
-	type WeightInfo = pallet_nis::weights::SubstrateWeight<Runtime>;
-	type RuntimeEvent = RuntimeEvent;
-	type Currency = Balances;
-	type CurrencyBalance = Balance;
-	type FundOrigin = frame_system::EnsureSigned<AccountId>;
-	type Counterpart = ItemOf<Assets, ConstU32<9u32>, AccountId>;
-	type CounterpartAmount = WithMaximumOf<ConstU128<21_000_000_000_000_000_000u128>>;
-	type Deficit = ();
-	type IgnoredIssuance = ();
-	type Target = Target;
-	type PalletId = NisPalletId;
-	type QueueCount = QueueCount;
-	type MaxQueueLen = MaxQueueLen;
-	type FifoQueueLen = FifoQueueLen;
-	type BasePeriod = NisBasePeriod;
-	type MinBid = MinBid;
-	type MinReceipt = MinReceipt;
-	type IntakePeriod = IntakePeriod;
-	type MaxIntakeWeight = MaxIntakeWeight;
-	type ThawThrottle = ThawThrottle;
-	type RuntimeHoldReason = RuntimeHoldReason;
-}
 
 parameter_types! {
 	pub const CollectionDeposit: Balance = 100 * DOLLARS;
@@ -2030,7 +1992,6 @@ construct_runtime!(
 		Assets: pallet_assets::<Instance1>,
 		PoolAssets: pallet_assets::<Instance2>,
 		Mmr: pallet_mmr,
-		Nis: pallet_nis,
 		Uniques: pallet_uniques,
 		Nfts: pallet_nfts,
 		NftFractionalization: pallet_nft_fractionalization,
@@ -2101,7 +2062,6 @@ mod benches {
 		[pallet_election_provider_support_benchmarking, EPSBench::<Runtime>]
 		[pallet_elections_phragmen, Elections]
 		[pallet_fast_unstake, FastUnstake]
-		[pallet_nis, Nis]
 		[pallet_grandpa, Grandpa]
 		[pallet_identity, Identity]
 		[pallet_im_online, ImOnline]
