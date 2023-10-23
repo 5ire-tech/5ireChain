@@ -50,7 +50,13 @@ pub struct MockHandle {
 
 impl MockHandle {
 	pub fn new(input: Vec<u8>, gas_limit: Option<u64>, context: Context) -> Self {
-		Self { input, gas_limit, context, is_static: false, gas_used: 0 }
+		Self {
+			input,
+			gas_limit,
+			context,
+			is_static: false,
+			gas_used: 0,
+		}
 	}
 }
 
@@ -113,7 +119,8 @@ impl PrecompileHandle for MockHandle {
 /// The file is expected to be in JSON format and contain an array of test vectors, where each
 /// vector can be deserialized into an "EthConsensusTest".
 pub fn test_precompile_test_vectors<P: Precompile>(filepath: &str) -> Result<(), String> {
-	let data = fs::read_to_string(filepath).expect("Failed to read blake2F.json");
+	let data =
+		fs::read_to_string(filepath).unwrap_or_else(|_| panic!("Failed to read {}", filepath));
 
 	let tests: Vec<EthConsensusTest> = serde_json::from_str(&data).expect("expected json array");
 
@@ -140,7 +147,11 @@ pub fn test_precompile_test_vectors<P: Precompile>(filepath: &str) -> Result<(),
 					test.name,
 					result.exit_status
 				);
-				assert_eq!(as_hex, test.expected, "test '{}' failed (different output)", test.name);
+				assert_eq!(
+					as_hex, test.expected,
+					"test '{}' failed (different output)",
+					test.name
+				);
 				if let Some(expected_gas) = test.gas {
 					assert_eq!(
 						handle.gas_used, expected_gas,
@@ -148,8 +159,10 @@ pub fn test_precompile_test_vectors<P: Precompile>(filepath: &str) -> Result<(),
 						test.name
 					);
 				}
-			},
-			Err(err) => return Err(format!("Test '{}' returned error: {:?}", test.name, err)),
+			}
+			Err(err) => {
+				return Err(format!("Test '{}' returned error: {:?}", test.name, err));
+			}
 		}
 	}
 
@@ -157,7 +170,8 @@ pub fn test_precompile_test_vectors<P: Precompile>(filepath: &str) -> Result<(),
 }
 
 pub fn test_precompile_failure_test_vectors<P: Precompile>(filepath: &str) -> Result<(), String> {
-	let data = fs::read_to_string(filepath).expect("Failed to read json file");
+	let data =
+		fs::read_to_string(filepath).unwrap_or_else(|_| panic!("Failed to read {}", filepath));
 
 	let tests: Vec<EthConsensusFailureTest> =
 		serde_json::from_str(&data).expect("expected json array");
@@ -178,13 +192,17 @@ pub fn test_precompile_failure_test_vectors<P: Precompile>(filepath: &str) -> Re
 		match P::execute(&mut handle) {
 			Ok(..) => {
 				unreachable!("Test should be failed");
-			},
+			}
 			Err(err) => {
 				let expected_err = PrecompileFailure::Error {
 					exit_status: ExitError::Other(test.expected_error.into()),
 				};
-				assert_eq!(expected_err, err, "Test '{}' failed (different error)", test.name);
-			},
+				assert_eq!(
+					expected_err, err,
+					"Test '{}' failed (different error)",
+					test.name
+				);
+			}
 		}
 	}
 

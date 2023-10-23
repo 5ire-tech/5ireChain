@@ -19,19 +19,20 @@
 
 use ethereum::{TransactionAction, TransactionSignature};
 use frame_support::{
-	dispatch::Dispatchable,
 	parameter_types,
 	traits::{ConstU32, FindAuthor},
 	weights::Weight,
 	ConsensusEngineId, PalletId,
 };
-use pallet_evm::{AddressMapping, EnsureAddressTruncated, FeeCalculator};
 use rlp::RlpStream;
 use sp_core::{hashing::keccak_256, H160, H256, U256};
 use sp_runtime::{
 	traits::{BlakeTwo256, IdentityLookup},
 	AccountId32, BuildStorage,
 };
+
+// Frontier
+use pallet_evm::{AddressMapping, EnsureAddressTruncated, FeeCalculator};
 
 use super::*;
 use crate::IntermediateStateRoot;
