@@ -330,6 +330,7 @@ runtime-benchmarks = [
 	"pallet-whitelist/runtime-benchmarks",
 	"frame-system-benchmarking/runtime-benchmarks",
 	"pallet-esg/runtime-benchmarks",
+	"pallet-ethereum/runtime-benchmarks",
 ]
 try-runtime = [
 	"frame-try-runtime/try-runtime",
@@ -398,5 +399,5 @@ try-runtime = [
 	"pallet-nft-fractionalization/try-runtime",
 	"pallet-vesting/try-runtime",
 	"pallet-whitelist/try-runtime",
-	"pallet-esg/try-runtime",
+	#"pallet-esg/try-runtime",
 ]
