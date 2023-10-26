@@ -32,6 +32,10 @@ pub enum Client {
 	Qa(Arc<FullClient<firechain_qa_runtime::RuntimeApi, FirechainQaRuntimeExecutor>>),
 	#[cfg(feature = "firechain-uat")]
 	Uat(Arc<FullClient<firechain_uat_runtime::RuntimeApi, FirechainUatRuntimeExecutor>>),
+	#[cfg(feature = "firechain-thunder")]
+	Thunder(
+		Arc<FullClient<firechain_thunder_runtime::RuntimeApi, FirechainThunderRuntimeExecutor>>,
+	),
 }
 
 /// Only enable the benchmarking host functions when we actually want to benchmark.
@@ -51,6 +55,22 @@ impl sc_executor::NativeExecutionDispatch for FirechainQaRuntimeExecutor {
 
 	fn native_version() -> NativeVersion {
 		firechain_qa_runtime::native_version()
+	}
+}
+
+#[cfg(feature = "firechain-thunder")]
+pub struct FirechainThunderRuntimeExecutor;
+
+#[cfg(feature = "firechain-thunder")]
+impl sc_executor::NativeExecutionDispatch for FirechainThunderRuntimeExecutor {
+	type ExtendHostFunctions = sp_statement_store::runtime_api::statement_store::HostFunctions;
+
+	fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
+		firechain_thunder_runtime::api::dispatch(method, data)
+	}
+
+	fn native_version() -> NativeVersion {
+		firechain_thunder_runtime::native_version()
 	}
 }
 
@@ -89,6 +109,19 @@ impl From<Arc<FullClient<firechain_uat_runtime::RuntimeApi, FirechainUatRuntimeE
 		client: Arc<FullClient<firechain_uat_runtime::RuntimeApi, FirechainUatRuntimeExecutor>>,
 	) -> Self {
 		Self::Uat(client)
+	}
+}
+
+#[cfg(feature = "firechain-thunder")]
+impl From<Arc<FullClient<firechain_thunder_runtime::RuntimeApi, FirechainThunderRuntimeExecutor>>>
+	for Client
+{
+	fn from(
+		client: Arc<
+			FullClient<firechain_thunder_runtime::RuntimeApi, FirechainThunderRuntimeExecutor>,
+		>,
+	) -> Self {
+		Self::Thunder(client)
 	}
 }
 
@@ -148,13 +181,15 @@ impl ClientHandle for Client {
 			Self::Qa(client) => T::execute_with_client::<_, _, FullBackend>(t, client.clone()),
 			#[cfg(feature = "firechain-uat")]
 			Self::Uat(client) => T::execute_with_client::<_, _, FullBackend>(t, client.clone()),
+			#[cfg(feature = "firechain-thunder")]
+			Self::Thunder(client) => T::execute_with_client::<_, _, FullBackend>(t, client.clone()),
 		}
 	}
 }
 
 /// A handle to a client instance.
 ///
-/// The service supports multiple different runtimes (Qa, Uat e.t.c.).
+/// The service supports multiple different runtimes (Qa, Uat, Thunder e.t.c.).
 /// As each runtime has a specialized client, we need to hide them
 /// behind a trait. This is this trait.
 ///
@@ -171,6 +206,8 @@ macro_rules! match_client {
 			Self::Qa(client) => client.$method($($param),*),
 			#[cfg(feature = "firechain-uat")]
 			Self::Uat(client) => client.$method($($param),*),
+			#[cfg(feature = "firechain-thunder")]
+			Self::Thunder(client) => client.$method($($param),*),
 		}
 	};
 }
@@ -185,17 +222,23 @@ pub enum RuntimeVariant {
 	#[cfg(feature = "firechain-uat")]
 	Uat,
 	#[allow(dead_code)]
+	#[cfg(feature = "firechain-thunder")]
+	Thunder,
+	#[allow(dead_code)]
 	Unrecognized,
 }
 
 /// Can be called for a `Configuration` to check if it is a configuration for
 /// the `Firechain` network.
 pub trait IdentifyVariant {
-	/// Returns `true` if this is a configuration for the `Firechain` network.
+	/// Returns `true` if this is a configuration for the `Firechain` qa network.
 	fn is_qa(&self) -> bool;
 
-	/// Returns `true` if this is a configuration for the `Firechain` network.
+	/// Returns `true` if this is a configuration for the `Firechain` uat network.
 	fn is_uat(&self) -> bool;
+
+	/// Returns `true` if this is a configuration for the `Firechain` thunder network.
+	fn is_thunder(&self) -> bool;
 }
 
 impl IdentifyVariant for Box<dyn ChainSpec> {
@@ -205,6 +248,10 @@ impl IdentifyVariant for Box<dyn ChainSpec> {
 
 	fn is_uat(&self) -> bool {
 		self.id().starts_with("uat")
+	}
+
+	fn is_thunder(&self) -> bool {
+		self.id().starts_with("thunder")
 	}
 }
 
