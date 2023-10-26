@@ -19,16 +19,13 @@
 
 use frame_support::{
 	pallet_prelude::*,
-	traits::{
-		Currency, OnUnbalanced,
-	},
+	traits::{Currency, OnUnbalanced},
 };
 use pallet_alliance::{IdentityVerifier, ProposalIndex, ProposalProvider};
 use sp_std::prelude::*;
 
 use crate::{
-	AccountId, AllianceMotion, Authorship, Balances, Hash, NegativeImbalance,
-	RuntimeCall,
+	AccountId, AllianceMotion, Authorship, Balances, Hash, NegativeImbalance, RuntimeCall,
 };
 
 pub struct Author;
