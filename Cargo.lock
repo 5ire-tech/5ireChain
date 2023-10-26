@@ -2733,10 +2733,7 @@ dependencies = [
  "log",
  "node-primitives",
  "pallet-alliance",
- "pallet-asset-conversion",
- "pallet-asset-conversion-tx-payment",
  "pallet-asset-rate",
- "pallet-asset-tx-payment",
  "pallet-assets",
  "pallet-authority-discovery",
  "pallet-authorship",
@@ -2853,10 +2850,7 @@ dependencies = [
  "log",
  "node-primitives",
  "pallet-alliance",
- "pallet-asset-conversion",
- "pallet-asset-conversion-tx-payment",
  "pallet-asset-rate",
- "pallet-asset-tx-payment",
  "pallet-assets",
  "pallet-authority-discovery",
  "pallet-authorship",
@@ -6010,24 +6004,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-asset-conversion"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#55d432df8daa5e6e28733b84ef605c7417ce5223"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "scale-info",
- "sp-api",
- "sp-arithmetic",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "pallet-asset-conversion-tx-payment"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#55d432df8daa5e6e28733b84ef605c7417ce5223"
@@ -6060,13 +6036,11 @@ name = "pallet-asset-tx-payment"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#55d432df8daa5e6e28733b84ef605c7417ce5223"
 dependencies = [
- "frame-benchmarking",
  "frame-support",
  "frame-system",
  "pallet-transaction-payment",
  "parity-scale-codec",
  "scale-info",
- "serde",
  "sp-core",
  "sp-io",
  "sp-runtime",

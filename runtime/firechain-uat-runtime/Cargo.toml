@@ -24,7 +24,6 @@ scale-info = { version = "2.5.0", default-features = false, features = ["derive"
 static_assertions = "1.1.0"
 log = { version = "0.4.17", default-features = false }
 
-# pallet-asset-conversion: turn on "num-traits" feature
 primitive-types = { version = "0.12.0", default-features = false, features = ["codec", "scale-info", "num-traits"] }
 firechain-runtime-core-primitives = {path="../core-primitives", default-features = false}
 # primitives
@@ -57,7 +56,6 @@ frame-election-provider-support = { version = "4.0.0-dev", default-features = fa
 frame-system-rpc-runtime-api = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 frame-try-runtime = { version = "0.10.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0", optional = true }
 pallet-alliance = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-pallet-asset-conversion = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-asset-rate = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-assets = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-authority-discovery = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
@@ -112,8 +110,6 @@ pallet-treasury = { version = "4.0.0-dev", default-features = false, git = "ssh:
 pallet-utility = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-transaction-payment = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-transaction-payment-rpc-runtime-api = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"}
-pallet-asset-conversion-tx-payment = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-pallet-asset-tx-payment = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"}
 pallet-transaction-storage = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-vesting = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-esg = { version = "1.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"}
@@ -145,12 +141,9 @@ with-tracing = ["frame-executive/with-tracing"]
 std = [
 	"pallet-offences-benchmarking?/std",
 	"pallet-election-provider-support-benchmarking?/std",
-	"pallet-asset-conversion-tx-payment/std",
-	"pallet-asset-tx-payment/std",
 	"frame-system-benchmarking?/std",
 	"frame-election-provider-support/std",
 	"sp-authority-discovery/std",
-	"pallet-asset-conversion/std",
 	"pallet-assets/std",
 	"pallet-authority-discovery/std",
 	"pallet-authorship/std",
@@ -214,7 +207,6 @@ std = [
 	"pallet-transaction-payment/std",
 	"pallet-transaction-storage/std",
 	"pallet-treasury/std",
-	"pallet-asset-rate/std",
 	"sp-transaction-pool/std",
 	"sp-statement-store/std",
 	"pallet-utility/std",
@@ -254,7 +246,6 @@ runtime-benchmarks = [
 	"frame-system/runtime-benchmarks",
 	"sp-runtime/runtime-benchmarks",
 	"pallet-alliance/runtime-benchmarks",
-	"pallet-asset-conversion/runtime-benchmarks",
 	"pallet-assets/runtime-benchmarks",
 	"pallet-babe/runtime-benchmarks",
 	"pallet-bags-list/runtime-benchmarks",
@@ -307,7 +298,6 @@ try-runtime = [
 	"frame-system/try-runtime",
 	"frame-support/try-runtime",
 	"pallet-alliance/try-runtime",
-	"pallet-asset-conversion/try-runtime",
 	"pallet-assets/try-runtime",
 	"pallet-authority-discovery/try-runtime",
 	"pallet-authorship/try-runtime",
@@ -353,8 +343,6 @@ try-runtime = [
 	"pallet-asset-rate/try-runtime",
 	"pallet-utility/try-runtime",
 	"pallet-transaction-payment/try-runtime",
-	"pallet-asset-conversion-tx-payment/try-runtime",
-	"pallet-asset-tx-payment/try-runtime",
 	"pallet-transaction-storage/try-runtime",
 	"pallet-vesting/try-runtime",
 	"pallet-esg/try-runtime",
