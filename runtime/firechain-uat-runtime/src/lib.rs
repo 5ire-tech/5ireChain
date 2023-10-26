@@ -37,8 +37,7 @@ use frame_support::{
 	pallet_prelude::Get,
 	parameter_types,
 	traits::{
-		fungible::ItemOf,
-		tokens::{nonfungibles_v2::Inspect, GetSalary, PayFromAccount},
+		tokens::GetSalary,
 		AsEnsureOriginWithArg, ConstBool, ConstU128, ConstU16, ConstU32, Currency, EitherOfDiverse,
 		EqualPrivilegeOnly, Everything, FindAuthor, Imbalance, InstanceFilter, KeyOwnerProofSystem,
 		LockIdentifier, Nothing, OnUnbalanced, WithdrawReasons,
@@ -49,7 +48,7 @@ use frame_support::{
 		},
 		ConstantMultiplier, IdentityFee, Weight,
 	},
-	BoundedVec, PalletId, RuntimeDebug,
+	PalletId, RuntimeDebug,
 };
 use frame_system::{
 	limits::{BlockLength, BlockWeights},
@@ -351,7 +350,6 @@ impl InstanceFilter<RuntimeCall> for ProxyType {
 				c,
 				RuntimeCall::Balances(..) |
 					RuntimeCall::Assets(..) |
-					RuntimeCall::Uniques(..) |
 					RuntimeCall::Vesting(pallet_vesting::Call::vested_transfer { .. }) |
 					RuntimeCall::Indices(pallet_indices::Call::transfer { .. })
 			),
@@ -1571,38 +1569,6 @@ impl pallet_asset_conversion::Config for Runtime {
 }
 
 parameter_types! {
-	pub const CollectionDeposit: Balance = 100 * DOLLARS;
-	pub const ItemDeposit: Balance = DOLLARS;
-	pub const KeyLimit: u32 = 32;
-	pub const ValueLimit: u32 = 256;
-	pub const ApprovalsLimit: u32 = 20;
-	pub const ItemAttributesApprovalsLimit: u32 = 20;
-	pub const MaxTips: u32 = 10;
-	pub const MaxDeadlineDuration: BlockNumber = 12 * 30 * DAYS;
-}
-
-impl pallet_uniques::Config for Runtime {
-	type RuntimeEvent = RuntimeEvent;
-	type CollectionId = u32;
-	type ItemId = u32;
-	type Currency = Balances;
-	type ForceOrigin = frame_system::EnsureRoot<AccountId>;
-	type CollectionDeposit = CollectionDeposit;
-	type ItemDeposit = ItemDeposit;
-	type MetadataDepositBase = MetadataDepositBase;
-	type AttributeDepositBase = MetadataDepositBase;
-	type DepositPerByte = MetadataDepositPerByte;
-	type StringLimit = StringLimit;
-	type KeyLimit = KeyLimit;
-	type ValueLimit = ValueLimit;
-	type WeightInfo = pallet_uniques::weights::SubstrateWeight<Runtime>;
-	#[cfg(feature = "runtime-benchmarks")]
-	type Helper = ();
-	type CreateOrigin = AsEnsureOriginWithArg<EnsureSigned<AccountId>>;
-	type Locker = ();
-}
-
-parameter_types! {
 	pub const Budget: Balance = 10_000 * DOLLARS;
 	pub TreasuryAccount: AccountId = Treasury::account_id();
 }
@@ -1891,7 +1857,6 @@ construct_runtime!(
 		Assets: pallet_assets::<Instance1>,
 		PoolAssets: pallet_assets::<Instance2>,
 		Mmr: pallet_mmr,
-		Uniques: pallet_uniques,
 		CoreFellowship: pallet_core_fellowship,
 		TransactionStorage: pallet_transaction_storage,
 		VoterList: pallet_bags_list::<Instance1>,
@@ -1982,8 +1947,7 @@ mod benches {
 		[pallet_tips, Tips]
 		[pallet_transaction_storage, TransactionStorage]
 		[pallet_treasury, Treasury]
-		[pallet_asset_rate, AssetRate]
-		[pallet_uniques, Uniques]
+		[pallet_asset_rate, AssetRate]=
 		[pallet_utility, Utility]
 		[pallet_vesting, Vesting]
 		[pallet_evm, EVM]

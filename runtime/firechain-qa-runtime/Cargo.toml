@@ -116,7 +116,6 @@ pallet-transaction-payment-rpc-runtime-api = { version = "4.0.0-dev", default-fe
 pallet-asset-conversion-tx-payment = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-asset-tx-payment = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"}
 pallet-transaction-storage = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-pallet-uniques = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-vesting = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-esg = { version = "1.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"}
 
@@ -227,7 +226,6 @@ std = [
 	"pallet-remark/std",
 	"pallet-root-testing/std",
 	"pallet-recovery/std",
-	"pallet-uniques/std",
 	"pallet-vesting/std",
 	"log/std",
 	"frame-try-runtime?/std",
@@ -300,7 +298,6 @@ runtime-benchmarks = [
 	"pallet-treasury/runtime-benchmarks",
 	"pallet-asset-rate/runtime-benchmarks",
 	"pallet-utility/runtime-benchmarks",
-	"pallet-uniques/runtime-benchmarks",
 	"pallet-vesting/runtime-benchmarks",
 	"frame-system-benchmarking/runtime-benchmarks",
 	"pallet-esg/runtime-benchmarks",
@@ -362,7 +359,6 @@ try-runtime = [
 	"pallet-asset-conversion-tx-payment/try-runtime",
 	"pallet-asset-tx-payment/try-runtime",
 	"pallet-transaction-storage/try-runtime",
-	"pallet-uniques/try-runtime",
 	"pallet-vesting/try-runtime",
 	"pallet-esg/try-runtime",
 ]

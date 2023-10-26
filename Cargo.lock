@@ -2801,7 +2801,6 @@ dependencies = [
  "pallet-transaction-payment-rpc-runtime-api",
  "pallet-transaction-storage",
  "pallet-treasury",
- "pallet-uniques",
  "pallet-utility",
  "pallet-vesting",
  "parity-scale-codec",
@@ -2924,7 +2923,6 @@ dependencies = [
  "pallet-transaction-payment-rpc-runtime-api",
  "pallet-transaction-storage",
  "pallet-treasury",
- "pallet-uniques",
  "pallet-utility",
  "pallet-vesting",
  "parity-scale-codec",
@@ -7221,21 +7219,6 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-uniques"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#55d432df8daa5e6e28733b84ef605c7417ce5223"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "log",
- "parity-scale-codec",
- "scale-info",
  "sp-runtime",
  "sp-std",
 ]
