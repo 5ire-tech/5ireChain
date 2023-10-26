@@ -357,7 +357,6 @@ impl InstanceFilter<RuntimeCall> for ProxyType {
 				c,
 				RuntimeCall::Democracy(..) |
 					RuntimeCall::Council(..) |
-					RuntimeCall::Society(..) |
 					RuntimeCall::TechnicalCommittee(..) |
 					RuntimeCall::Elections(..) |
 					RuntimeCall::Treasury(..)
@@ -1422,36 +1421,6 @@ impl pallet_recovery::Config for Runtime {
 }
 
 parameter_types! {
-	pub const GraceStrikes: u32 = 10;
-	pub const SocietyVotingPeriod: BlockNumber = 80 * HOURS;
-	pub const ClaimPeriod: BlockNumber = 80 * HOURS;
-	pub const PeriodSpend: Balance = 500 * DOLLARS;
-	pub const MaxLockDuration: BlockNumber = 36 * 30 * DAYS;
-	pub const ChallengePeriod: BlockNumber = 7 * DAYS;
-	pub const MaxPayouts: u32 = 10;
-	pub const MaxBids: u32 = 10;
-	pub const SocietyPalletId: PalletId = PalletId(*b"py/socie");
-}
-
-impl pallet_society::Config for Runtime {
-	type RuntimeEvent = RuntimeEvent;
-	type PalletId = SocietyPalletId;
-	type Currency = Balances;
-	type Randomness = RandomnessCollectiveFlip;
-	type GraceStrikes = GraceStrikes;
-	type PeriodSpend = PeriodSpend;
-	type VotingPeriod = SocietyVotingPeriod;
-	type ClaimPeriod = ClaimPeriod;
-	type MaxLockDuration = MaxLockDuration;
-	type FounderSetOrigin =
-		pallet_collective::EnsureProportionMoreThan<AccountId, CouncilCollective, 1, 2>;
-	type ChallengePeriod = ChallengePeriod;
-	type MaxPayouts = MaxPayouts;
-	type MaxBids = MaxBids;
-	type WeightInfo = pallet_society::weights::SubstrateWeight<Runtime>;
-}
-
-parameter_types! {
 	pub const MinVestedTransfer: Balance = 100 * DOLLARS;
 	pub UnvestedFundsAllowedWithdrawReasons: WithdrawReasons =
 		WithdrawReasons::except(WithdrawReasons::TRANSFER | WithdrawReasons::RESERVE);
@@ -1845,7 +1814,6 @@ construct_runtime!(
 		Historical: pallet_session_historical::{Pallet},
 		RandomnessCollectiveFlip: pallet_insecure_randomness_collective_flip,
 		Identity: pallet_identity,
-		Society: pallet_society,
 		Recovery: pallet_recovery,
 		Vesting: pallet_vesting,
 		Scheduler: pallet_scheduler,
@@ -1938,7 +1906,6 @@ mod benches {
 		[pallet_remark, Remark]
 		[pallet_scheduler, Scheduler]
 		[pallet_session, SessionBench::<Runtime>]
-		[pallet_society, Society]
 		[pallet_staking, Staking]
 		[pallet_state_trie_migration, StateTrieMigration]
 		[pallet_sudo, Sudo]
