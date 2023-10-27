@@ -20,7 +20,9 @@ use crate::{
 	service,
 	service::new_partial,
 };
+#[cfg(feature = "runtime-benchmarks")]
 use frame_benchmarking_cli::*;
+
 use node_primitives::Block;
 use sc_cli::{Result, SubstrateCli};
 use sc_service::PartialComponents;
@@ -170,6 +172,7 @@ pub fn run() -> Result<()> {
 		//
 		// 	runner.sync_run(|config| cmd.run::<Block, RuntimeApi, ExecutorDispatch>(config))
 		// },
+		#[cfg(feature = "runtime-benchmarks")]
 		Some(Subcommand::Benchmark(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 
@@ -300,7 +303,6 @@ pub fn run() -> Result<()> {
 						_ => Err("Chain spec not supported".into()),
 					}
 				},
-				//BenchmarkCmd::Storage(_) |
 				BenchmarkCmd::Overhead(_) |
 				BenchmarkCmd::Extrinsic(_) |
 				BenchmarkCmd::Machine(_) => Err("Unsupported benchmarking command".into()),
