@@ -6,4 +6,3 @@ pub mod client;
 pub mod eth;
 pub mod rpc;
 pub mod service;
-
