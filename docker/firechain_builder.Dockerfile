@@ -46,7 +46,8 @@ RUN set -eux; \
 RUN ldd /5ire/firechain-node
 RUN /5ire/firechain-node --version
 
+EXPOSE 30333 9933 9944
 
-VOLUME ["/data"]
+VOLUME ["5ire/data"]
 
-ENTRYPOINT ["/5ire/firechain-node", "--chain", "/5ire/specs/5ire-qa-chain-spec-raw.json", "-d", "/data", "--prometheus-external", "--rpc-external", "--rpc-cors", "all", "--rpc-methods=unsafe"]
+ENTRYPOINT ["/5ire/firechain-node"]
