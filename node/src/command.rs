@@ -186,21 +186,21 @@ pub fn run() -> Result<()> {
 							#[cfg(feature = "firechain-qa")]
 							spec if spec.is_qa() => runner.sync_run(|config| {
 								return cmd
-									.run::<firechain_qa_runtime::Block, crate::client::HostFunctions>(
+									.run::<firechain_qa_runtime::Block, sp_statement_store::runtime_api::HostFunctions>(
 										config,
 									)
 							}),
 							#[cfg(feature = "firechain-uat")]
 							spec if spec.is_uat() => runner.sync_run(|config| {
 								return cmd
-									.run::<firechain_uat_runtime::Block, crate::client::HostFunctions>(
+									.run::<firechain_uat_runtime::Block, sp_statement_store::runtime_api::HostFunctions>(
 										config,
 									)
 							}),
 							#[cfg(feature = "firechain-thunder")]
-							spec if spec.is_uat() => runner.sync_run(|config| {
+							spec if spec.is_thunder() => runner.sync_run(|config| {
 								return cmd
-									.run::<firechain_thunder_runtime::Block, crate::client::HostFunctions>(
+									.run::<firechain_thunder_runtime::Block, sp_statement_store::runtime_api::HostFunctions>(
 										config,
 									)
 							}),
