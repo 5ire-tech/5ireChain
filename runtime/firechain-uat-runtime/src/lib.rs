@@ -2167,6 +2167,7 @@ mod benches {
 		[pallet_vesting, Vesting]
 		[pallet_whitelist, Whitelist]
 		[pallet_evm, EVM]
+		[pallet_esg, EsgScore]
 	);
 }
 
