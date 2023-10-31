@@ -41,7 +41,6 @@ sp-runtime = { version = "24.0.0", default-features = false, git = "ssh://git@gi
 sp-staking = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 sp-session = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"}
 sp-transaction-pool = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"}
-sp-statement-store = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"}
 sp-version = { version = "22.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 sp-io = { version = "23.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 
@@ -101,7 +100,6 @@ pallet-staking = { version = "4.0.0-dev", default-features = false, git = "ssh:/
 pallet-staking-reward-curve = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-staking-runtime-api = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-state-trie-migration = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-pallet-statement = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 pallet-scheduler = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"}
 pallet-sudo = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0"}
 pallet-timestamp = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
@@ -191,7 +189,6 @@ std = [
 	"pallet-staking/std",
 	"pallet-staking-runtime-api/std",
 	"pallet-state-trie-migration/std",
-	"pallet-statement/std",
 	"sp-session/std",
 	"pallet-sudo/std",
 	"frame-support/std",
@@ -207,7 +204,6 @@ std = [
 	"pallet-treasury/std",
 	"pallet-asset-rate/std",
 	"sp-transaction-pool/std",
-	"sp-statement-store/std",
 	"pallet-utility/std",
 	"sp-version/std",
 	"pallet-ranked-collective/std",
@@ -331,7 +327,6 @@ try-runtime = [
 	"pallet-session/try-runtime",
 	"pallet-staking/try-runtime",
 	"pallet-state-trie-migration/try-runtime",
-	"pallet-statement/try-runtime",
 	"pallet-scheduler/try-runtime",
 	"pallet-sudo/try-runtime",
 	"pallet-timestamp/try-runtime",

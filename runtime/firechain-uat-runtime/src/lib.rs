@@ -1608,27 +1608,6 @@ impl pallet_alliance::Config for Runtime {
 impl frame_benchmarking_pallet_pov::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 }
-
-parameter_types! {
-	pub StatementCost: Balance = DOLLARS;
-	pub StatementByteCost: Balance = 100 * MILLICENTS;
-	pub const MinAllowedStatements: u32 = 4;
-	pub const MaxAllowedStatements: u32 = 10;
-	pub const MinAllowedBytes: u32 = 1024;
-	pub const MaxAllowedBytes: u32 = 4096;
-}
-
-impl pallet_statement::Config for Runtime {
-	type RuntimeEvent = RuntimeEvent;
-	type Currency = Balances;
-	type StatementCost = StatementCost;
-	type ByteCost = StatementByteCost;
-	type MinAllowedStatements = MinAllowedStatements;
-	type MaxAllowedStatements = MaxAllowedStatements;
-	type MinAllowedBytes = MinAllowedBytes;
-	type MaxAllowedBytes = MaxAllowedBytes;
-}
-
 impl pallet_esg::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type MaxFileSize = ConstU32<1024000>;
@@ -1783,7 +1762,6 @@ construct_runtime!(
 		RankedCollective: pallet_ranked_collective,
 		FastUnstake: pallet_fast_unstake,
 		Pov: frame_benchmarking_pallet_pov,
-		Statement: pallet_statement,
 		EsgScore: pallet_esg,
 
 		Ethereum: pallet_ethereum,
@@ -1914,15 +1892,6 @@ impl_runtime_apis! {
 			block_hash: <Block as BlockT>::Hash,
 		) -> TransactionValidity {
 			Executive::validate_transaction(source, tx, block_hash)
-		}
-	}
-
-	impl sp_statement_store::runtime_api::ValidateStatement<Block> for Runtime {
-		fn validate_statement(
-			source: sp_statement_store::runtime_api::StatementSource,
-			statement: sp_statement_store::Statement,
-		) -> Result<sp_statement_store::runtime_api::ValidStatement, sp_statement_store::runtime_api::InvalidStatement> {
-			Statement::validate_statement(source, statement)
 		}
 	}
 
