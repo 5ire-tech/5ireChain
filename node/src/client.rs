@@ -79,6 +79,7 @@ pub struct FirechainUatRuntimeExecutor;
 
 #[cfg(feature = "firechain-uat")]
 impl sc_executor::NativeExecutionDispatch for FirechainUatRuntimeExecutor {
+	type ExtendHostFunctions = ();
 	fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
 		firechain_uat_runtime::api::dispatch(method, data)
 	}
