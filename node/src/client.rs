@@ -63,7 +63,7 @@ pub struct FirechainThunderRuntimeExecutor;
 
 #[cfg(feature = "firechain-thunder")]
 impl sc_executor::NativeExecutionDispatch for FirechainThunderRuntimeExecutor {
-	type ExtendHostFunctions = sp_statement_store::runtime_api::statement_store::HostFunctions;
+	type ExtendHostFunctions = ();
 
 	fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
 		firechain_thunder_runtime::api::dispatch(method, data)
