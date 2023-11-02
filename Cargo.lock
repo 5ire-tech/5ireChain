@@ -2653,7 +2653,6 @@ dependencies = [
  "sc-keystore",
  "sc-network",
  "sc-network-common",
- "sc-network-statement",
  "sc-network-sync",
  "sc-offchain",
  "sc-rpc",
@@ -2661,7 +2660,6 @@ dependencies = [
  "sc-rpc-spec-v2",
  "sc-service",
  "sc-service-test",
- "sc-statement-store",
  "sc-storage-monitor",
  "sc-sync-state-rpc",
  "sc-sysinfo",
@@ -2685,7 +2683,6 @@ dependencies = [
  "sp-offchain",
  "sp-runtime",
  "sp-session",
- "sp-statement-store",
  "sp-storage",
  "sp-timestamp",
  "sp-tracing",
@@ -2858,10 +2855,7 @@ dependencies = [
  "log",
  "node-primitives",
  "pallet-alliance",
- "pallet-asset-conversion",
- "pallet-asset-conversion-tx-payment",
  "pallet-asset-rate",
- "pallet-asset-tx-payment",
  "pallet-assets",
  "pallet-authority-discovery",
  "pallet-authorship",
@@ -2889,22 +2883,15 @@ dependencies = [
  "pallet-evm-precompile-sha3fips",
  "pallet-evm-precompile-simple",
  "pallet-fast-unstake",
- "pallet-glutton",
  "pallet-grandpa",
  "pallet-hotfix-sufficients",
  "pallet-identity",
  "pallet-im-online",
  "pallet-indices",
  "pallet-insecure-randomness-collective-flip",
- "pallet-lottery",
  "pallet-membership",
- "pallet-message-queue",
  "pallet-mmr",
  "pallet-multisig",
- "pallet-nft-fractionalization",
- "pallet-nfts",
- "pallet-nfts-runtime-api",
- "pallet-nis",
  "pallet-nomination-pools",
  "pallet-nomination-pools-benchmarking",
  "pallet-nomination-pools-runtime-api",
@@ -2917,7 +2904,6 @@ dependencies = [
  "pallet-referenda",
  "pallet-remark",
  "pallet-root-testing",
- "pallet-salary",
  "pallet-scheduler",
  "pallet-session",
  "pallet-session-benchmarking",
@@ -2926,18 +2912,14 @@ dependencies = [
  "pallet-staking-reward-curve",
  "pallet-staking-runtime-api",
  "pallet-state-trie-migration",
- "pallet-statement",
  "pallet-sudo",
  "pallet-timestamp",
- "pallet-tips",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc-runtime-api",
  "pallet-transaction-storage",
  "pallet-treasury",
- "pallet-uniques",
  "pallet-utility",
  "pallet-vesting",
- "pallet-whitelist",
  "parity-scale-codec",
  "primitive-types",
  "scale-info",
@@ -2953,7 +2935,6 @@ dependencies = [
  "sp-runtime",
  "sp-session",
  "sp-staking",
- "sp-statement-store",
  "sp-std",
  "sp-transaction-pool",
  "sp-version",
@@ -9445,24 +9426,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sc-network-statement"
-version = "0.10.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#55d432df8daa5e6e28733b84ef605c7417ce5223"
-dependencies = [
- "array-bytes",
- "async-channel",
- "futures",
- "libp2p",
- "log",
- "parity-scale-codec",
- "sc-network",
- "sc-network-common",
- "sp-consensus",
- "sp-statement-store",
- "substrate-prometheus-endpoint",
-]
-
-[[package]]
 name = "sc-network-sync"
 version = "0.10.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#55d432df8daa5e6e28733b84ef605c7417ce5223"
@@ -9758,24 +9721,6 @@ dependencies = [
  "parity-scale-codec",
  "parking_lot 0.12.1",
  "sp-core",
-]
-
-[[package]]
-name = "sc-statement-store"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#55d432df8daa5e6e28733b84ef605c7417ce5223"
-dependencies = [
- "log",
- "parity-db",
- "parking_lot 0.12.1",
- "sc-client-api",
- "sp-api",
- "sp-blockchain",
- "sp-core",
- "sp-runtime",
- "sp-statement-store",
- "substrate-prometheus-endpoint",
- "tokio",
 ]
 
 [[package]]

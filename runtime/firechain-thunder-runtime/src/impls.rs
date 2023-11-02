@@ -18,18 +18,13 @@
 //! Some configurable implementations as associated type for the substrate runtime.
 
 use crate::{
-	AccountId, AllianceMotion, Assets, Authorship, Balances, Hash, NegativeImbalance, Runtime,
-	RuntimeCall,
+	AccountId, AllianceMotion, Authorship, Balances, Hash, NegativeImbalance, RuntimeCall,
 };
 use frame_support::{
 	pallet_prelude::*,
-	traits::{
-		fungibles::{Balanced, Credit},
-		Currency, OnUnbalanced,
-	},
+	traits::{Currency, OnUnbalanced},
 };
 use pallet_alliance::{IdentityVerifier, ProposalIndex, ProposalProvider};
-use pallet_asset_tx_payment::HandleCredit;
 use sp_std::prelude::*;
 
 pub struct Author;
@@ -37,18 +32,6 @@ impl OnUnbalanced<NegativeImbalance> for Author {
 	fn on_nonzero_unbalanced(amount: NegativeImbalance) {
 		if let Some(author) = Authorship::author() {
 			Balances::resolve_creating(&author, amount);
-		}
-	}
-}
-
-/// A `HandleCredit` implementation that naively transfers the fees to the block author.
-/// Will drop and burn the assets in case the transfer fails.
-pub struct CreditToBlockAuthor;
-impl HandleCredit<AccountId, Assets> for CreditToBlockAuthor {
-	fn handle_credit(credit: Credit<AccountId, Assets>) {
-		if let Some(author) = pallet_authorship::Pallet::<Runtime>::author() {
-			// Drop the result which will trigger the `OnDrop` of the imbalance in case of error.
-			let _ = Assets::resolve(&author, credit);
 		}
 	}
 }
@@ -126,7 +109,7 @@ mod multiplier_tests {
 
 	use crate::{
 		constants::{currency::*, time::*},
-		AdjustmentVariable, MaximumMultiplier, MinimumMultiplier, Runtime,
+		AdjustmentVariable, MaximumMultiplier, MinimumMultiplier,
 		RuntimeBlockWeights as BlockWeights, System, TargetBlockFullness, TransactionPayment,
 	};
 

@@ -47,7 +47,7 @@ pub struct FirechainQaRuntimeExecutor;
 
 #[cfg(feature = "firechain-qa")]
 impl sc_executor::NativeExecutionDispatch for FirechainQaRuntimeExecutor {
-	type ExtendHostFunctions = sp_statement_store::runtime_api::statement_store::HostFunctions;
+	type ExtendHostFunctions = ();
 
 	fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
 		firechain_qa_runtime::api::dispatch(method, data)
@@ -63,7 +63,7 @@ pub struct FirechainThunderRuntimeExecutor;
 
 #[cfg(feature = "firechain-thunder")]
 impl sc_executor::NativeExecutionDispatch for FirechainThunderRuntimeExecutor {
-	type ExtendHostFunctions = sp_statement_store::runtime_api::statement_store::HostFunctions;
+	type ExtendHostFunctions = ();
 
 	fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
 		firechain_thunder_runtime::api::dispatch(method, data)
@@ -79,7 +79,7 @@ pub struct FirechainUatRuntimeExecutor;
 
 #[cfg(feature = "firechain-uat")]
 impl sc_executor::NativeExecutionDispatch for FirechainUatRuntimeExecutor {
-	type ExtendHostFunctions = sp_statement_store::runtime_api::statement_store::HostFunctions;
+	type ExtendHostFunctions = ();
 
 	fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
 		firechain_uat_runtime::api::dispatch(method, data)

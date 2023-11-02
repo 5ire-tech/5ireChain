@@ -25,27 +25,23 @@ use crate::rpc::{create_full, BabeDeps, FullDeps, GrandpaDeps};
 use firechain_runtime_core_primitives::opaque::{Block, BlockNumber, Hash};
 use frame_benchmarking_cli::SUBSTRATE_REFERENCE_HARDWARE;
 use futures::prelude::*;
-use sc_client_api::{Backend, BlockBackend};
+use sc_client_api::BlockBackend;
 use sc_consensus_babe::{self, BabeWorkerHandle, SlotProportion};
 use sc_executor::NativeElseWasmExecutor;
 use sc_network::{event::Event, NetworkEventStream};
 use sc_network_common::sync::warp::WarpSyncParams;
 use sc_service::{config::Configuration, error::Error as ServiceError, TaskManager};
-use sc_statement_store::Store as StatementStore;
 use sc_telemetry::{Telemetry, TelemetryWorker};
 use sc_transaction_pool_api::OffchainTransactionPoolFactory;
 use sp_api::ConstructRuntimeApi;
 use sp_trie::PrefixedMemoryDB;
-// use std::sync::Arc;
 
 use sp_runtime::traits::BlakeTwo256;
 use std::{
 	collections::BTreeMap,
 	sync::{Arc, Mutex},
 };
-// Frontier
-//
-// use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
+
 #[cfg(feature = "firechain-qa")]
 use crate::client::FirechainQaRuntimeExecutor;
 #[cfg(feature = "firechain-thunder")]
@@ -104,7 +100,6 @@ pub fn new_partial<RuntimeApi, Executor>(
 			BabeWorkerHandle<Block>,
 			// grandpa::SharedVoterState,
 			Option<Telemetry>,
-			Arc<StatementStore>,
 			FrontierBackend,
 		),
 	>,
@@ -116,7 +111,6 @@ where
 	RuntimeApi::RuntimeApi:
 		RuntimeApiCollection<StateBackend = sc_client_api::StateBackendFor<FullBackend, Block>>,
 	RuntimeApi::RuntimeApi: sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>,
-	RuntimeApi::RuntimeApi: sp_statement_store::runtime_api::ValidateStatement<Block>,
 	Executor: sc_executor::NativeExecutionDispatch + 'static,
 {
 	let telemetry = config
@@ -208,15 +202,6 @@ where
 
 	let import_setup = (block_import, grandpa_link, babe_link);
 
-	let statement_store = sc_statement_store::Store::new_shared(
-		&config.data_path,
-		Default::default(),
-		client.clone(),
-		config.prometheus_registry(),
-		&task_manager.spawn_handle(),
-	)
-	.map_err(|e| ServiceError::Other(format!("Statement store error: {:?}", e)))?;
-
 	Ok(sc_service::PartialComponents {
 		client,
 		backend,
@@ -225,7 +210,7 @@ where
 		select_chain,
 		import_queue,
 		transaction_pool,
-		other: (import_setup, babe_worker_handle, telemetry, statement_store, frontier_backend),
+		other: (import_setup, babe_worker_handle, telemetry, frontier_backend),
 	})
 }
 /// Creates a full service from the configuration.
@@ -248,7 +233,6 @@ where
 	RuntimeApi::RuntimeApi:
 		RuntimeApiCollection<StateBackend = sc_client_api::StateBackendFor<FullBackend, Block>>,
 	RuntimeApi::RuntimeApi: sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>,
-	RuntimeApi::RuntimeApi: sp_statement_store::runtime_api::ValidateStatement<Block>,
 	RuntimeApi::RuntimeApi: mmr_rpc::MmrRuntimeApi<Block, Hash, BlockNumber>,
 	RuntimeApi::RuntimeApi: sp_authority_discovery::AuthorityDiscoveryApi<Block>,
 	Executor: sc_executor::NativeExecutionDispatch + 'static,
@@ -268,7 +252,7 @@ where
 		keystore_container,
 		select_chain,
 		transaction_pool,
-		other: (import_setup, babe_worker_handle, mut telemetry, statement_store, frontier_backend),
+		other: (import_setup, babe_worker_handle, mut telemetry, frontier_backend),
 	} = new_partial(&config, eth_config.clone())?;
 
 	new_frontier_partial(&eth_config)?;
@@ -283,12 +267,6 @@ where
 	net_config.add_notification_protocol(grandpa::grandpa_peers_set_config(
 		grandpa_protocol_name.clone(),
 	));
-
-	let statement_handler_proto = sc_network_statement::StatementHandlerPrototype::new(
-		client.block_hash(0u32).ok().flatten().expect("Genesis block exists; qed"),
-		config.chain_spec.fork_id(),
-	);
-	net_config.add_notification_protocol(statement_handler_proto.set_config());
 
 	let warp_sync = Arc::new(grandpa::warp_proof::NetworkProvider::new(
 		backend.clone(),
@@ -315,7 +293,7 @@ where
 	let name = config.network.node_name.clone();
 	let enable_grandpa = !config.disable_grandpa;
 	let _prometheus_registry = config.prometheus_registry().cloned();
-	let enable_offchain_worker = config.offchain_worker.enabled;
+	let _enable_offchain_worker = config.offchain_worker.enabled;
 
 	// Sinks for pubsub notifications.
 	// Everytime a new subscription is created, a new mpsc channel is added to the sink pool.
@@ -443,7 +421,6 @@ where
 		let chain_spec = config.chain_spec.cloned_box();
 
 		let rpc_backend = backend.clone();
-		let rpc_statement_store = statement_store.clone();
 		let subscription_task_executor = Arc::new(task_manager.spawn_handle());
 		let rpc_extensions_builder = move |deny_unsafe, subscription_executor| {
 			let deps = FullDeps {
@@ -463,7 +440,6 @@ where
 					subscription_executor,
 					finality_provider: finality_proof_provider.clone(),
 				},
-				statement_store: rpc_statement_store.clone(),
 				backend: rpc_backend.clone(),
 				eth: eth_rpc_params.clone(),
 			};
@@ -668,49 +644,6 @@ where
 		);
 	}
 
-	// Spawn statement protocol worker
-	let statement_protocol_executor = {
-		let spawn_handle = task_manager.spawn_handle();
-		Box::new(move |fut| {
-			spawn_handle.spawn("network-statement-validator", Some("networking"), fut);
-		})
-	};
-	let statement_handler = statement_handler_proto.build(
-		network.clone(),
-		sync_service.clone(),
-		statement_store.clone(),
-		prometheus_registry.as_ref(),
-		statement_protocol_executor,
-	)?;
-	task_manager.spawn_handle().spawn(
-		"network-statement-handler",
-		Some("networking"),
-		statement_handler.run(),
-	);
-
-	if enable_offchain_worker {
-		task_manager.spawn_handle().spawn(
-			"offchain-workers-runner",
-			"offchain-work",
-			sc_offchain::OffchainWorkers::new(sc_offchain::OffchainWorkerOptions {
-				runtime_api_provider: client.clone(),
-				keystore: Some(keystore_container.keystore()),
-				offchain_db: backend.offchain_storage(),
-				transaction_pool: Some(OffchainTransactionPoolFactory::new(
-					transaction_pool.clone(),
-				)),
-				network_provider: network.clone(),
-				is_validator: role.is_authority(),
-				enable_http_requests: true,
-				custom_extensions: move |_| {
-					vec![Box::new(statement_store.clone().as_statement_store_ext()) as Box<_>]
-				},
-			})
-			.run(client.clone(), task_manager.spawn_handle())
-			.boxed(),
-		);
-	}
-
 	network_starter.start_network();
 	Ok(task_manager)
 }
@@ -769,7 +702,6 @@ where
 	RuntimeApi::RuntimeApi:
 		RuntimeApiCollection<StateBackend = sc_client_api::StateBackendFor<FullBackend, Block>>,
 	RuntimeApi::RuntimeApi: sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>,
-	RuntimeApi::RuntimeApi: sp_statement_store::runtime_api::ValidateStatement<Block>,
 	RuntimeApi::RuntimeApi: mmr_rpc::MmrRuntimeApi<Block, Hash, BlockNumber>,
 	RuntimeApi::RuntimeApi: sp_authority_discovery::AuthorityDiscoveryApi<Block>,
 	Executor: sc_executor::NativeExecutionDispatch + 'static,
@@ -792,7 +724,6 @@ where
 	RuntimeApi::RuntimeApi:
 		RuntimeApiCollection<StateBackend = sc_client_api::StateBackendFor<FullBackend, Block>>,
 	RuntimeApi::RuntimeApi: sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>,
-	RuntimeApi::RuntimeApi: sp_statement_store::runtime_api::ValidateStatement<Block>,
 	RuntimeApi::RuntimeApi: mmr_rpc::MmrRuntimeApi<Block, Hash, BlockNumber>,
 	RuntimeApi::RuntimeApi: sp_authority_discovery::AuthorityDiscoveryApi<Block>,
 	Executor: sc_executor::NativeExecutionDispatch + 'static,
