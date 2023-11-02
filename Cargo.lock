@@ -2838,10 +2838,7 @@ dependencies = [
  "log",
  "node-primitives",
  "pallet-alliance",
- "pallet-asset-conversion",
- "pallet-asset-conversion-tx-payment",
  "pallet-asset-rate",
- "pallet-asset-tx-payment",
  "pallet-assets",
  "pallet-authority-discovery",
  "pallet-authorship",
@@ -2869,22 +2866,15 @@ dependencies = [
  "pallet-evm-precompile-sha3fips",
  "pallet-evm-precompile-simple",
  "pallet-fast-unstake",
- "pallet-glutton",
  "pallet-grandpa",
  "pallet-hotfix-sufficients",
  "pallet-identity",
  "pallet-im-online",
  "pallet-indices",
  "pallet-insecure-randomness-collective-flip",
- "pallet-lottery",
  "pallet-membership",
- "pallet-message-queue",
  "pallet-mmr",
  "pallet-multisig",
- "pallet-nft-fractionalization",
- "pallet-nfts",
- "pallet-nfts-runtime-api",
- "pallet-nis",
  "pallet-nomination-pools",
  "pallet-nomination-pools-benchmarking",
  "pallet-nomination-pools-runtime-api",
@@ -2897,7 +2887,6 @@ dependencies = [
  "pallet-referenda",
  "pallet-remark",
  "pallet-root-testing",
- "pallet-salary",
  "pallet-scheduler",
  "pallet-session",
  "pallet-session-benchmarking",
@@ -2906,18 +2895,14 @@ dependencies = [
  "pallet-staking-reward-curve",
  "pallet-staking-runtime-api",
  "pallet-state-trie-migration",
- "pallet-statement",
  "pallet-sudo",
  "pallet-timestamp",
- "pallet-tips",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc-runtime-api",
  "pallet-transaction-storage",
  "pallet-treasury",
- "pallet-uniques",
  "pallet-utility",
  "pallet-vesting",
- "pallet-whitelist",
  "parity-scale-codec",
  "primitive-types",
  "scale-info",
@@ -2933,7 +2918,6 @@ dependencies = [
  "sp-runtime",
  "sp-session",
  "sp-staking",
- "sp-statement-store",
  "sp-std",
  "sp-transaction-pool",
  "sp-version",
@@ -6114,24 +6098,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-asset-conversion"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#6710404d5080b42d69428d355eedc339f675ea40"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "scale-info",
- "sp-api",
- "sp-arithmetic",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "pallet-asset-conversion-tx-payment"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#6710404d5080b42d69428d355eedc339f675ea40"
@@ -6164,13 +6130,11 @@ name = "pallet-asset-tx-payment"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#6710404d5080b42d69428d355eedc339f675ea40"
 dependencies = [
- "frame-benchmarking",
  "frame-support",
  "frame-system",
  "pallet-transaction-payment",
  "parity-scale-codec",
  "scale-info",
- "serde",
  "sp-core",
  "sp-io",
  "sp-runtime",
@@ -6675,24 +6639,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-glutton"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#6710404d5080b42d69428d355eedc339f675ea40"
-dependencies = [
- "blake2",
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "log",
- "parity-scale-codec",
- "scale-info",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "pallet-grandpa"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#6710404d5080b42d69428d355eedc339f675ea40"
@@ -6800,20 +6746,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-lottery"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#6710404d5080b42d69428d355eedc339f675ea40"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "scale-info",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "pallet-membership"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#6710404d5080b42d69428d355eedc339f675ea40"
@@ -6828,25 +6760,6 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-std",
-]
-
-[[package]]
-name = "pallet-message-queue"
-version = "7.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#6710404d5080b42d69428d355eedc339f675ea40"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "log",
- "parity-scale-codec",
- "scale-info",
- "sp-arithmetic",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
- "sp-weights",
 ]
 
 [[package]]
@@ -6878,68 +6791,6 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-nft-fractionalization"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#6710404d5080b42d69428d355eedc339f675ea40"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "log",
- "pallet-assets",
- "pallet-nfts",
- "parity-scale-codec",
- "scale-info",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-nfts"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#6710404d5080b42d69428d355eedc339f675ea40"
-dependencies = [
- "enumflags2",
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "log",
- "parity-scale-codec",
- "scale-info",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-nfts-runtime-api"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#6710404d5080b42d69428d355eedc339f675ea40"
-dependencies = [
- "frame-support",
- "pallet-nfts",
- "parity-scale-codec",
- "sp-api",
-]
-
-[[package]]
-name = "pallet-nis"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#6710404d5080b42d69428d355eedc339f675ea40"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "scale-info",
- "sp-arithmetic",
- "sp-core",
  "sp-runtime",
  "sp-std",
 ]
@@ -7150,24 +7001,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-salary"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#6710404d5080b42d69428d355eedc339f675ea40"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "log",
- "parity-scale-codec",
- "scale-info",
- "sp-arithmetic",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "pallet-scheduler"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#6710404d5080b42d69428d355eedc339f675ea40"
@@ -7304,24 +7137,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-statement"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#6710404d5080b42d69428d355eedc339f675ea40"
-dependencies = [
- "frame-support",
- "frame-system",
- "log",
- "parity-scale-codec",
- "scale-info",
- "sp-api",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-statement-store",
- "sp-std",
-]
-
-[[package]]
 name = "pallet-sudo"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#6710404d5080b42d69428d355eedc339f675ea40"
@@ -7352,25 +7167,6 @@ dependencies = [
  "sp-runtime",
  "sp-std",
  "sp-timestamp",
-]
-
-[[package]]
-name = "pallet-tips"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#6710404d5080b42d69428d355eedc339f675ea40"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "log",
- "pallet-treasury",
- "parity-scale-codec",
- "scale-info",
- "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
 ]
 
 [[package]]
@@ -7456,21 +7252,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-uniques"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#6710404d5080b42d69428d355eedc339f675ea40"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "log",
- "parity-scale-codec",
- "scale-info",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "pallet-utility"
 version = "4.0.0-dev"
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#6710404d5080b42d69428d355eedc339f675ea40"
@@ -7497,21 +7278,6 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-whitelist"
-version = "4.0.0-dev"
-source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.0.0#6710404d5080b42d69428d355eedc339f675ea40"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "scale-info",
- "sp-api",
  "sp-runtime",
  "sp-std",
 ]
