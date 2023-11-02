@@ -1,6 +1,6 @@
 // This file is part of Substrate.
 
-// Copyright (C) 2019-2022 Parity Technologies (UK) Ltd.
+// Copyright (C) Parity Technologies (UK) Ltd.
 // SPDX-License-Identifier: Apache-2.0
 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,15 +17,16 @@
 
 //! Some configurable implementations as associated type for the substrate runtime.
 
-use crate::{
-	AccountId, AllianceMotion, Authorship, Balances, Hash, NegativeImbalance, RuntimeCall,
-};
 use frame_support::{
 	pallet_prelude::*,
 	traits::{Currency, OnUnbalanced},
 };
 use pallet_alliance::{IdentityVerifier, ProposalIndex, ProposalProvider};
 use sp_std::prelude::*;
+
+use crate::{
+	AccountId, AllianceMotion, Authorship, Balances, Hash, NegativeImbalance, RuntimeCall,
+};
 
 pub struct Author;
 impl OnUnbalanced<NegativeImbalance> for Author {
@@ -44,15 +45,13 @@ impl IdentityVerifier<AccountId> for AllianceIdentityVerifier {
 
 	fn has_good_judgement(who: &AccountId) -> bool {
 		use pallet_identity::Judgement;
-		if let Some(judgements) =
-			crate::Identity::identity(who).map(|registration| registration.judgements)
-		{
-			judgements
-				.iter()
-				.any(|(_, j)| matches!(j, Judgement::KnownGood | Judgement::Reasonable))
-		} else {
-			false
-		}
+		crate::Identity::identity(who)
+			.map(|registration| registration.judgements)
+			.map_or(false, |judgements| {
+				judgements
+					.iter()
+					.any(|(_, j)| matches!(j, Judgement::KnownGood | Judgement::Reasonable))
+			})
 	}
 
 	fn super_account_id(who: &AccountId) -> Option<AccountId> {
@@ -109,7 +108,7 @@ mod multiplier_tests {
 
 	use crate::{
 		constants::{currency::*, time::*},
-		AdjustmentVariable, MaximumMultiplier, MinimumMultiplier,
+		AdjustmentVariable, MaximumMultiplier, MinimumMultiplier, Runtime,
 		RuntimeBlockWeights as BlockWeights, System, TargetBlockFullness, TransactionPayment,
 	};
 
@@ -137,20 +136,6 @@ mod multiplier_tests {
 			MinimumMultiplier,
 			MaximumMultiplier,
 		>::convert(fm)
-	}
-
-	fn run_with_system_weight<F>(w: Weight, assertions: F)
-	where
-		F: Fn() -> (),
-	{
-		let mut t: sp_io::TestExternalities = frame_system::GenesisConfig::<Runtime>::default()
-			.build_storage()
-			.unwrap()
-			.into();
-		t.execute_with(|| {
-			System::set_block_consumed_resources(w, 0);
-			assertions()
-		});
 	}
 
 	// update based on reference impl.
@@ -189,6 +174,20 @@ mod multiplier_tests {
 		let t2 = v.powi(2) * (s / m - ss / m).powi(2) / 2.0;
 		let next_float = previous_float * (1.0 + t1 + t2);
 		Multiplier::from_float(next_float)
+	}
+
+	fn run_with_system_weight<F>(w: Weight, assertions: F)
+	where
+		F: Fn() -> (),
+	{
+		let mut t: sp_io::TestExternalities = frame_system::GenesisConfig::<Runtime>::default()
+			.build_storage()
+			.unwrap()
+			.into();
+		t.execute_with(|| {
+			System::set_block_consumed_resources(w, 0);
+			assertions()
+		});
 	}
 
 	#[test]
