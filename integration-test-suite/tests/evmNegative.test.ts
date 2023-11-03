@@ -139,7 +139,7 @@ async function createContractWithInvalidNonceFailure(evmAddress:any, alice: Keyr
         const dataStr = JSON.parse(data);
 
         const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
-        expect(filteredData[0].event.data[0].module.index == 70).true; //EVM
+        expect(filteredData[0].event.data[0].module.index == 55).true; //EVM
         expect(filteredData[0].event.data[0].module.error == '0x05000000').true; //InvalidNonce, index 5
 
         unsub();
@@ -176,7 +176,7 @@ async function    createContractWithGasPriceTooLowFailure(evmAddress:any, alice:
 
         const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
         console.log(`filteredData ${JSON.stringify(filteredData)}`);
-        expect(filteredData[0].event.data[0].module.index == 70).true; //EVM
+        expect(filteredData[0].event.data[0].module.index == 55).true; //EVM
         expect(filteredData[0].event.data[0].module.error == '0x04000000').true; //GasPriceTooLow
 
         unsub();
@@ -213,7 +213,7 @@ async function createContractWithGasLimitTooLowFailure(evmAddress:any, alice: Ke
 
         const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
         console.log(`filteredData ${JSON.stringify(filteredData)}`);
-        expect(filteredData[0].event.data[0].module.index == 70).true; //EVM
+        expect(filteredData[0].event.data[0].module.index == 55).true; //EVM
         expect(filteredData[0].event.data[0].module.error == '0x06000000').true; //GasLimitTooLow
 
         unsub();
@@ -251,7 +251,7 @@ async function createContractWithGasLimitTooHighFailure(evmAddress:any, alice: K
 
           const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
           console.log(`filteredData ${JSON.stringify(filteredData)}`);
-          expect(filteredData[0].event.data[0].module.index == 70).true; //EVM
+          expect(filteredData[0].event.data[0].module.index == 55).true; //EVM
           expect(filteredData[0].event.data[0].module.error == '0x06000000').true; //GasLimitTooLow
 
           unsub();
