@@ -22,8 +22,8 @@ use firechain_uat_runtime::{
 	constants::currency::*, wasm_binary_unwrap, AuthorityDiscoveryConfig, BabeConfig,
 	BalancesConfig, Block, CouncilConfig, DemocracyConfig, ElectionsConfig, EthereumConfig,
 	GrandpaConfig, ImOnlineConfig, IndicesConfig, MaxNominations, NominationPoolsConfig,
-	SessionConfig, SessionKeys, SocietyConfig, StakerStatus, StakingConfig, SudoConfig,
-	SystemConfig, TechnicalCommitteeConfig,
+	SessionConfig, SessionKeys, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
+	TechnicalCommitteeConfig,
 };
 use fp_evm::GenesisAccount;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
@@ -362,7 +362,6 @@ pub fn testnet_genesis(
 		grandpa: Default::default(),
 		technical_membership: Default::default(),
 		treasury: Default::default(),
-		society: SocietyConfig { pot: 0 },
 		vesting: Default::default(),
 		assets: Default::default(),
 		pool_assets: Default::default(),
@@ -375,7 +374,6 @@ pub fn testnet_genesis(
 			min_join_bond: DOLLARS,
 			..Default::default()
 		},
-		glutton: Default::default(),
 		// EVM compatibility
 		evm: Default::default(),
 		ethereum: Default::default(),
@@ -503,8 +501,6 @@ pub fn development_genesis(
 		grandpa: GrandpaConfig { authorities: vec![], ..Default::default() },
 		technical_membership: Default::default(),
 		treasury: Default::default(),
-
-		society: Default::default(),
 		vesting: Default::default(),
 		assets: Default::default(),
 		pool_assets: Default::default(),
@@ -518,7 +514,6 @@ pub fn development_genesis(
 			min_join_bond: DOLLARS,
 			..Default::default()
 		},
-		glutton: Default::default(),
 
 		// EVM compatibility
 		evm: EVMConfig {

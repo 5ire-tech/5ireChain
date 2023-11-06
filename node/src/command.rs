@@ -186,7 +186,7 @@ pub fn run() -> Result<()> {
 							)
 						}
 
-						cmd.run::<Block, sp_statement_store::runtime_api::HostFunctions>(config)
+						cmd.run::<Block, ()>(config)
 					},
 					BenchmarkCmd::Block(cmd) => {
 						let runner = cli.create_runner(cmd)?;

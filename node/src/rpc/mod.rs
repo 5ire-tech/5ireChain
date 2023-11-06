@@ -96,8 +96,6 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi, CT> {
 	pub babe: BabeDeps,
 	/// GRANDPA specific dependencies.
 	pub grandpa: GrandpaDeps<B>,
-	/// Shared statement store reference.
-	pub statement_store: Arc<dyn sp_statement_store::StatementStore>,
 	/// The backend used by the node.
 	pub backend: Arc<B>,
 	/// Ethereum-compatibility specific dependencies.
@@ -127,7 +125,6 @@ pub fn create_full<C, P, BE, SC, B, A, CT>(
 		deny_unsafe,
 		babe,
 		grandpa,
-		statement_store,
 		backend,
 		eth,
 	}: FullDeps<C, P, SC, B, A, CT>,
@@ -172,10 +169,7 @@ where
 	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApiServer};
 	use sc_consensus_babe_rpc::{Babe, BabeApiServer};
 	use sc_consensus_grandpa_rpc::{Grandpa, GrandpaApiServer};
-	use sc_rpc::{
-		dev::{Dev, DevApiServer},
-		statement::StatementApiServer,
-	};
+	use sc_rpc::dev::{Dev, DevApiServer};
 	use sc_rpc_spec_v2::chain_spec::{ChainSpec, ChainSpecApiServer};
 	use sc_sync_state_rpc::{SyncState, SyncStateApiServer};
 	use substrate_frame_rpc_system::{System, SystemApiServer};
@@ -234,9 +228,6 @@ where
 
 	io.merge(StateMigration::new(client.clone(), backend, deny_unsafe).into_rpc())?;
 	io.merge(Dev::new(client, deny_unsafe).into_rpc())?;
-	let statement_store =
-		sc_rpc::statement::StatementStore::new(statement_store, deny_unsafe).into_rpc();
-	io.merge(statement_store)?;
 
 	// Ethereum compatibility RPCs
 	let io = create_eth::<_, _, _, _, _, _, DefaultEthConfig<C, BE>>(
