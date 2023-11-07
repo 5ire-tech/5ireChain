@@ -255,10 +255,13 @@ sp_api::decl_runtime_apis! {
 	}
 }
 
+/// Fallback transaction converter when the `ConvertTransactionRuntimeApi` is not available. For
+/// almost all non-legacy cases, you can instantiate this type as `NoTransactionConverter`.
 pub trait ConvertTransaction<E> {
 	fn convert_transaction(&self, transaction: ethereum::TransactionV2) -> E;
 }
 
+/// No fallback transaction converter is available.
 // `NoTransactionConverter` is a non-instantiable type (an enum with no variants),
 // so we are guaranteed at compile time that `NoTransactionConverter` can never be instantiated.
 pub enum NoTransactionConverter {}
@@ -267,6 +270,6 @@ impl<E> ConvertTransaction<E> for NoTransactionConverter {
 	// an instance of type Self, so we are guaranteed at compile time that this method can never be
 	// called.
 	fn convert_transaction(&self, _transaction: ethereum::TransactionV2) -> E {
-		unreachable!()
+		match *self {}
 	}
 }

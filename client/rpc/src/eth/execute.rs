@@ -25,14 +25,15 @@ use scale_codec::{Decode, Encode};
 // Substrate
 use sc_client_api::backend::{Backend, StorageProvider};
 use sc_transaction_pool::ChainApi;
-use sp_api::{
-	ApiExt, CallApiAt, CallApiAtParams, CallContext, Extensions, ProvideRuntimeApi,
-	StorageTransactionCache,
-};
+use sp_api::{ApiExt, CallApiAt, CallApiAtParams, CallContext, Extensions, ProvideRuntimeApi};
 use sp_block_builder::BlockBuilder as BlockBuilderApi;
 use sp_blockchain::HeaderBackend;
+use sp_inherents::CreateInherentDataProviders;
 use sp_io::hashing::{blake2_128, twox_128};
-use sp_runtime::{traits::Block as BlockT, DispatchError, SaturatedConversion};
+use sp_runtime::{
+	traits::{Block as BlockT, HashingFor},
+	DispatchError, SaturatedConversion,
+};
 use sp_state_machine::OverlayedChanges;
 // Frontier
 use fc_rpc_core::types::*;
@@ -41,7 +42,7 @@ use fp_rpc::{EthereumRuntimeRPCApi, RuntimeStorageOverride};
 use fp_storage::{EVM_ACCOUNT_CODES, PALLET_EVM};
 
 use crate::{
-	eth::{pending_runtime_api, Eth, EthConfig},
+	eth::{Eth, EthConfig},
 	frontier_backend_client, internal_err,
 };
 
@@ -66,19 +67,21 @@ impl EstimateGasAdapter for () {
 	}
 }
 
-impl<B, C, P, CT, BE, A: ChainApi, EC: EthConfig<B, C>> Eth<B, C, P, CT, BE, A, EC>
+impl<B, C, P, CT, BE, A, CIDP, EC> Eth<B, C, P, CT, BE, A, CIDP, EC>
 where
 	B: BlockT,
 	C: CallApiAt<B> + ProvideRuntimeApi<B>,
 	C::Api: BlockBuilderApi<B> + EthereumRuntimeRPCApi<B>,
 	C: HeaderBackend<B> + StorageProvider<B, BE> + 'static,
 	BE: Backend<B> + 'static,
-	A: ChainApi<Block = B> + 'static,
+	A: ChainApi<Block = B>,
+	CIDP: CreateInherentDataProviders<B, ()> + Send + 'static,
+	EC: EthConfig<B, C>,
 {
 	pub async fn call(
 		&self,
 		request: CallRequest,
-		number: Option<BlockNumber>,
+		number_or_hash: Option<BlockNumberOrHash>,
 		state_overrides: Option<BTreeMap<H160, CallStateOverride>>,
 	) -> RpcResult<Bytes> {
 		let CallRequest {
@@ -103,7 +106,7 @@ where
 		let (substrate_hash, api) = match frontier_backend_client::native_block_id::<B, C>(
 			self.client.as_ref(),
 			self.backend.as_ref(),
-			number,
+			number_or_hash,
 		)
 		.await?
 		{
@@ -116,8 +119,9 @@ where
 			},
 			None => {
 				// Not mapped in the db, assume pending.
-				let hash = self.client.info().best_hash;
-				let api = pending_runtime_api(self.client.as_ref(), self.graph.as_ref())?;
+				let (hash, api) = self.pending_runtime_api().await.map_err(|err| {
+					internal_err(format!("Create pending runtime api error: {err}"))
+				})?;
 				(hash, api)
 			},
 		};
@@ -132,12 +136,12 @@ where
 
 		let block = if api_version > 1 {
 			api.current_block(substrate_hash)
-				.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?
+				.map_err(|err| internal_err(format!("runtime error: {err}")))?
 		} else {
 			#[allow(deprecated)]
 			let legacy_block = api
 				.current_block_before_version_2(substrate_hash)
-				.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?;
+				.map_err(|err| internal_err(format!("runtime error: {err}")))?;
 			legacy_block.map(|block| block.into())
 		};
 
@@ -183,8 +187,8 @@ where
 						nonce,
 						false,
 					)
-					.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?
-					.map_err(|err| internal_err(format!("execution fatal: {:?}", err)))?;
+					.map_err(|err| internal_err(format!("runtime error: {err}")))?
+					.map_err(|err| internal_err(format!("execution fatal: {err:?}")))?;
 
 					error_on_execution_failure(&info.exit_reason, &info.value)?;
 					Ok(Bytes(info.value))
@@ -203,8 +207,8 @@ where
 						nonce,
 						false,
 					)
-					.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?
-					.map_err(|err| internal_err(format!("execution fatal: {:?}", err)))?;
+					.map_err(|err| internal_err(format!("runtime error: {err}")))?
+					.map_err(|err| internal_err(format!("execution fatal: {err:?}")))?;
 
 					error_on_execution_failure(&info.exit_reason, &info.value)?;
 					Ok(Bytes(info.value))
@@ -233,14 +237,11 @@ where
 						api_version,
 						state_overrides,
 					)?;
-					let storage_transaction_cache =
-						RefCell::<StorageTransactionCache<B, C::StateBackend>>::default();
 					let params = CallApiAtParams {
 						at: substrate_hash,
 						function: "EthereumRuntimeRPCApi_call",
 						arguments: encoded_params,
 						overlayed_changes: &RefCell::new(overlayed_changes),
-						storage_transaction_cache: &storage_transaction_cache,
 						call_context: CallContext::Offchain,
 						recorder: &None,
 						extensions: &RefCell::new(Extensions::new()),
@@ -259,8 +260,8 @@ where
 									},
 								)
 							})
-							.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?
-							.map_err(|err| internal_err(format!("execution fatal: {:?}", err)))?;
+							.map_err(|err| internal_err(format!("runtime error: {err}")))?
+							.map_err(|err| internal_err(format!("execution fatal: {err:?}")))?;
 
 						error_on_execution_failure(&info.exit_reason, &info.value)?;
 						info.value
@@ -277,8 +278,8 @@ where
 									},
 								)
 							})
-							.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?
-							.map_err(|err| internal_err(format!("execution fatal: {:?}", err)))?;
+							.map_err(|err| internal_err(format!("runtime error: {err}")))?
+							.map_err(|err| internal_err(format!("execution fatal: {err:?}")))?;
 
 						error_on_execution_failure(&info.exit_reason, &info.value)?;
 						info.value
@@ -305,14 +306,14 @@ where
 						nonce,
 						false,
 					)
-					.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?
-					.map_err(|err| internal_err(format!("execution fatal: {:?}", err)))?;
+					.map_err(|err| internal_err(format!("runtime error: {err}")))?
+					.map_err(|err| internal_err(format!("execution fatal: {err:?}")))?;
 
 					error_on_execution_failure(&info.exit_reason, &[])?;
 
 					let code = api
 						.account_code_at(substrate_hash, info.value)
-						.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?;
+						.map_err(|err| internal_err(format!("runtime error: {err}")))?;
 					Ok(Bytes(code))
 				} else if api_version >= 2 && api_version < 4 {
 					// Post-london
@@ -328,14 +329,14 @@ where
 						nonce,
 						false,
 					)
-					.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?
-					.map_err(|err| internal_err(format!("execution fatal: {:?}", err)))?;
+					.map_err(|err| internal_err(format!("runtime error: {err}")))?
+					.map_err(|err| internal_err(format!("execution fatal: {err:?}")))?;
 
 					error_on_execution_failure(&info.exit_reason, &[])?;
 
 					let code = api
 						.account_code_at(substrate_hash, info.value)
-						.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?;
+						.map_err(|err| internal_err(format!("runtime error: {err}")))?;
 					Ok(Bytes(code))
 				} else if api_version == 4 {
 					// Post-london + access list support
@@ -358,14 +359,14 @@ where
 								.collect(),
 						),
 					)
-					.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?
-					.map_err(|err| internal_err(format!("execution fatal: {:?}", err)))?;
+					.map_err(|err| internal_err(format!("runtime error: {err}")))?
+					.map_err(|err| internal_err(format!("execution fatal: {err:?}")))?;
 
 					error_on_execution_failure(&info.exit_reason, &[])?;
 
 					let code = api
 						.account_code_at(substrate_hash, info.value)
-						.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?;
+						.map_err(|err| internal_err(format!("runtime error: {err}")))?;
 					Ok(Bytes(code))
 				} else if api_version == 5 {
 					// Post-london + access list support
@@ -388,14 +389,14 @@ where
 									.collect(),
 							),
 						)
-						.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?
-						.map_err(|err| internal_err(format!("execution fatal: {:?}", err)))?;
+						.map_err(|err| internal_err(format!("runtime error: {err}")))?
+						.map_err(|err| internal_err(format!("execution fatal: {err:?}")))?;
 
 					error_on_execution_failure(&info.exit_reason, &[])?;
 
 					let code = api
 						.account_code_at(substrate_hash, info.value)
-						.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?;
+						.map_err(|err| internal_err(format!("runtime error: {err}")))?;
 					Ok(Bytes(code))
 				} else {
 					Err(internal_err("failed to retrieve Runtime Api version"))
@@ -407,7 +408,7 @@ where
 	pub async fn estimate_gas(
 		&self,
 		request: CallRequest,
-		number: Option<BlockNumber>,
+		number_or_hash: Option<BlockNumberOrHash>,
 	) -> RpcResult<U256> {
 		let client = Arc::clone(&self.client);
 		let block_data_cache = Arc::clone(&self.block_data_cache);
@@ -419,7 +420,7 @@ where
 		let (substrate_hash, api) = match frontier_backend_client::native_block_id::<B, C>(
 			self.client.as_ref(),
 			self.backend.as_ref(),
-			number,
+			number_or_hash,
 		)
 		.await?
 		{
@@ -431,8 +432,9 @@ where
 			},
 			None => {
 				// Not mapped in the db, assume pending.
-				let hash = client.info().best_hash;
-				let api = pending_runtime_api(client.as_ref(), self.graph.as_ref())?;
+				let (hash, api) = self.pending_runtime_api().await.map_err(|err| {
+					internal_err(format!("Create pending runtime api error: {err}"))
+				})?;
 				(hash, api)
 			},
 		};
@@ -449,7 +451,7 @@ where
 			if let Some(to) = request.to {
 				let to_code = api
 					.account_code_at(substrate_hash, to)
-					.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?;
+					.map_err(|err| internal_err(format!("runtime error: {err}")))?;
 				if to_code.is_empty() {
 					return Ok(MIN_GAS_PER_TX)
 				}
@@ -501,7 +503,7 @@ where
 			if gas_price > U256::zero() {
 				let balance = api
 					.account_basic(substrate_hash, from)
-					.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?
+					.map_err(|err| internal_err(format!("runtime error: {err}")))?
 					.balance;
 				let mut available = balance;
 				if let Some(value) = request.value {
@@ -580,8 +582,8 @@ where
 								nonce,
 								estimate_mode,
 							)
-							.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?
-							.map_err(|err| internal_err(format!("execution fatal: {:?}", err)))?;
+							.map_err(|err| internal_err(format!("runtime error: {err}")))?
+							.map_err(|err| internal_err(format!("execution fatal: {err:?}")))?;
 
 							(info.exit_reason, info.value, info.used_gas)
 						} else if api_version < 4 {
@@ -599,8 +601,8 @@ where
 								nonce,
 								estimate_mode,
 							)
-							.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?
-							.map_err(|err| internal_err(format!("execution fatal: {:?}", err)))?;
+							.map_err(|err| internal_err(format!("runtime error: {err}")))?
+							.map_err(|err| internal_err(format!("execution fatal: {err:?}")))?;
 
 							(info.exit_reason, info.value, info.used_gas)
 						} else if api_version == 4 {
@@ -625,8 +627,8 @@ where
 										.collect(),
 								),
 							)
-							.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?
-							.map_err(|err| internal_err(format!("execution fatal: {:?}", err)))?;
+							.map_err(|err| internal_err(format!("runtime error: {err}")))?
+							.map_err(|err| internal_err(format!("execution fatal: {err:?}")))?;
 
 							(info.exit_reason, info.value, info.used_gas)
 						} else {
@@ -650,8 +652,8 @@ where
 										.collect(),
 								),
 							)
-							.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?
-							.map_err(|err| internal_err(format!("execution fatal: {:?}", err)))?;
+							.map_err(|err| internal_err(format!("runtime error: {err}")))?
+							.map_err(|err| internal_err(format!("execution fatal: {err:?}")))?;
 
 							(info.exit_reason, info.value, info.used_gas.effective)
 						}
@@ -670,8 +672,8 @@ where
 								nonce,
 								estimate_mode,
 							)
-							.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?
-							.map_err(|err| internal_err(format!("execution fatal: {:?}", err)))?;
+							.map_err(|err| internal_err(format!("runtime error: {err}")))?
+							.map_err(|err| internal_err(format!("execution fatal: {err:?}")))?;
 
 							(info.exit_reason, Vec::new(), info.used_gas)
 						} else if api_version < 4 {
@@ -688,8 +690,8 @@ where
 								nonce,
 								estimate_mode,
 							)
-							.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?
-							.map_err(|err| internal_err(format!("execution fatal: {:?}", err)))?;
+							.map_err(|err| internal_err(format!("runtime error: {err}")))?
+							.map_err(|err| internal_err(format!("execution fatal: {err:?}")))?;
 
 							(info.exit_reason, Vec::new(), info.used_gas)
 						} else if api_version == 4 {
@@ -713,8 +715,8 @@ where
 										.collect(),
 								),
 							)
-							.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?
-							.map_err(|err| internal_err(format!("execution fatal: {:?}", err)))?;
+							.map_err(|err| internal_err(format!("runtime error: {err}")))?
+							.map_err(|err| internal_err(format!("execution fatal: {err:?}")))?;
 
 							(info.exit_reason, Vec::new(), info.used_gas)
 						} else {
@@ -737,8 +739,8 @@ where
 										.collect(),
 								),
 							)
-							.map_err(|err| internal_err(format!("runtime error: {:?}", err)))?
-							.map_err(|err| internal_err(format!("execution fatal: {:?}", err)))?;
+							.map_err(|err| internal_err(format!("runtime error: {err}")))?
+							.map_err(|err| internal_err(format!("execution fatal: {err:?}")))?;
 
 							(info.exit_reason, Vec::new(), info.used_gas.effective)
 						}
@@ -785,8 +787,7 @@ where
 					match exit_reason {
 						ExitReason::Succeed(_) =>
 							return Err(internal_err(format!(
-								"gas required exceeds allowance {}",
-								cap
+								"gas required exceeds allowance {cap}",
 							))),
 						// The execution has been done with block gas limit, so it is not a lack of
 						// gas from the user.
@@ -856,7 +857,7 @@ where
 		block_hash: B::Hash,
 		api_version: u32,
 		state_overrides: Option<BTreeMap<H160, CallStateOverride>>,
-	) -> RpcResult<OverlayedChanges> {
+	) -> RpcResult<OverlayedChanges<HashingFor<B>>> {
 		let mut overlayed_changes = OverlayedChanges::default();
 		if let Some(state_overrides) = state_overrides {
 			for (address, state_override) in state_overrides {
@@ -931,12 +932,12 @@ where
 pub fn error_on_execution_failure(reason: &ExitReason, data: &[u8]) -> RpcResult<()> {
 	match reason {
 		ExitReason::Succeed(_) => Ok(()),
-		ExitReason::Error(e) => {
-			if *e == ExitError::OutOfGas {
+		ExitReason::Error(err) => {
+			if *err == ExitError::OutOfGas {
 				// `ServerError(0)` will be useful in estimate gas
 				return Err(internal_err("out of gas"))
 			}
-			Err(crate::internal_err_with_data(format!("evm error: {:?}", e), &[]))
+			Err(crate::internal_err_with_data(format!("evm error: {err:?}"), &[]))
 		},
 		ExitReason::Revert(_) => {
 			const LEN_START: usize = 36;
@@ -953,14 +954,14 @@ pub fn error_on_execution_failure(reason: &ExitReason, data: &[u8]) -> RpcResult
 				if data.len() >= message_end {
 					let body: &[u8] = &data[MESSAGE_START..message_end];
 					if let Ok(reason) = std::str::from_utf8(body) {
-						message = format!("{} {}", message, reason);
+						message = format!("{message} {reason}");
 					}
 				}
 			}
 			Err(crate::internal_err_with_data(message, data))
 		},
-		ExitReason::Fatal(e) =>
-			Err(crate::internal_err_with_data(format!("evm fatal: {:?}", e), &[])),
+		ExitReason::Fatal(err) =>
+			Err(crate::internal_err_with_data(format!("evm fatal: {err:?}"), &[])),
 	}
 }
 

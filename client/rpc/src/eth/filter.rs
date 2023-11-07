@@ -16,7 +16,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use std::{collections::HashSet, marker::PhantomData, sync::Arc, time};
+use std::{
+	collections::{BTreeMap, HashSet},
+	marker::PhantomData,
+	sync::Arc,
+	time::{Duration, Instant},
+};
 
 use ethereum::BlockV2 as EthereumBlock;
 use ethereum_types::{H256, U256};
@@ -40,7 +45,7 @@ use crate::{eth::cache::EthBlockDataCacheTask, frontier_backend_client, internal
 
 pub struct EthFilter<B: BlockT, C, BE, A: ChainApi> {
 	client: Arc<C>,
-	backend: Arc<dyn fc_db::BackendReader<B> + Send + Sync>,
+	backend: Arc<dyn fc_api::Backend<B>>,
 	graph: Arc<Pool<A>>,
 	filter_pool: FilterPool,
 	max_stored_filters: usize,
@@ -52,7 +57,7 @@ pub struct EthFilter<B: BlockT, C, BE, A: ChainApi> {
 impl<B: BlockT, C, BE, A: ChainApi> EthFilter<B, C, BE, A> {
 	pub fn new(
 		client: Arc<C>,
-		backend: Arc<dyn fc_db::BackendReader<B> + Send + Sync>,
+		backend: Arc<dyn fc_api::Backend<B>>,
 		graph: Arc<Pool<A>>,
 		filter_pool: FilterPool,
 		max_stored_filters: usize,
@@ -126,7 +131,7 @@ where
 			locked.insert(
 				key,
 				FilterPoolItem {
-					last_poll: BlockNumber::Num(best_number),
+					last_poll: BlockNumberOrHash::Num(best_number),
 					filter_type,
 					at_block: best_number,
 					pending_transaction_hashes,
@@ -196,7 +201,7 @@ where
 						locked.insert(
 							key,
 							FilterPoolItem {
-								last_poll: BlockNumber::Num(next),
+								last_poll: BlockNumberOrHash::Num(next),
 								filter_type: pool_item.filter_type.clone(),
 								at_block: pool_item.at_block,
 								pending_transaction_hashes: HashSet::new(),
@@ -229,7 +234,7 @@ where
 						locked.insert(
 							key,
 							FilterPoolItem {
-								last_poll: BlockNumber::Num(best_number + 1),
+								last_poll: BlockNumberOrHash::Num(best_number + 1),
 								filter_type: pool_item.filter_type.clone(),
 								at_block: pool_item.at_block,
 								pending_transaction_hashes: current_hashes.clone(),
@@ -248,7 +253,7 @@ where
 						locked.insert(
 							key,
 							FilterPoolItem {
-								last_poll: BlockNumber::Num(best_number + 1),
+								last_poll: BlockNumberOrHash::Num(best_number + 1),
 								filter_type: pool_item.filter_type.clone(),
 								at_block: pool_item.at_block,
 								pending_transaction_hashes: HashSet::new(),
@@ -321,7 +326,7 @@ where
 				if backend.is_indexed() {
 					let _ = filter_range_logs_indexed(
 						client.as_ref(),
-						backend.as_ref(),
+						backend.log_indexer(),
 						&block_data_cache,
 						&mut ret,
 						max_past_logs,
@@ -395,7 +400,7 @@ where
 		if backend.is_indexed() {
 			let _ = filter_range_logs_indexed(
 				client.as_ref(),
-				backend.as_ref(),
+				backend.log_indexer(),
 				&block_data_cache,
 				&mut ret,
 				max_past_logs,
@@ -483,7 +488,7 @@ where
 			if backend.is_indexed() {
 				let _ = filter_range_logs_indexed(
 					client.as_ref(),
-					backend.as_ref(),
+					backend.log_indexer(),
 					&block_data_cache,
 					&mut ret,
 					max_past_logs,
@@ -511,7 +516,7 @@ where
 
 async fn filter_range_logs_indexed<B, C, BE>(
 	_client: &C,
-	backend: &(dyn fc_db::BackendReader<B> + Send + Sync),
+	backend: &dyn fc_api::LogIndexerBackend<B>,
 	block_data_cache: &EthBlockDataCacheTask<B>,
 	ret: &mut Vec<Log>,
 	max_past_logs: u32,
@@ -526,13 +531,12 @@ where
 	C: HeaderBackend<B> + StorageProvider<B, BE> + 'static,
 	BE: Backend<B> + 'static,
 {
-	use std::time::Instant;
 	let timer_start = Instant::now();
 	let timer_prepare = Instant::now();
 
 	// Max request duration of 10 seconds.
-	let max_duration = time::Duration::from_secs(10);
-	let begin_request = time::Instant::now();
+	let max_duration = Duration::from_secs(10);
+	let begin_request = Instant::now();
 
 	let topics_input = if filter.topics.is_some() {
 		let filtered_params = FilteredParams::new(Some(filter.clone()));
@@ -570,7 +574,6 @@ where
 	{
 		let time_fetch = timer_fetch.elapsed().as_millis();
 		let timer_post = Instant::now();
-		use std::collections::BTreeMap;
 
 		let mut statuses_cache: BTreeMap<B::Hash, Option<Vec<TransactionStatus>>> = BTreeMap::new();
 
@@ -654,7 +657,7 @@ where
 	Ok(())
 }
 
-async fn filter_range_logs<B: BlockT, C, BE>(
+async fn filter_range_logs<B, C, BE>(
 	client: &C,
 	block_data_cache: &EthBlockDataCacheTask<B>,
 	ret: &mut Vec<Log>,
@@ -671,8 +674,8 @@ where
 	BE: Backend<B> + 'static,
 {
 	// Max request duration of 10 seconds.
-	let max_duration = time::Duration::from_secs(10);
-	let begin_request = time::Instant::now();
+	let max_duration = Duration::from_secs(10);
+	let begin_request = Instant::now();
 
 	let mut current_number = from;
 
