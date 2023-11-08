@@ -129,7 +129,6 @@ pallet-transaction-payment-rpc-runtime-api = { version = "4.0.0-dev", git = "ssh
 pallet-utility = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
 node-primitives = { version = "2.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false  }
 pallet-im-online = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-pallet-asset-conversion-tx-payment = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
 pallet-asset-tx-payment = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
 pallet-assets = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
 # Substrate Utility

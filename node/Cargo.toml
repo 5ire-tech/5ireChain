@@ -94,7 +94,6 @@ substrate-state-trie-migration-rpc = {  workspace = true  }
 sc-authority-discovery = {  workspace = true  }
 pallet-assets = { workspace = true}
 pallet-asset-tx-payment = {  workspace = true }
-pallet-asset-conversion-tx-payment = {  workspace = true }
 sp-storage = {  workspace = true }
 sp-trie= {  workspace = true }
 
