@@ -238,10 +238,10 @@ mod proof_size_test {
 			let read_account_metadata = ACCOUNT_CODES_METADATA_PROOF_SIZE as usize;
 			let is_empty_check = (IS_EMPTY_CHECK_PROOF_SIZE * 2) as usize;
 			let increase_nonce = (ACCOUNT_BASIC_PROOF_SIZE * 3) as usize;
-			let expected_proof_size = ((read_account_metadata * 2)
-				+ reading_contract_len
-				+ reading_main_contract_len
-				+ is_empty_check + increase_nonce) as u64;
+			let expected_proof_size = ((read_account_metadata * 2) +
+				reading_contract_len +
+				reading_main_contract_len +
+				is_empty_check + increase_nonce) as u64;
 
 			let actual_proof_size = result
 				.weight_info
@@ -295,10 +295,10 @@ mod proof_size_test {
 			let is_empty_check = IS_EMPTY_CHECK_PROOF_SIZE as usize;
 			let increase_nonce = ACCOUNT_BASIC_PROOF_SIZE as usize;
 			let reading_main_contract_len = AccountCodes::<Test>::get(call_contract_address).len();
-			let expected_proof_size = (basic_account_size
-				+ read_account_metadata
-				+ reading_main_contract_len
-				+ is_empty_check + increase_nonce) as u64;
+			let expected_proof_size = (basic_account_size +
+				read_account_metadata +
+				reading_main_contract_len +
+				is_empty_check + increase_nonce) as u64;
 
 			let actual_proof_size = result
 				.weight_info
@@ -343,11 +343,11 @@ mod proof_size_test {
 
 			let reading_main_contract_len =
 				AccountCodes::<Test>::get(call_contract_address).len() as u64;
-			let expected_proof_size = reading_main_contract_len
-				+ ACCOUNT_STORAGE_PROOF_SIZE
-				+ ACCOUNT_CODES_METADATA_PROOF_SIZE
-				+ IS_EMPTY_CHECK_PROOF_SIZE
-				+ (ACCOUNT_BASIC_PROOF_SIZE * 2);
+			let expected_proof_size = reading_main_contract_len +
+				ACCOUNT_STORAGE_PROOF_SIZE +
+				ACCOUNT_CODES_METADATA_PROOF_SIZE +
+				IS_EMPTY_CHECK_PROOF_SIZE +
+				(ACCOUNT_BASIC_PROOF_SIZE * 2);
 
 			let actual_proof_size = result
 				.weight_info
@@ -392,12 +392,11 @@ mod proof_size_test {
 
 			let reading_main_contract_len =
 				AccountCodes::<Test>::get(call_contract_address).len() as u64;
-			let expected_proof_size = reading_main_contract_len
-				+ WRITE_PROOF_SIZE
-				+ ACCOUNT_CODES_METADATA_PROOF_SIZE
-				+ ACCOUNT_STORAGE_PROOF_SIZE
-				+ IS_EMPTY_CHECK_PROOF_SIZE
-				+ (ACCOUNT_BASIC_PROOF_SIZE * 2);
+			let expected_proof_size = reading_main_contract_len +
+				WRITE_PROOF_SIZE + ACCOUNT_CODES_METADATA_PROOF_SIZE +
+				ACCOUNT_STORAGE_PROOF_SIZE +
+				IS_EMPTY_CHECK_PROOF_SIZE +
+				(ACCOUNT_BASIC_PROOF_SIZE * 2);
 
 			let actual_proof_size = result
 				.weight_info
@@ -446,9 +445,9 @@ mod proof_size_test {
 			// Find how many random balance reads can we do with the available proof size.
 			let reading_main_contract_len =
 				AccountCodes::<Test>::get(call_contract_address).len() as u64;
-			let overhead = reading_main_contract_len
-				+ ACCOUNT_CODES_METADATA_PROOF_SIZE
-				+ IS_EMPTY_CHECK_PROOF_SIZE;
+			let overhead = reading_main_contract_len +
+				ACCOUNT_CODES_METADATA_PROOF_SIZE +
+				IS_EMPTY_CHECK_PROOF_SIZE;
 			let available_proof_size = weight_limit.proof_size() - overhead;
 			let number_balance_reads =
 				available_proof_size.saturating_div(ACCOUNT_BASIC_PROOF_SIZE);
@@ -519,11 +518,12 @@ mod proof_size_test {
 			let reading_callee_contract_len =
 				AccountCodes::<Test>::get(subcall_contract_address).len();
 			// In order to do the subcall, we need to check metadata 3 times -
-			// one for each contract + one for the call opcode -, load two bytecodes - caller and callee.
-			let expected_proof_size = ((read_account_metadata * 2)
-				+ reading_callee_contract_len
-				+ reading_main_contract_len
-				+ is_empty_check + increase_nonce) as u64;
+			// one for each contract + one for the call opcode -, load two bytecodes - caller and
+			// callee.
+			let expected_proof_size = ((read_account_metadata * 2) +
+				reading_callee_contract_len +
+				reading_main_contract_len +
+				is_empty_check + increase_nonce) as u64;
 
 			let actual_proof_size = result
 				.weight_info
@@ -569,10 +569,7 @@ mod proof_size_test {
 			)
 			.expect("call succeeds");
 
-			assert_eq!(
-				result.exit_reason,
-				crate::ExitReason::Error(crate::ExitError::OutOfGas)
-			);
+			assert_eq!(result.exit_reason, crate::ExitReason::Error(crate::ExitError::OutOfGas));
 		});
 	}
 
@@ -629,9 +626,7 @@ type Balances = pallet_balances::Pallet<Test>;
 type EVM = Pallet<Test>;
 
 pub fn new_test_ext() -> sp_io::TestExternalities {
-	let mut t = frame_system::GenesisConfig::<Test>::default()
-		.build_storage()
-		.unwrap();
+	let mut t = frame_system::GenesisConfig::<Test>::default().build_storage().unwrap();
 
 	let mut accounts = BTreeMap::new();
 	accounts.insert(
@@ -676,12 +671,9 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
 	.assimilate_storage(&mut t)
 	.expect("Pallet balances storage can be assimilated");
 
-	crate::GenesisConfig::<Test> {
-		accounts,
-		..Default::default()
-	}
-	.assimilate_storage(&mut t)
-	.unwrap();
+	crate::GenesisConfig::<Test> { accounts, ..Default::default() }
+		.assimilate_storage(&mut t)
+		.unwrap();
 
 	t.into()
 }
@@ -741,8 +733,8 @@ fn fee_deduction() {
 #[test]
 fn ed_0_refund_patch_works() {
 	new_test_ext().execute_with(|| {
-		// Verifies that the OnChargeEVMTransaction patch is applied and fixes a known bug in Substrate for evm transactions.
-		// https://github.com/paritytech/substrate/issues/10117
+		// Verifies that the OnChargeEVMTransaction patch is applied and fixes a known bug in
+		// Substrate for evm transactions. https://github.com/paritytech/substrate/issues/10117
 		let evm_addr = H160::from_str("1000000000000000000000000000000000000003").unwrap();
 		let substrate_addr = <Test as Config>::AddressMapping::into_account_id(evm_addr);
 
@@ -769,8 +761,8 @@ fn ed_0_refund_patch_works() {
 #[test]
 fn ed_0_refund_patch_is_required() {
 	new_test_ext().execute_with(|| {
-		// This test proves that the patch is required, verifying that the current Substrate behaviour is incorrect
-		// for ED 0 configured chains.
+		// This test proves that the patch is required, verifying that the current Substrate
+		// behaviour is incorrect for ED 0 configured chains.
 		let evm_addr = H160::from_str("1000000000000000000000000000000000000003").unwrap();
 		let substrate_addr = <Test as Config>::AddressMapping::into_account_id(evm_addr);
 
@@ -787,13 +779,13 @@ fn ed_0_refund_patch_is_required() {
 		assert_eq!(Balances::free_balance(substrate_addr), 0);
 
 		// Try to refund. With ED 0, although the balance is now 0, the account still exists.
-		// So its expected that calling `deposit_into_existing` results in the AccountData to increase the Balance.
+		// So its expected that calling `deposit_into_existing` results in the AccountData to
+		// increase the Balance.
 		//
-		// Is not the case, and this proves that the refund logic needs to be handled taking this into account.
-		assert!(
-			<Test as Config>::Currency::deposit_into_existing(&substrate_addr, 5u32.into())
-				.is_err()
-		);
+		// Is not the case, and this proves that the refund logic needs to be handled taking this
+		// into account.
+		assert!(<Test as Config>::Currency::deposit_into_existing(&substrate_addr, 5u32.into())
+			.is_err());
 		// Balance didn't change, and should be 5.
 		assert_eq!(Balances::free_balance(substrate_addr), 0);
 	});
@@ -803,10 +795,7 @@ fn ed_0_refund_patch_is_required() {
 fn find_author() {
 	new_test_ext().execute_with(|| {
 		let author = EVM::find_author();
-		assert_eq!(
-			author,
-			H160::from_str("1234500000000000000000000000000000000000").unwrap()
-		);
+		assert_eq!(author, H160::from_str("1234500000000000000000000000000000000000").unwrap());
 	});
 }
 
@@ -873,9 +862,8 @@ fn issuance_after_tip() {
 		result.expect("EVM can be called");
 		let after_tip = <Test as Config>::Currency::total_issuance();
 		// Only base fee is burned
-		let base_fee: u64 = <Test as Config>::FeeCalculator::min_gas_price()
-			.0
-			.unique_saturated_into();
+		let base_fee: u64 =
+			<Test as Config>::FeeCalculator::min_gas_price().0.unique_saturated_into();
 		assert_eq!(after_tip, (before_tip - (base_fee * 21_000)));
 	});
 }
@@ -985,10 +973,7 @@ fn call_should_fail_with_priority_greater_than_max_fee() {
 		);
 		assert!(result.is_err());
 		// Some used weight is returned as part of the error.
-		assert_eq!(
-			result.unwrap_err().post_info.actual_weight,
-			Some(Weight::from_parts(7, 0))
-		);
+		assert_eq!(result.unwrap_err().post_info.actual_weight, Some(Weight::from_parts(7, 0)));
 	});
 }
 
@@ -1045,15 +1030,12 @@ fn handle_sufficient_reference() {
 #[test]
 fn runner_non_transactional_calls_with_non_balance_accounts_is_ok_without_gas_price() {
 	// Expect to skip checks for gas price and account balance when both:
-	//	- The call is non transactional (`is_transactional == false`).
-	//	- The `max_fee_per_gas` is None.
+	// 	- The call is non transactional (`is_transactional == false`).
+	// 	- The `max_fee_per_gas` is None.
 	new_test_ext().execute_with(|| {
 		let non_balance_account =
 			H160::from_str("7700000000000000000000000000000000000001").unwrap();
-		assert_eq!(
-			EVM::account_basic(&non_balance_account).0.balance,
-			U256::zero()
-		);
+		assert_eq!(EVM::account_basic(&non_balance_account).0.balance, U256::zero());
 		let _ = <Test as Config>::Runner::call(
 			non_balance_account,
 			H160::from_str("1000000000000000000000000000000000000001").unwrap(),
@@ -1071,10 +1053,7 @@ fn runner_non_transactional_calls_with_non_balance_accounts_is_ok_without_gas_pr
 			&<Test as Config>::config().clone(),
 		)
 		.expect("Non transactional call succeeds");
-		assert_eq!(
-			EVM::account_basic(&non_balance_account).0.balance,
-			U256::zero()
-		);
+		assert_eq!(EVM::account_basic(&non_balance_account).0.balance, U256::zero());
 	});
 }
 
@@ -1086,10 +1065,7 @@ fn runner_non_transactional_calls_with_non_balance_accounts_is_err_with_gas_pric
 	new_test_ext().execute_with(|| {
 		let non_balance_account =
 			H160::from_str("7700000000000000000000000000000000000001").unwrap();
-		assert_eq!(
-			EVM::account_basic(&non_balance_account).0.balance,
-			U256::zero()
-		);
+		assert_eq!(EVM::account_basic(&non_balance_account).0.balance, U256::zero());
 		let res = <Test as Config>::Runner::call(
 			non_balance_account,
 			H160::from_str("1000000000000000000000000000000000000001").unwrap(),
@@ -1136,7 +1112,8 @@ fn runner_transactional_call_with_zero_gas_price_fails() {
 
 #[test]
 fn runner_max_fee_per_gas_gte_max_priority_fee_per_gas() {
-	// Transactional and non transactional calls enforce `max_fee_per_gas >= max_priority_fee_per_gas`.
+	// Transactional and non transactional calls enforce `max_fee_per_gas >=
+	// max_priority_fee_per_gas`.
 	new_test_ext().execute_with(|| {
 		let res = <Test as Config>::Runner::call(
 			H160::default(),
@@ -1196,10 +1173,7 @@ fn eip3607_transaction_from_contract() {
 			None,
 			&<Test as Config>::config().clone(),
 		) {
-			Err(RunnerError {
-				error: Error::TransactionMustComeFromEOA,
-				..
-			}) => (),
+			Err(RunnerError { error: Error::TransactionMustComeFromEOA, .. }) => (),
 			_ => panic!("Should have failed"),
 		}
 

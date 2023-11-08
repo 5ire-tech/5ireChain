@@ -1203,7 +1203,7 @@ parameter_types! {
 	pub Schedule: pallet_contracts::Schedule<Runtime> = Default::default();
 	pub const CodeHashLockupDepositPercent: Perbill = Perbill::from_percent(0);
 	pub const MaxDelegateDependencies: u32 = 32;
-	
+
 }
 
 impl pallet_contracts::Config for Runtime {

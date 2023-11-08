@@ -143,9 +143,7 @@ impl<T: Serialize> Serialize for Rich<T> {
 			// and serialize
 			value.serialize(serializer)
 		} else {
-			Err(S::Error::custom(
-				"Unserializable structures: expected objects",
-			))
+			Err(S::Error::custom("Unserializable structures: expected objects"))
 		}
 	}
 }

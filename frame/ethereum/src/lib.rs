@@ -67,8 +67,7 @@ pub use fp_rpc::TransactionStatus;
 use fp_storage::{EthereumStorageSchema, PALLET_ETHEREUM_SCHEMA};
 use pallet_evm::{BlockHashMapping, FeeCalculator, GasWeightMapping, Runner};
 
-#[derive(Clone, Eq, PartialEq, RuntimeDebug)]
-#[derive(Encode, Decode, MaxEncodedLen, TypeInfo)]
+#[derive(Clone, Eq, PartialEq, RuntimeDebug, Encode, Decode, MaxEncodedLen, TypeInfo)]
 pub enum RawOrigin {
 	EthereumTransaction(H160),
 }
@@ -134,13 +133,10 @@ where
 	) -> Option<Result<(), TransactionValidityError>> {
 		if let Call::transact { transaction } = self {
 			if let Err(e) = CheckWeight::<T>::do_pre_dispatch(dispatch_info, len) {
-				return Some(Err(e));
+				return Some(Err(e))
 			}
 
-			Some(Pallet::<T>::validate_transaction_in_block(
-				*origin,
-				transaction,
-			))
+			Some(Pallet::<T>::validate_transaction_in_block(*origin, transaction))
 		} else {
 			None
 		}
@@ -154,13 +150,10 @@ where
 	) -> Option<TransactionValidity> {
 		if let Call::transact { transaction } = self {
 			if let Err(e) = CheckWeight::<T>::do_validate(dispatch_info, len) {
-				return Some(Err(e));
+				return Some(Err(e))
 			}
 
-			Some(Pallet::<T>::validate_transaction_in_pool(
-				*origin,
-				transaction,
-			))
+			Some(Pallet::<T>::validate_transaction_in_pool(*origin, transaction))
 		} else {
 			None
 		}
@@ -215,9 +208,7 @@ pub mod pallet {
 			);
 			// move block hash pruning window by one block
 			let block_hash_count = T::BlockHashCount::get();
-			let to_remove = n
-				.saturating_sub(block_hash_count)
-				.saturating_sub(One::one());
+			let to_remove = n.saturating_sub(block_hash_count).saturating_sub(One::one());
 			// keep genesis hash
 			if !to_remove.is_zero() {
 				<BlockHash<T>>::remove(U256::from(
@@ -250,10 +241,10 @@ pub mod pallet {
 				}
 			}
 			// Account for `on_finalize` weight:
-			//	- read: frame_system::Pallet::<T>::digest()
-			//	- read: frame_system::Pallet::<T>::block_number()
-			//	- write: <Pallet<T>>::store_block()
-			//	- write: <BlockHash<T>>::remove()
+			// 	- read: frame_system::Pallet::<T>::digest()
+			// 	- read: frame_system::Pallet::<T>::block_number()
+			// 	- write: <Pallet<T>>::store_block()
+			// 	- write: <BlockHash<T>>::remove()
 			weight.saturating_add(T::DbWeight::get().reads_writes(2, 2))
 		}
 
@@ -382,7 +373,7 @@ impl<T: Config> Pallet<T> {
 				msg.copy_from_slice(
 					&ethereum::LegacyTransactionMessage::from(t.clone()).hash()[..],
 				);
-			}
+			},
 			Transaction::EIP2930(t) => {
 				sig[0..32].copy_from_slice(&t.r[..]);
 				sig[32..64].copy_from_slice(&t.s[..]);
@@ -390,7 +381,7 @@ impl<T: Config> Pallet<T> {
 				msg.copy_from_slice(
 					&ethereum::EIP2930TransactionMessage::from(t.clone()).hash()[..],
 				);
-			}
+			},
 			Transaction::EIP1559(t) => {
 				sig[0..32].copy_from_slice(&t.r[..]);
 				sig[32..64].copy_from_slice(&t.s[..]);
@@ -398,7 +389,7 @@ impl<T: Config> Pallet<T> {
 				msg.copy_from_slice(
 					&ethereum::EIP1559TransactionMessage::from(t.clone()).hash()[..],
 				);
-			}
+			},
 		}
 		let pubkey = sp_io::crypto::secp256k1_ecdsa_recover(&sig, &msg).ok()?;
 		Some(H160::from(H256::from(sp_io::hashing::keccak_256(&pubkey))))
@@ -415,9 +406,8 @@ impl<T: Config> Pallet<T> {
 			statuses.push(status);
 			receipts.push(receipt.clone());
 			let (logs, used_gas) = match receipt {
-				Receipt::Legacy(d) | Receipt::EIP2930(d) | Receipt::EIP1559(d) => {
-					(d.logs.clone(), d.used_gas)
-				}
+				Receipt::Legacy(d) | Receipt::EIP2930(d) | Receipt::EIP1559(d) =>
+					(d.logs.clone(), d.used_gas),
 			};
 			cumulative_gas_used = used_gas;
 			Self::logs_bloom(logs, &mut logs_bloom);
@@ -460,15 +450,15 @@ impl<T: Config> Pallet<T> {
 					PostLog::Hashes(fp_consensus::Hashes::from_block(block)).encode(),
 				);
 				frame_system::Pallet::<T>::deposit_log(digest);
-			}
+			},
 			Some(PostLogContent::OnlyBlockHash) => {
 				let digest = DigestItem::Consensus(
 					FRONTIER_ENGINE_ID,
 					PostLog::BlockHash(block.header.hash()).encode(),
 				);
 				frame_system::Pallet::<T>::deposit_log(digest);
-			}
-			None => { /* do nothing*/ }
+			},
+			None => { /* do nothing*/ },
 		}
 	}
 
@@ -519,7 +509,7 @@ impl<T: Config> Pallet<T> {
 		// on trnasaction execution, otherwise a contract tx will be included in
 		// the mempool and pollute the mempool forever.
 		if !pallet_evm::AccountCodes::<T>::get(origin).is_empty() {
-			return Err(InvalidTransaction::BadSigner.into());
+			return Err(InvalidTransaction::BadSigner.into())
 		}
 
 		let priority = match (
@@ -530,9 +520,8 @@ impl<T: Config> Pallet<T> {
 			// Legacy or EIP-2930 transaction.
 			// Handle priority here. On legacy transaction everything in gas_price except
 			// the current base_fee is considered a tip to the miner and thus the priority.
-			(Some(gas_price), None, None) => {
-				gas_price.saturating_sub(base_fee).unique_saturated_into()
-			}
+			(Some(gas_price), None, None) =>
+				gas_price.saturating_sub(base_fee).unique_saturated_into(),
 			// EIP-1559 transaction without tip.
 			(None, Some(_), None) => 0,
 			// EIP-1559 transaction with tip.
@@ -611,7 +600,7 @@ impl<T: Config> Pallet<T> {
 						} else {
 							data
 						}
-					}
+					},
 					_ => vec![],
 				},
 			),
@@ -646,9 +635,8 @@ impl<T: Config> Pallet<T> {
 			let logs = status.clone().logs;
 			let cumulative_gas_used = if let Some((_, _, receipt)) = pending.last() {
 				match receipt {
-					Receipt::Legacy(d) | Receipt::EIP2930(d) | Receipt::EIP1559(d) => {
-						d.used_gas.saturating_add(used_gas.effective)
-					}
+					Receipt::Legacy(d) | Receipt::EIP2930(d) | Receipt::EIP1559(d) =>
+						d.used_gas.saturating_add(used_gas.effective),
 				}
 			} else {
 				used_gas.effective
@@ -763,7 +751,7 @@ impl<T: Config> Pallet<T> {
 						t.action,
 						access_list,
 					)
-				}
+				},
 				Transaction::EIP1559(t) => {
 					let access_list: Vec<(H160, Vec<H256>)> = t
 						.access_list
@@ -780,7 +768,7 @@ impl<T: Config> Pallet<T> {
 						t.action,
 						access_list,
 					)
-				}
+				},
 			}
 		};
 
@@ -803,19 +791,18 @@ impl<T: Config> Pallet<T> {
 					config.as_ref().unwrap_or_else(|| T::config()),
 				) {
 					Ok(res) => res,
-					Err(e) => {
+					Err(e) =>
 						return Err(DispatchErrorWithPostInfo {
 							post_info: PostDispatchInfo {
 								actual_weight: Some(e.weight),
 								pays_fee: Pays::Yes,
 							},
 							error: e.error.into(),
-						})
-					}
+						}),
 				};
 
 				Ok((Some(target), None, CallOrCreateInfo::Call(res)))
-			}
+			},
 			ethereum::TransactionAction::Create => {
 				let res = match T::Runner::create(
 					from,
@@ -833,19 +820,18 @@ impl<T: Config> Pallet<T> {
 					config.as_ref().unwrap_or_else(|| T::config()),
 				) {
 					Ok(res) => res,
-					Err(e) => {
+					Err(e) =>
 						return Err(DispatchErrorWithPostInfo {
 							post_info: PostDispatchInfo {
 								actual_weight: Some(e.weight),
 								pays_fee: Pays::Yes,
 							},
 							error: e.error.into(),
-						})
-					}
+						}),
 				};
 
 				Ok((None, Some(res.value), CallOrCreateInfo::Create(res)))
-			}
+			},
 		}
 	}
 
@@ -995,15 +981,12 @@ impl From<TransactionValidationError> for InvalidTransactionWrapper {
 			TransactionValidationError::PriorityFeeTooHigh => InvalidTransactionWrapper(
 				InvalidTransaction::Custom(TransactionValidationError::PriorityFeeTooHigh as u8),
 			),
-			TransactionValidationError::BalanceTooLow => {
-				InvalidTransactionWrapper(InvalidTransaction::Payment)
-			}
-			TransactionValidationError::TxNonceTooLow => {
-				InvalidTransactionWrapper(InvalidTransaction::Stale)
-			}
-			TransactionValidationError::TxNonceTooHigh => {
-				InvalidTransactionWrapper(InvalidTransaction::Future)
-			}
+			TransactionValidationError::BalanceTooLow =>
+				InvalidTransactionWrapper(InvalidTransaction::Payment),
+			TransactionValidationError::TxNonceTooLow =>
+				InvalidTransactionWrapper(InvalidTransaction::Stale),
+			TransactionValidationError::TxNonceTooHigh =>
+				InvalidTransactionWrapper(InvalidTransaction::Future),
 			TransactionValidationError::InvalidFeeInput => InvalidTransactionWrapper(
 				InvalidTransaction::Custom(TransactionValidationError::InvalidFeeInput as u8),
 			),

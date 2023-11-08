@@ -95,10 +95,7 @@ where
 
 		#[cfg(feature = "forbid-evm-reentrancy")]
 		if IN_EVM.with(|in_evm| in_evm.replace(true)) {
-			return Err(RunnerError {
-				error: Error::<T>::Reentrancy,
-				weight,
-			});
+			return Err(RunnerError { error: Error::<T>::Reentrancy, weight })
 		}
 
 		let res = Self::execute_inner(
@@ -154,19 +151,15 @@ where
 	{
 		// Used to record the external costs in the evm through the StackState implementation
 		let maybe_weight_info =
-			WeightInfo::new_from_weight_limit(weight_limit, proof_size_base_cost).map_err(
-				|_| RunnerError {
-					error: Error::<T>::Undefined,
-					weight,
-				},
-			)?;
+			WeightInfo::new_from_weight_limit(weight_limit, proof_size_base_cost)
+				.map_err(|_| RunnerError { error: Error::<T>::Undefined, weight })?;
 		// The precompile check is only used for transactional invocations. However, here we always
 		// execute the check, because the check has side effects.
 		match precompiles.is_precompile(source, gas_limit) {
 			IsPrecompileResult::Answer { extra_cost, .. } => {
 				gas_limit = gas_limit.saturating_sub(extra_cost);
-			}
-			IsPrecompileResult::OutOfGas => {
+			},
+			IsPrecompileResult::OutOfGas =>
 				return Ok(ExecutionInfoV2 {
 					exit_reason: ExitError::OutOfGas.into(),
 					value: Default::default(),
@@ -176,21 +169,17 @@ where
 					},
 					weight_info: maybe_weight_info,
 					logs: Default::default(),
-				})
-			}
+				}),
 		};
 
-		// Only check the restrictions of EIP-3607 if the source of the EVM operation is from an external transaction.
-		// If the source of this EVM operation is from an internal call, like from `eth_call` or `eth_estimateGas` RPC,
-		// we will skip the checks for the EIP-3607.
+		// Only check the restrictions of EIP-3607 if the source of the EVM operation is from an
+		// external transaction. If the source of this EVM operation is from an internal call, like
+		// from `eth_call` or `eth_estimateGas` RPC, we will skip the checks for the EIP-3607.
 		//
 		// EIP-3607: https://eips.ethereum.org/EIPS/eip-3607
 		// Do not allow transactions for which `tx.sender` has any code deployed.
 		if is_transactional && !<AccountCodes<T>>::get(source).is_empty() {
-			return Err(RunnerError {
-				error: Error::<T>::TransactionMustComeFromEOA,
-				weight,
-			});
+			return Err(RunnerError { error: Error::<T>::TransactionMustComeFromEOA, weight })
 		}
 
 		let (total_fee_per_gas, _actual_priority_fee_per_gas) =
@@ -203,44 +192,31 @@ where
 				// With tip, we include as much of the tip on top of base_fee that we can, never
 				// exceeding max_fee_per_gas
 				(Some(max_fee_per_gas), Some(max_priority_fee_per_gas), _) => {
-					let actual_priority_fee_per_gas = max_fee_per_gas
-						.saturating_sub(base_fee)
-						.min(max_priority_fee_per_gas);
+					let actual_priority_fee_per_gas =
+						max_fee_per_gas.saturating_sub(base_fee).min(max_priority_fee_per_gas);
 					(
 						base_fee.saturating_add(actual_priority_fee_per_gas),
 						actual_priority_fee_per_gas,
 					)
-				}
+				},
 				// Gas price check is skipped for non-transactional calls that don't
 				// define a `max_fee_per_gas` input.
 				(None, _, false) => (Default::default(), U256::zero()),
 				// Unreachable, previously validated. Handle gracefully.
-				_ => {
-					return Err(RunnerError {
-						error: Error::<T>::GasPriceTooLow,
-						weight,
-					})
-				}
+				_ => return Err(RunnerError { error: Error::<T>::GasPriceTooLow, weight }),
 			};
 
 		// After eip-1559 we make sure the account can pay both the evm execution and priority fees.
-		let total_fee =
-			total_fee_per_gas
-				.checked_mul(U256::from(gas_limit))
-				.ok_or(RunnerError {
-					error: Error::<T>::FeeOverflow,
-					weight,
-				})?;
+		let total_fee = total_fee_per_gas
+			.checked_mul(U256::from(gas_limit))
+			.ok_or(RunnerError { error: Error::<T>::FeeOverflow, weight })?;
 
 		// Deduct fee from the `source` account. Returns `None` if `total_fee` is Zero.
 		let fee = T::OnChargeTransaction::withdraw_fee(&source, total_fee)
 			.map_err(|e| RunnerError { error: e, weight })?;
 
 		// Execute the EVM call.
-		let vicinity = Vicinity {
-			gas_price: base_fee,
-			origin: source,
-		};
+		let vicinity = Vicinity { gas_price: base_fee, origin: source };
 
 		let metadata = StackSubstateMetadata::new(gas_limit, config);
 		let state = SubstrateStackState::new(&vicinity, metadata, maybe_weight_info);
@@ -342,10 +318,7 @@ where
 		Ok(ExecutionInfoV2 {
 			value: retv,
 			exit_reason: reason,
-			used_gas: fp_evm::UsedGas {
-				standard: used_gas.into(),
-				effective: effective_gas,
-			},
+			used_gas: fp_evm::UsedGas { standard: used_gas.into(), effective: effective_gas },
 			weight_info: state.weight_info(),
 			logs: state.substate.logs,
 		})
@@ -633,11 +606,11 @@ impl<'config> SubstrateStackSubstate<'config> {
 
 	pub fn deleted(&self, address: H160) -> bool {
 		if self.deletes.contains(&address) {
-			return true;
+			return true
 		}
 
 		if let Some(parent) = self.parent.as_ref() {
-			return parent.deleted(address);
+			return parent.deleted(address)
 		}
 
 		false
@@ -648,11 +621,7 @@ impl<'config> SubstrateStackSubstate<'config> {
 	}
 
 	pub fn log(&mut self, address: H160, topics: Vec<H256>, data: Vec<u8>) {
-		self.logs.push(Log {
-			address,
-			topics,
-			data,
-		});
+		self.logs.push(Log { address, topics, data });
 	}
 
 	fn recursive_is_cold<F: Fn(&Accessed) -> bool>(&self, f: &F) -> bool {
@@ -660,10 +629,7 @@ impl<'config> SubstrateStackSubstate<'config> {
 		if local_is_accessed {
 			false
 		} else {
-			self.parent
-				.as_ref()
-				.map(|p| p.recursive_is_cold(f))
-				.unwrap_or(true)
+			self.parent.as_ref().map(|p| p.recursive_is_cold(f)).unwrap_or(true)
 		}
 	}
 }
@@ -780,10 +746,7 @@ where
 	fn basic(&self, address: H160) -> evm::backend::Basic {
 		let (account, _) = Pallet::<T>::account_basic(&address);
 
-		evm::backend::Basic {
-			balance: account.balance,
-			nonce: account.nonce,
-		}
+		evm::backend::Basic { balance: account.balance, nonce: account.nonce }
 	}
 
 	fn code(&self, address: H160) -> Vec<u8> {
@@ -909,10 +872,7 @@ where
 		T::Currency::transfer(
 			&source,
 			&target,
-			transfer
-				.value
-				.try_into()
-				.map_err(|_| ExitError::OutOfFund)?,
+			transfer.value.try_into().map_err(|_| ExitError::OutOfFund)?,
 			ExistenceRequirement::AllowDeath,
 		)
 		.map_err(|_| ExitError::OutOfFund)
@@ -935,8 +895,7 @@ where
 	}
 
 	fn is_cold(&self, address: H160) -> bool {
-		self.substate
-			.recursive_is_cold(&|a| a.accessed_addresses.contains(&address))
+		self.substate.recursive_is_cold(&|a| a.accessed_addresses.contains(&address))
 	}
 
 	fn is_storage_cold(&self, address: H160, key: H256) -> bool {
@@ -953,20 +912,15 @@ where
 	}
 
 	fn record_external_operation(&mut self, op: evm::ExternalOperation) -> Result<(), ExitError> {
-		let size_limit: u64 = self
-			.metadata()
-			.gasometer()
-			.config()
-			.create_contract_limit
-			.unwrap_or_default() as u64;
+		let size_limit: u64 =
+			self.metadata().gasometer().config().create_contract_limit.unwrap_or_default() as u64;
 
 		let (weight_info, recorded) = self.info_mut();
 
 		if let Some(weight_info) = weight_info {
 			match op {
-				evm::ExternalOperation::AccountBasicRead => {
-					weight_info.try_record_proof_size_or_fail(ACCOUNT_BASIC_PROOF_SIZE)?
-				}
+				evm::ExternalOperation::AccountBasicRead =>
+					weight_info.try_record_proof_size_or_fail(ACCOUNT_BASIC_PROOF_SIZE)?,
 				evm::ExternalOperation::AddressCodeRead(address) => {
 					let maybe_record = !recorded.account_codes.contains(&address);
 					// Skip if the address has been already recorded this block
@@ -977,7 +931,7 @@ where
 						weight_info.try_record_proof_size_or_fail(IS_EMPTY_CHECK_PROOF_SIZE)?;
 
 						if <AccountCodes<T>>::decode_len(address).unwrap_or(0) == 0 {
-							return Ok(());
+							return Ok(())
 						}
 						// Try to record fixed sized `AccountCodesMetadata` read
 						// Tentatively 16 + 20 + 40
@@ -995,13 +949,11 @@ where
 						}
 						recorded.account_codes.push(address);
 					}
-				}
-				evm::ExternalOperation::IsEmpty => {
-					weight_info.try_record_proof_size_or_fail(IS_EMPTY_CHECK_PROOF_SIZE)?
-				}
-				evm::ExternalOperation::Write => {
-					weight_info.try_record_proof_size_or_fail(WRITE_PROOF_SIZE)?
-				}
+				},
+				evm::ExternalOperation::IsEmpty =>
+					weight_info.try_record_proof_size_or_fail(IS_EMPTY_CHECK_PROOF_SIZE)?,
+				evm::ExternalOperation::Write =>
+					weight_info.try_record_proof_size_or_fail(WRITE_PROOF_SIZE)?,
 			};
 		}
 		Ok(())
@@ -1013,54 +965,47 @@ where
 		_gas_cost: GasCost,
 		target: evm::gasometer::StorageTarget,
 	) -> Result<(), ExitError> {
-		// If account code or storage slot is in the overlay it is already accounted for and early exit
+		// If account code or storage slot is in the overlay it is already accounted for and early
+		// exit
 		let mut accessed_storage: Option<AccessedStorage> = match target {
-			StorageTarget::Address(address) => {
+			StorageTarget::Address(address) =>
 				if self.recorded().account_codes.contains(&address) {
-					return Ok(());
+					return Ok(())
 				} else {
 					Some(AccessedStorage::AccountCodes(address))
-				}
-			}
+				},
 			StorageTarget::Slot(address, index) => {
-				if self
-					.recorded()
-					.account_storages
-					.contains_key(&(address, index))
-				{
-					return Ok(());
+				if self.recorded().account_storages.contains_key(&(address, index)) {
+					return Ok(())
 				} else {
 					Some(AccessedStorage::AccountStorages((address, index)))
 				}
-			}
+			},
 			_ => None,
 		};
 
-		let size_limit: u64 = self
-			.metadata()
-			.gasometer()
-			.config()
-			.create_contract_limit
-			.unwrap_or_default() as u64;
+		let size_limit: u64 =
+			self.metadata().gasometer().config().create_contract_limit.unwrap_or_default() as u64;
 
 		let (weight_info, recorded) = {
 			let (weight_info, recorded) = self.info_mut();
 			if let Some(weight_info) = weight_info {
 				(weight_info, recorded)
 			} else {
-				return Ok(());
+				return Ok(())
 			}
 		};
 
 		// Record ref_time first
-		// TODO benchmark opcodes, until this is done we do used_gas to weight conversion for ref_time
+		// TODO benchmark opcodes, until this is done we do used_gas to weight conversion for
+		// ref_time
 
 		// Record proof_size
 		// Return if proof size recording is disabled
 		let proof_size_limit = if let Some(proof_size_limit) = weight_info.proof_size_limit {
 			proof_size_limit
 		} else {
-			return Ok(());
+			return Ok(())
 		};
 
 		let mut maybe_record_and_refund = |with_empty_check: bool| -> Result<(), ExitError> {
@@ -1069,7 +1014,7 @@ where
 			} else {
 				// This must be unreachable, a valid target must be set.
 				// TODO decide how do we want to gracefully handle.
-				return Err(ExitError::OutOfGas);
+				return Err(ExitError::OutOfGas)
 			};
 			// First try to record fixed sized `AccountCodesMetadata` read
 			// Tentatively 20 + 8 + 32
@@ -1097,22 +1042,21 @@ where
 		// the full key/value for reads. For read and writes over the same storage, the full value
 		// is included.
 		// For cold reads involving code (call, callcode, staticcall and delegatecall):
-		//	- We depend on https://github.com/paritytech/frontier/pull/893
-		//	- Try to get the cached size or compute it on the fly
-		//	- We record the actual size after caching, refunding the difference between it and the initially deducted
+		// 	- We depend on https://github.com/paritytech/frontier/pull/893
+		// 	- Try to get the cached size or compute it on the fly
+		// 	- We record the actual size after caching, refunding the difference between it and the
+		//    initially deducted
 		//	contract size limit.
 		let opcode_proof_size = match opcode {
 			// Basic account fixed length
 			Opcode::BALANCE => {
 				accessed_storage = None;
 				U256::from(ACCOUNT_BASIC_PROOF_SIZE)
-			}
-			Opcode::EXTCODESIZE | Opcode::EXTCODECOPY | Opcode::EXTCODEHASH => {
-				return maybe_record_and_refund(false)
-			}
-			Opcode::CALLCODE | Opcode::CALL | Opcode::DELEGATECALL | Opcode::STATICCALL => {
-				return maybe_record_and_refund(true)
-			}
+			},
+			Opcode::EXTCODESIZE | Opcode::EXTCODECOPY | Opcode::EXTCODEHASH =>
+				return maybe_record_and_refund(false),
+			Opcode::CALLCODE | Opcode::CALL | Opcode::DELEGATECALL | Opcode::STATICCALL =>
+				return maybe_record_and_refund(true),
 			// (H160, H256) double map blake2 128 concat key size (68) + value 32
 			Opcode::SLOAD => U256::from(ACCOUNT_STORAGE_PROOF_SIZE),
 			Opcode::SSTORE => {
@@ -1124,7 +1068,7 @@ where
 					} else {
 						// This must be unreachable, a valid target must be set.
 						// TODO decide how do we want to gracefully handle.
-						return Err(ExitError::OutOfGas);
+						return Err(ExitError::OutOfGas)
 					};
 				let mut cost = WRITE_PROOF_SIZE;
 				let maybe_record = !recorded.account_storages.contains_key(&(address, index));
@@ -1135,35 +1079,35 @@ where
 					cost = cost.saturating_add(ACCOUNT_STORAGE_PROOF_SIZE);
 				}
 				U256::from(cost)
-			}
+			},
 			// Fixed trie 32 byte hash
 			Opcode::CREATE | Opcode::CREATE2 => U256::from(WRITE_PROOF_SIZE),
 			// When calling SUICIDE a target account will receive the self destructing
 			// address's balance. We need to account for both:
-			//	- Target basic account read
-			//	- 5 bytes of `decode_len`
+			// 	- Target basic account read
+			// 	- 5 bytes of `decode_len`
 			Opcode::SUICIDE => {
 				accessed_storage = None;
 				U256::from(IS_EMPTY_CHECK_PROOF_SIZE)
-			}
+			},
 			// Rest of dynamic opcodes that do not involve proof size recording, do nothing
 			_ => return Ok(()),
 		};
 
 		if opcode_proof_size > U256::from(u64::MAX) {
 			weight_info.try_record_proof_size_or_fail(proof_size_limit)?;
-			return Err(ExitError::OutOfGas);
+			return Err(ExitError::OutOfGas)
 		}
 
 		// Cache the storage access
 		match accessed_storage {
 			Some(AccessedStorage::AccountStorages((address, index))) => {
 				recorded.account_storages.insert((address, index), true);
-			}
+			},
 			Some(AccessedStorage::AccountCodes(address)) => {
 				recorded.account_codes.push(address);
-			}
-			_ => {}
+			},
+			_ => {},
 		}
 
 		// Record cost
@@ -1179,10 +1123,11 @@ where
 		let weight_info = if let (Some(weight_info), _) = self.info_mut() {
 			weight_info
 		} else {
-			return Ok(());
+			return Ok(())
 		};
 		// Record ref_time first
-		// TODO benchmark opcodes, until this is done we do used_gas to weight conversion for ref_time
+		// TODO benchmark opcodes, until this is done we do used_gas to weight conversion for
+		// ref_time
 		if let Some(amount) = ref_time {
 			weight_info.try_record_ref_time_or_fail(amount)?;
 		}
@@ -1258,22 +1203,13 @@ mod tests {
 					None,
 					|_| (ExitReason::Succeed(ExitSucceed::Stopped), ()),
 				);
-				assert_matches!(
-					res,
-					Err(RunnerError {
-						error: Error::<Test>::Reentrancy,
-						..
-					})
-				);
+				assert_matches!(res, Err(RunnerError { error: Error::<Test>::Reentrancy, .. }));
 				(ExitReason::Error(ExitError::CallTooDeep), ())
 			},
 		);
 		assert_matches!(
 			res,
-			Ok(ExecutionInfoV2 {
-				exit_reason: ExitReason::Error(ExitError::CallTooDeep),
-				..
-			})
+			Ok(ExecutionInfoV2 { exit_reason: ExitReason::Error(ExitError::CallTooDeep), .. })
 		);
 
 		// Should succeed if there is no reentrancy
