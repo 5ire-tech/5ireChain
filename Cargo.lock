@@ -2588,6 +2588,7 @@ version = "1.0.0-dev"
 dependencies = [
  "clap 4.4.7",
  "ethereum-types",
+ "fc-api",
  "fc-db",
  "firechain-qa-runtime",
  "fp-rpc",

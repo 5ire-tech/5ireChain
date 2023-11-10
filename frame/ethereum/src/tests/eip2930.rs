@@ -63,9 +63,8 @@ fn transaction_without_enough_gas_should_not_work() {
 
 	ext.execute_with(|| {
 		let mut transaction = eip2930_erc20_creation_transaction(alice);
-		match &mut transaction {
-			Transaction::EIP2930(t) => t.gas_price = U256::from(11_000_000),
-			_ => {},
+		if let Transaction::EIP2930(t) = &mut transaction {
+			t.gas_price = U256::from(11_000_000);
 		}
 
 		let call = crate::Call::<Test>::transact { transaction };
@@ -178,7 +177,7 @@ fn transaction_with_invalid_chain_id_should_fail_in_block() {
 		assert_err!(
 			extrinsic.apply::<Test>(&dispatch_info, 0),
 			TransactionValidityError::Invalid(InvalidTransaction::Custom(
-				fp_ethereum::TransactionValidationError::InvalidChainId as u8,
+				fp_evm::TransactionValidationError::InvalidChainId as u8,
 			))
 		);
 	});
