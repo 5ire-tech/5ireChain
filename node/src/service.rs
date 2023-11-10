@@ -29,14 +29,13 @@ use sc_client_api::{Backend, BlockBackend};
 use sc_consensus_babe::{self, BabeWorkerHandle, SlotProportion};
 use sc_executor::NativeElseWasmExecutor;
 use sc_network::{event::Event, NetworkEventStream};
-use sc_network_common::sync::warp::WarpSyncParams;
+use sc_network_sync::warp::WarpSyncParams;
 use sc_service::{config::Configuration, error::Error as ServiceError, TaskManager};
 use sc_telemetry::{Telemetry, TelemetryWorker};
 use sc_transaction_pool_api::OffchainTransactionPoolFactory;
 use sp_api::ConstructRuntimeApi;
-use sp_trie::PrefixedMemoryDB;
 
-use sp_runtime::traits::BlakeTwo256;
+use sp_core::U256;
 use std::{
 	collections::BTreeMap,
 	sync::{Arc, Mutex},
@@ -83,7 +82,7 @@ pub fn new_partial<RuntimeApi, Executor>(
 		FullClient<RuntimeApi, Executor>,
 		FullBackend,
 		FullSelectChain,
-		sc_consensus::DefaultImportQueue<Block, FullClient<RuntimeApi, Executor>>,
+		sc_consensus::DefaultImportQueue<Block>,
 		sc_transaction_pool::FullPool<Block, FullClient<RuntimeApi, Executor>>,
 		(
 			// impl Fn(
@@ -110,8 +109,7 @@ pub fn new_partial<RuntimeApi, Executor>(
 where
 	RuntimeApi:
 		ConstructRuntimeApi<Block, FullClient<RuntimeApi, Executor>> + Send + Sync + 'static,
-	RuntimeApi::RuntimeApi:
-		RuntimeApiCollection<StateBackend = sc_client_api::StateBackendFor<FullBackend, Block>>,
+	RuntimeApi::RuntimeApi: RuntimeApiCollection,
 	RuntimeApi::RuntimeApi: sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>,
 	Executor: sc_executor::NativeExecutionDispatch + 'static,
 {
@@ -153,6 +151,7 @@ where
 
 	let (grandpa_block_import, grandpa_link) = grandpa::block_import(
 		client.clone(),
+		512,
 		&(client.clone() as Arc<_>),
 		select_chain.clone(),
 		telemetry.as_ref().map(|x| x.handle()),
@@ -229,8 +228,7 @@ pub fn new_full_base<RuntimeApi, Executor>(
 where
 	RuntimeApi:
 		ConstructRuntimeApi<Block, FullClient<RuntimeApi, Executor>> + Send + Sync + 'static,
-	RuntimeApi::RuntimeApi:
-		RuntimeApiCollection<StateBackend = sc_client_api::StateBackendFor<FullBackend, Block>>,
+	RuntimeApi::RuntimeApi: RuntimeApiCollection,
 	RuntimeApi::RuntimeApi: sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>,
 	RuntimeApi::RuntimeApi: mmr_rpc::MmrRuntimeApi<Block, Hash, BlockNumber>,
 	RuntimeApi::RuntimeApi: sp_authority_discovery::AuthorityDiscoveryApi<Block>,
@@ -294,6 +292,8 @@ where
 	let _prometheus_registry = config.prometheus_registry().cloned();
 	let enable_offchain_worker = config.offchain_worker.enabled;
 
+	let (_, _, babe_link) = &import_setup;
+
 	// Sinks for pubsub notifications.
 	// Everytime a new subscription is created, a new mpsc channel is added to the sink pool.
 	// The MappingSyncWorker sends through the channel on block import and the subscription emits a
@@ -308,6 +308,22 @@ where
 	let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
 	let fee_history_cache_limit: FeeHistoryCacheLimit = 1000;
 	let overrides = overrides_handle(client.clone());
+
+	let slot_duration = babe_link.config().slot_duration();
+	let target_gas_price = eth_config.target_gas_price;
+
+	let pending_create_inherent_data_providers = move |_, ()| async move {
+		let current = sp_timestamp::InherentDataProvider::from_system_time();
+		let next_slot = current.timestamp().as_millis() + slot_duration.as_millis();
+		let timestamp = sp_timestamp::InherentDataProvider::new(next_slot.into());
+		let slot =
+			sp_consensus_babe::inherents::InherentDataProvider::from_timestamp_and_slot_duration(
+				*timestamp,
+				slot_duration,
+			);
+		let dynamic_fee = fp_dynamic_fee::InherentDataProvider(U256::from(target_gas_price));
+		Ok((slot, timestamp, dynamic_fee))
+	};
 
 	// for ethereum-compatibility rpc.
 	// 	config.rpc_id_provider = Some(Box::new(fc_rpc::EthereumSubIdProvider));   // Need to check??
@@ -339,6 +355,7 @@ where
 		fee_history_cache_limit,
 		execute_gas_limit_multiplier: eth_config.execute_gas_limit_multiplier,
 		forced_parent_hashes: None,
+		pending_create_inherent_data_providers,
 	};
 
 	#[allow(unused)]
@@ -369,6 +386,7 @@ where
 		fee_history_cache_limit,
 		execute_gas_limit_multiplier: eth_config.execute_gas_limit_multiplier,
 		forced_parent_hashes: None,
+		pending_create_inherent_data_providers,
 	};
 
 	#[cfg(feature = "firechain-thunder")]
@@ -398,6 +416,7 @@ where
 		fee_history_cache_limit,
 		execute_gas_limit_multiplier: eth_config.execute_gas_limit_multiplier,
 		forced_parent_hashes: None,
+		pending_create_inherent_data_providers,
 	};
 
 	let (rpc_extensions_builder, rpc_setup) = {
@@ -554,7 +573,7 @@ where
 			},
 			force_authoring,
 			backoff_authoring_blocks,
-			babe_link,
+			babe_link: babe_link.clone(),
 			block_proposal_slot_portion: SlotProportion::new(0.5),
 			max_block_proposal_slot_portion: None,
 			telemetry: telemetry.as_ref().map(|x| x.handle()),
@@ -606,7 +625,7 @@ where
 	let grandpa_config = grandpa::Config {
 		// FIXME #1578 make this available through chainspec
 		gossip_duration: std::time::Duration::from_millis(333),
-		justification_period: 512,
+		justification_generation_period: 512,
 		name: Some(name),
 		observer_enabled: false,
 		keystore,
@@ -674,12 +693,7 @@ pub fn new_chain_ops(
 	config: &mut Configuration,
 	eth_config: EthConfiguration,
 ) -> Result<
-	(
-		Arc<Client>,
-		Arc<FullBackend>,
-		sc_consensus::BasicQueue<Block, PrefixedMemoryDB<BlakeTwo256>>,
-		TaskManager,
-	),
+	(Arc<Client>, Arc<FullBackend>, sc_consensus::BasicQueue<Block>, TaskManager),
 	ServiceError,
 > {
 	match &config.chain_spec {
@@ -707,20 +721,14 @@ fn new_chain_ops_inner<RuntimeApi, Executor>(
 	config: &mut Configuration,
 	eth_config: EthConfiguration,
 ) -> Result<
-	(
-		Arc<Client>,
-		Arc<FullBackend>,
-		sc_consensus::BasicQueue<Block, PrefixedMemoryDB<BlakeTwo256>>,
-		TaskManager,
-	),
+	(Arc<Client>, Arc<FullBackend>, sc_consensus::BasicQueue<Block>, TaskManager),
 	ServiceError,
 >
 where
 	Client: From<Arc<FullClient<RuntimeApi, Executor>>>,
 	RuntimeApi:
 		ConstructRuntimeApi<Block, FullClient<RuntimeApi, Executor>> + Send + Sync + 'static,
-	RuntimeApi::RuntimeApi:
-		RuntimeApiCollection<StateBackend = sc_client_api::StateBackendFor<FullBackend, Block>>,
+	RuntimeApi::RuntimeApi: RuntimeApiCollection,
 	RuntimeApi::RuntimeApi: sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>,
 	RuntimeApi::RuntimeApi: mmr_rpc::MmrRuntimeApi<Block, Hash, BlockNumber>,
 	RuntimeApi::RuntimeApi: sp_authority_discovery::AuthorityDiscoveryApi<Block>,
@@ -741,8 +749,7 @@ pub fn new_full<RuntimeApi, Executor>(
 where
 	RuntimeApi:
 		ConstructRuntimeApi<Block, FullClient<RuntimeApi, Executor>> + Send + Sync + 'static,
-	RuntimeApi::RuntimeApi:
-		RuntimeApiCollection<StateBackend = sc_client_api::StateBackendFor<FullBackend, Block>>,
+	RuntimeApi::RuntimeApi: RuntimeApiCollection,
 	RuntimeApi::RuntimeApi: sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>,
 	RuntimeApi::RuntimeApi: mmr_rpc::MmrRuntimeApi<Block, Hash, BlockNumber>,
 	RuntimeApi::RuntimeApi: sp_authority_discovery::AuthorityDiscoveryApi<Block>,

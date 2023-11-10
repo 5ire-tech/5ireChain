@@ -111,11 +111,12 @@ frame-system-rpc-runtime-api = {   workspace = true }
 
 
 # Frontier
+fc-api = { path = "../client/api" }
 fc-cli = { path = "../client/cli" }
 fc-consensus = { path = "../client/consensus" }
 fc-db = { path = "../client/db" }
 fc-mapping-sync = { path = "../client/mapping-sync" }
-fc-rpc = { path = "../client/rpc" }
+fc-rpc = { path = "../client/rpc", default-features = false }
 fc-rpc-core = { path = "../client/rpc-core" }
 fp-consensus = { path = "../primitives/consensus" }
 fp-dynamic-fee = { path = "../primitives/dynamic-fee" }

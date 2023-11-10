@@ -52,9 +52,9 @@ use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
 use sp_consensus_babe::BabeApi;
+use sp_inherents::CreateInherentDataProviders;
 use sp_keystore::KeystorePtr;
 use sp_runtime::traits::Block as BlockT;
-
 mod eth;
 pub use self::eth::{create_eth, overrides_handle, EthDeps};
 
@@ -81,7 +81,7 @@ pub struct GrandpaDeps<B> {
 }
 
 /// Full client dependencies.
-pub struct FullDeps<C, P, SC, B, A: ChainApi, CT> {
+pub struct FullDeps<C, P, SC, B, A: ChainApi, CT, CIDP> {
 	/// The client instance to use.
 	pub client: Arc<C>,
 	/// Transaction pool instance.
@@ -99,7 +99,7 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi, CT> {
 	/// The backend used by the node.
 	pub backend: Arc<B>,
 	/// Ethereum-compatibility specific dependencies.
-	pub eth: EthDeps<C, P, A, CT, Block>,
+	pub eth: EthDeps<C, P, A, CT, Block, CIDP>,
 }
 
 /// Default Eth Config
@@ -116,7 +116,7 @@ where
 }
 
 /// Instantiate all Full RPC extensions.
-pub fn create_full<C, P, BE, SC, B, A, CT>(
+pub fn create_full<C, P, BE, SC, B, A, CT, CIDP>(
 	FullDeps {
 		client,
 		pool,
@@ -127,7 +127,7 @@ pub fn create_full<C, P, BE, SC, B, A, CT>(
 		grandpa,
 		backend,
 		eth,
-	}: FullDeps<C, P, SC, B, A, CT>,
+	}: FullDeps<C, P, SC, B, A, CT, CIDP>,
 	subscription_task_executor: SubscriptionTaskExecutor,
 	pubsub_notification_sinks: Arc<
 		fc_mapping_sync::EthereumBlockNotificationSinks<
@@ -160,9 +160,9 @@ where
 	SC: SelectChain<Block> + 'static,
 	BE: Backend<Block> + 'static,
 	B: sc_client_api::Backend<Block> + Send + Sync + 'static,
-	B::State: sc_client_api::backend::StateBackend<sp_runtime::traits::HashFor<Block>>,
 	P: TransactionPool<Block = Block> + 'static,
 	A: ChainApi<Block = Block> + 'static,
+	CIDP: CreateInherentDataProviders<Block, ()> + Send + 'static,
 	CT: fp_rpc::ConvertTransaction<<Block as BlockT>::Extrinsic> + Send + Sync + 'static,
 {
 	use mmr_rpc::{Mmr, MmrApiServer};
@@ -230,7 +230,7 @@ where
 	io.merge(Dev::new(client, deny_unsafe).into_rpc())?;
 
 	// Ethereum compatibility RPCs
-	let io = create_eth::<_, _, _, _, _, _, DefaultEthConfig<C, BE>>(
+	let io = create_eth::<_, _, _, _, _, _, _, DefaultEthConfig<C, BE>>(
 		io,
 		eth,
 		subscription_task_executor,
