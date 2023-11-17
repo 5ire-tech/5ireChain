@@ -440,6 +440,8 @@ where
 		let chain_spec = config.chain_spec.cloned_box();
 
 		let rpc_backend = backend.clone();
+		let pubsub_notification_sinks = pubsub_notification_sinks.clone();
+
 		let subscription_task_executor = Arc::new(task_manager.spawn_handle());
 		let rpc_extensions_builder = move |deny_unsafe, subscription_executor| {
 			let deps = FullDeps {
@@ -493,10 +495,6 @@ where
 	let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
 	let fee_history_cache_limit: FeeHistoryCacheLimit = 1000;
 	let filter_pool: Option<FilterPool> = Some(Arc::new(Mutex::new(BTreeMap::new())));
-	let pubsub_notification_sinks: fc_mapping_sync::EthereumBlockNotificationSinks<
-		fc_mapping_sync::EthereumBlockNotification<Block>,
-	> = Default::default();
-	let pubsub_notification_sinks = Arc::new(pubsub_notification_sinks);
 
 	spawn_frontier_tasks(
 		&task_manager,
