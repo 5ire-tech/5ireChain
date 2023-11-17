@@ -326,7 +326,7 @@ where
 	};
 
 	// for ethereum-compatibility rpc.
-	config.rpc_id_provider = Some(Box::new(fc_rpc::EthereumSubIdProvider));   // Need to check??
+	config.rpc_id_provider = Some(Box::new(fc_rpc::EthereumSubIdProvider)); // Need to check??
 
 	#[allow(unused)]
 	#[cfg(feature = "firechain-qa")]

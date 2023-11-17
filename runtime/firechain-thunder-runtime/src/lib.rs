@@ -80,8 +80,7 @@ use pallet_ethereum::{
 	TransactionData,
 };
 use pallet_evm::{
-	Account as EVMAccount, EnsureAddressTruncated, FeeCalculator,
-	HashedAddressMapping, Runner,
+	Account as EVMAccount, EnsureAddressTruncated, FeeCalculator, HashedAddressMapping, Runner,
 };
 mod precompiles;
 use precompiles::FrontierPrecompiles;
