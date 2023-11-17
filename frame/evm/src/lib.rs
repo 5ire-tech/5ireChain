@@ -210,6 +210,20 @@ pub mod pallet {
 
 			Ok(())
 		}
+		/// Deposit balance from EVM into currency/balances pallet.
+		#[pallet::call_index(4)]
+		#[pallet::weight(<T as pallet::Config>::WeightInfo::deposit())]
+		pub fn deposit(origin: OriginFor<T>, address: H160, value: BalanceOf<T>) -> DispatchResult {
+			let destination = ensure_signed(origin.clone())?;
+			let address_account_id = T::AddressMapping::into_account_id(address);
+			T::Currency::transfer(
+				&destination,
+				&address_account_id,
+				value,
+				ExistenceRequirement::AllowDeath,
+			)?;
+			Ok(())
+		}
 
 		/// Issue an EVM call operation. This is similar to a message call transaction in Ethereum.
 		#[pallet::call_index(1)]

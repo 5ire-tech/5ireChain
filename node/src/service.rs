@@ -213,7 +213,7 @@ where
 }
 /// Creates a full service from the configuration.
 pub fn new_full_base<RuntimeApi, Executor>(
-	config: Configuration,
+	mut config: Configuration,
 	disable_hardware_benchmarks: bool,
 	with_startup_data: impl FnOnce(
 		&sc_consensus_babe::BabeBlockImport<
@@ -326,7 +326,8 @@ where
 	};
 
 	// for ethereum-compatibility rpc.
-	// 	config.rpc_id_provider = Some(Box::new(fc_rpc::EthereumSubIdProvider));   // Need to check??
+	config.rpc_id_provider = Some(Box::new(fc_rpc::EthereumSubIdProvider));   // Need to check??
+
 	#[allow(unused)]
 	#[cfg(feature = "firechain-qa")]
 	let eth_rpc_params = crate::rpc::EthDeps {
