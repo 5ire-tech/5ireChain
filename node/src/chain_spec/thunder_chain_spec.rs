@@ -22,8 +22,8 @@ use firechain_thunder_runtime::{
 	constants::currency::*, wasm_binary_unwrap, AuthorityDiscoveryConfig, BabeConfig,
 	BalancesConfig, Block, CouncilConfig, DemocracyConfig, ElectionsConfig, EthereumConfig,
 	GrandpaConfig, ImOnlineConfig, IndicesConfig, MaxNominations, NominationPoolsConfig,
-	SessionConfig, SessionKeys, SocietyConfig, StakerStatus, StakingConfig, SudoConfig,
-	SystemConfig, TechnicalCommitteeConfig,
+	SessionConfig, SessionKeys, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
+	TechnicalCommitteeConfig,
 };
 use fp_evm::GenesisAccount;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
@@ -86,10 +86,10 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 		AuthorityDiscoveryId,
 	)> = vec![
 		(
-			// Stash Account 
+			// Stash Account
 			// 5GMrYp9kF7XfHS9VpnuhR3SQSAHzkN5QA78fG3zZaWSgcRAW
 			array_bytes::hex_n_into_unchecked("be055db8061cc45db6e9d1081e0557ebc227638093753231cfd1c73c20676269"),
-			// Controller Account 
+			// Controller Account
 			// 5CLceuLf2iRDkBa57AdPXHb8FqCVfFNzdBs9b4SZJ3KVKaos
 			array_bytes::hex_n_into_unchecked("0c22697f7bb7a8cb19aed95c8f4c59fb0d9aed8d722e3d705c00d1aa482d144b"),
 			// Grandpa Key
@@ -110,17 +110,17 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 				.unchecked_into(),
 		),
 		(
-			//Stash Account 
+			//Stash Account
 			// 5EJFbw1cBAafHqzx8jbBeBngJgqS5oPwdbwY1qdx9Fz9Nr9x
 			array_bytes::hex_n_into_unchecked("62cd8600e09239f8ccb88ac0ab20dcc580306d273f484980f36bc770f300883c"),
-			// Controller Account 
+			// Controller Account
 			// 5EUJs8i23gsEUsn2WDS7vtg9XnTgTLUXndpoUM9epHpLLUqx
 			array_bytes::hex_n_into_unchecked("6a78f56cfdc02e3af6e71443eb486b51fd58ea570b29f97817ac4fcdc896c565"),
 			// Grandpa Key
 			// 5EkNeM8T7QQQgAWEE2JryYpZNwwXYW7fervHmZ28PhTTQrph
 			array_bytes::hex2array_unchecked("76b99bb825b4eb9e91d29a5546c1a84aec8142e86096ac6b86cb387cd9cc5d4a")
 				.unchecked_into(),
-			// Babe Key 
+			// Babe Key
 			// 5EvXomXtfsWbWHmCpRHTH7mTzKE2AjqrWhKJENe69YYVmGD7
 			array_bytes::hex2array_unchecked("7e78e7e28d33590d261815eddbc1a68b3bbfbf9606d7123bc564b7ec9ebb956f")
 				.unchecked_into(),
@@ -134,17 +134,17 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 				.unchecked_into(),
 		),
 		(
-			//Stash Account 
+			//Stash Account
 			// 5Cr6sFdRTmBDjpciMnYxLWonhHvb19gRVvchwbXB2YkJfaLW
 			array_bytes::hex_n_into_unchecked("229f8083a7d8a256bf80fadb21db8ed435b5de311f47db791b706ec450f45111"),
-			// Controller Account 
+			// Controller Account
 			// 5Ccg3RzTzi8awEhoJF3LCE67EqBCjutzfzduq8jhqQ5tpu24
 			array_bytes::hex_n_into_unchecked("1861beb96bb42dcd335155305670755799b514ee62616fc5bede4d49e2647525"),
 			// Grandpa Key
 			// 5HkgqDV2u4kdcygt5ALPVgoc4gMW1KQ9Q1kcvfr2JBGGbYge
 			array_bytes::hex2array_unchecked("fbab8867344acd5ed00428a20a2b2d768ad9381216703a8f1984c544c2f1efca")
 				.unchecked_into(),
-			// Babe key 
+			// Babe key
 			// 5Cu56oz5BBusV9z2245jN1VX3tcuMzGD2UfToB1iMHpzYbRh
 			array_bytes::hex2array_unchecked("24e34ae24c55945ae248218dc3a4bbe8cd66636eaad4e9ffe4abe10097b7d56f")
 				.unchecked_into(),
@@ -158,17 +158,17 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 				.unchecked_into(),
 		),
 		(
-			//Stash Account 
+			//Stash Account
 			// 5EXKXux2FQXmA3V2p972JzLu1yPKKxskVekEoiDTCGzjcEk8
 			array_bytes::hex_n_into_unchecked("6cc4f218867e0ca92a2bf6cec5b916113f1ffee5a541a54d2fd93ba2d388a156"),
-			// Controller Account 
+			// Controller Account
 			// 5HYmh1cQ5mpdV9qV7MG2v5rxdimd17Kr5ueYi1pFmsroJbm3
 			array_bytes::hex_n_into_unchecked("f294f17a6ec64bc040c66e1a1da525864100405cd3297af06abcb150c519ee6d"),
 			// Grandpa Key
 			// 5Gq2LFdGkSJTwGAz47tsrYhZ9xAjoXJFUo2cjdcmcDabhTbS
 			array_bytes::hex2array_unchecked("d2bded0d4d41631fe7244999cdc0bf1f42e77fb3abc1c679be2cd0a594c8a98a")
 				.unchecked_into(),
-			// Babe Key 
+			// Babe Key
 			// 5Gh28tLMzfsxSVWaxNQe12BjMCwe3WX92WyNZvoq9nQVaC7P
 			array_bytes::hex2array_unchecked("cca34d91dded37a9d727c6290ecb16f1ce02226055e2c993bbf4a82f1a7b7c1a")
 				.unchecked_into(),
@@ -362,7 +362,6 @@ pub fn testnet_genesis(
 		grandpa: Default::default(),
 		technical_membership: Default::default(),
 		treasury: Default::default(),
-		society: SocietyConfig { pot: 0 },
 		vesting: Default::default(),
 		assets: Default::default(),
 		pool_assets: Default::default(),
@@ -502,8 +501,6 @@ pub fn development_genesis(
 		grandpa: GrandpaConfig { authorities: vec![], ..Default::default() },
 		technical_membership: Default::default(),
 		treasury: Default::default(),
-
-		society: Default::default(),
 		vesting: Default::default(),
 		assets: Default::default(),
 		pool_assets: Default::default(),

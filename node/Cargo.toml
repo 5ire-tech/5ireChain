@@ -67,11 +67,8 @@ sp-authority-discovery = {  default-features = false, workspace = true }
 sc-sync-state-rpc = {  default-features = false, workspace = true }
 sc-sysinfo = {   workspace = true }
 sc-network-sync = {  workspace = true  }
-sc-statement-store = {  workspace = true }
 sc-offchain = {  workspace = true }
 sc-storage-monitor = {  workspace = true  }
-sc-network-statement = {  workspace = true }
-sp-statement-store = { workspace = true }
 sc-rpc-spec-v2 = {  workspace = true }
 sp-transaction-pool = { workspace = true, features = ["default"] }
 grandpa = { workspace = true }
@@ -100,7 +97,7 @@ pallet-asset-tx-payment = {  workspace = true }
 pallet-asset-conversion-tx-payment = {  workspace = true }
 sp-storage = {  workspace = true }
 sp-trie= {  workspace = true }
-
+sp-statement-store = { workspace = true}
 mmr-rpc = { workspace = true }
 
 # These dependencies are used for runtime benchmarking
