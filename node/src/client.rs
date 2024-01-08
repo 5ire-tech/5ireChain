@@ -39,8 +39,8 @@ pub enum Client {
 }
 
 /// Only enable the benchmarking host functions when we actually want to benchmark.
-#[cfg(feature = "runtime-benchmarks")]
-pub type HostFunctions = frame_benchmarking::benchmarking::HostFunctions;
+// #[cfg(feature = "runtime-benchmarks")]
+// pub type HostFunctions = frame_benchmarking::benchmarking::HostFunctions;
 
 #[cfg(feature = "firechain-qa")]
 pub struct FirechainQaRuntimeExecutor;

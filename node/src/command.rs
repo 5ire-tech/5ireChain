@@ -20,7 +20,9 @@ use crate::{
 	service,
 	service::new_partial,
 };
+#[cfg(feature = "runtime-benchmarks")]
 use frame_benchmarking_cli::*;
+
 use node_primitives::Block;
 use sc_cli::{Result, SubstrateCli};
 use sc_service::PartialComponents;
@@ -170,74 +172,98 @@ pub fn run() -> Result<()> {
 		//
 		// 	runner.sync_run(|config| cmd.run::<Block, RuntimeApi, ExecutorDispatch>(config))
 		// },
+		#[cfg(feature = "runtime-benchmarks")]
 		Some(Subcommand::Benchmark(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 
-			runner.sync_run(|config| {
-				// This switch needs to be in the client, since the client decides
-				// which sub-commands it wants to support.
-				match cmd {
-					BenchmarkCmd::Pallet(cmd) => {
-						if !cfg!(feature = "runtime-benchmarks") {
-							return Err(
-								"Runtime benchmarking wasn't enabled when building the node. \
+			// This switch needs to be in the client, since the client decides
+			// which sub-commands it wants to support.
+			match cmd {
+				BenchmarkCmd::Pallet(cmd) =>
+					if !cfg!(feature = "runtime-benchmarks") {
+						return Err("Runtime benchmarking wasn't enabled when building the node. \
 							You can enable it with `--features runtime-benchmarks`."
-									.into(),
-							)
-						}
-
-						cmd.run::<Block, ()>(config)
-					},
-					BenchmarkCmd::Block(cmd) => {
-						let runner = cli.create_runner(cmd)?;
-						let chain_spec = &runner.config().chain_spec;
-
-						// ensure that we keep the task manager alive
-						match chain_spec {
+							.into())
+					} else {
+						match &runner.config().chain_spec {
 							#[cfg(feature = "firechain-qa")]
-							spec if spec.is_qa() => {
+							spec if spec.is_qa() => runner.sync_run(|config| {
+								return cmd
+									.run::<firechain_qa_runtime::Block, sp_statement_store::runtime_api::HostFunctions>(
+										config,
+									)
+							}),
+							#[cfg(feature = "firechain-uat")]
+							spec if spec.is_uat() => runner.sync_run(|config| {
+								return cmd
+									.run::<firechain_uat_runtime::Block, sp_statement_store::runtime_api::HostFunctions>(
+										config,
+									)
+							}),
+							#[cfg(feature = "firechain-thunder")]
+							spec if spec.is_thunder() => runner.sync_run(|config| {
+								return cmd
+									.run::<firechain_thunder_runtime::Block, sp_statement_store::runtime_api::HostFunctions>(
+										config,
+									)
+							}),
+							_ => panic!("No runtime feature (qa, uat, thunder) is enabled"),
+						}
+					},
+				BenchmarkCmd::Block(cmd) => {
+					let chain_spec = &runner.config().chain_spec;
+
+					// ensure that we keep the task manager alive
+					match chain_spec {
+						#[cfg(feature = "firechain-qa")]
+						spec if spec.is_qa() =>
+							return runner.sync_run(|config| {
 								let partial = new_partial::<
 									firechain_qa_runtime::RuntimeApi,
 									FirechainQaRuntimeExecutor,
 								>(&config, cli.eth.clone())?;
-								cmd.run(partial.client)
-							},
 
-							#[cfg(feature = "firechain-uat")]
-							spec if spec.is_uat() => {
+								cmd.run(partial.client)
+							}),
+
+						#[cfg(feature = "firechain-uat")]
+						spec if spec.is_uat() =>
+							return runner.sync_run(|config| {
 								let partial = new_partial::<
 									firechain_uat_runtime::RuntimeApi,
 									FirechainUatRuntimeExecutor,
 								>(&config, cli.eth.clone())?;
-								cmd.run(partial.client)
-							},
 
-							#[cfg(feature = "firechain-thunder")]
-							spec if spec.is_thunder() => {
+								cmd.run(partial.client)
+							}),
+
+						#[cfg(feature = "firechain-thunder")]
+						spec if spec.is_thunder() =>
+							return runner.sync_run(|config| {
 								let partial = new_partial::<
 									firechain_thunder_runtime::RuntimeApi,
 									FirechainThunderRuntimeExecutor,
 								>(&config, cli.eth.clone())?;
+
 								cmd.run(partial.client)
-							},
+							}),
 
-							_ => Err("Chain spec not supported".into()),
-						}
-					},
-					#[cfg(not(feature = "runtime-benchmarks"))]
-					BenchmarkCmd::Storage(_) => Err(
-						"Storage benchmarking can be enabled with `--features runtime-benchmarks`."
-							.into(),
-					),
-					#[cfg(feature = "runtime-benchmarks")]
-					BenchmarkCmd::Storage(cmd) => {
-						// ensure that we keep the task manager alive
-						let runner = cli.create_runner(cmd)?;
-						let chain_spec = &runner.config().chain_spec;
+						_ => Err("Chain spec not supported".into()),
+					}
+				},
+				#[cfg(not(feature = "runtime-benchmarks"))]
+				BenchmarkCmd::Storage(_) =>
+					Err("Storage benchmarking can be enabled with `--features runtime-benchmarks`."
+						.into()),
 
-						match chain_spec {
-							#[cfg(feature = "firechain-qa")]
-							spec if spec.is_qa() => {
+				BenchmarkCmd::Storage(cmd) => {
+					let chain_spec = &runner.config().chain_spec;
+
+					// ensure that we keep the task manager alive
+					match chain_spec {
+						#[cfg(feature = "firechain-qa")]
+						spec if spec.is_qa() =>
+							return runner.sync_run(|config| {
 								let partial = new_partial::<
 									firechain_qa_runtime::RuntimeApi,
 									FirechainQaRuntimeExecutor,
@@ -245,11 +271,12 @@ pub fn run() -> Result<()> {
 								let db = partial.backend.expose_db();
 								let storage = partial.backend.expose_storage();
 
-								return cmd.run(config, partial.client, db, storage)
-							},
+								cmd.run(config, partial.client, db, storage)
+							}),
 
-							#[cfg(feature = "firechain-uat")]
-							spec if spec.is_uat() => {
+						#[cfg(feature = "firechain-uat")]
+						spec if spec.is_uat() =>
+							return runner.sync_run(|config| {
 								let partial = new_partial::<
 									firechain_uat_runtime::RuntimeApi,
 									FirechainUatRuntimeExecutor,
@@ -257,11 +284,12 @@ pub fn run() -> Result<()> {
 								let db = partial.backend.expose_db();
 								let storage = partial.backend.expose_storage();
 
-								return cmd.run(config, partial.client, db, storage)
-							},
+								cmd.run(config, partial.client, db, storage)
+							}),
 
-							#[cfg(feature = "firechain-thunder")]
-							spec if spec.is_thunder() => {
+						#[cfg(feature = "firechain-thunder")]
+						spec if spec.is_thunder() =>
+							return runner.sync_run(|config| {
 								let partial = new_partial::<
 									firechain_thunder_runtime::RuntimeApi,
 									FirechainThunderRuntimeExecutor,
@@ -269,17 +297,16 @@ pub fn run() -> Result<()> {
 								let db = partial.backend.expose_db();
 								let storage = partial.backend.expose_storage();
 
-								return cmd.run(config, partial.client, db, storage)
-							},
+								cmd.run(config, partial.client, db, storage)
+							}),
 
-							_ => Err("Chain spec not supported".into()),
-						}
-					},
-					BenchmarkCmd::Overhead(_) |
-					BenchmarkCmd::Extrinsic(_) |
-					BenchmarkCmd::Machine(_) => Err("Unsupported benchmarking command".into()),
-				}
-			})
+						_ => Err("Chain spec not supported".into()),
+					}
+				},
+				BenchmarkCmd::Overhead(_) |
+				BenchmarkCmd::Extrinsic(_) |
+				BenchmarkCmd::Machine(_) => Err("Unsupported benchmarking command".into()),
+			}
 		},
 		Some(Subcommand::Key(cmd)) => cmd.run(&cli),
 		Some(Subcommand::Sign(cmd)) => cmd.run(),

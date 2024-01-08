@@ -46,7 +46,7 @@ sp-io = { version = "23.0.0", default-features = false, git = "ssh://git@github.
 
 # frame dependencies
 frame-executive = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
-frame-benchmarking = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
+frame-benchmarking = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0", optional = true }
 frame-benchmarking-pallet-pov = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
 frame-support = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0", features = ["tuples-96"] }
 frame-system = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.0.0" }
@@ -283,6 +283,7 @@ runtime-benchmarks = [
 	"pallet-vesting/runtime-benchmarks",
 	"frame-system-benchmarking/runtime-benchmarks",
 	"pallet-esg/runtime-benchmarks",
+	"pallet-ethereum/runtime-benchmarks",
 ]
 try-runtime = [
 	"frame-try-runtime/try-runtime",

@@ -1831,10 +1831,11 @@ mod benches {
 		[pallet_timestamp, Timestamp]
 		[pallet_transaction_storage, TransactionStorage]
 		[pallet_treasury, Treasury]
-		[pallet_asset_rate, AssetRate]=
+		[pallet_asset_rate, AssetRate]
 		[pallet_utility, Utility]
 		[pallet_vesting, Vesting]
 		[pallet_evm, EVM]
+		[pallet_esg, EsgScore]
 	);
 }
 

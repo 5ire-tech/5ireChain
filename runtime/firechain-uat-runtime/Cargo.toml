@@ -286,6 +286,7 @@ runtime-benchmarks = [
 	"pallet-vesting/runtime-benchmarks",
 	"frame-system-benchmarking/runtime-benchmarks",
 	"pallet-esg/runtime-benchmarks",
+	"pallet-ethereum/runtime-benchmarks",
 ]
 try-runtime = [
 	"frame-try-runtime/try-runtime",

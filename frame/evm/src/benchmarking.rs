@@ -33,9 +33,9 @@ benchmarks! {
 
 		let x in 1..10000000;
 
-		use frame_benchmarking::vec;
 		use rlp::RlpStream;
 		use sp_core::{H160, U256};
+		use sp_std::vec;
 
 		// contract bytecode below is for:
 		//
@@ -69,7 +69,7 @@ benchmarks! {
 			"2eeada8e094193a364736f6c63430008030033"))
 			.expect("Bad hex string");
 
-		let caller = "1000000000000000000000000000000000000001".parse::<H160>().unwrap();
+		let caller = H160::default();
 
 		let mut nonce: u64 = 1;
 		let nonce_as_u256: U256 = nonce.into();
