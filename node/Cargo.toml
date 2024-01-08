@@ -96,12 +96,12 @@ pallet-assets = { workspace = true}
 pallet-asset-tx-payment = {  workspace = true }
 sp-storage = {  workspace = true }
 sp-trie= {  workspace = true }
-
+sp-statement-store = { workspace = true}
 mmr-rpc = { workspace = true }
 
 # These dependencies are used for runtime benchmarking
-frame-benchmarking = {  workspace = true }
-frame-benchmarking-cli = {  workspace = true }
+frame-benchmarking = { optional = true, workspace = true }
+frame-benchmarking-cli = {  optional = true, workspace = true }
 
 # frame dependencies
 pallet-im-online = {  workspace = true }
@@ -136,14 +136,11 @@ firechain-runtime-core-primitives = {path="../runtime/core-primitives"}
 
 [build-dependencies]
 substrate-build-script-utils = { workspace = true, optional = true}
-
-
 clap = { version = "4.2.5", optional = true }
 clap_complete = { version = "4.0.2", optional = true }
 sc-cli = {  workspace = true, optional = true }
 frame-benchmarking-cli = {  optional = true, workspace = true }
 substrate-frame-cli = {  optional = true, workspace = true }
-
 
 
 # CLI-specific dependencies

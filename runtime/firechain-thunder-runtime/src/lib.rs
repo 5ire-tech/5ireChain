@@ -1822,6 +1822,7 @@ mod benches {
 		[pallet_utility, Utility]
 		[pallet_vesting, Vesting]
 		[pallet_evm, EVM]
+		[pallet_esg, EsgScore]
 	);
 }
 
