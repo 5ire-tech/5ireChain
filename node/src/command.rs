@@ -71,7 +71,7 @@ impl SubstrateCli for Cli {
 	}
 
 	fn support_url() -> String {
-		"https://github.com/5ire-tech/5ire-evm-base/issues/new".into()
+		"https://github.com/5ire-tech/5ireChain/issues/new".into()
 	}
 
 	fn copyright_start_year() -> i32 {

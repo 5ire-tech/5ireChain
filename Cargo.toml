@@ -11,7 +11,7 @@ resolver = "2"
 [workspace.package]
 authors = ["5ireChain Team"]
 edition = "2021"
-repository = "https://github.com/5ire-tech/5ire-evm-base"
+repository = "https://github.com/5ire-tech/5ireChain"
 
 [workspace.dependencies]
 async-trait = "0.1"
