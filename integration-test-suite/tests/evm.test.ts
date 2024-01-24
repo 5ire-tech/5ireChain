@@ -70,8 +70,8 @@ async function createContract(evmAddress:any, alice: KeyringPair) {
         console.log(data);
         const dataStr = JSON.parse(data);
 
-        const filteredData = dataStr.filter((item: any) => item.event.index === "0x3700");
-        const contractAddress = filteredData[0].event.data[0].address;
+        const filteredData = dataStr.filter((item: any) => item.event.index === "0x3601");
+        const contractAddress = filteredData[0].event.data[0];
         expect(contractAddress).not.undefined;
         console.log(`Contract address: ${contractAddress}`);
         unsub();

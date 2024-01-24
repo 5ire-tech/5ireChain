@@ -46,6 +46,7 @@ pub fn open_database<Block: BlockT, C: HeaderBackend<Block>>(
 	Ok(db)
 }
 
+#[allow(unused_variables)]
 #[cfg(feature = "rocksdb")]
 fn open_kvdb_rocksdb<Block: BlockT, C: HeaderBackend<Block>>(
 	client: Arc<C>,
@@ -64,7 +65,7 @@ fn open_kvdb_rocksdb<Block: BlockT, C: HeaderBackend<Block>>(
 	db_config.create_if_missing = create;
 
 	let db = kvdb_rocksdb::Database::open(&db_config, path).map_err(|err| format!("{}", err))?;
-	// write database version only after the database is succesfully opened
+	// write database version only after the database is successfully opened
 	#[cfg(not(test))]
 	super::upgrade::update_version(path).map_err(|_| "Cannot update db version".to_string())?;
 	Ok(sp_database::as_database(db))
@@ -80,6 +81,7 @@ fn open_kvdb_rocksdb<Block: BlockT, C: HeaderBackend<Block>>(
 	Err("Missing feature flags `rocksdb`".to_string())
 }
 
+#[allow(unused_variables)]
 fn open_parity_db<Block: BlockT, C: HeaderBackend<Block>>(
 	client: Arc<C>,
 	path: &Path,
@@ -95,7 +97,7 @@ fn open_parity_db<Block: BlockT, C: HeaderBackend<Block>>(
 	config.columns[super::columns::BLOCK_MAPPING as usize].btree_index = true;
 
 	let db = parity_db::Db::open_or_create(&config).map_err(|err| format!("{}", err))?;
-	// write database version only after the database is succesfully opened
+	// write database version only after the database is successfully opened
 	#[cfg(not(test))]
 	super::upgrade::update_version(path).map_err(|_| "Cannot update db version".to_string())?;
 	Ok(Arc::new(super::parity_db_adapter::DbAdapter(db)))

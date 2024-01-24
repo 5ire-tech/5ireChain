@@ -45,16 +45,8 @@ jobs:
         with:
           version: "3.9.1"
 
-      - name: Install Protobuf
-        run: sudo apt-get install protobuf-compiler
-
-      - name: Install Libclang
-        run: sudo apt-get install -y libclang-dev
-
-      - name: Configure sccache
-        run: |
-          echo "RUSTC_WRAPPER=sccache" >> $GITHUB_ENV
-          echo "SCCACHE_GHA_ENABLED=true" >> $GITHUB_ENV
+      - name: Install Protobuf and Libclang
+        run: sudo apt-get install -y protobuf-compiler libclang-dev
 
       - name: Check format
         run: cargo +nightly fmt --all --check
@@ -64,6 +56,11 @@ jobs:
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@v0.0.3
+
+      - name: Configure sccache
+        run: |
+          echo "RUSTC_WRAPPER=sccache" >> $GITHUB_ENV
+          echo "SCCACHE_GHA_ENABLED=true" >> $GITHUB_ENV
 
       - name: Check
         run: cargo check --features all
@@ -81,6 +78,7 @@ jobs:
         run: cd integration-test-suite && yarn install --frozen-lockfile
 
       - name: Run Integration Tests
+        if: github.event.pull_request.merged == true
         run: cd integration-test-suite && yarn test
 
       - name: Test

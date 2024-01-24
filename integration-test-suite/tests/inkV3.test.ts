@@ -100,8 +100,8 @@ const deployContract = async () => {
 
 const executeContract = async () =>  {
 
-  const refTime = polkadotApi.registry.createType('Compact<u64>', 9691415738);
-  const proofSize = polkadotApi.registry.createType('Compact<u64>', 66536);
+  const refTime = polkadotApi.registry.createType('Compact<u64>', BigInt(10000000000));
+  const proofSize = polkadotApi.registry.createType('Compact<u64>', BigInt(10000000000));
 
   const gasLimitForCallAndQuery = polkadotApi.registry.createType('SpWeightsWeightV2Weight', {
     refTime: refTime,
@@ -142,6 +142,10 @@ const executeContract = async () =>  {
       } else if (result.status.isFinalized) {
         console.log( `execute contract transfer transaction events are ${result.events}`)
         console.log(`execute contract transfer transaction finalized at blockHash ${result.status.asFinalized}`);
+        result.events.forEach(({ event: { data, method, section }, phase }) => {
+          console.log('\t', phase.toString(), `: ${section}.${method}`, data.toString());
+        });
+        
         unsub();
       }
     });

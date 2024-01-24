@@ -17,7 +17,7 @@
 customSpec.json
 
 integration-test-suite/node_modules
-
+tmp
 .idea
 
 *.iml

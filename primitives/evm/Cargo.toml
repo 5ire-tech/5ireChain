@@ -12,6 +12,7 @@ targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
 evm = { workspace = true, features = ["with-codec"] }
+num_enum = { workspace = true, default-features = false }
 scale-codec = { package = "parity-scale-codec", version = "3.3.0", default-features = false,  features = ["derive"] }
 scale-info = { workspace = true }
 serde = { workspace = true, optional = true }

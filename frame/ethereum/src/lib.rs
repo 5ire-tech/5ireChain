@@ -30,40 +30,42 @@ mod mock;
 #[cfg(all(feature = "std", test))]
 mod tests;
 
+pub use ethereum::{
+	AccessListItem, BlockV2 as Block, LegacyTransactionMessage, Log, ReceiptV3 as Receipt,
+	TransactionAction, TransactionV2 as Transaction,
+};
 use ethereum_types::{Bloom, BloomInput, H160, H256, H64, U256};
 use evm::ExitReason;
-use fp_consensus::{PostLog, PreLog, FRONTIER_ENGINE_ID};
-use fp_ethereum::{
-	TransactionData, TransactionValidationError, ValidatedTransaction as ValidatedTransactionT,
-};
-use fp_evm::{
-	CallOrCreateInfo, CheckEvmTransaction, CheckEvmTransactionConfig, InvalidEvmTransactionError,
-};
-use fp_storage::{EthereumStorageSchema, PALLET_ETHEREUM_SCHEMA};
+use scale_codec::{Decode, Encode, MaxEncodedLen};
+use scale_info::TypeInfo;
+// Substrate
 use frame_support::{
-	codec::{Decode, Encode, MaxEncodedLen},
-	dispatch::{DispatchInfo, DispatchResultWithPostInfo, Pays, PostDispatchInfo},
-	scale_info::TypeInfo,
+	dispatch::{
+		DispatchErrorWithPostInfo, DispatchInfo, DispatchResultWithPostInfo, Pays, PostDispatchInfo,
+	},
 	traits::{EnsureOrigin, Get, PalletInfoAccess, Time},
 	weights::Weight,
 };
 use frame_system::{pallet_prelude::OriginFor, CheckWeight, WeightInfo};
-use pallet_evm::{BlockHashMapping, FeeCalculator, GasWeightMapping, Runner};
 use sp_runtime::{
 	generic::DigestItem,
 	traits::{DispatchInfoOf, Dispatchable, One, Saturating, UniqueSaturatedInto, Zero},
 	transaction_validity::{
 		InvalidTransaction, TransactionValidity, TransactionValidityError, ValidTransactionBuilder,
 	},
-	DispatchErrorWithPostInfo, RuntimeDebug, SaturatedConversion,
+	RuntimeDebug, SaturatedConversion,
 };
 use sp_std::{marker::PhantomData, prelude::*};
-
-pub use ethereum::{
-	AccessListItem, BlockV2 as Block, LegacyTransactionMessage, Log, ReceiptV3 as Receipt,
-	TransactionAction, TransactionV2 as Transaction,
+// Frontier
+use fp_consensus::{PostLog, PreLog, FRONTIER_ENGINE_ID};
+pub use fp_ethereum::TransactionData;
+use fp_ethereum::ValidatedTransaction as ValidatedTransactionT;
+use fp_evm::{
+	CallOrCreateInfo, CheckEvmTransaction, CheckEvmTransactionConfig, TransactionValidationError,
 };
 pub use fp_rpc::TransactionStatus;
+use fp_storage::{EthereumStorageSchema, PALLET_ETHEREUM_SCHEMA};
+use pallet_evm::{BlockHashMapping, FeeCalculator, GasWeightMapping, Runner};
 
 #[derive(Clone, Eq, PartialEq, RuntimeDebug, Encode, Decode, MaxEncodedLen, TypeInfo)]
 pub enum RawOrigin {
@@ -232,7 +234,7 @@ pub mod pallet {
 					Self::validate_transaction_in_block(source, &transaction).expect(
 						"pre-block transaction verification failed; the block cannot be built",
 					);
-					let r = Self::apply_validated_transaction(source, transaction)
+					let (r, _) = Self::apply_validated_transaction(source, transaction)
 						.expect("pre-block apply transaction failed; the block cannot be built");
 
 					weight = weight.saturating_add(r.actual_weight.unwrap_or_default());
@@ -281,7 +283,7 @@ pub mod pallet {
 				"pre log already exists; block is invalid",
 			);
 
-			Self::apply_validated_transaction(source, transaction)
+			Self::apply_validated_transaction(source, transaction).map(|(post_info, _)| post_info)
 		}
 	}
 
@@ -347,16 +349,17 @@ pub mod pallet {
 }
 
 impl<T: Config> Pallet<T> {
-	/// The call wrapped in the extrinsic is part of the PoV, record this as a base cost for the
-	/// size of the proof.
-	fn proof_size_base_cost(transaction: &Transaction) -> u64 {
-		transaction
-			.encode()
-			.len()
-			// pallet index
-			.saturating_add(1)
-			// call index
-			.saturating_add(1) as u64
+	pub fn transaction_weight(transaction_data: &TransactionData) -> (Option<Weight>, Option<u64>) {
+		match <T as pallet_evm::Config>::GasWeightMapping::gas_to_weight(
+			transaction_data.gas_limit.unique_saturated_into(),
+			true,
+		) {
+			weight_limit if weight_limit.proof_size() > 0 => (
+				Some(weight_limit),
+				Some(transaction_data.proof_size_base_cost.unwrap_or_default()),
+			),
+			_ => (None, None),
+		}
 	}
 
 	fn recover_signer(transaction: &Transaction) -> Option<H160> {
@@ -477,17 +480,7 @@ impl<T: Config> Pallet<T> {
 	) -> TransactionValidity {
 		let transaction_data: TransactionData = transaction.into();
 		let transaction_nonce = transaction_data.nonce;
-
-		let (weight_limit, proof_size_base_cost) =
-			match <T as pallet_evm::Config>::GasWeightMapping::gas_to_weight(
-				transaction_data.gas_limit.unique_saturated_into(),
-				true,
-			) {
-				weight_limit if weight_limit.proof_size() > 0 =>
-					(Some(weight_limit), Some(Self::proof_size_base_cost(transaction))),
-				_ => (None, None),
-			};
-
+		let (weight_limit, proof_size_base_cost) = Self::transaction_weight(&transaction_data);
 		let (base_fee, _) = T::FeeCalculator::min_gas_price();
 		let (who, _) = pallet_evm::Pallet::<T>::account_basic(&origin);
 
@@ -508,6 +501,16 @@ impl<T: Config> Pallet<T> {
 		.and_then(|v| v.with_base_fee())
 		.and_then(|v| v.with_balance_for(&who))
 		.map_err(|e| e.0)?;
+
+		// EIP-3607: https://eips.ethereum.org/EIPS/eip-3607
+		// Do not allow transactions for which `tx.sender` has any code deployed.
+		//
+		// This check should be done on the transaction validation (here) **and**
+		// on trnasaction execution, otherwise a contract tx will be included in
+		// the mempool and pollute the mempool forever.
+		if !pallet_evm::AccountCodes::<T>::get(origin).is_empty() {
+			return Err(InvalidTransaction::BadSigner.into())
+		}
 
 		let priority = match (
 			transaction_data.gas_price,
@@ -549,14 +552,14 @@ impl<T: Config> Pallet<T> {
 	fn apply_validated_transaction(
 		source: H160,
 		transaction: Transaction,
-	) -> DispatchResultWithPostInfo {
+	) -> Result<(PostDispatchInfo, CallOrCreateInfo), DispatchErrorWithPostInfo> {
 		let (to, _, info) = Self::execute(source, &transaction, None)?;
 
 		let pending = Pending::<T>::get();
 		let transaction_hash = transaction.hash();
 		let transaction_index = pending.len() as u32;
 
-		let (reason, status, weight_info, used_gas, dest, extra_data) = match info {
+		let (reason, status, weight_info, used_gas, dest, extra_data) = match info.clone() {
 			CallOrCreateInfo::Call(info) => (
 				info.exit_reason.clone(),
 				TransactionStatus {
@@ -670,24 +673,27 @@ impl<T: Config> Pallet<T> {
 			extra_data,
 		});
 
-		Ok(PostDispatchInfo {
-			actual_weight: {
-				let mut gas_to_weight = T::GasWeightMapping::gas_to_weight(
-					sp_std::cmp::max(
-						used_gas.standard.unique_saturated_into(),
-						used_gas.effective.unique_saturated_into(),
-					),
-					true,
-				);
-				if let Some(weight_info) = weight_info {
-					if let Some(proof_size_usage) = weight_info.proof_size_usage {
-						*gas_to_weight.proof_size_mut() = proof_size_usage;
+		Ok((
+			PostDispatchInfo {
+				actual_weight: {
+					let mut gas_to_weight = T::GasWeightMapping::gas_to_weight(
+						sp_std::cmp::max(
+							used_gas.standard.unique_saturated_into(),
+							used_gas.effective.unique_saturated_into(),
+						),
+						true,
+					);
+					if let Some(weight_info) = weight_info {
+						if let Some(proof_size_usage) = weight_info.proof_size_usage {
+							*gas_to_weight.proof_size_mut() = proof_size_usage;
+						}
 					}
-				}
-				Some(gas_to_weight)
+					Some(gas_to_weight)
+				},
+				pays_fee: Pays::No,
 			},
-			pays_fee: Pays::No,
-		})
+			info,
+		))
 	}
 
 	/// Get current block hash
@@ -700,10 +706,12 @@ impl<T: Config> Pallet<T> {
 		from: H160,
 		transaction: &Transaction,
 		config: Option<evm::Config>,
-	) -> Result<
-		(Option<H160>, Option<H160>, CallOrCreateInfo),
-		DispatchErrorWithPostInfo<PostDispatchInfo>,
-	> {
+	) -> Result<(Option<H160>, Option<H160>, CallOrCreateInfo), DispatchErrorWithPostInfo> {
+		let transaction_data: TransactionData = transaction.into();
+		let (weight_limit, proof_size_base_cost) = Self::transaction_weight(&transaction_data);
+		let is_transactional = true;
+		let validate = false;
+
 		let (
 			input,
 			value,
@@ -764,18 +772,6 @@ impl<T: Config> Pallet<T> {
 			}
 		};
 
-		let is_transactional = true;
-		let validate = false;
-
-		let (proof_size_base_cost, weight_limit) =
-			match <T as pallet_evm::Config>::GasWeightMapping::gas_to_weight(
-				gas_limit.unique_saturated_into(),
-				true,
-			) {
-				weight_limit if weight_limit.proof_size() > 0 =>
-					(Some(Self::proof_size_base_cost(transaction)), Some(weight_limit)),
-				_ => (None, None),
-			};
 		match action {
 			ethereum::TransactionAction::Call(target) => {
 				let res = match T::Runner::call(
@@ -848,19 +844,9 @@ impl<T: Config> Pallet<T> {
 		transaction: &Transaction,
 	) -> Result<(), TransactionValidityError> {
 		let transaction_data: TransactionData = transaction.into();
-
+		let (weight_limit, proof_size_base_cost) = Self::transaction_weight(&transaction_data);
 		let (base_fee, _) = T::FeeCalculator::min_gas_price();
 		let (who, _) = pallet_evm::Pallet::<T>::account_basic(&origin);
-
-		let (weight_limit, proof_size_base_cost) =
-			match <T as pallet_evm::Config>::GasWeightMapping::gas_to_weight(
-				transaction_data.gas_limit.unique_saturated_into(),
-				true,
-			) {
-				weight_limit if weight_limit.proof_size() > 0 =>
-					(Some(weight_limit), Some(Self::proof_size_base_cost(transaction))),
-				_ => (None, None),
-			};
 
 		let _ = CheckEvmTransaction::<InvalidTransactionWrapper>::new(
 			CheckEvmTransactionConfig {
@@ -950,7 +936,10 @@ impl<T: Config> Pallet<T> {
 
 pub struct ValidatedTransaction<T>(PhantomData<T>);
 impl<T: Config> ValidatedTransactionT for ValidatedTransaction<T> {
-	fn apply(source: H160, transaction: Transaction) -> DispatchResultWithPostInfo {
+	fn apply(
+		source: H160,
+		transaction: Transaction,
+	) -> Result<(PostDispatchInfo, CallOrCreateInfo), DispatchErrorWithPostInfo> {
 		Pallet::<T>::apply_validated_transaction(source, transaction)
 	}
 }
@@ -980,30 +969,38 @@ impl<T: Config> BlockHashMapping for EthereumBlockHashMapping<T> {
 
 pub struct InvalidTransactionWrapper(InvalidTransaction);
 
-impl From<InvalidEvmTransactionError> for InvalidTransactionWrapper {
-	fn from(validation_error: InvalidEvmTransactionError) -> Self {
+impl From<TransactionValidationError> for InvalidTransactionWrapper {
+	fn from(validation_error: TransactionValidationError) -> Self {
 		match validation_error {
-			InvalidEvmTransactionError::GasLimitTooLow => InvalidTransactionWrapper(
+			TransactionValidationError::GasLimitTooLow => InvalidTransactionWrapper(
 				InvalidTransaction::Custom(TransactionValidationError::GasLimitTooLow as u8),
 			),
-			InvalidEvmTransactionError::GasLimitTooHigh => InvalidTransactionWrapper(
+			TransactionValidationError::GasLimitTooHigh => InvalidTransactionWrapper(
 				InvalidTransaction::Custom(TransactionValidationError::GasLimitTooHigh as u8),
 			),
-			InvalidEvmTransactionError::GasPriceTooLow =>
-				InvalidTransactionWrapper(InvalidTransaction::Payment),
-			InvalidEvmTransactionError::PriorityFeeTooHigh => InvalidTransactionWrapper(
-				InvalidTransaction::Custom(TransactionValidationError::MaxFeePerGasTooLow as u8),
+			TransactionValidationError::PriorityFeeTooHigh => InvalidTransactionWrapper(
+				InvalidTransaction::Custom(TransactionValidationError::PriorityFeeTooHigh as u8),
 			),
-			InvalidEvmTransactionError::BalanceTooLow =>
+			TransactionValidationError::BalanceTooLow =>
 				InvalidTransactionWrapper(InvalidTransaction::Payment),
-			InvalidEvmTransactionError::TxNonceTooLow =>
+			TransactionValidationError::TxNonceTooLow =>
 				InvalidTransactionWrapper(InvalidTransaction::Stale),
-			InvalidEvmTransactionError::TxNonceTooHigh =>
+			TransactionValidationError::TxNonceTooHigh =>
 				InvalidTransactionWrapper(InvalidTransaction::Future),
-			InvalidEvmTransactionError::InvalidPaymentInput =>
-				InvalidTransactionWrapper(InvalidTransaction::Payment),
-			InvalidEvmTransactionError::InvalidChainId => InvalidTransactionWrapper(
+			TransactionValidationError::InvalidFeeInput => InvalidTransactionWrapper(
+				InvalidTransaction::Custom(TransactionValidationError::InvalidFeeInput as u8),
+			),
+			TransactionValidationError::InvalidChainId => InvalidTransactionWrapper(
 				InvalidTransaction::Custom(TransactionValidationError::InvalidChainId as u8),
+			),
+			TransactionValidationError::InvalidSignature => InvalidTransactionWrapper(
+				InvalidTransaction::Custom(TransactionValidationError::InvalidSignature as u8),
+			),
+			TransactionValidationError::GasPriceTooLow => InvalidTransactionWrapper(
+				InvalidTransaction::Custom(TransactionValidationError::GasPriceTooLow as u8),
+			),
+			TransactionValidationError::UnknownError => InvalidTransactionWrapper(
+				InvalidTransaction::Custom(TransactionValidationError::UnknownError as u8),
 			),
 		}
 	}

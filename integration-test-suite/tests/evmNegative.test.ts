@@ -93,7 +93,7 @@ async function createContract(nonce: number, evmAddress:any, alice: KeyringPair)
 
         const dataStr = JSON.parse(data);
 
-        const filteredData = dataStr.filter((item: any) => item.event.index === "0x3a01");
+        const filteredData = dataStr.filter((item: any) => item.event.index === "0x3601");
         const contractAddress = filteredData[0].event.data[0];
         expect(contractAddress).not.undefined;
 
@@ -137,9 +137,8 @@ async function createContractWithInvalidNonceFailure(evmAddress:any, alice: Keyr
       } else if (result.status.isFinalized) {
         const data = JSON.stringify(result.events);
         const dataStr = JSON.parse(data);
-
         const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
-        expect(filteredData[0].event.data[0].module.index == 55).true; //EVM
+        expect(filteredData[0].event.data[0].module.index == 54).true; //EVM
         expect(filteredData[0].event.data[0].module.error == '0x05000000').true; //InvalidNonce, index 5
 
         unsub();
@@ -176,8 +175,8 @@ async function    createContractWithGasPriceTooLowFailure(evmAddress:any, alice:
 
         const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
         console.log(`filteredData ${JSON.stringify(filteredData)}`);
-        expect(filteredData[0].event.data[0].module.index == 55).true; //EVM
-        expect(filteredData[0].event.data[0].module.error == '0x04000000').true; //GasPriceTooLow
+        expect(filteredData[0].event.data[0].module.index == 54).true; //EVM
+        expect(filteredData[0].event.data[0].module.error == '0x06000000').true; //GasPriceTooLow
 
         unsub();
         resolve({
@@ -213,7 +212,7 @@ async function createContractWithGasLimitTooLowFailure(evmAddress:any, alice: Ke
 
         const filteredData = dataStr.filter((item: any) => item.event.index === "0x0001");
         console.log(`filteredData ${JSON.stringify(filteredData)}`);
-        expect(filteredData[0].event.data[0].module.index == 55).true; //EVM
+        expect(filteredData[0].event.data[0].module.index == 54).true; //EVM
         expect(filteredData[0].event.data[0].module.error == '0x06000000').true; //GasLimitTooLow
 
         unsub();

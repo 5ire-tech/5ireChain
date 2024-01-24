@@ -36,7 +36,6 @@ benchmarks! {
 		use rlp::RlpStream;
 		use sp_core::{H160, U256};
 		use sp_std::vec;
-
 		// contract bytecode below is for:
 		//
 		// pragma solidity >=0.8.0;
