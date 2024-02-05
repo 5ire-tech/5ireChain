@@ -112,7 +112,7 @@ pallet-transaction-storage = { version = "4.0.0-dev", default-features = false, 
 pallet-uniques = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1"}
 pallet-vesting = { version = "4.0.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1"}
 pallet-whitelist = { version = "4.0.0-dev", default-features = false,git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1"}
-pallet-esg = {version = "1.0.0", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "upgrade/5irechain-V0.1" }
+pallet-esg = { version="1.0.0", path = "../frame/esg", default-features = false }
 
 # pallet-evm = { version="6.0.0-dev", path = "../../../evm-frame/evm", default-features = false }
 

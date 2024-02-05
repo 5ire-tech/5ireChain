@@ -4289,7 +4289,7 @@ dependencies = [
  "pallet-election-provider-multi-phase",
  "pallet-election-provider-support-benchmarking",
  "pallet-elections-phragmen",
- "pallet-esg",
+ "pallet-esg 1.0.0",
  "pallet-ethereum",
  "pallet-evm",
  "pallet-evm-precompile-modexp",
@@ -4661,7 +4661,7 @@ dependencies = [
  "frame-system",
  "log",
  "pallet-authorship",
- "pallet-esg",
+ "pallet-esg 1.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=upgrade/5irechain-V0.1)",
  "pallet-session",
  "pallet-timestamp",
  "parity-scale-codec",
@@ -4934,6 +4934,25 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-npos-elections",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
+name = "pallet-esg"
+version = "1.0.0"
+dependencies = [
+ "bs58",
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "hex-literal",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "serde_json",
+ "sp-core",
+ "sp-io",
  "sp-runtime",
  "sp-std",
 ]
@@ -5558,7 +5577,7 @@ dependencies = [
  "frame-system",
  "log",
  "pallet-authorship",
- "pallet-esg",
+ "pallet-esg 1.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=upgrade/5irechain-V0.1)",
  "pallet-im-online",
  "pallet-session",
  "parity-scale-codec",
