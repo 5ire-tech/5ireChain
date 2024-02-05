@@ -5845,6 +5845,31 @@ dependencies = [
  "pallet-asset-tx-payment",
  "pallet-assets",
  "pallet-balances",
+<<<<<<< HEAD
+=======
+ "pallet-base-fee",
+ "pallet-bounties",
+ "pallet-child-bounties",
+ "pallet-collective",
+ "pallet-contracts",
+ "pallet-contracts-primitives",
+ "pallet-conviction-voting",
+ "pallet-democracy",
+ "pallet-dynamic-fee",
+ "pallet-election-provider-multi-phase",
+ "pallet-election-provider-support-benchmarking",
+ "pallet-elections-phragmen",
+ "pallet-esg 1.0.0",
+ "pallet-ethereum",
+ "pallet-evm",
+ "pallet-evm-precompile-modexp",
+ "pallet-evm-precompile-sha3fips",
+ "pallet-evm-precompile-simple",
+ "pallet-fast-unstake",
+ "pallet-grandpa",
+ "pallet-hotfix-sufficients",
+ "pallet-identity",
+>>>>>>> dffe4d2 (feat: migration of pallet-esg from 5ire-substrate repo)
  "pallet-im-online",
  "parity-scale-codec",
  "rand 0.8.5",
@@ -6360,7 +6385,7 @@ dependencies = [
  "frame-system",
  "log",
  "pallet-authorship",
- "pallet-esg",
+ "pallet-esg 1.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=upgrade/5irechain-V0.1)",
  "pallet-session",
  "pallet-timestamp",
  "parity-scale-codec",
@@ -6680,7 +6705,30 @@ dependencies = [
 [[package]]
 name = "pallet-esg"
 version = "1.0.0"
+<<<<<<< HEAD
 source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=polkadot-v1.1.0#521eb4691628cdd5c4260b11b11d98e926f5aa62"
+=======
+dependencies = [
+ "bs58",
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "hex-literal",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "serde_json",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
+name = "pallet-esg"
+version = "1.0.0"
+source = "git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=upgrade/5irechain-V0.1#e49ed4d8c9a22c914a8962a99e532d23bd75d69e"
+>>>>>>> dffe4d2 (feat: migration of pallet-esg from 5ire-substrate repo)
 dependencies = [
  "bs58 0.4.0",
  "frame-benchmarking",
@@ -7425,7 +7473,7 @@ dependencies = [
  "frame-system",
  "log",
  "pallet-authorship",
- "pallet-esg",
+ "pallet-esg 1.0.0 (git+ssh://git@github.com/5ire-tech/5ire-substrate.git?branch=upgrade/5irechain-V0.1)",
  "pallet-im-online",
  "pallet-session",
  "parity-scale-codec",
