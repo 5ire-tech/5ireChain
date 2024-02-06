@@ -1,10 +1,9 @@
 #![cfg(feature = "runtime-benchmarks")]
 
-use crate::*;
-use crate::Pallet as Esg;
-use frame_benchmarking::{benchmarks, whitelisted_caller, account};
-use frame_system::RawOrigin;
+use crate::{Pallet as Esg, *};
+use frame_benchmarking::{account, benchmarks, whitelisted_caller};
 use frame_support::{inherent::Vec, WeakBoundedVec};
+use frame_system::RawOrigin;
 
 benchmarks! {
 
