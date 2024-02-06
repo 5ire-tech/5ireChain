@@ -182,7 +182,7 @@ pallet-session = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/
 pallet-session-benchmarking = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
 
 # Pallet implementation
-pallet-esg = { version = "1.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
+pallet-esg = { version = "1.0.0", path = "frame/esg", default-features = false}
 # Substrate Utility
 frame-benchmarking-cli = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
 prometheus-endpoint = { package = "substrate-prometheus-endpoint", version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
