@@ -5,10 +5,10 @@ pub use pallet::*;
 #[cfg(test)]
 mod mock;
 
-#[cfg(test)]
-pub mod tests;
 #[cfg(feature = "runtime-benchmarks")]
 pub mod benchmarking;
+#[cfg(test)]
+pub mod tests;
 
 pub mod weights;
 
@@ -18,13 +18,17 @@ pub trait Sustainability<AccountId> {
 
 #[frame_support::pallet]
 pub mod pallet {
-	use core::num::IntErrorKind;
 	use crate::weights::WeightInfo;
 	use bs58;
-	use frame_support::{pallet_prelude::{*, DispatchResult}, traits::ERScoresTrait, WeakBoundedVec};
-	use sp_std::vec::Vec;
+	use core::num::IntErrorKind;
+	use frame_support::{
+		pallet_prelude::{DispatchResult, *},
+		traits::ERScoresTrait,
+		WeakBoundedVec,
+	};
 	use frame_system::pallet_prelude::*;
 	use serde_json::Value;
+	use sp_std::vec::Vec;
 
 	#[pallet::pallet]
 	#[pallet::generate_store(pub(super) trait Store)]
@@ -47,15 +51,17 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn get_score_of)]
 	pub type ESGScoresMap<T> =
-	StorageMap<_, Blake2_128Concat, <T as frame_system::Config>::AccountId, u16, ValueQuery>;
+		StorageMap<_, Blake2_128Concat, <T as frame_system::Config>::AccountId, u16, ValueQuery>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn get_oracle_sudo)]
-	pub type SudoOraclesStore<T> = StorageValue<_, Vec<<T as frame_system::Config>::AccountId>, ValueQuery>;
+	pub type SudoOraclesStore<T> =
+		StorageValue<_, Vec<<T as frame_system::Config>::AccountId>, ValueQuery>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn get_oracle_nsudo)]
-	pub type NonSudoOraclesStore<T> = StorageValue<_, Vec<<T as frame_system::Config>::AccountId>, ValueQuery>;
+	pub type NonSudoOraclesStore<T> =
+		StorageValue<_, Vec<<T as frame_system::Config>::AccountId>, ValueQuery>;
 
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
@@ -95,7 +101,7 @@ pub mod pallet {
 				!ip.iter().all(alpha_num_tester)
 			// contains non-alphanumeric
 			{
-				return true;
+				return true
 			}
 			// otherwise everything is good!
 			false
@@ -114,8 +120,8 @@ pub mod pallet {
 
 		/// checks if given id is an oracle of any kind
 		fn is_an_oracle(acc_id: &T::AccountId) -> bool {
-			<SudoOraclesStore<T>>::get().contains(acc_id)
-				|| <NonSudoOraclesStore<T>>::get().contains(acc_id)
+			<SudoOraclesStore<T>>::get().contains(acc_id) ||
+				<NonSudoOraclesStore<T>>::get().contains(acc_id)
 		}
 
 		/// checks given id is of a sudo oracle
@@ -125,13 +131,14 @@ pub mod pallet {
 
 		/// stores an id as an oracle into respective storage kind as per `is_sudo`
 		fn store_oracle(oracle: &T::AccountId, is_sudo: bool) {
-			let fn_mutate = |oracles: &mut Vec<<T as frame_system::Config>::AccountId>| oracles.push(oracle.clone());
+			let fn_mutate = |oracles: &mut Vec<<T as frame_system::Config>::AccountId>| {
+				oracles.push(oracle.clone())
+			};
 
 			match is_sudo {
 				true => <SudoOraclesStore<T>>::mutate(fn_mutate),
 				false => <NonSudoOraclesStore<T>>::mutate(fn_mutate),
 			}
-
 		}
 
 		/// discard an oracle from respective storage kind as per `is_sudo`
@@ -140,10 +147,10 @@ pub mod pallet {
 				for (i, orc) in oracles.iter().enumerate() {
 					if orc.eq(oracle) {
 						oracles.remove(i);
-						return Ok(());
+						return Ok(())
 					}
 				}
-				return Err(Error::<T>::OracleNotExist.into());
+				return Err(Error::<T>::OracleNotExist.into())
 			};
 
 			match is_sudo {
@@ -160,13 +167,15 @@ pub mod pallet {
 			score_val
 				.unwrap_or(&Value::Null)
 				.as_str()
-				.map_or(0u16, |s| s.parse::<u16>().unwrap_or_else(|e| {
-					if e.kind().eq(&IntErrorKind::PosOverflow) {
-						MAX_ESG_SCORE
-					} else {
-						0u16
-					}
-				}))
+				.map_or(0u16, |s| {
+					s.parse::<u16>().unwrap_or_else(|e| {
+						if e.kind().eq(&IntErrorKind::PosOverflow) {
+							MAX_ESG_SCORE
+						} else {
+							0u16
+						}
+					})
+				})
 				.clamp(0, MAX_ESG_SCORE)
 		}
 
@@ -174,13 +183,10 @@ pub mod pallet {
 		/// returns Some(AccountId) if everything is ok or
 		/// returns None if something, like invalid string provided, about it is not ok
 		pub fn try_parse_acc_id(acc_val: Option<&serde_json::Value>) -> Option<T::AccountId> {
-			let acc = acc_val
-				.unwrap_or(&Value::Null)
-				.as_str()
-				.unwrap_or(&"");
+			let acc = acc_val.unwrap_or(&Value::Null).as_str().unwrap_or(&"");
 
 			if Self::not_valid_acc_id_format(acc.as_bytes()) {
-				return None;
+				return None
 			}
 
 			// str to <T as Config>::AccountId
@@ -197,12 +203,15 @@ pub mod pallet {
 	impl<T: Config> Pallet<T> {
 		#[pallet::call_index(0)]
 		#[pallet::weight(T::WeightInfo::upsert_esg_scores())]
-		pub fn upsert_esg_scores(origin: OriginFor<T>, json_str_bytes: WeakBoundedVec<u8, T::MaxFileSize>) -> DispatchResult {
+		pub fn upsert_esg_scores(
+			origin: OriginFor<T>,
+			json_str_bytes: WeakBoundedVec<u8, T::MaxFileSize>,
+		) -> DispatchResult {
 			let signer = ensure_signed(origin)?;
 
 			// return an error if caller is not an oracle
 			if !Self::is_an_oracle(&signer) {
-				return Err(Error::<T>::CallerNotAnOracle.into());
+				return Err(Error::<T>::CallerNotAnOracle.into())
 			}
 
 			// try decode bytes to utf8 string slice
@@ -213,33 +222,27 @@ pub mod pallet {
 			let esg_info: Value = serde_json::from_str(converted_string)
 				.map_or_else(|_| Err(Error::<T>::InvalidJson), |d| Ok(d))?;
 
-			let esg_data = esg_info.as_array()
-				.map_or_else(|| Err(Error::<T>::InvalidJson), |d| Ok(d))?;
+			let esg_data =
+				esg_info.as_array().map_or_else(|| Err(Error::<T>::InvalidJson), |d| Ok(d))?;
 
 			// to keep track of indexes of invalid account ids in given data
 			let mut skipped_indeces = Vec::<u16>::new();
 
-			esg_data.iter()
-				.enumerate()
-				.for_each(|(i, ed)| {
-					match Self::try_parse_acc_id(ed.get("account")) {
-						Some(id) => <ESGScoresMap<T>>::mutate(
-							&id,
-							|v| *v = Self::parse_score(
-								ed.get("score")
-							)
-						),
-						// acc_id is either invalid or
-						// not found in json data under current index
-						None => skipped_indeces.push(i as u16),
-					};
-				});
+			esg_data.iter().enumerate().for_each(|(i, ed)| {
+				match Self::try_parse_acc_id(ed.get("account")) {
+					Some(id) =>
+						<ESGScoresMap<T>>::mutate(&id, |v| *v = Self::parse_score(ed.get("score"))),
+					// acc_id is either invalid or
+					// not found in json data under current index
+					None => skipped_indeces.push(i as u16),
+				};
+			});
 
 			if skipped_indeces.len() > 0 {
 				return Ok(Self::deposit_event(Event::ESGStoredWithSkip {
 					skipped_indeces,
 					caller: signer.clone(),
-				}));
+				}))
 			}
 
 			Ok(Self::deposit_event(Event::ESGStored { caller: signer.clone() }))
@@ -263,13 +266,13 @@ pub mod pallet {
 			log::info!("#@! root: {is_root} same?: {}", acc_id.eq(&oracle));
 
 			if Self::is_an_oracle(&oracle) {
-				return Err(Error::<T>::OracleRegisteredAlready.into());
+				return Err(Error::<T>::OracleRegisteredAlready.into())
 			}
 
 			if is_root || Self::is_sudo_oracle(&acc_id) {
 				Self::store_oracle(&oracle, is_sudo_oracle);
 			} else {
-				return Err(Error::<T>::CallerNotRootOrSudoOracle.into());
+				return Err(Error::<T>::CallerNotRootOrSudoOracle.into())
 			}
 
 			Ok(Self::deposit_event(Event::NewOracleRegistered {
@@ -288,11 +291,11 @@ pub mod pallet {
 			let o = ensure_root(origin);
 
 			if o.is_err() {
-				return Err(DispatchError::BadOrigin.into());
+				return Err(DispatchError::BadOrigin.into())
 			}
 
 			if !Self::is_an_oracle(&oracle) {
-				return Err(Error::<T>::OracleNotExist.into());
+				return Err(Error::<T>::OracleNotExist.into())
 			}
 
 			let un_stored = Self::un_store_oracle(&oracle, is_sudo_oracle);
@@ -302,7 +305,7 @@ pub mod pallet {
 					is_sudo: is_sudo_oracle,
 				}))
 			}
-			return un_stored;
+			return un_stored
 		}
 	}
 
@@ -313,6 +316,6 @@ pub mod pallet {
 		fn chilled_validator_status(_org: T::AccountId) {}
 		fn reset_chilled_validator_status(_org: T::AccountId) {}
 		fn reset_score_after_era_for_chilled_active_validator() {}
-		fn reset_score_of_chilled_waiting_validator(_org:T::AccountId) {}
+		fn reset_score_of_chilled_waiting_validator(_org: T::AccountId) {}
 	}
 }
