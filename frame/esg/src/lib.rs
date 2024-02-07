@@ -31,7 +31,6 @@ pub mod pallet {
 	use sp_std::vec::Vec;
 
 	#[pallet::pallet]
-	#[pallet::generate_store(pub(super) trait Store)]
 	#[pallet::without_storage_info]
 	pub struct Pallet<T>(_);
 
@@ -92,9 +91,9 @@ pub mod pallet {
 		/// false for valid one
 		fn not_valid_acc_id_format(ip: &[u8]) -> bool {
 			let alpha_num_tester = |c: &u8| {
-				(c >= &48 && c <= &57) || // is a digit or
-					(c >= &65 && c <= &90) || // is an uppercase or
-					(c >= &97 && c <= &122) // is a lowercase
+				(&48..=&57).contains(&c) || // is a digit or
+					(&65..=&90).contains(&c) || // is an uppercase or
+					(&97..=&122).contains(&c) // is a lowercase
 			};
 			if ip.len() != 48 || 				 // hasn't length of 48 or
 				ip[0] != 53 || 					 // isn't prefixed by 5 or
@@ -150,7 +149,7 @@ pub mod pallet {
 						return Ok(())
 					}
 				}
-				return Err(Error::<T>::OracleNotExist.into())
+				Err(Error::<T>::OracleNotExist.into())
 			};
 
 			match is_sudo {
@@ -183,7 +182,7 @@ pub mod pallet {
 		/// returns Some(AccountId) if everything is ok or
 		/// returns None if something, like invalid string provided, about it is not ok
 		pub fn try_parse_acc_id(acc_val: Option<&serde_json::Value>) -> Option<T::AccountId> {
-			let acc = acc_val.unwrap_or(&Value::Null).as_str().unwrap_or(&"");
+			let acc = acc_val.unwrap_or(&Value::Null).as_str().unwrap_or("");
 
 			if Self::not_valid_acc_id_format(acc.as_bytes()) {
 				return None
@@ -216,14 +215,13 @@ pub mod pallet {
 
 			// try decode bytes to utf8 string slice
 			let converted_string = core::str::from_utf8(&json_str_bytes)
-				.map_or_else(|_| Err(Error::<T>::InvalidUTF8), |c| Ok(c))?;
+				.map_or_else(|_| Err(Error::<T>::InvalidUTF8), Ok)?;
 
 			// try deserialize utf8 string slice
 			let esg_info: Value = serde_json::from_str(converted_string)
-				.map_or_else(|_| Err(Error::<T>::InvalidJson), |d| Ok(d))?;
+				.map_or_else(|_| Err(Error::<T>::InvalidJson), Ok)?;
 
-			let esg_data =
-				esg_info.as_array().map_or_else(|| Err(Error::<T>::InvalidJson), |d| Ok(d))?;
+			let esg_data = esg_info.as_array().map_or_else(|| Err(Error::<T>::InvalidJson), Ok)?;
 
 			// to keep track of indexes of invalid account ids in given data
 			let mut skipped_indeces = Vec::<u16>::new();
@@ -238,14 +236,15 @@ pub mod pallet {
 				};
 			});
 
-			if skipped_indeces.len() > 0 {
-				return Ok(Self::deposit_event(Event::ESGStoredWithSkip {
+			if !skipped_indeces.is_empty() {
+				Self::deposit_event(Event::ESGStoredWithSkip {
 					skipped_indeces,
 					caller: signer.clone(),
-				}))
+				});
+				return Ok(())
 			}
-
-			Ok(Self::deposit_event(Event::ESGStored { caller: signer.clone() }))
+			Self::deposit_event(Event::ESGStored { caller: signer.clone() });
+			Ok(())
 		}
 
 		#[pallet::call_index(1)]
@@ -274,11 +273,11 @@ pub mod pallet {
 			} else {
 				return Err(Error::<T>::CallerNotRootOrSudoOracle.into())
 			}
-
-			Ok(Self::deposit_event(Event::NewOracleRegistered {
+			Self::deposit_event(Event::NewOracleRegistered {
 				oracle: oracle.clone(),
 				is_sudo: is_sudo_oracle,
-			}))
+			});
+			Ok(())
 		}
 
 		#[pallet::call_index(2)]
@@ -291,7 +290,7 @@ pub mod pallet {
 			let o = ensure_root(origin);
 
 			if o.is_err() {
-				return Err(DispatchError::BadOrigin.into())
+				return Err(DispatchError::BadOrigin)
 			}
 
 			if !Self::is_an_oracle(&oracle) {
@@ -300,10 +299,11 @@ pub mod pallet {
 
 			let un_stored = Self::un_store_oracle(&oracle, is_sudo_oracle);
 			if un_stored.is_ok() {
-				return Ok(Self::deposit_event(Event::OracleDeRegistered {
+				Self::deposit_event(Event::OracleDeRegistered {
 					oracle: oracle.clone(),
 					is_sudo: is_sudo_oracle,
-				}))
+				});
+				return Ok(())
 			}
 			return un_stored
 		}
