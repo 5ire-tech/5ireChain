@@ -50,7 +50,7 @@ substrate-test-utils = { workspace = true }
 frame-benchmarking = { workspace = true }
 frame-election-provider-support = { workspace = true }
 rand_chacha = { version = "0.2" }
-pallet-esg = {version = "1.0.0", default-features = false, path = "../esg" }
+
 
 [features]
 default = [ "std" ]

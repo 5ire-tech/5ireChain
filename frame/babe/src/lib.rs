@@ -25,11 +25,12 @@ use codec::{Decode, Encode};
 use frame_support::{
 	dispatch::{DispatchResultWithPostInfo, Pays},
 	ensure,
-	traits::{ConstU32, DisabledValidators, FindAuthor, Get, OnTimestampSet, OneSessionHandler, OneSessionHandlerAll},
+	traits::{ConstU32, DisabledValidators, FindAuthor, Get, OnTimestampSet, OneSessionHandler},
 	weights::Weight,
 	BoundedVec, WeakBoundedVec,
 };
 use frame_system::pallet_prelude::{BlockNumberFor, HeaderFor};
+use pallet_session::validation::OneSessionHandlerAll;
 use sp_consensus_babe::{
 	digests::{NextConfigDescriptor, NextEpochDescriptor, PreDigest},
 	AllowedSlots, BabeAuthorityWeight, BabeEpochConfiguration, ConsensusLog, Epoch,
@@ -1013,13 +1014,15 @@ fn compute_randomness(
 	sp_io::hashing::blake2_256(&s)
 }
 
+// Our implementation
 impl<T: Config> OneSessionHandlerAll<T::AccountId> for Pallet<T> {
 	type Key = AuthorityId;
 
-	fn on_new_session_all<'a, I: 'a>(_changed: bool, validators: I, queued_validators: I)
-		where
-			I: Iterator<Item = (&'a T::AccountId, AuthorityId)>,
-	{}
+	fn on_new_session_all<'a, I: 'a>(_changed: bool, _validators: I, _queued_validators: I)
+	where
+		I: Iterator<Item = (&'a T::AccountId, AuthorityId)>,
+	{
+	}
 }
 
 pub mod migrations {

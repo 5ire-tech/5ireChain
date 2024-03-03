@@ -83,11 +83,15 @@ mod tests;
 pub mod weights;
 
 use codec::{Decode, Encode, MaxEncodedLen};
+use frame_election_provider_support::{
+	bounds::{CountBound, SizeBound},
+	DataProviderBounds, ElectionDataProvider,
+};
 use frame_support::{
 	pallet_prelude::*,
 	traits::{
 		EstimateNextSessionRotation, Get, OneSessionHandler, ValidatorSet,
-		ValidatorSetWithIdentification, OneSessionHandlerAll, ERScoresTrait,
+		ValidatorSetWithIdentification,
 	},
 	BoundedSlice, WeakBoundedVec,
 };
@@ -96,6 +100,8 @@ use frame_system::{
 	pallet_prelude::*,
 };
 pub use pallet::*;
+use pallet_esg::traits::ERScoresTrait;
+use pallet_session::validation::OneSessionHandlerAll;
 use scale_info::TypeInfo;
 use sp_application_crypto::RuntimeAppPublic;
 use sp_runtime::{
@@ -109,12 +115,10 @@ use sp_staking::{
 };
 use sp_std::prelude::*;
 pub use weights::WeightInfo;
-use frame_election_provider_support::{DataProviderBounds, ElectionDataProvider};
-use frame_election_provider_support::bounds::{CountBound, SizeBound};
 
 pub trait Reliability<ValidatorId> {
 	fn get_score_of(company: ValidatorId) -> u16;
-	fn reset_score_of(company: ValidatorId) ;
+	fn reset_score_of(company: ValidatorId);
 }
 
 pub mod sr25519 {
@@ -263,7 +267,7 @@ pub type ValidatorsListsTuple<T> = (
 	Vec<ValidatorId<T>>,
 	Vec<ValidatorId<T>>,
 	Vec<ValidatorId<T>>,
-	Vec<IdentificationTuple<T>>
+	Vec<IdentificationTuple<T>>,
 );
 
 #[frame_support::pallet]
@@ -362,11 +366,15 @@ pub mod pallet {
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
 		/// A new heartbeat was received from `AuthorityId`.
-		HeartbeatReceived { authority_id: T::AuthorityId },
+		HeartbeatReceived {
+			authority_id: T::AuthorityId,
+		},
 		/// At the end of the session, no offence was committed.
 		AllGood,
 		/// At the end of the session, at least one validator was found to be offline.
-		SomeOffline { offline: Vec<IdentificationTuple<T>> },
+		SomeOffline {
+			offline: Vec<IdentificationTuple<T>>,
+		},
 
 		EndSession {
 			s_idx: SessionIndex,
@@ -378,7 +386,7 @@ pub mod pallet {
 		},
 		Authorities {
 			authorities: WeakBoundedVec<T::AuthorityId, T::MaxKeys>,
-		}
+		},
 	}
 
 	#[pallet::error]
@@ -391,17 +399,17 @@ pub mod pallet {
 
 	#[pallet::storage]
 	pub type ReliabilityScoresMap<T> =
-	StorageMap<_, Blake2_128Concat, ValidatorId<T>, RScoreType, ValueQuery>;
+		StorageMap<_, Blake2_128Concat, ValidatorId<T>, RScoreType, ValueQuery>;
 
 	#[pallet::storage]
 	pub type ChilledValidatorsMap<T> =
-	StorageMap<_, Blake2_128Concat, ValidatorId<T>, bool, ValueQuery>;
+		StorageMap<_, Blake2_128Concat, ValidatorId<T>, bool, ValueQuery>;
 
 	/// The current set of keys that may issue a heartbeat.
 	#[pallet::storage]
 	#[pallet::getter(fn all_keys)]
 	pub(crate) type AllKeys<T: Config> =
-	StorageValue<_, WeakBoundedVec<T::AuthorityId, T::MaxKeys>, ValueQuery>;
+		StorageValue<_, WeakBoundedVec<T::AuthorityId, T::MaxKeys>, ValueQuery>;
 
 	/// The block number after which it's ok to send heartbeats in the current
 	/// session.
@@ -597,13 +605,8 @@ impl<T: Config> Pallet<T> {
 	/// implementation is supposed to change in future
 	fn inc_reliability_score_of(acc_id: &ValidatorId<T>, is_active: bool) {
 		<ReliabilityScoresMap<T>>::mutate(acc_id, |v| {
-			*v = (*v + (
-				if is_active {
-					ACTIVE_FACTOR
-				} else {
-					WAITING_FACTOR
-				}
-			)).clamp(0, REL_SCORE_MAX);
+			*v = (*v + (if is_active { ACTIVE_FACTOR } else { WAITING_FACTOR }))
+				.clamp(0, REL_SCORE_MAX);
 		});
 	}
 
@@ -619,11 +622,9 @@ impl<T: Config> Pallet<T> {
 	pub fn is_online(authority_index: AuthIndex) -> bool {
 		let data_provider_bounds = DataProviderBounds {
 			count: Some(CountBound::from(T::TargetsBound::get())),
-			size: Some(SizeBound::from(T::TargetsBound::get()))
+			size: Some(SizeBound::from(T::TargetsBound::get())),
 		};
-		let all_validators = T::DataProvider::electable_targets(
-			data_provider_bounds
-		);
+		let all_validators = T::DataProvider::electable_targets(data_provider_bounds);
 		// Err("Target snapshot too big") -- very rare case
 		if all_validators.is_err() {
 			sp_runtime::print("Target snapshot too big");
@@ -843,12 +844,10 @@ impl<T: Config> Pallet<T> {
 
 		let data_provider_bounds = DataProviderBounds {
 			count: Some(CountBound::from(T::TargetsBound::get())),
-			size: Some(SizeBound::from(T::TargetsBound::get()))
+			size: Some(SizeBound::from(T::TargetsBound::get())),
 		};
 
-		let all_validators = match T::DataProvider::electable_targets(
-			data_provider_bounds
-		) {
+		let all_validators = match T::DataProvider::electable_targets(data_provider_bounds) {
 			Ok(v) => v,
 			// Err("Target snapshot too big") -- very rare case
 			Err(e) => {
@@ -887,13 +886,7 @@ impl<T: Config> Pallet<T> {
 				all_offenders.push(acid)
 			}
 		}
-		(
-			active_validators,
-			all_validators,
-			all_offenders,
-			waiting_validators,
-			active_offenders,
-		)
+		(active_validators, all_validators, all_offenders, waiting_validators, active_offenders)
 	}
 
 	pub fn process_reliablilties(all_lists: ValidatorsListsTuple<T>, s_idx: SessionIndex) {
@@ -913,15 +906,11 @@ impl<T: Config> Pallet<T> {
 			}
 		};
 
-		active_validators
-			.iter()
-			.for_each(|vid| handle_score(vid, true));
+		active_validators.iter().for_each(|vid| handle_score(vid, true));
 
-		waiting_validators
-			.iter()
-			.for_each(|vid| handle_score(vid, false));
+		waiting_validators.iter().for_each(|vid| handle_score(vid, false));
 
-		Self::deposit_event(Event::<T>::EndSession{
+		Self::deposit_event(Event::<T>::EndSession {
 			s_idx,
 			all_offenders,
 			all_validators,
@@ -994,16 +983,12 @@ impl<T: Config> OneSessionHandler<T::AccountId> for Pallet<T> {
 		} else {
 			Self::deposit_event(Event::<T>::SomeOffline { offline: active_offenders.clone() });
 
-			Self::deposit_event(
-				Event::<T>::SomeOffline {
-					offline: active_offenders.clone()
-				}
-			);
+			Self::deposit_event(Event::<T>::SomeOffline { offline: active_offenders.clone() });
 			let validator_set_count = Keys::<T>::get().len() as u32;
 			let offence = UnresponsivenessOffence {
 				session_index: s_idx,
 				validator_set_count,
-				offenders: active_offenders.clone()
+				offenders: active_offenders.clone(),
 			};
 			// this will eventually trigger slashing
 			if let Err(e) = T::ReportUnresponsiveness::report_offence(vec![], offence) {
@@ -1025,10 +1010,9 @@ impl<T: Config> OneSessionHandlerAll<T::AccountId> for Pallet<T> {
 	type Key = T::AuthorityId;
 
 	fn on_new_session_all<'a, I: 'a>(_changed: bool, validators: I, _queued_validators: I)
-		where
-			I: Iterator<Item = (&'a T::AccountId, T::AuthorityId)>,
+	where
+		I: Iterator<Item = (&'a T::AccountId, T::AuthorityId)>,
 	{
-
 		let keys = validators.map(|x| x.1).collect::<Vec<_>>();
 		let bounded_keys = WeakBoundedVec::<_, T::MaxKeys>::force_from(
 			keys,
@@ -1100,7 +1084,7 @@ impl<T: Config> ERScoresTrait<ValidatorId<T>> for Pallet<T> {
 
 	fn chilled_validator_status(company: ValidatorId<T>) {
 		let active_validators = Self::prepare_all_lists().0;
-		if active_validators.contains(&company){
+		if active_validators.contains(&company) {
 			ChilledValidatorsMap::<T>::mutate(company, |v| *v = true);
 		}
 	}
@@ -1111,19 +1095,17 @@ impl<T: Config> ERScoresTrait<ValidatorId<T>> for Pallet<T> {
 
 	fn reset_score_after_era_for_chilled_active_validator() {
 		let active_validators = Self::prepare_all_lists().0;
-		active_validators
-			.iter()
-			.for_each(|vid|
-				if ChilledValidatorsMap::<T>::get(vid) == true {
-					ReliabilityScoresMap::<T>::mutate(vid, |v| *v = 0);
-					ChilledValidatorsMap::<T>::mutate(vid, |v| *v = false)
-				}
-			);
+		active_validators.iter().for_each(|vid| {
+			if ChilledValidatorsMap::<T>::get(vid) == true {
+				ReliabilityScoresMap::<T>::mutate(vid, |v| *v = 0);
+				ChilledValidatorsMap::<T>::mutate(vid, |v| *v = false)
+			}
+		});
 	}
 
 	fn reset_score_of_chilled_waiting_validator(company: ValidatorId<T>) {
 		let active_validators = Self::prepare_all_lists().0;
-		if !active_validators.contains(&company){
+		if !active_validators.contains(&company) {
 			ReliabilityScoresMap::<T>::mutate(company.clone(), |v| *v = 0);
 		}
 	}

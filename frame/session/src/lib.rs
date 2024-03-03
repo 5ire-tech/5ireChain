@@ -113,9 +113,14 @@ pub mod migrations;
 mod mock;
 #[cfg(test)]
 mod tests;
+pub mod validation;
 pub mod weights;
-
+use crate::validation::OneSessionHandlerAll;
 use codec::{Decode, MaxEncodedLen};
+use frame_election_provider_support::{
+	bounds::{CountBound, SizeBound},
+	DataProviderBounds, ElectionDataProvider,
+};
 use frame_support::{
 	dispatch::DispatchResult,
 	ensure,
@@ -126,14 +131,11 @@ use frame_support::{
 	weights::Weight,
 	Parameter,
 };
-use frame_support::traits::OneSessionHandlerAll;
 use frame_system::pallet_prelude::BlockNumberFor;
 use sp_runtime::{
 	traits::{AtLeast32BitUnsigned, Convert, Member, One, OpaqueKeys, Zero},
 	ConsensusEngineId, DispatchError, KeyTypeId, Permill, RuntimeAppPublic,
 };
-use frame_election_provider_support::{DataProviderBounds, ElectionDataProvider};
-use frame_election_provider_support::bounds::{CountBound, SizeBound};
 use sp_staking::SessionIndex;
 use sp_std::{
 	marker::PhantomData,
@@ -714,11 +716,9 @@ impl<T: Config> Pallet<T> {
 		let all_session_keys = <AllQueuedKeys<T>>::get();
 		let data_provider_bounds = DataProviderBounds {
 			count: Some(CountBound::from(T::TargetsBound::get())),
-			size: Some(SizeBound::from(T::TargetsBound::get()))
+			size: Some(SizeBound::from(T::TargetsBound::get())),
 		};
-		let all_validators = T::DataProvider::electable_targets(
-			data_provider_bounds
-		);
+		let all_validators = T::DataProvider::electable_targets(data_provider_bounds);
 
 		if changed {
 			// reset disabled validators
@@ -734,7 +734,7 @@ impl<T: Config> Pallet<T> {
 				// same as before, as underlying economic conditions may have changed.
 				(all_validators, true)
 			} else {
-				( all_validators.clone().unwrap() , false)
+				(all_validators.clone().unwrap(), false)
 			};
 
 		// Increment session index.
@@ -827,7 +827,11 @@ impl<T: Config> Pallet<T> {
 
 		// Tell everyone about the new session keys.
 		T::SessionHandler::on_new_session::<T::Keys>(changed, &session_keys, &queued_amalgamated);
-		T::AllSessionHandler::on_new_session_all::<T::Keys>(all_changed, &all_session_keys, &queued_amalgamated1);
+		T::AllSessionHandler::on_new_session_all::<T::Keys>(
+			all_changed,
+			&all_session_keys,
+			&queued_amalgamated1,
+		);
 	}
 
 	/// Disable the validator of index `i`, returns `false` if the validator was already disabled.

@@ -38,11 +38,12 @@ use frame_support::{
 	dispatch::{DispatchResultWithPostInfo, Pays},
 	pallet_prelude::Get,
 	storage,
-	traits::{OneSessionHandler, OneSessionHandlerAll},
+	traits::OneSessionHandler,
 	weights::Weight,
 	WeakBoundedVec,
 };
 use frame_system::pallet_prelude::BlockNumberFor;
+use pallet_session::validation::OneSessionHandlerAll;
 use scale_info::TypeInfo;
 use sp_consensus_grandpa::{
 	ConsensusLog, EquivocationProof, ScheduledChange, SetId, GRANDPA_AUTHORITIES_KEY,
@@ -625,13 +626,14 @@ where
 }
 
 impl<T: Config> OneSessionHandlerAll<T::AccountId> for Pallet<T>
-	where
-		T: pallet_session::Config,
+where
+	T: pallet_session::Config,
 {
 	type Key = AuthorityId;
 
 	fn on_new_session_all<'a, I: 'a>(_changed: bool, _validators: I, _queued_validators: I)
-		where
-			I: Iterator<Item = (&'a T::AccountId, AuthorityId)>,
-	{}
+	where
+		I: Iterator<Item = (&'a T::AccountId, AuthorityId)>,
+	{
+	}
 }

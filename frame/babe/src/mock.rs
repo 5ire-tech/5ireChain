@@ -27,6 +27,7 @@ use frame_support::{
 	parameter_types,
 	traits::{ConstU128, ConstU32, ConstU64, KeyOwnerProofSystem, OnInitialize},
 };
+pub use pallet_esg;
 use pallet_session::historical as pallet_session_historical;
 use pallet_staking::FixedNominationsQuota;
 use sp_consensus_babe::{AuthorityId, AuthorityPair, Randomness, Slot, VrfSignature};
@@ -43,7 +44,6 @@ use sp_runtime::{
 	BuildStorage, Perbill,
 };
 use sp_staking::{EraIndex, SessionIndex};
-pub use pallet_esg;
 
 type DummyValidatorId = u64;
 

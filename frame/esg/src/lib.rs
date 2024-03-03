@@ -12,18 +12,19 @@ pub mod tests;
 
 pub mod weights;
 
+pub mod traits;
+
 pub trait Sustainability<AccountId> {
 	fn get_score_of(company: AccountId) -> u16;
 }
 
 #[frame_support::pallet]
 pub mod pallet {
-	use crate::weights::WeightInfo;
+	use crate::{traits::ERScoresTrait, weights::WeightInfo};
 	use bs58;
 	use core::num::IntErrorKind;
 	use frame_support::{
 		pallet_prelude::{DispatchResult, *},
-		traits::ERScoresTrait,
 		WeakBoundedVec,
 	};
 	use frame_system::pallet_prelude::*;

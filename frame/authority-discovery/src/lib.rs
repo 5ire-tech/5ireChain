@@ -24,9 +24,10 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use frame_support::{
-	traits::{Get, OneSessionHandler, OneSessionHandlerAll},
+	traits::{Get, OneSessionHandler},
 	WeakBoundedVec,
 };
+use pallet_session::validation::OneSessionHandlerAll;
 use sp_authority_discovery::AuthorityId;
 use sp_std::prelude::*;
 
@@ -168,9 +169,10 @@ impl<T: Config> OneSessionHandlerAll<T::AccountId> for Pallet<T> {
 	type Key = AuthorityId;
 
 	fn on_new_session_all<'a, I: 'a>(_changed: bool, _validators: I, _queued_validators: I)
-		where
-			I: Iterator<Item = (&'a T::AccountId, Self::Key)>,
-	{}
+	where
+		I: Iterator<Item = (&'a T::AccountId, Self::Key)>,
+	{
+	}
 }
 
 #[cfg(test)]

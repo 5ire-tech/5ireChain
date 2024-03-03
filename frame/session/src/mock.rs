@@ -281,10 +281,10 @@ pub struct MyAllSessionHandler;
 impl OneSessionHandlerAll<u64> for MyAllSessionHandler {
 	type Key = UintAuthorityId;
 	fn on_new_session_all<'a, I: 'a>(changed: bool, validators: I, queued_validators: I)
-		where
-			I: Iterator<Item = (&'a u64, Self::Key)>,
-			u64: 'a {
-
+	where
+		I: Iterator<Item = (&'a u64, Self::Key)>,
+		u64: 'a,
+	{
 	}
 }
 
@@ -305,7 +305,7 @@ impl Config for Test {
 	type RuntimeEvent = RuntimeEvent;
 	type NextSessionRotation = ();
 	type WeightInfo = ();
-	type AllSessionHandler = (MyAllSessionHandler, );
+	type AllSessionHandler = (MyAllSessionHandler,);
 	type DataProvider = TestElectionDP;
 	type TargetsBound = MaxOnChainElectableTargets;
 }

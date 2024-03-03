@@ -25,12 +25,13 @@ use frame_election_provider_support::{
 use frame_support::{
 	assert_ok, ord_parameter_types, parameter_types,
 	traits::{
-		ConstU32, ConstU64, Currency, EitherOfDiverse, FindAuthor, Get, Hooks, Imbalance,
-		OnUnbalanced, OneSessionHandler, ERScoresTrait
+		ConstU32, ConstU64, Currency, ERScoresTrait, EitherOfDiverse, FindAuthor, Get, Hooks,
+		Imbalance, OnUnbalanced, OneSessionHandler,
 	},
 	weights::constants::RocksDbWeight,
 };
 use frame_system::{EnsureRoot, EnsureSignedBy};
+pub use pallet_esg;
 use sp_core::H256;
 use sp_io;
 use sp_runtime::{
@@ -40,7 +41,6 @@ use sp_runtime::{
 	BuildStorage,
 };
 use sp_staking::offence::{DisableStrategy, OffenceDetails, OnOffenceHandler};
-pub use pallet_esg;
 
 pub const INIT_TIMESTAMP: u64 = 30_000;
 pub const BLOCK_TIME: u64 = 1000;

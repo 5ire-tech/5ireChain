@@ -18,7 +18,6 @@
 //! Test utilities
 #![allow(dead_code)]
 #![allow(unused_imports)]
-
 #![cfg(test)]
 
 use sp_std::collections::btree_map::BTreeMap;
@@ -29,25 +28,23 @@ use sp_runtime::{
 	curve::PiecewiseLinear,
 	testing::{TestXt, UintAuthorityId},
 	traits::{BlakeTwo256, ConvertInto, IdentityLookup, Zero},
-	BuildStorage, Permill,
-	Perbill,
+	BuildStorage, Perbill, Permill,
 };
 use sp_staking::{
 	offence::{OffenceError, ReportOffence},
 	SessionIndex,
 };
 
+use frame_election_provider_support::{onchain, SequentialPhragmen, VoteWeight};
 use frame_support::{
-	assert_ok,
-	parameter_types,
+	assert_ok, parameter_types,
 	traits::{
-		ConstU32, ConstU64,
-		Currency, FindAuthor, GenesisBuild, Get, Hooks, Imbalance,
+		ConstU32, ConstU64, Currency, FindAuthor, GenesisBuild, Get, Hooks, Imbalance,
 		OnUnbalanced, OneSessionHandler,
 	},
-	weights::{Weight, constants::RocksDbWeight}, Parameter,
+	weights::{constants::RocksDbWeight, Weight},
+	Parameter,
 };
-use frame_election_provider_support::{onchain, SequentialPhragmen, VoteWeight};
 use pallet_staking::{BalanceOf, Exposure, ExposureOf, RewardDestination, ValidatorPrefs};
 
 type AccountId = u64;
@@ -176,9 +173,11 @@ pub fn new_test_ext(n: u64) -> sp_io::TestExternalities {
 		for i in 1..=n {
 			System::inc_providers(&i);
 			// i'm using controller id; i same as that of stash id; i
-			Staking::bond(RuntimeOrigin::signed(i), i, 1500, RewardDestination::Controller).unwrap();
+			Staking::bond(RuntimeOrigin::signed(i), i, 1500, RewardDestination::Controller)
+				.unwrap();
 			Staking::validate(RuntimeOrigin::signed(i), ValidatorPrefs::default()).unwrap();
-			Session::set_keys(RuntimeOrigin::signed(i), (i).into(), vec![]).unwrap();		}
+			Session::set_keys(RuntimeOrigin::signed(i), (i).into(), vec![]).unwrap();
+		}
 	});
 	result
 }
@@ -186,8 +185,8 @@ pub fn new_test_ext(n: u64) -> sp_io::TestExternalities {
 pub struct Author11;
 impl FindAuthor<AccountId> for Author11 {
 	fn find_author<'a, I>(_digests: I) -> Option<AccountId>
-		where
-			I: 'a + IntoIterator<Item = (frame_support::ConsensusEngineId, &'a [u8])>,
+	where
+		I: 'a + IntoIterator<Item = (frame_support::ConsensusEngineId, &'a [u8])>,
 	{
 		Some(11)
 	}
@@ -203,7 +202,7 @@ impl frame_system::Config for Test {
 	type RuntimeCall = RuntimeCall;
 	type Hash = H256;
 	type Hashing = ::sp_runtime::traits::BlakeTwo256;
-	type AccountId = AccountId	;
+	type AccountId = AccountId;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Block = Block;
 	type RuntimeEvent = RuntimeEvent;
@@ -239,14 +238,11 @@ impl pallet_session::Config for Test {
 	type ShouldEndSession = pallet_session::PeriodicSessions<Period, Offset>;
 	type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
 	type SessionManager = pallet_session::historical::NoteHistoricalRoot<Test, TestSessionManager>;
-
 }
 
 impl pallet_session::historical::Config for Runtime {
-
 	type FullIdentification = u64;
 	type FullIdentificationOf = ConvertInto;
-
 }
 
 impl pallet_balances::Config for Test {
@@ -285,7 +281,6 @@ impl pallet_staking::SessionInterface<AccountId> for ImOnlineSession {
 	fn validators() -> Vec<AccountId> {
 		Validators::get().unwrap()
 	}
-
 
 	fn prune_historical_up_to(up_to: SessionIndex) {}
 }
@@ -404,7 +399,6 @@ impl frame_support::traits::EstimateNextSessionRotation<u64> for TestNextSession
 		(mock.unwrap_or(estimate), weight)
 	}
 
-
 	fn estimate_next_session_rotation(now: u64) -> (Option<u64>, Weight) {
 		pallet_session::PeriodicSessions::<Period, Offset>::estimate_next_session_rotation(now)
 	}
@@ -444,7 +438,7 @@ pub fn advance_session() {
 pub fn print_all_events() {
 	System::events()
 		.iter()
-		.for_each(|record|log::info!("#@! Event: {:?}", record.event));
+		.for_each(|record| log::info!("#@! Event: {:?}", record.event));
 }
 
 pub fn auth_at_idx(i: u32) -> UintAuthorityId {

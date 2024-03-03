@@ -28,10 +28,12 @@ use frame_support::{
 	pallet_prelude::*,
 	traits::{
 		Currency, Defensive, DefensiveResult, EstimateNextNewSession, Get, Imbalance,
-		LockableCurrency, OnUnbalanced, TryCollect, UnixTime, WithdrawReasons, ERScoresTrait,
+		LockableCurrency, OnUnbalanced, TryCollect, UnixTime, WithdrawReasons,
 	},
 	weights::Weight,
 };
+use pallet_esg::traits::ERScoresTrait;
+
 use frame_system::{pallet_prelude::BlockNumberFor, RawOrigin};
 use pallet_session::historical;
 use sp_runtime::{

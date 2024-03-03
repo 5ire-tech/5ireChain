@@ -26,12 +26,13 @@ use frame_support::{
 	traits::{
 		Currency, Defensive, DefensiveResult, DefensiveSaturating, EnsureOrigin,
 		EstimateNextNewSession, Get, LockIdentifier, LockableCurrency, OnUnbalanced, TryCollect,
-		UnixTime, ERScoresTrait,
+		UnixTime,
 	},
 	weights::Weight,
 	BoundedVec,
 };
 use frame_system::{ensure_root, ensure_signed, pallet_prelude::*};
+use pallet_esg::traits::ERScoresTrait;
 use sp_runtime::{
 	traits::{CheckedSub, SaturatedConversion, StaticLookup, Zero},
 	ArithmeticError, Perbill, Percent,
@@ -271,7 +272,6 @@ pub mod pallet {
 
 		/// Weight information for extrinsics in this pallet.
 		type WeightInfo: WeightInfo;
-
 
 		/// Esg & Reliability Score
 		type ESG: ERScoresTrait<Self::AccountId>;
