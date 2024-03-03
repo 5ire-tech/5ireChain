@@ -42,140 +42,140 @@ sqlx = { version = "0.7.1", default-features = false, features = ["macros"] }
 thiserror = "1.0"
 tokio = "1.29.1"
 # Substrate Client
-sc-basic-authorship = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-block-builder = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-chain-spec = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-cli = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sc-client-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-client-db = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sc-consensus = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-consensus-aura = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-consensus-grandpa = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-consensus-manual-seal = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-executor = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-keystore = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-network = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-network-common = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-network-sync = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-offchain = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-rpc = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-rpc-api = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-service = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sc-telemetry = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-transaction-pool = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-transaction-pool-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-utils = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-grandpa = { version = "0.10.0-dev", package = "sc-consensus-grandpa", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0"}
-mmr-rpc = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-authority-discovery = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0"  }
-sc-consensus-babe = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0"  }
-sc-consensus-babe-rpc = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-consensus-epochs = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-consensus-grandpa-rpc = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-consensus-slots = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-network-statement = { version = "0.10.0-dev",git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-rpc-spec-v2 = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-service-test = { version = "2.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-statement-store = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-storage-monitor = { version = "0.1.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sc-sync-state-rpc = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-sc-sysinfo = { version = "6.0.0-dev",   git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
+sc-basic-authorship = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-block-builder = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-chain-spec = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-cli = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sc-client-api = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-client-db = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sc-consensus = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-consensus-aura = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-consensus-grandpa = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-consensus-manual-seal = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-executor = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-keystore = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-network = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-network-common = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-network-sync = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-offchain = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-rpc = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-rpc-api = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-service = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sc-telemetry = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-transaction-pool = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-transaction-pool-api = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-utils = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+grandpa = { version = "0.10.0-dev", package = "sc-consensus-grandpa", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0"}
+mmr-rpc = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-authority-discovery = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0"  }
+sc-consensus-babe = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0"  }
+sc-consensus-babe-rpc = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-consensus-epochs = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-consensus-grandpa-rpc = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-consensus-slots = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-network-statement = { version = "0.10.0-dev",git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-rpc-spec-v2 = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-service-test = { version = "2.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-statement-store = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-storage-monitor = { version = "0.1.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sc-sync-state-rpc = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+sc-sysinfo = { version = "6.0.0-dev",   git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
 # Substrate Primitive
-sp-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-block-builder = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-blockchain = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sp-consensus = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sp-consensus-aura = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-consensus-grandpa = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-core = { version = "21.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-database = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sp-inherents = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-io = { version = "23.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-keyring = { version = "24.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sp-offchain = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-runtime = { version = "24.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-runtime-interface = { version = "17.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-session = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-state-machine = { version = "0.28.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-std = { version = "8.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-storage = { version = "13.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-timestamp = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-transaction-pool = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-trie = { version = "22.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-version = { version = "22.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-authority-discovery = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-consensus-babe = { version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-sp-keystore = { version = "0.27.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sp-statement-store = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sp-tracing = { version = "10.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0"  }
-sp-transaction-storage-proof = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-substrate-state-trie-migration-rpc = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0"  }
-substrate-rpc-client = { git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-sp-staking = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-application-crypto = { version = "23.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-sp-npos-elections = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-substrate-test-utils = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
+sp-api = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-block-builder = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-blockchain = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sp-consensus = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sp-consensus-aura = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-consensus-grandpa = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-core = { version = "21.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-database = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sp-inherents = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-io = { version = "23.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-keyring = { version = "24.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sp-offchain = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-runtime = { version = "24.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-runtime-interface = { version = "17.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-session = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-state-machine = { version = "0.28.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-std = { version = "8.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-storage = { version = "13.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-timestamp = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-transaction-pool = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-trie = { version = "22.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-version = { version = "22.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-authority-discovery = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-consensus-babe = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+sp-keystore = { version = "0.27.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sp-statement-store = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sp-tracing = { version = "10.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0"  }
+sp-transaction-storage-proof = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+substrate-state-trie-migration-rpc = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0"  }
+substrate-rpc-client = { git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+sp-staking = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-application-crypto = { version = "23.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-npos-elections = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+substrate-test-utils = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
 
 # Substrate FRAME
-frame-benchmarking = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-frame-executive = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-frame-support = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-frame-system = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-frame-system-benchmarking = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-frame-system-rpc-runtime-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-pallet-aura = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-pallet-balances = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-pallet-sudo = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-pallet-timestamp = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-pallet-transaction-payment = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-pallet-transaction-payment-rpc = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-pallet-transaction-payment-rpc-runtime-api = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-pallet-utility = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-node-primitives = { version = "2.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false  }
-pallet-asset-tx-payment = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false }
-pallet-assets = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-frame-benchmarking-pallet-pov = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-frame-election-provider-support = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-alliance = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
+frame-benchmarking = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+frame-executive = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+frame-support = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+frame-system = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+frame-system-benchmarking = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+frame-system-rpc-runtime-api = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+pallet-aura = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+pallet-balances = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+pallet-sudo = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+pallet-timestamp = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+pallet-transaction-payment = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+pallet-transaction-payment-rpc = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+pallet-transaction-payment-rpc-runtime-api = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+pallet-utility = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+node-primitives = { version = "2.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false  }
+pallet-asset-tx-payment = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+pallet-assets = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+frame-benchmarking-pallet-pov = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+frame-election-provider-support = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-alliance = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
 
-pallet-authorship = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-bags-list = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-bounties = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-child-bounties = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-collective = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-contracts = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-conviction-voting = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-core-fellowship = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-democracy = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-election-provider-multi-phase = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-election-provider-support-benchmarking = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-fast-unstake = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-identity = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-indices = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-insecure-randomness-collective-flip = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-membership = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-mmr = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-multisig = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-offences = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-preimage = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-proxy = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-ranked-collective = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-recovery = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-referenda = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-remark = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-scheduler = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
+pallet-authorship = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-bags-list = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-bounties = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-child-bounties = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-collective = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-contracts = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-conviction-voting = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-core-fellowship = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-democracy = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-election-provider-multi-phase = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-election-provider-support-benchmarking = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-fast-unstake = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-identity = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-indices = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-insecure-randomness-collective-flip = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-membership = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-mmr = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-multisig = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-offences = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-preimage = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-proxy = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-ranked-collective = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-recovery = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-referenda = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-remark = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-scheduler = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
 
-pallet-state-trie-migration = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-transaction-storage = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-treasury = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-vesting = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-contracts-primitives = { version = "24.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-elections-phragmen = { version = "5.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-nomination-pools = { version = "1.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-nomination-pools-benchmarking = { version = "1.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-nomination-pools-runtime-api = { version = "1.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-offences-benchmarking = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
-pallet-root-testing = { version = "1.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0", default-features = false}
+pallet-state-trie-migration = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-transaction-storage = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-treasury = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-vesting = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-contracts-primitives = { version = "24.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-elections-phragmen = { version = "5.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-nomination-pools = { version = "1.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-nomination-pools-benchmarking = { version = "1.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-nomination-pools-runtime-api = { version = "1.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-offences-benchmarking = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
+pallet-root-testing = { version = "1.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
 
 
 # Pallet implementation
@@ -191,17 +191,17 @@ pallet-im-online = { version = "4.0.0-dev", path = "frame/im-online", default-fe
 pallet-grandpa = { version = "4.0.0-dev", path = "frame/grandpa", default-features = false }
 
 # Substrate Utility
-frame-benchmarking-cli = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-prometheus-endpoint = { package = "substrate-prometheus-endpoint", version = "0.10.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-substrate-build-script-utils = { version = "3.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-substrate-frame-rpc-system = { version = "4.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-substrate-test-runtime-client = { version = "2.0.0", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-substrate-wasm-builder = { version = "5.0.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-substrate-cli-test-utils = { git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-try-runtime-cli = { git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-node-inspect = { version = "0.9.0-dev", git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0"}
-substrate-frame-cli = {  git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0" }
-frame-try-runtime = { version = "0.10.0-dev", default-features = false, git = "ssh://git@github.com/5ire-tech/5ire-substrate.git", branch = "polkadot-v1.1.0"}
+frame-benchmarking-cli = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+prometheus-endpoint = { package = "substrate-prometheus-endpoint", version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+substrate-build-script-utils = { version = "3.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+substrate-frame-rpc-system = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+substrate-test-runtime-client = { version = "2.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+substrate-wasm-builder = { version = "5.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+substrate-cli-test-utils = { git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+try-runtime-cli = { git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+node-inspect = { version = "0.9.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0"}
+substrate-frame-cli = {  git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
+frame-try-runtime = { version = "0.10.0-dev", default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0"}
 # Frontier Client
 fc-api = { version = "1.0.0-dev", path = "client/api" }
 fc-cli = { version = "1.0.0-dev", path = "client/cli", default-features = false }
