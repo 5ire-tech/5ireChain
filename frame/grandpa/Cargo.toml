@@ -20,7 +20,7 @@ frame-benchmarking = { workspace = true, optional = true}
 frame-support = { workspace = true}
 frame-system = { workspace = true}
 pallet-authorship = { workspace = true}
-pallet-session = { path = "../session", default-features = false}
+pallet-session = { workspace = true }
 sp-application-crypto = { workspace = true, features = ["serde"] }
 sp-consensus-grandpa = { workspace = true, features = ["serde"] }
 sp-core = { workspace = true, features = ["serde"] }
@@ -36,11 +36,11 @@ frame-benchmarking = { workspace = true }
 frame-election-provider-support = { workspace = true }
 pallet-balances = { workspace = true }
 pallet-offences = { workspace = true }
-pallet-staking = { path = "../staking" }
-pallet-staking-reward-curve = { path = "../staking/reward-curve" }
+pallet-staking = { workspace = true }
+pallet-staking-reward-curve = { workspace = true }
 pallet-timestamp = { workspace = true }
 sp-keyring = { workspace = true }
-pallet-esg = {version = "1.0.0", default-features = false, path = "../esg" }
+pallet-esg = { workspace = true }
 
 [features]
 default = [ "std" ]

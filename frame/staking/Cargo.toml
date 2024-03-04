@@ -31,7 +31,7 @@ pallet-authorship = { workspace = true }
 sp-application-crypto = { workspace = true , features = ["serde"] }
 frame-election-provider-support = { workspace = true , default-features = false}
 log = { version = "0.4.17", default-features = false }
-pallet-esg = {version = "1.0.0", default-features = false, path = "../esg" }
+pallet-esg = { workspace = true }
 pallet-im-online = { workspace = true }
 
 # Optional imports for benchmarking

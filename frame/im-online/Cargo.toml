@@ -27,15 +27,15 @@ sp-runtime = { workspace = true, features = ["serde"] }
 sp-staking = { workspace = true, features = ["serde"] }
 sp-std = { workspace = true}
 frame-election-provider-support = { workspace = true }
-pallet-esg = {version = "1.0.0", default-features = false, path = "../esg" }
-pallet-session = { path = "../session", default-features = false }
+pallet-esg = { workspace = true }
+pallet-session = { workspace = true }
 
 [dev-dependencies]
 env_logger = "0.9"
 sp-npos-elections = { workspace = true }
 pallet-balances = { workspace = true }
-pallet-staking = { version = "4.0.0-dev", default-features = false, path = "../staking" }
-pallet-staking-reward-curve = { version = "4.0.0-dev", path = "../staking/reward-curve" }
+pallet-staking = { workspace = true }
+pallet-staking-reward-curve = { workspace = true }
 pallet-timestamp = { workspace = true }
 pallet-bags-list = { workspace = true }
 

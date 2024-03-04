@@ -19,7 +19,7 @@ codec = { package = "parity-scale-codec", version = "3.6.1", default-features = 
 scale-info = { version = "2.5.0", default-features = false, features = ["derive"] }
 frame-support = { workspace = true }
 frame-system = { workspace = true }
-pallet-session = { path = "../session", default-features = false, features = [
+pallet-session = { workspace = true, features = [
 	"historical",
 ]}
 sp-application-crypto = { workspace = true }

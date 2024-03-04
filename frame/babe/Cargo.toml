@@ -20,7 +20,7 @@ frame-benchmarking = { workspace = true, optional = true}
 frame-support = { workspace = true }
 frame-system = { workspace = true }
 pallet-authorship = { workspace = true }
-pallet-session = { path = "../session", default-features = false}
+pallet-session = { workspace = true }
 pallet-timestamp = { workspace = true }
 sp-application-crypto = { workspace = true, features = ["serde"] }
 sp-consensus-babe = { workspace = true, features = ["serde"] }
@@ -30,7 +30,7 @@ sp-runtime = { workspace = true, features = ["serde"] }
 sp-session = { workspace = true}
 sp-staking = { workspace = true, features = ["serde"] }
 sp-std = { workspace = true}
-pallet-esg = {version = "1.0.0", default-features = false, path = "../esg" }
+pallet-esg = { workspace = true }
 
 [dev-dependencies]
 frame-election-provider-support = { workspace = true }
