@@ -628,7 +628,7 @@ impl<T: Config> Pallet<T> {
 		// Err("Target snapshot too big") -- very rare case
 		if all_validators.is_err() {
 			sp_runtime::print("Target snapshot too big");
-			return false;
+			return false
 		}
 		let all_validators = all_validators.unwrap();
 		if authority_index >= all_validators.len() as u32 {
@@ -994,11 +994,10 @@ impl<T: Config> OneSessionHandler<T::AccountId> for Pallet<T> {
 			if let Err(e) = T::ReportUnresponsiveness::report_offence(vec![], offence) {
 				sp_runtime::print(e);
 			}
-
-			// finally process reliability score of
-			// every validator of any kind
-			Self::process_reliablilties(all_lists, s_idx);
 		}
+		// finally process reliability score of
+		// every validator of any kind
+		Self::process_reliablilties(all_lists, s_idx);
 	}
 
 	fn on_disabled(_i: u32) {
