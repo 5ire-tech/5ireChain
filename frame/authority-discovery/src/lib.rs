@@ -165,6 +165,7 @@ impl<T: Config> OneSessionHandler<T::AccountId> for Pallet<T> {
 	}
 }
 
+// 5ire's implementation
 impl<T: Config> OneSessionHandlerAll<T::AccountId> for Pallet<T> {
 	type Key = AuthorityId;
 
@@ -208,6 +209,56 @@ mod tests {
 		pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(33);
 	}
 
+	// 5ire's implementation
+	parameter_types! {
+		pub MaxNominations: u32 =  0u32;
+		pub MaxOnChainElectableTargets: u16 = 1250;
+	}
+
+	//5ire's implementation
+	pub struct MyAllSessionHandler;
+	impl OneSessionHandlerAll<AuthorityId> for MyAllSessionHandler {
+		type Key = UintAuthorityId;
+		fn on_new_session_all<'a, I: 'a>(changed: bool, validators: I, queued_validators: I)
+		where
+			I: Iterator<Item = (&'a AuthorityId, Self::Key)>,
+			u64: 'a,
+		{
+		}
+	}
+
+	impl sp_runtime::BoundToRuntimeAppPublic for MyAllSessionHandler {
+		type Public = UintAuthorityId;
+	}
+
+	// 5ire's implementation
+	pub struct TestElectionDP;
+
+	impl frame_election_provider_support::ElectionDataProvider for TestElectionDP {
+		type AccountId = AuthorityId;
+		type BlockNumber = u64;
+		type MaxVotesPerVoter = MaxNominations;
+
+		fn desired_targets() -> frame_election_provider_support::data_provider::Result<u32> {
+			frame_election_provider_support::data_provider::Result::Ok(0u32)
+		}
+		fn electable_targets(
+			_maybe_max_len: frame_election_provider_support::DataProviderBounds,
+		) -> frame_election_provider_support::data_provider::Result<Vec<Self::AccountId>> {
+			frame_election_provider_support::data_provider::Result::Ok(Vec::<AuthorityId>::new())
+		}
+		fn electing_voters(
+			_maybe_max_len: frame_election_provider_support::DataProviderBounds,
+		) -> frame_election_provider_support::data_provider::Result<
+			Vec<frame_election_provider_support::VoterOf<Self>>,
+		> {
+			frame_election_provider_support::data_provider::Result::Err("not implemented!!")
+		}
+		fn next_election_prediction(_now: Self::BlockNumber) -> Self::BlockNumber {
+			0u64
+		}
+	}
+
 	impl Config for Test {
 		type MaxAuthorities = ConstU32<100>;
 	}
@@ -222,6 +273,9 @@ mod tests {
 		type ValidatorIdOf = ConvertInto;
 		type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
 		type WeightInfo = ();
+		type AllSessionHandler = (MyAllSessionHandler,);
+		type DataProvider = TestElectionDP;
+		type TargetsBound = MaxOnChainElectableTargets;
 	}
 
 	impl pallet_session::historical::Config for Test {

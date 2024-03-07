@@ -6335,6 +6335,7 @@ dependencies = [
 name = "pallet-authority-discovery"
 version = "4.0.0-dev"
 dependencies = [
+ "frame-election-provider-support",
  "frame-support",
  "frame-system",
  "pallet-session 4.0.0-dev",
