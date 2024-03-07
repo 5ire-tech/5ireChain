@@ -311,12 +311,12 @@ impl frame_election_provider_support::ElectionDataProvider for TestElectionDP {
 		frame_election_provider_support::data_provider::Result::Ok(0u32)
 	}
 	fn electable_targets(
-		maybe_max_len: DataProviderBounds,
+		_maybe_max_len: DataProviderBounds,
 	) -> frame_election_provider_support::data_provider::Result<Vec<Self::AccountId>> {
 		frame_election_provider_support::data_provider::Result::Ok(Vec::<u64>::new())
 	}
 	fn electing_voters(
-		maybe_max_len: DataProviderBounds,
+		_maybe_max_len: DataProviderBounds,
 	) -> frame_election_provider_support::data_provider::Result<
 		Vec<frame_election_provider_support::VoterOf<Self>>,
 	> {

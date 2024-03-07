@@ -367,6 +367,7 @@ impl<AId> SessionHandler<AId> for TestSessionHandler {
 	fn on_disabled(_: u32) {}
 }
 
+/// 5ire's implementation 
 pub trait AllSessionHandler<ValidatorId> {
 	/// All the key type ids this session handler can process.
 	///
@@ -470,6 +471,7 @@ pub mod pallet {
 		type WeightInfo: WeightInfo;
 
 		/// Something that will provide the election data.
+		/// 5ire's implementation 
 		type DataProvider: ElectionDataProvider<
 			AccountId = Self::ValidatorId,
 			BlockNumber = BlockNumberFor<Self>,
@@ -477,6 +479,7 @@ pub mod pallet {
 
 		/// Bounds the number of targets, when calling into [`Config::DataProvider`]. It might be
 		/// overwritten in the `InstantElectionProvider` impl.
+		/// 5ire's implementation 
 		type TargetsBound: Get<u32>;
 	}
 
@@ -573,7 +576,8 @@ pub mod pallet {
 	/// has changed in the queued validator set.
 	#[pallet::storage]
 	pub type QueuedChanged<T> = StorageValue<_, bool, ValueQuery>;
-
+	
+	/// 5ire's implementation 
 	#[pallet::storage]
 	pub type AllQueuedChanged<T> = StorageValue<_, bool, ValueQuery>;
 
@@ -585,6 +589,7 @@ pub mod pallet {
 
 	/// The queued keys for the next session. When the next session begins, these keys
 	/// will be used to determine the validator's session keys.
+	/// 5ire's implementation 
 	#[pallet::storage]
 	#[pallet::getter(fn all_queued_keys)]
 	pub type AllQueuedKeys<T: Config> = StorageValue<_, Vec<(T::ValidatorId, T::Keys)>, ValueQuery>;
@@ -713,29 +718,17 @@ impl<T: Config> Pallet<T> {
 			session_keys.iter().map(|(validator, _)| validator.clone()).collect::<Vec<_>>();
 		Validators::<T>::put(&validators);
 
+		// 5ire's implementation 
 		let all_session_keys = <AllQueuedKeys<T>>::get();
 		let data_provider_bounds = DataProviderBounds {
 			count: Some(CountBound::from(T::TargetsBound::get())),
 			size: Some(SizeBound::from(T::TargetsBound::get())),
 		};
 		let all_validators = T::DataProvider::electable_targets(data_provider_bounds);
-
 		if changed {
 			// reset disabled validators
 			<DisabledValidators<T>>::take();
 		}
-
-		// Get next validator set.
-		let maybe_next_validators_all = T::SessionManager::new_session(session_index + 1);
-		let (next_validators_all, next_identities_changed_all) =
-			if let Some(all_validators) = maybe_next_validators_all {
-				// NOTE: as per the documentation on `OnSessionEnding`, we consider
-				// the validator set as having changed even if the validators are the
-				// same as before, as underlying economic conditions may have changed.
-				(all_validators, true)
-			} else {
-				(all_validators.clone().unwrap(), false)
-			};
 
 		// Increment session index.
 		let session_index = session_index + 1;
@@ -755,6 +748,18 @@ impl<T: Config> Pallet<T> {
 				(Validators::<T>::get(), false)
 			};
 
+		// Get next validator set.
+		// 5ire's implementation
+		let maybe_next_validators_all = T::SessionManager::new_session(session_index + 1);
+		let (next_validators_all, next_identities_changed_all) =
+			if let Some(all_validators) = maybe_next_validators_all {
+				// NOTE: as per the documentation on `OnSessionEnding`, we consider
+				// the validator set as having changed even if the validators are the
+				// same as before, as underlying economic conditions may have changed.
+				(all_validators, true)
+			} else {
+				(all_validators.clone().unwrap(), false)
+			};
 		// Queue next session keys.
 		let (queued_amalgamated, next_changed) = {
 			// until we are certain there has been a change, iterate the prior
@@ -786,6 +791,8 @@ impl<T: Config> Pallet<T> {
 
 			(queued_amalgamated, changed)
 		};
+
+		// 5ire's implementation 
 		let (queued_amalgamated1, next_changed1) = {
 			// until we are certain there has been a change, iterate the prior
 			// validators along with the current and check for changes
@@ -819,6 +826,7 @@ impl<T: Config> Pallet<T> {
 
 		<QueuedKeys<T>>::put(queued_amalgamated.clone());
 		<QueuedChanged<T>>::put(next_changed);
+		//5ire's implementation 
 		<AllQueuedKeys<T>>::put(queued_amalgamated1.clone());
 		<AllQueuedChanged<T>>::put(next_changed1);
 
@@ -826,6 +834,7 @@ impl<T: Config> Pallet<T> {
 		Self::deposit_event(Event::NewSession { session_index });
 
 		// Tell everyone about the new session keys.
+		// 5ire's implementation 
 		T::SessionHandler::on_new_session::<T::Keys>(changed, &session_keys, &queued_amalgamated);
 		T::AllSessionHandler::on_new_session_all::<T::Keys>(
 			all_changed,
