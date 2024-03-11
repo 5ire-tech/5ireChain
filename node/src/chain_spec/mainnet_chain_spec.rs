@@ -18,7 +18,7 @@
 
 //! Substrate chain configurations.
 
-use firechain_uat_runtime::{
+use firechain_mainnet_runtime::{
 	constants::currency::*, wasm_binary_unwrap, AuthorityDiscoveryConfig, BabeConfig,
 	BalancesConfig, Block, CouncilConfig, DemocracyConfig, ElectionsConfig, EthereumConfig,
 	GrandpaConfig, ImOnlineConfig, IndicesConfig, MaxNominations, NominationPoolsConfig,
@@ -41,13 +41,13 @@ use sp_runtime::{
 };
 use std::{collections::BTreeMap, str::FromStr};
 
-pub use firechain_uat_runtime::{EVMConfig, RuntimeGenesisConfig};
+pub use firechain_mainnet_runtime::{EVMConfig, RuntimeGenesisConfig};
 pub use node_primitives::{AccountId, Balance, Signature};
 
 type AccountPublic = <Signature as Verify>::Signer;
 
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
-const DEFAULT_PROTOCOL_ID: &str = "uat-5ire";
+const DEFAULT_PROTOCOL_ID: &str = "mainnet-5ire";
 /// Node `ChainSpec` extensions.
 ///
 /// Additional parameters for some Substrate core modules,
@@ -193,12 +193,12 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 	testnet_genesis(initial_authorities, vec![], root_key, Some(endowed_accounts))
 }
 
-/// UAT testnet config.
+/// Mainnet testnet config.
 pub fn staging_testnet_config() -> ChainSpec {
 	let boot_nodes = vec![];
 	ChainSpec::from_genesis(
-		"5ireChain UAT",
-		"uat_5ireChain_staging",
+		"5ireChain Mainnet",
+		"mainnet_5ireChain_staging",
 		ChainType::Live,
 		staging_testnet_config_genesis,
 		boot_nodes,
@@ -595,7 +595,7 @@ fn development_config_genesis() -> RuntimeGenesisConfig {
 pub fn development_config() -> ChainSpec {
 	ChainSpec::from_genesis(
 		"Development",
-		"uat_5ireChain_dev",
+		"mainnet_5ireChian_dev",
 		ChainType::Development,
 		development_config_genesis,
 		vec![],
@@ -623,7 +623,7 @@ fn local_testnet_genesis() -> RuntimeGenesisConfig {
 pub fn local_testnet_config() -> ChainSpec {
 	ChainSpec::from_genesis(
 		"Local Testnet",
-		"uat_5ireChain_local",
+		"mainnet_5ireChain_local",
 		ChainType::Local,
 		local_testnet_genesis,
 		vec![],
