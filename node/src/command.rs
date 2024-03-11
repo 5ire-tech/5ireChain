@@ -99,8 +99,9 @@ impl SubstrateCli for Cli {
 			"mainnet-dev" => Box::new(mainnet_chain_spec::development_config()),
 			"mainnet-local" => Box::new(mainnet_chain_spec::local_testnet_config()),
 			"mainnet-staging" => Box::new(mainnet_chain_spec::staging_testnet_config()),
-			path =>
-				Box::new(mainnet_chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
+			path => Box::new(mainnet_chain_spec::ChainSpec::from_json_file(
+				std::path::PathBuf::from(path),
+			)?),
 		};
 
 		#[cfg(feature = "firechain-thunder")]

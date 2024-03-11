@@ -31,7 +31,9 @@ pub enum Client {
 	#[cfg(feature = "firechain-qa")]
 	Qa(Arc<FullClient<firechain_qa_runtime::RuntimeApi, FirechainQaRuntimeExecutor>>),
 	#[cfg(feature = "firechain-mainnet")]
-	Mainnet(Arc<FullClient<firechain_mainnet_runtime::RuntimeApi, FirechainMainnetRuntimeExecutor>>),
+	Mainnet(
+		Arc<FullClient<firechain_mainnet_runtime::RuntimeApi, FirechainMainnetRuntimeExecutor>>,
+	),
 	#[cfg(feature = "firechain-thunder")]
 	Thunder(
 		Arc<FullClient<firechain_thunder_runtime::RuntimeApi, FirechainThunderRuntimeExecutor>>,
@@ -105,7 +107,9 @@ impl From<Arc<FullClient<firechain_mainnet_runtime::RuntimeApi, FirechainMainnet
 	for Client
 {
 	fn from(
-		client: Arc<FullClient<firechain_mainnet_runtime::RuntimeApi, FirechainMainnetRuntimeExecutor>>,
+		client: Arc<
+			FullClient<firechain_mainnet_runtime::RuntimeApi, FirechainMainnetRuntimeExecutor>,
+		>,
 	) -> Self {
 		Self::Mainnet(client)
 	}
