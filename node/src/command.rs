@@ -32,8 +32,8 @@ use firechain_node::client::IdentifyVariant;
 #[cfg(feature = "firechain-qa")]
 use firechain_node::client::FirechainQaRuntimeExecutor;
 
-#[cfg(feature = "firechain-uat")]
-use firechain_node::client::FirechainUatRuntimeExecutor;
+#[cfg(feature = "firechain-mainnet")]
+use firechain_node::client::FirechainMainnetRuntimeExecutor;
 
 #[cfg(feature = "firechain-thunder")]
 use firechain_node::client::FirechainThunderRuntimeExecutor;
@@ -41,8 +41,8 @@ use firechain_node::client::FirechainThunderRuntimeExecutor;
 #[cfg(feature = "firechain-qa")]
 use firechain_node::chain_spec::qa_chain_spec;
 
-#[cfg(feature = "firechain-uat")]
-use firechain_node::chain_spec::uat_chain_spec;
+#[cfg(feature = "firechain-mainnet")]
+use firechain_node::chain_spec::mainnet_chain_spec;
 
 #[cfg(feature = "firechain-thunder")]
 use firechain_node::chain_spec::thunder_chain_spec;
@@ -95,18 +95,18 @@ impl SubstrateCli for Cli {
 		};
 
 		#[allow(unused)]
-		#[cfg(feature = "firechain-uat")]
+		#[cfg(feature = "firechain-mainnet")]
 		let spec = match id {
 			"" =>
 				return Err(
 					"Please specify which chain you want to run, e.g. --dev or --chain=local"
 						.into(),
 				),
-			"uat-dev" => Box::new(uat_chain_spec::development_config()),
-			"uat-local" => Box::new(uat_chain_spec::local_testnet_config()),
-			"uat-staging" => Box::new(uat_chain_spec::staging_testnet_config()),
+			"mainnet-dev" => Box::new(mainnet_chain_spec::development_config()),
+			"mainnet-local" => Box::new(mainnet_chain_spec::local_testnet_config()),
+			"mainnet-staging" => Box::new(mainnet_chain_spec::staging_testnet_config()),
 			path =>
-				Box::new(uat_chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
+				Box::new(mainnet_chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
 		};
 
 		#[cfg(feature = "firechain-thunder")]
@@ -146,11 +146,11 @@ pub fn run() -> Result<()> {
 						.map_err(sc_cli::Error::Service)
 				}),
 
-				#[cfg(feature = "firechain-uat")]
-				spec if spec.is_uat() => runner.run_node_until_exit(|config| async move {
+				#[cfg(feature = "firechain-mainnet")]
+				spec if spec.is_mainnet() => runner.run_node_until_exit(|config| async move {
 					service::new_full::<
-						firechain_uat_runtime::RuntimeApi,
-						FirechainUatRuntimeExecutor,
+						firechain_mainnet_runtime::RuntimeApi,
+						FirechainMainnetRuntimeExecutor,
 					>(config, cli.no_hardware_benchmarks, cli.eth.clone())
 					.map_err(sc_cli::Error::Service)
 				}),
@@ -193,10 +193,10 @@ pub fn run() -> Result<()> {
 										config,
 									)
 							}),
-							#[cfg(feature = "firechain-uat")]
-							spec if spec.is_uat() => runner.sync_run(|config| {
+							#[cfg(feature = "firechain-mainnet")]
+							spec if spec.is_mainnet() => runner.sync_run(|config| {
 								return cmd
-									.run::<firechain_uat_runtime::Block, sp_statement_store::runtime_api::HostFunctions>(
+									.run::<firechain_mainnet_runtime::Block, sp_statement_store::runtime_api::HostFunctions>(
 										config,
 									)
 							}),
@@ -207,7 +207,7 @@ pub fn run() -> Result<()> {
 										config,
 									)
 							}),
-							_ => panic!("No runtime feature (qa, uat, thunder) is enabled"),
+							_ => panic!("No runtime feature (qa, mainnet, thunder) is enabled"),
 						}
 					},
 				BenchmarkCmd::Block(cmd) => {
@@ -226,12 +226,12 @@ pub fn run() -> Result<()> {
 								cmd.run(partial.client)
 							}),
 
-						#[cfg(feature = "firechain-uat")]
-						spec if spec.is_uat() =>
+						#[cfg(feature = "firechain-mainnet")]
+						spec if spec.is_mainnet() =>
 							return runner.sync_run(|config| {
 								let partial = new_partial::<
-									firechain_uat_runtime::RuntimeApi,
-									FirechainUatRuntimeExecutor,
+									firechain_mainnet_runtime::RuntimeApi,
+									FirechainMainnetRuntimeExecutor,
 								>(&config, cli.eth.clone())?;
 
 								cmd.run(partial.client)
@@ -274,12 +274,12 @@ pub fn run() -> Result<()> {
 								cmd.run(config, partial.client, db, storage)
 							}),
 
-						#[cfg(feature = "firechain-uat")]
-						spec if spec.is_uat() =>
+						#[cfg(feature = "firechain-mainnet")]
+						spec if spec.is_mainnet() =>
 							return runner.sync_run(|config| {
 								let partial = new_partial::<
-									firechain_uat_runtime::RuntimeApi,
-									FirechainUatRuntimeExecutor,
+									firechain_mainnet_runtime::RuntimeApi,
+									FirechainMainnetRuntimeExecutor,
 								>(&config, cli.eth.clone())?;
 								let db = partial.backend.expose_db();
 								let storage = partial.backend.expose_storage();
@@ -370,12 +370,12 @@ pub fn run() -> Result<()> {
 						Ok((cmd.run(client, backend, None), task_manager))
 					}),
 
-				#[cfg(feature = "firechain-uat")]
-				spec if spec.is_uat() => runner.async_run(|config| {
+				#[cfg(feature = "firechain-mainnet")]
+				spec if spec.is_mainnet() => runner.async_run(|config| {
 					let PartialComponents { client, task_manager, backend, .. } =
 						new_partial::<
-							firechain_uat_runtime::RuntimeApi,
-							FirechainUatRuntimeExecutor,
+							firechain_mainnet_runtime::RuntimeApi,
+							FirechainMainnetRuntimeExecutor,
 						>(&config, cli.eth.clone())?;
 
 					Ok((cmd.run(client, backend, None), task_manager))
@@ -410,8 +410,8 @@ pub fn run() -> Result<()> {
 				#[cfg(feature = "firechain-qa")]
 				let info_provider = substrate_info(firechain_qa_runtime::constants::time::SLOT_DURATION);
 
-				#[cfg(feature = "firechain-uat")]
-				let info_provider = substrate_info(firechain_uat_runtime::constants::time::SLOT_DURATION);
+				#[cfg(feature = "firechain-mainnet")]
+				let info_provider = substrate_info(firechain_mainnet_runtime::constants::time::SLOT_DURATION);
 
 				#[cfg(feature = "firechain-thunder")]
 				let info_provider = substrate_info(firechain_thunder_runtime::constants::time::SLOT_DURATION);

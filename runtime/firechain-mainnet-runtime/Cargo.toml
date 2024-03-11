@@ -1,5 +1,5 @@
 [package]
-name = "firechain-uat-runtime"
+name = "firechain-mainnet-runtime"
 version = "4.0.0-dev"
 authors = ["5ire Team <admin@5ire.org>"]
 description = "5ire chain node runtime"

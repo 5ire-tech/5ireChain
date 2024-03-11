@@ -1,6 +1,6 @@
 {
-  "name": "5ireChain UAT",
-  "id": "uat_5ireChain",
+  "name": "5ireChain MAINNET",
+  "id": "mainnet_5ireChain",
   "chainType": "Live",
   "bootNodes": [],
   "telemetryEndpoints": [
@@ -9,7 +9,7 @@
       0
     ]
   ],
-  "protocolId": "uat-5ire",
+  "protocolId": "mainnet-5ire",
   "properties": {
     "tokenDecimals": 18,
     "tokenSymbol": "5IRE"

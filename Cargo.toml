@@ -3,7 +3,7 @@ members = [
 	"node",
 	"runtime/core-primitives",
 	"runtime/firechain-qa-runtime",
-	"runtime/firechain-uat-runtime",
+	"runtime/firechain-mainnet-runtime",
 	"runtime/firechain-thunder-runtime"
 ]
 resolver = "2"
@@ -226,7 +226,7 @@ pallet-evm-test-vector-support = { version = "1.0.0-dev", path = "frame/evm/test
 pallet-hotfix-sufficients = { version = "1.0.0", path = "frame/hotfix-sufficients", default-features = false }
 # Firechain Runtine
 firechain-qa-runtime = { path = "runtime/firechain-qa-runtime", default-features = false }
-firechain-uat-runtime = { path = "runtime/firechain-uat-runtime", default-features = false }
+firechain-mainnet-runtime = { path = "runtime/firechain-mainnet-runtime", default-features = false }
 firechain-thunder-runtime = { path = "runtime/firechain-thunder-runtime", default-features = false }
 # Arkworks
 ark-bls12-377 = { version = "0.4.0", default-features = false, features = ["curve"] }

@@ -159,7 +159,7 @@ pub fn wasm_binary_unwrap() -> &'static [u8] {
 /// Runtime version.
 #[sp_version::runtime_version]
 pub const VERSION: RuntimeVersion = RuntimeVersion {
-	spec_name: create_runtime_str!("firechain-node-uat"),
+	spec_name: create_runtime_str!("firechain-node-mainnet"),
 	impl_name: create_runtime_str!("5ire"),
 	authoring_version: 1,
 	// Per convention: if the runtime behavior changes, increment spec_version
