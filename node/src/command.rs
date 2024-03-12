@@ -47,12 +47,6 @@ use firechain_node::chain_spec::mainnet_chain_spec;
 #[cfg(feature = "firechain-thunder")]
 use firechain_node::chain_spec::thunder_chain_spec;
 
-#[cfg(feature = "try-runtime")]
-use {
-	firechain_runtime::constants::time::SLOT_DURATION,
-	try_runtime_cli::block_building_info::substrate_info,
-};
-
 impl SubstrateCli for Cli {
 	fn impl_name() -> String {
 		"FireChain Node".into()
@@ -105,8 +99,9 @@ impl SubstrateCli for Cli {
 			"mainnet-dev" => Box::new(mainnet_chain_spec::development_config()),
 			"mainnet-local" => Box::new(mainnet_chain_spec::local_testnet_config()),
 			"mainnet-staging" => Box::new(mainnet_chain_spec::staging_testnet_config()),
-			path =>
-				Box::new(mainnet_chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
+			path => Box::new(mainnet_chain_spec::ChainSpec::from_json_file(
+				std::path::PathBuf::from(path),
+			)?),
 		};
 
 		#[cfg(feature = "firechain-thunder")]
@@ -396,35 +391,7 @@ pub fn run() -> Result<()> {
 			}
 		},
 		#[cfg(feature = "try-runtime")]
-		Some(Subcommand::TryRuntime(cmd)) => {
-			use sc_executor::{sp_wasm_interface::ExtendedHostFunctions, NativeExecutionDispatch};
-			let runner = cli.create_runner(cmd)?;
-			runner.async_run(|config| {
-				// we don't need any of the components of new_partial, just a runtime, or a task
-				// manager to do `async_run`.
-				let registry = config.prometheus_config.as_ref().map(|cfg| &cfg.registry);
-				let task_manager =
-					sc_service::TaskManager::new(config.tokio_handle.clone(), registry)
-						.map_err(|e| sc_cli::Error::Service(sc_service::Error::Prometheus(e)))?;
-
-				#[cfg(feature = "firechain-qa")]
-				let info_provider = substrate_info(firechain_qa_runtime::constants::time::SLOT_DURATION);
-
-				#[cfg(feature = "firechain-mainnet")]
-				let info_provider = substrate_info(firechain_mainnet_runtime::constants::time::SLOT_DURATION);
-
-				#[cfg(feature = "firechain-thunder")]
-				let info_provider = substrate_info(firechain_thunder_runtime::constants::time::SLOT_DURATION);
-
-				Ok((
-					cmd.run::<Block, ExtendedHostFunctions<
-						sp_io::SubstrateHostFunctions,
-						<ExecutorDispatch as NativeExecutionDispatch>::ExtendHostFunctions,
-					>, _>(Some(info_provider)),
-					task_manager,
-				))
-			})
-		},
+		Some(Subcommand::TryRuntime) => Err(try_runtime_cli::DEPRECATION_NOTICE.into()),
 		#[cfg(not(feature = "try-runtime"))]
 		Some(Subcommand::TryRuntime) => Err("TryRuntime wasn't enabled when building the node. \
 				You can enable it with `--features try-runtime`."

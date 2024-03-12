@@ -43,12 +43,12 @@ use std::{
 // Frontier
 //
 // use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
+#[cfg(feature = "firechain-mainnet")]
+use crate::client::FirechainMainnetRuntimeExecutor;
 #[cfg(feature = "firechain-qa")]
 use crate::client::FirechainQaRuntimeExecutor;
 #[cfg(feature = "firechain-thunder")]
 use crate::client::FirechainThunderRuntimeExecutor;
-#[cfg(feature = "firechain-mainnet")]
-use crate::client::FirechainMainnetRuntimeExecutor;
 pub use crate::{
 	client::Client,
 	eth::{db_config_dir, EthConfiguration},

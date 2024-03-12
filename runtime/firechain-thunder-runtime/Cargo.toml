@@ -129,7 +129,7 @@ substrate-wasm-builder = { workspace = true, optional = true }
 [features]
 default = ["std"]
 runtime-wasm = []
-with-tracing = ["frame-executive/with-tracing"]
+#with-tracing = ["frame-executive/with-tracing"]
 std = [
 	"pallet-offences-benchmarking?/std",
 	"pallet-election-provider-support-benchmarking?/std",
@@ -282,6 +282,7 @@ runtime-benchmarks = [
 try-runtime = [
 	"frame-try-runtime/try-runtime",
 	"frame-benchmarking-pallet-pov/try-runtime",
+	"frame-election-provider-support/try-runtime",
 	"frame-executive/try-runtime",
 	"frame-system/try-runtime",
 	"frame-support/try-runtime",
@@ -331,4 +332,10 @@ try-runtime = [
 	"pallet-transaction-storage/try-runtime",
 	"pallet-vesting/try-runtime",
 	"pallet-esg/try-runtime",
+	"fp-self-contained/try-runtime",
+	"sp-runtime/try-runtime",
+	"pallet-ethereum/try-runtime",
+	"pallet-evm/try-runtime",
+	"pallet-base-fee/try-runtime",
+	"pallet-dynamic-fee/try-runtime"
 ]

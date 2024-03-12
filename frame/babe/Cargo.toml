@@ -1,0 +1,94 @@
+[package]
+name = "pallet-babe"
+version = "4.0.0-dev"
+authors.workspace = true
+edition.workspace = true
+license = "Apache-2.0"
+homepage = "https://substrate.io"
+repository.workspace = true
+description = "Consensus extension module for BABE consensus. Collects on-chain randomness from VRF outputs and manages epoch transitions."
+readme = "README.md"
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+
+[dependencies]
+codec = { package = "parity-scale-codec", version = "3.6.1", default-features = false, features = ["derive"] }
+log = { version = "0.4.17", default-features = false }
+scale-info = { version = "2.5.0", default-features = false, features = ["derive", "serde"] }
+frame-benchmarking = { workspace = true, optional = true}
+frame-support = { workspace = true }
+frame-system = { workspace = true }
+pallet-authorship = { workspace = true }
+pallet-session = { workspace = true }
+pallet-timestamp = { workspace = true }
+sp-application-crypto = { workspace = true, features = ["serde"] }
+sp-consensus-babe = { workspace = true, features = ["serde"] }
+sp-core = { workspace = true, features = ["serde"] }
+sp-io = { workspace = true}
+sp-runtime = { workspace = true, features = ["serde"] }
+sp-session = { workspace = true}
+sp-staking = { workspace = true, features = ["serde"] }
+sp-std = { workspace = true}
+pallet-esg = { workspace = true }
+
+[dev-dependencies]
+frame-election-provider-support = { workspace = true }
+pallet-balances = { workspace = true }
+pallet-offences = { workspace = true }
+pallet-staking = { path = "../staking" }
+pallet-staking-reward-curve = { path = "../staking/reward-curve" }
+sp-core = { workspace = true }
+
+[features]
+default = [ "std" ]
+std = [
+	"codec/std",
+	"frame-benchmarking?/std",
+	"frame-election-provider-support/std",
+	"frame-support/std",
+	"frame-system/std",
+	"log/std",
+	"pallet-authorship/std",
+	"pallet-balances/std",
+	"pallet-offences/std",
+	"pallet-session/std",
+	"pallet-staking/std",
+	"pallet-timestamp/std",
+	"scale-info/std",
+	"sp-application-crypto/std",
+	"sp-consensus-babe/std",
+	"sp-core/std",
+	"sp-io/std",
+	"sp-runtime/std",
+	"sp-session/std",
+	"sp-staking/std",
+	"sp-std/std",
+	"pallet-esg/std",
+]
+runtime-benchmarks = [
+	"frame-benchmarking/runtime-benchmarks",
+	"frame-election-provider-support/runtime-benchmarks",
+	"frame-support/runtime-benchmarks",
+	"frame-system/runtime-benchmarks",
+	"pallet-balances/runtime-benchmarks",
+	"pallet-offences/runtime-benchmarks",
+	"pallet-staking/runtime-benchmarks",
+	"pallet-timestamp/runtime-benchmarks",
+	"sp-runtime/runtime-benchmarks",
+	"sp-staking/runtime-benchmarks",
+	"pallet-esg/runtime-benchmarks",
+]
+try-runtime = [
+	"frame-election-provider-support/try-runtime",
+	"frame-support/try-runtime",
+	"frame-system/try-runtime",
+	"pallet-authorship/try-runtime",
+	"pallet-balances/try-runtime",
+	"pallet-offences/try-runtime",
+	"pallet-session/try-runtime",
+	"pallet-staking/try-runtime",
+	"pallet-timestamp/try-runtime",
+	"pallet-esg/try-runtime",
+	"sp-runtime/try-runtime",
+]
