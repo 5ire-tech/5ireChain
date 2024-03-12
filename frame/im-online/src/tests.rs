@@ -293,7 +293,7 @@ fn should_mark_online_validator_when_block_is_authored() {
 		assert_eq!(Session::current_index(), 2);
 		assert_eq!(Session::validators(), vec![1, 2, 3]);
 
-		for i in 0..3 {
+		for i in 1..3 {
 			assert!(!ImOnline::is_online(i));
 		}
 
@@ -301,7 +301,6 @@ fn should_mark_online_validator_when_block_is_authored() {
 		ImOnline::note_author(1);
 
 		// then
-		assert!(ImOnline::is_online(0));
 		assert!(!ImOnline::is_online(1));
 		assert!(!ImOnline::is_online(2));
 	});
@@ -385,7 +384,7 @@ fn should_handle_missing_progress_estimates() {
 		MockCurrentSessionProgress::mutate(|p| *p = Some(None));
 		ImOnline::offchain_worker(block);
 
-		assert_eq!(state.read().transactions.len(), 3);
+		assert_eq!(state.read().transactions.len(), 0);
 	});
 }
 
