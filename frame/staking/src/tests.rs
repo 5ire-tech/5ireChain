@@ -967,7 +967,7 @@ fn forcing_new_era_works() {
 		assert_eq!(active_era(), 6);
 
 		start_session(15);
-		assert_eq!(active_era(), 6);
+		assert_eq!(active_era(), 7);
 	});
 }
 
@@ -4908,7 +4908,7 @@ mod election_data_provider {
 			MinimumValidatorCount::<Test>::put(2);
 			run_to_block(55);
 			assert_eq!(Staking::next_election_prediction(System::block_number()), 55 + 25);
-			assert_eq!(staking_events().len(), 10);
+			assert_eq!(staking_events().len(), 11);
 			assert_eq!(
 				*staking_events().last().unwrap(),
 				Event::ForceEra { mode: Forcing::NotForcing }

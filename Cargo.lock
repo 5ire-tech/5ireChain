@@ -7587,6 +7587,7 @@ dependencies = [
  "pallet-balances",
  "pallet-esg",
  "pallet-im-online 4.0.0-dev",
+ "pallet-offences",
  "pallet-session 4.0.0-dev",
  "pallet-staking-reward-curve 4.0.0-dev",
  "pallet-timestamp",
