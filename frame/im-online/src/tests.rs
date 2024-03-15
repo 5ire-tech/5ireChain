@@ -21,7 +21,7 @@
 
 use super::*;
 use crate::mock::*;
-use frame_support::{assert_noop, assert_err, dispatch};
+use frame_support::{assert_err, assert_noop, dispatch};
 use sp_core::offchain::{
 	testing::{TestOffchainExt, TestTransactionPoolExt},
 	OffchainDbExt, OffchainWorkerExt, TransactionPoolExt,
@@ -187,14 +187,8 @@ fn late_heartbeat_and_invalid_keys_len_should_fail() {
 		assert_eq!(Session::validators(), vec![1, 2, 3]);
 
 		// when
-		assert_err!(
-			heartbeat(1, 3, 0, 0.into(), Session::validators()),
-			"Transaction is outdated"
-		);
-		assert_err!(
-			heartbeat(1, 1, 0, 0.into(), Session::validators()),
-			"Transaction is outdated"
-		);
+		assert_err!(heartbeat(1, 3, 0, 0.into(), Session::validators()), "Transaction is outdated");
+		assert_err!(heartbeat(1, 1, 0, 0.into(), Session::validators()), "Transaction is outdated");
 
 		// invalid validators_len
 		assert_err!(heartbeat(1, 2, 0, 0.into(), vec![]), "invalid validators len");

@@ -924,8 +924,7 @@ impl<T: Config> Pallet<T> {
 	fn set_keys(keys: Vec<T::AuthorityId>) {
 		let bounded_keys = WeakBoundedVec::<_, T::MaxKeys>::try_from(keys)
 			.expect("More than the maximum number of keys provided");
-		Keys::<T>::put(bounded_keys.clone());
-		AllKeys::<T>::put(bounded_keys);
+		Keys::<T>::put(bounded_keys);
 	}
 }
 

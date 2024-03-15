@@ -30,8 +30,10 @@ pub type FullClient<RuntimeApi, Executor> =
 pub enum Client {
 	#[cfg(feature = "firechain-qa")]
 	Qa(Arc<FullClient<firechain_qa_runtime::RuntimeApi, FirechainQaRuntimeExecutor>>),
-	#[cfg(feature = "firechain-uat")]
-	Uat(Arc<FullClient<firechain_uat_runtime::RuntimeApi, FirechainUatRuntimeExecutor>>),
+	#[cfg(feature = "firechain-mainnet")]
+	Mainnet(
+		Arc<FullClient<firechain_mainnet_runtime::RuntimeApi, FirechainMainnetRuntimeExecutor>>,
+	),
 	#[cfg(feature = "firechain-thunder")]
 	Thunder(
 		Arc<FullClient<firechain_thunder_runtime::RuntimeApi, FirechainThunderRuntimeExecutor>>,
@@ -74,18 +76,18 @@ impl sc_executor::NativeExecutionDispatch for FirechainThunderRuntimeExecutor {
 	}
 }
 
-#[cfg(feature = "firechain-uat")]
-pub struct FirechainUatRuntimeExecutor;
+#[cfg(feature = "firechain-mainnet")]
+pub struct FirechainMainnetRuntimeExecutor;
 
-#[cfg(feature = "firechain-uat")]
-impl sc_executor::NativeExecutionDispatch for FirechainUatRuntimeExecutor {
+#[cfg(feature = "firechain-mainnet")]
+impl sc_executor::NativeExecutionDispatch for FirechainMainnetRuntimeExecutor {
 	type ExtendHostFunctions = ();
 	fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
-		firechain_uat_runtime::api::dispatch(method, data)
+		firechain_mainnet_runtime::api::dispatch(method, data)
 	}
 
 	fn native_version() -> NativeVersion {
-		firechain_uat_runtime::native_version()
+		firechain_mainnet_runtime::native_version()
 	}
 }
 
@@ -100,14 +102,16 @@ impl From<Arc<FullClient<firechain_qa_runtime::RuntimeApi, FirechainQaRuntimeExe
 	}
 }
 
-#[cfg(feature = "firechain-uat")]
-impl From<Arc<FullClient<firechain_uat_runtime::RuntimeApi, FirechainUatRuntimeExecutor>>>
+#[cfg(feature = "firechain-mainnet")]
+impl From<Arc<FullClient<firechain_mainnet_runtime::RuntimeApi, FirechainMainnetRuntimeExecutor>>>
 	for Client
 {
 	fn from(
-		client: Arc<FullClient<firechain_uat_runtime::RuntimeApi, FirechainUatRuntimeExecutor>>,
+		client: Arc<
+			FullClient<firechain_mainnet_runtime::RuntimeApi, FirechainMainnetRuntimeExecutor>,
+		>,
 	) -> Self {
-		Self::Uat(client)
+		Self::Mainnet(client)
 	}
 }
 
@@ -177,8 +181,8 @@ impl ClientHandle for Client {
 		match self {
 			#[cfg(feature = "firechain-qa")]
 			Self::Qa(client) => T::execute_with_client::<_, _, FullBackend>(t, client.clone()),
-			#[cfg(feature = "firechain-uat")]
-			Self::Uat(client) => T::execute_with_client::<_, _, FullBackend>(t, client.clone()),
+			#[cfg(feature = "firechain-mainnet")]
+			Self::Mainnet(client) => T::execute_with_client::<_, _, FullBackend>(t, client.clone()),
 			#[cfg(feature = "firechain-thunder")]
 			Self::Thunder(client) => T::execute_with_client::<_, _, FullBackend>(t, client.clone()),
 		}
@@ -187,7 +191,7 @@ impl ClientHandle for Client {
 
 /// A handle to a client instance.
 ///
-/// The service supports multiple different runtimes (Qa, Uat, Thunder e.t.c.).
+/// The service supports multiple different runtimes (Qa, Mainnet, Thunder e.t.c.).
 /// As each runtime has a specialized client, we need to hide them
 /// behind a trait. This is this trait.
 ///
@@ -202,8 +206,8 @@ macro_rules! match_client {
 		match $self {
 			#[cfg(feature = "firechain-qa")]
 			Self::Qa(client) => client.$method($($param),*),
-			#[cfg(feature = "firechain-uat")]
-			Self::Uat(client) => client.$method($($param),*),
+			#[cfg(feature = "firechain-mainnet")]
+			Self::Mainnet(client) => client.$method($($param),*),
 			#[cfg(feature = "firechain-thunder")]
 			Self::Thunder(client) => client.$method($($param),*),
 		}
@@ -217,8 +221,8 @@ pub enum RuntimeVariant {
 	#[cfg(feature = "firechain-qa")]
 	Qa,
 	#[allow(dead_code)]
-	#[cfg(feature = "firechain-uat")]
-	Uat,
+	#[cfg(feature = "firechain-mainnet")]
+	Mainnet,
 	#[allow(dead_code)]
 	#[cfg(feature = "firechain-thunder")]
 	Thunder,
@@ -232,8 +236,8 @@ pub trait IdentifyVariant {
 	/// Returns `true` if this is a configuration for the `Firechain` qa network.
 	fn is_qa(&self) -> bool;
 
-	/// Returns `true` if this is a configuration for the `Firechain` uat network.
-	fn is_uat(&self) -> bool;
+	/// Returns `true` if this is a configuration for the `Firechain` mainnet network.
+	fn is_mainnet(&self) -> bool;
 
 	/// Returns `true` if this is a configuration for the `Firechain` thunder network.
 	fn is_thunder(&self) -> bool;
@@ -244,8 +248,8 @@ impl IdentifyVariant for Box<dyn ChainSpec> {
 		self.id().starts_with("qa")
 	}
 
-	fn is_uat(&self) -> bool {
-		self.id().starts_with("uat")
+	fn is_mainnet(&self) -> bool {
+		self.id().starts_with("mainnet")
 	}
 
 	fn is_thunder(&self) -> bool {

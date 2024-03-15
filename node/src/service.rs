@@ -43,12 +43,12 @@ use std::{
 // Frontier
 //
 // use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
+#[cfg(feature = "firechain-mainnet")]
+use crate::client::FirechainMainnetRuntimeExecutor;
 #[cfg(feature = "firechain-qa")]
 use crate::client::FirechainQaRuntimeExecutor;
 #[cfg(feature = "firechain-thunder")]
 use crate::client::FirechainThunderRuntimeExecutor;
-#[cfg(feature = "firechain-uat")]
-use crate::client::FirechainUatRuntimeExecutor;
 pub use crate::{
 	client::Client,
 	eth::{db_config_dir, EthConfiguration},
@@ -360,12 +360,12 @@ where
 	};
 
 	#[allow(unused)]
-	#[cfg(feature = "firechain-uat")]
+	#[cfg(feature = "firechain-mainnet")]
 	let eth_rpc_params = crate::rpc::EthDeps {
 		client: client.clone(),
 		pool: transaction_pool.clone(),
 		graph: transaction_pool.pool().clone(),
-		converter: Some(firechain_uat_runtime::TransactionConverter),
+		converter: Some(firechain_mainnet_runtime::TransactionConverter),
 		is_authority: config.role.is_authority(),
 		enable_dev_signer: eth_config.enable_dev_signer,
 		network: network.clone(),
@@ -701,10 +701,10 @@ pub fn new_chain_ops(
 			firechain_qa_runtime::RuntimeApi,
 			FirechainQaRuntimeExecutor,
 		>(config, eth_config),
-		#[cfg(feature = "firechain-uat")]
-		spec if spec.is_uat() => new_chain_ops_inner::<
-			firechain_uat_runtime::RuntimeApi,
-			FirechainUatRuntimeExecutor,
+		#[cfg(feature = "firechain-mainnet")]
+		spec if spec.is_mainnet() => new_chain_ops_inner::<
+			firechain_mainnet_runtime::RuntimeApi,
+			FirechainMainnetRuntimeExecutor,
 		>(config, eth_config),
 		#[cfg(feature = "firechain-thunder")]
 		spec if spec.is_thunder() => new_chain_ops_inner::<

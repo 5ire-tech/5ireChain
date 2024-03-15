@@ -25,8 +25,8 @@ use frame_election_provider_support::{
 use frame_support::{
 	assert_ok, ord_parameter_types, parameter_types,
 	traits::{
-		ConstU32, ConstU64, Currency, EitherOfDiverse, FindAuthor, Get, Hooks,
-		Imbalance, OnUnbalanced, OneSessionHandler,
+		ConstU32, ConstU64, Currency, EitherOfDiverse, FindAuthor, Get, Hooks, Imbalance,
+		OnUnbalanced, OneSessionHandler,
 	},
 	weights::constants::RocksDbWeight,
 };
@@ -179,7 +179,6 @@ impl pallet_esg::Config for Test {
 	type MaxFileSize = ConstU32<1024000>;
 }
 
-
 pub type Extrinsic = sp_runtime::testing::TestXt<RuntimeCall, ()>;
 
 impl<T> frame_system::offchain::SendTransactionTypes<T> for Test
@@ -190,7 +189,7 @@ where
 	type OverarchingCall = RuntimeCall;
 }
 
-impl pallet_im_online::Config for Test{
+impl pallet_im_online::Config for Test {
 	type AuthorityId = UintAuthorityId;
 	type RuntimeEvent = RuntimeEvent;
 	type ValidatorSet = Historical;
@@ -198,7 +197,7 @@ impl pallet_im_online::Config for Test{
 	type ReportUnresponsiveness = Offences;
 	type UnsignedPriority = ConstU64<{ 1 << 20 }>;
 	type WeightInfo = ();
-	type MaxKeys = ConstU32<10_000>;	
+	type MaxKeys = ConstU32<10_000>;
 	type MaxPeerInHeartbeats = ConstU32<10_000>;
 	type DataProvider = Staking;
 	type TargetsBound = MaxOnChainElectableTargets;
@@ -222,8 +221,6 @@ impl pallet_session::Config for Test {
 	type AllSessionHandler = (ImOnline,);
 	type DataProvider = Staking;
 	type TargetsBound = MaxOnChainElectableTargets;
-
-
 }
 
 impl pallet_session::historical::Config for Test {
