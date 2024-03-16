@@ -25,7 +25,7 @@ https://docs.substrate.io/install/
 
 docker pull 5irechain/5ire-thunder-node:0.12
 
-Run docker image
+### Run docker image
 
 ```bash
 docker run  -p 30333:30333  -p 9933:9933 -p 9944:9944 5irechain/5ire-thunder-node:0.12  --port 30333 --no-telemetry --name 5ire-thunder-archive --base-path /5ire/data --keystore-path /5ire/data   --node-key-file /5ire/secrets/node.key --chain /5ire/thunder-chain-spec.json --bootnodes /ip4/13.215.176.156/tcp/30333/ws/p2p/12D3KooWSCPiw5WquLQ1rZCbVUU8U95tgGU55EEuRZryxVJZyB7a --pruning archive --ws-external --rpc-external --rpc-cors all
@@ -81,9 +81,9 @@ cargo build --release --features firechain-qa
 
 ## Contributions & Code of Conduct
 
-If you wish to contribute, kindly fork the repository, implement your changes, and then submit a pull request. We welcome all pull requests enthusiastically
+If you wish to contribute, kindly fork the repository, implement your changes, and then submit a pull request. We welcome all pull requests enthusiastically.
 
-Please follow the contributions guidelines as outlined in [`docs/CONTRIBUTING.adoc`](docs/CONTRIBUTING.adoc). In all communications and contributions, this project follows the [Contributor Covenant Code of Conduct](docs/CODE_OF_CONDUCT.md).
+In all communications and contributions, this project follows the [Contributor Covenant Code of Conduct](docs/CODE_OF_CONDUCT.md).
 
 ## Security
 
