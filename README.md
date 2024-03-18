@@ -10,6 +10,10 @@
 
 This repository hosts the Rust implementation of the 5ireChain node, built upon the Polkadot SDK
 
+# Roadmap
+This is our roadmap
+
+[RoadMap](docs/README.md)
 
 # Running 5ireChain node
 
