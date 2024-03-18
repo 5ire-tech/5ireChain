@@ -4,10 +4,18 @@ Table of Contents
 
 - [Introduction to 5ireChain](#1-introduction)
 - [5ire Consensus](#2-5irechain-consensus)
+    - [Election Process](#the-election-process)
+
+    - [Reward Mechenism](#reward-calculation-and-distribution)
 
 - [Features](#3-pallets-customization)
 
 - [Roadmap](#5-roadmap)
+    - [Phase 1 - Completed](#phase-1-completed---road-to-testnet)
+
+    - [Phase 2 - Ongoing](#phase-2-ongoing---road-to-mainnet)
+
+    - [Phase 3 - Near Future](#phase-3---near-future)
 
 ## **1. Introduction**
 
@@ -36,7 +44,7 @@ The above diagram depicts the election input process for the SPoS mechanism. Nom
 
 Reward payments can be processed when an era ends. The total reward of an era is the dividend of the total coin supply and the total number of coins staked by nominators within that era. The core emphasis on rewards is to allow and encourage users to stake coins at a specific rate. The users are requested to provide a payout of their personal rewards for reward redemption.
 
-### **Consider the following example:**
+#### **Consider the following example:**
 
 - Rewards per era: 200 5ire Coins
     
@@ -74,7 +82,7 @@ Reward payments can be processed when an era ends. The total reward of an era is
         E: 180 5ire (remaining rewards) x [70 5ire (stake of E) / 200 5ire (total stake of validator)] = 63 5ire
         
 
-### **Rewards and Slashing**
+#### **Rewards and Slashing**
 
 Integrated into the staking module is the reward and slashing module, which focuses on rewarding essential activities and penalizing any absence or misconduct during the specific era. The stakeholders eligible for a payout must claim rewards after leveraging the call of ‘payout_stakers’ before they expire. A network participant has the authority to make this call that can automatically provide rewards to validators and nominators. If any misconduct is identified, slashing will occur. A specific value will be subtracted from the balance of the validator and all the participating nominators that were required to vote for the given penalized entity.
 
