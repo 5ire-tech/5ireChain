@@ -111,6 +111,8 @@ Trait OneSessionHandlerAll & ERScoresTrait are added into the lib.rs.
 ### **Staking Pallet:**
 Implemented ESG interface to convert the ESG score into weight and incorporate it as a factor in calculating rewards when validators stake in the network.
 
+`NOTE` : OneSessionHandlerAll gets all validators in the network including active, waiting to calculate the Reliability Score.
+
 ## **4. 5ire's pallets**
 
 ### **Esg Pallet:** 
