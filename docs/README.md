@@ -22,7 +22,7 @@ Table of Contents
 
 5ireChain is an EVM-compatible sustainability-oriented smart contract platform that focuses on developing a sustainable and for-benefit ecosystem based on the United Nations Sustainable Development Goals (UN SDGs) .To enable this, our goal is to build a computing platform that promotes and advocates these activities to achieve the goals.
 
-5ire is a layer-1 blockchain ecosystem designed with economic and environmental sustainability at its core and is one of India's fastest-growing unicorns, enabled by a community of people worldwide.
+5ireChain is a layer-1 blockchain ecosystem designed with economic and environmental sustainability at its core and is one of India's fastest-growing unicorns, enabled by a community of people worldwide.
 
 5ireChain highlights many building blocks that can be combined to further create tools and schemes that can help make the shift from the fourth industrial revolution to the fifth. 5ire, thus, invites stakeholders, developers, legacy agencies, and users to be creative in how they utilize 5ireChain and interact with its ecosystem.
 
@@ -85,14 +85,14 @@ Reward payments can be processed when an era ends. The total reward of an era is
 
 #### **Rewards and Slashing**
 
-Integrated into the staking module is the reward and slashing module, which focuses on rewarding essential activities and penalizing any absence or misconduct during the specific era. The stakeholders eligible for a payout must claim rewards after leveraging the call of ‘payout_stakers’ before they expire. A network participant has the authority to make this call that can automatically provide rewards to validators and nominators. If any misconduct is identified, slashing will occur. A specific value will be subtracted from the balance of the validator and all the participating nominators that were required to vote for the given penalized entity.
+Integrated into the staking module is the reward and slashing module, which focuses on rewarding essential activities and penalizing any absence or misconduct during the specific era. The stakeholders eligible for a payout must claim rewards after leveraging the call of `payout_stakers` before they expire. A network participant has the authority to make this call that can automatically provide rewards to validators and nominators. If any misconduct is identified, slashing will occur. A specific value will be subtracted from the balance of the validator and all the participating nominators that were required to vote for the given penalized entity.
 
 ## **3. Pallets Customization** 
 
 Along with default pallets, 5ireChain uses some customised pallet in order to achieve 5ireChain's consensus. We started from pallets used for NPOS(Nominated Proof Of Stake) and then customized and added few new pallets. The customised pallets include: 
 
 ### **Im Online Pallet:** 
-Need to customize the whole pallet for Reliability Score. StorageMap, Pallet configuration and other functionalities for Relaibilty score are added.
+Need to customize the whole pallet for Reliability Score. On-chain Storage, Pallet configuration and other functionalities for Relaibilty score are added.
 
 ### **Authority Discovery Pallet:**
 In lib.rs, trait `OneSessionHandlerAll` is added and in cargo.toml, the required dependencies are added which are used in pallet im-online to calculate Reliability Score.
@@ -109,7 +109,7 @@ Trait `OneSessionHandlerAll` is added and implemented it into the lib.rs which w
 ### **Staking Pallet:**
 Implemented ESG interface to convert the ESG score into weight and incorporate it as a factor in calculating rewards when validators stake in the network.
 
-`NOTE` : OneSessionHandlerAll gets all validators in the network including active, waiting to calculate the Reliability Score.
+`NOTE` : `OneSessionHandlerAll` gets all validators in the network including active, waiting to calculate the Reliability Score.
 
 ## **4. 5ire's pallets**
 

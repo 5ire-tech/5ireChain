@@ -2,7 +2,7 @@
     <img src="./docs/media/5ire-logo.png">
 </p>
 
-<h1><code>5irechain Node</code></h1>
+<h1><code>5ireChain Node</code></h1>
 
 5ireChain is an EVM-compatible sustainability-oriented smart contract platform that focuses on developing a sustainable and for-benefit ecosystem based on the United Nations Sustainable Development Goals (UN SDGs) .To enable this, our goal is to build a computing platform that promotes and advocates these activities to achieve the goals.
 
