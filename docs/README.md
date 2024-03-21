@@ -94,19 +94,16 @@ Along with default pallets, 5ireChain uses some customised pallet in order to ac
 Need to customize the whole pallet for Reliability Score. StorageMap, Pallet configuration and other functionalities for Relaibilty score are added.
 
 ### **Authority Discovery Pallet:**
-In lib.rs, trait OneSessionHandlerAll is added and in cargo.toml, the required dependencies are added which are used in pallet im-online to calculate Reliability Score.
+In lib.rs, trait `OneSessionHandlerAll` is added and in cargo.toml, the required dependencies are added which are used in pallet im-online to calculate Reliability Score.
 
 ### **Babe Pallet:**
-Trait OneSessionHandlerAll is added in lib.rs .
+Trait `OneSessionHandlerAll` is added in lib.rs .
 
 ### **Grandpa Pallet:** 
-Trait OneSessionHandlerAll is added in lib.rs .
+Trait `OneSessionHandlerAll` is added in lib.rs .
 
 ### **Session Pallet:**
-Trait OneSessionHandlerAll is added and implemented it into the lib.rs which will be used in pallet im-online.
-
-### **Support Pallet:**
-Trait OneSessionHandlerAll & ERScoresTrait are added into the lib.rs.
+Trait `OneSessionHandlerAll` is added and implemented it into the lib.rs which will be used in pallet im-online.
 
 ### **Staking Pallet:**
 Implemented ESG interface to convert the ESG score into weight and incorporate it as a factor in calculating rewards when validators stake in the network.
