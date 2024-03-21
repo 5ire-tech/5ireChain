@@ -16,6 +16,7 @@ Table of Contents
     - [Phase 2 - Ongoing](#phase-2-ongoing---road-to-mainnet)
 
     - [Phase 3 - Near Future](#phase-3---near-future)
+    - [Phase 4 - Road to an Integrated Economy](#phase-4---road-to-an-integrated-economy)
 
 ## **1. Introduction**
 
@@ -120,15 +121,16 @@ Implement an ESG interface to convert the ESG score into weight and incorporate 
 #### Q4 2022: Thunder Testnet Alpha Launch
 1. Initial launch of the 5ireChain Testnet, closed to the public.
 2. Released items include:
-+ Base blockchain with multiple validators
-+ Base blockchain EVM compatibility
-+ Base blockchain WASM compatibility
-ESG module integrated with consensus mechanism (centralized)
-+ Blockchain explorer
-+ Web Wallet
-+ EVM Faucet
-+ WASM Faucet
-+ Build on 5ire Documentation
+
+    + Base blockchain with multiple validators
+    + Base blockchain EVM compatibility
+    + Base blockchain WASM compatibility
+    ESG module integrated with consensus mechanism (centralized)
+    + Blockchain explorer
+    + Web Wallet
+    + EVM Faucet
+    + WASM Faucet
+    + Build on 5ire Documentation
 
 #### Q2 2023: 5ire IDE
 App for users to deploy solidity-based smart contracts on 5ire’s EVM chain.
@@ -155,10 +157,11 @@ Dedicated 5ire Wallet Extension to interact to native and EVM chains for Google 
 ### Phase 2 (Ongoing) - Road to Mainnet
 
 #### Q1 2024: Rewards Mechanism - SPoS & Reliability
-Sustainable Proof-of-Stake (SPoS) and reliability mechanism. The consensus will be updated to use fast-forward (BABE + GRANDPA) for selection, block production and validation and ESG scores will be used for rewards computation. Rewards will also be provided to validator nodes with reliable uptime.
+Sustainable Proof-of-Stake (SPoS) and reliability mechanism -> consensus update to use fast-forward (BABE + GRANDPA) for selection, block production and validation and ESG scores used for rewards computation. Rewards are also generated for validator nodes with reliable uptime. Rewards distributed are in addition to standard PoS rewards based on stake.
+
 
 #### Q1 2024: Sustainability Scores Service
-Service that persists an enterprise’s sustainability score on-chain. Based on ESG data provided, this service will calculate an organization’s sustainability score which is subsequently pushed on-chain. The rewards mechanism will use the available sustainability score to determine alternate rewards
+Service that persists an enterprise’s sustainability score on-chain. Based on ESG data provided, the service calculates an organization’s sustainability score that is subsequently pushed on-chain. The rewards mechanism uses the available sustainability score to determine alternate rewards.
 
 #### Q1 2024: Thunder Testnet GA Launch
 The Thunder Testnet General Availability (GA) launch provides all updates to previously released items from the Beta Testnet and other items:
@@ -172,47 +175,49 @@ The Thunder Testnet General Availability (GA) launch provides all updates to pre
 8. Updated Build on 5ire Documentation
 
 #### Q2 2024: Decentralized EVM Bridge
-Create a decentralized bridge that allows users the ability to bridge 5ire tokens between the Ethereum network and the 5ire EVM network.
+A decentralized bridge that allows for users to bridge 5ire tokens between the Ethereum network and the 5ire EVM network.
 
 #### Q2 2024: Secured Wallet Transactions
-Create a solution that enables secure wallet transactions for large amounts where the sender can generate a key to provide to the receiver (via social mechanisms), and funds will not be released until the key is input on the receiver’s side.
+Enables secure wallet transactions for large amounts where the sender can generate a key to provide to the receiver (via social mechanisms), and funds are only released once the key is input on the receiver’s side.
 
 #### Q2 2024: Wallet Inheritance
-Create a solution for sustainable wealth transfer within a decentralized network. The feature that allows a user to trigger the automatic transfer of asset ownership in a web3 wallet to another wallet, depending on the requirements and preferences of the owner. A real-world scenario is wallet inheritance upon the death of a wallet owner.
+Sustainable wealth transfer within a decentralized network. The feature allows a user to trigger the automatic transfer of asset ownership in a web3 wallet to another wallet, depending on the requirements and preferences of the owner.
 
 #### Q2 2024: 5ireScan
-Create an “EtherScan” style web app for 5ireChain to allow users to see any blocks, transactions, addresses or contracts on 5ireChain, and differentiate the explorer offering within the 5ireChain ecosystem.
+An “EtherScan” style web app for 5ireChain to allow users to see any blocks, transactions, addresses or contracts on 5ireChain, and differentiate the explorer offering within the 5ireChain ecosystem.
 
 #### Q2 2024: 5ireChain Mainnet Launch
 Incorporating all features from the Thunder Testnet GA, plus the following items:
-1. Decentralized EVM bridge
-2. 5ire Wallet Extension upgrade
-3. 5ireScan
-4. Secured Transactions feature
-5. Wallet Inheritance feature
+    1. Decentralized EVM bridge
+    2. 5ire Wallet Extension upgrade
+    3. 5ireScan
+    4. Secured Transactions feature
+    5. Wallet Inheritance feature
 
  
 
 #### Q3 2024: Carbon Credit dApp
-Deploy a third-party carbon credit app that allows enterprises to deploy, bridge, acquire and retire carbon credits on 5ireChain.
+A third-party carbon credit app that allows enterprises to deploy, bridge, acquire and retire carbon credits on 5ireChain.
 
 #### Q3 2024: Carbon Credit + Sustainability Service Integration
-Update Sustainability Service to incorporate carbon credits retired on-chain to improve sustainability score. Enterprises that use a Carbon Credit exchange to retire carbon credits and offset carbon emissions will be rewarded within the consensus mechanism in real time.
+Update of the Sustainability Service to incorporate carbon credits retired on-chain to improve sustainability score, in real-time.
 
 ### Phase 3  - Near Future
 
 #### Q1 2025: Decentralized Sustainability Corporate Rating (DSCR) Hub
-Create a solution that enables enterprises to acquire a corporate sustainability rating report based on available sustainability data (ESG as a Service). This feature requires a long onboarding process for enterprises to provide data and for 5ire to validate data amongst several data brokers. Guidelines and validation for the format and scope of the data are defined within the solution and allow data and reports to be available on-chain. Sustainability reporting for enterprises on-chain brings more transparency and decentralized ratings.
+A hub that enables enterprises to acquire a corporate sustainability rating report based on available sustainability data (ESG as a Service), with an onboarding process for enterprises to provide data.
+
+### Phase 4  - Road to an Integrated Economy
 
 #### Q2 2025: Data Brokerage for Nodes
-Provide tools to onboard sustainability data via nodes. This feature allows nodes and data brokers to earn rewards for onboarding and validating reliable, quality data. The emphasis is to decentralize sustainability rating/reporting by acquiring and standardizing data across many brokers.
+Tools for onboarding sustainability data via nodes and generating rewards
 
 #### Q3 2025: 5ire Enterprise Licensing & dApp Marketplace 
-Create a dApp marketplace aimed at business use cases for enterprises. Also, provides an ecosystem for enterprises/institutions to acquire, approve, renew and revoke licenses. The emphasis is to help to navigate enterprises from Web2 to Web3 and foment enterprise data on 5ireChain.
+A dApp marketplace/ecosystem aimed at business use cases for enterprises, to help to navigate enterprises from Web2 to Web3 and foment enterprise data on 5ireChain.
 
 #### Q4 2025: AI-driven Insights & Real-Time Monitoring in DSCR
-Implement ESG use cases for industry running in real-time (Energy consumption monitoring, housing demand forecasting, etc). Utilizing ESG data to provide insights that drive business decisions, by using AI and Machine Learning tools with 5ireChain data.
+Utilizing ESG data to provide insights that drive business decisions, by using AI and Machine Learning tools with 5ireChain data.
 
 #### Q1 2026: Fully interconnected DSCR Hub
-Implement advanced AI and industry-leading ESG use cases (prediction of future sales, Business success recom. engine, etc.). Create a fully interconnected infrastructure enabling data enrichment with 2nd and 3rd-party data partnerships.
+A fully interconnected infrastructure enabling data enrichment with 2nd and 3rd-party data partnerships.
 
