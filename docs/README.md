@@ -89,30 +89,32 @@ Integrated into the staking module is the reward and slashing module, which focu
 
 ## **3. Pallets Customization** 
 
-5ireChain utilizes pallets for NPOS, then customizes certain functionalities for 5ireChain's consensus, including:
+Along with default pallets, 5ireChain uses some customised pallet in order to achieve 5ireChain's consensus. We started from pallets used for NPOS(Nominated Proof Of Stake) and then customized and added few new pallets. The customised pallets include: 
 
-- `Im Online Pallet`: 
+### **Im Online Pallet:** 
+Need to customize the whole pallet for Reliability Score. StorageMap, Pallet configuration and other functionalities for Relaibilty score are added.
 
-Need to customize the whole pallet for Reliability Score.
-- `Authority Discovery Pallet`:
+### **Authority Discovery Pallet:**
+In lib.rs, trait `OneSessionHandlerAll` is added and in cargo.toml, the required dependencies are added which are used in pallet im-online to calculate Reliability Score.
 
-Add the trait OneSessionHandlerAll into the lib.rs and add required dependency in cargo.toml which will be used in pallet im-online to calculate Reliability Score.
-- `Babe Pallet`  :
+### **Babe Pallet:**
+Trait `OneSessionHandlerAll` is added in lib.rs .
 
-Add the trait OneSessionHandlerAll into the lib.rs .
-- `Grandpa Pallet` : 
+### **Grandpa Pallet:** 
+Trait `OneSessionHandlerAll` is added in lib.rs .
 
-Add the trait OneSessionHandlerAll into the lib.rs.
-- `Session Pallet` : 
+### **Session Pallet:**
+Trait `OneSessionHandlerAll` is added and implemented it into the lib.rs which will be used in pallet im-online.
 
-Add the trait OneSessionHandlerAll and implement it into the lib.rs which will be used in pallet im-online.
-- `Staking Pallet`: 
+### **Staking Pallet:**
+Implemented ESG interface to convert the ESG score into weight and incorporate it as a factor in calculating rewards when validators stake in the network.
 
-Implement an ESG interface to convert the ESG score into weight and incorporate it as a factor in calculating rewards when validators stake in the network.
+`NOTE` : OneSessionHandlerAll gets all validators in the network including active, waiting to calculate the Reliability Score.
 
 ## **4. 5ire's pallets**
 
-- Esg Pallet : Upload `ESG` score from oracle  to on-chain storage , then tightly coupling with other pallets to use `ESG` interface for calculating reward for validators and nominators
+### **Esg Pallet:** 
+An oracle loads the `ESG` score from off-chain storage to on-chain storage. Then `ESG` interface is tightly coupled with the other pallets and is used as a factor in calculating reward for validators and nominators.
 
 ## **5. Roadmap**
 
