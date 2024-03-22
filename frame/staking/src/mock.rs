@@ -25,8 +25,8 @@ use frame_election_provider_support::{
 use frame_support::{
 	assert_ok, ord_parameter_types, parameter_types,
 	traits::{
-		ConstU32, ConstU64, Currency, ERScoresTrait, EitherOfDiverse, FindAuthor, Get, Hooks,
-		Imbalance, OnUnbalanced, OneSessionHandler,
+		ConstU32, ConstU64, Currency, EitherOfDiverse, FindAuthor, Get, Hooks, Imbalance,
+		OnUnbalanced, OneSessionHandler,
 	},
 	weights::constants::RocksDbWeight,
 };
@@ -101,6 +101,8 @@ frame_support::construct_runtime!(
 		Historical: pallet_session::historical,
 		VoterBagsList: pallet_bags_list::<Instance1>,
 		EsgScore: pallet_esg,
+		ImOnline: pallet_im_online,
+		Offences: pallet_offences,
 	}
 );
 
@@ -121,6 +123,7 @@ parameter_types! {
 	pub static SlashDeferDuration: EraIndex = 0;
 	pub static Period: BlockNumber = 5;
 	pub static Offset: BlockNumber = 0;
+	pub static MaxOnChainElectableTargets: u16 = 1250;
 }
 
 impl frame_system::Config for Test {
@@ -164,10 +167,40 @@ impl pallet_balances::Config for Test {
 	type MaxHolds = ();
 }
 
+impl pallet_offences::Config for Test {
+	type RuntimeEvent = RuntimeEvent;
+	type IdentificationTuple = pallet_session::historical::IdentificationTuple<Self>;
+	type OnOffenceHandler = Staking;
+}
+
 impl pallet_esg::Config for Test {
 	type WeightInfo = ();
 	type RuntimeEvent = RuntimeEvent;
 	type MaxFileSize = ConstU32<1024000>;
+}
+
+pub type Extrinsic = sp_runtime::testing::TestXt<RuntimeCall, ()>;
+
+impl<T> frame_system::offchain::SendTransactionTypes<T> for Test
+where
+	RuntimeCall: From<T>,
+{
+	type Extrinsic = Extrinsic;
+	type OverarchingCall = RuntimeCall;
+}
+
+impl pallet_im_online::Config for Test {
+	type AuthorityId = UintAuthorityId;
+	type RuntimeEvent = RuntimeEvent;
+	type ValidatorSet = Historical;
+	type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
+	type ReportUnresponsiveness = Offences;
+	type UnsignedPriority = ConstU64<{ 1 << 20 }>;
+	type WeightInfo = ();
+	type MaxKeys = ConstU32<10_000>;
+	type MaxPeerInHeartbeats = ConstU32<10_000>;
+	type DataProvider = Staking;
+	type TargetsBound = MaxOnChainElectableTargets;
 }
 
 sp_runtime::impl_opaque_keys! {
@@ -185,6 +218,9 @@ impl pallet_session::Config for Test {
 	type ValidatorIdOf = crate::StashOf<Test>;
 	type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
 	type WeightInfo = ();
+	type AllSessionHandler = (ImOnline,);
+	type DataProvider = Staking;
+	type TargetsBound = MaxOnChainElectableTargets;
 }
 
 impl pallet_session::historical::Config for Test {
@@ -291,7 +327,7 @@ impl OnStakingUpdate<AccountId, Balance> for EventListenerMock {
 	}
 }
 
-impl crate::pallet::pallet::Config for Test {
+impl Config for Test {
 	type Currency = Balances;
 	type CurrencyBalance = <Self as pallet_balances::Config>::Balance;
 	type UnixTime = Timestamp;
@@ -321,6 +357,7 @@ impl crate::pallet::pallet::Config for Test {
 	type BenchmarkingConfig = TestBenchmarkingConfig;
 	type WeightInfo = ();
 	type ESG = EsgScore;
+	type Reliability = EsgScore;
 }
 
 pub struct WeightedNominationsQuota<const MAX: u32>;

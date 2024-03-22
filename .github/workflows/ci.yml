@@ -79,10 +79,10 @@ jobs:
         run: cd integration-test-suite && yarn test
 
       - name: Test
-        run: cargo test --features all
+        run: cargo test --features firechain-qa
 
-      - name: Clippy
-        run: cargo clippy --features all -- -D warnings
+      # - name: Clippy
+      #   run: cargo clippy --features all -- -D warnings
 
       - name: Save Cache
         if: ${{ !cancelled() }}

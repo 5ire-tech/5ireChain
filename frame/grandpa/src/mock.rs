@@ -19,7 +19,9 @@
 
 #![cfg(test)]
 
-use crate::{self as pallet_grandpa, AuthorityId, AuthorityList, Config, ConsensusLog};
+use crate::{
+	self as pallet_grandpa, AuthorityId, AuthorityList, Config, ConsensusLog, OneSessionHandlerAll,
+};
 use ::grandpa as finality_grandpa;
 use codec::Encode;
 use frame_election_provider_support::{
@@ -105,6 +107,55 @@ parameter_types! {
 	pub const Period: u64 = 1;
 	pub const Offset: u64 = 0;
 }
+// 5ire's implementation
+parameter_types! {
+	pub MaxNominations: u32 =  0u32;
+	pub MaxOnChainElectableTargets: u16 = 1250;
+}
+
+//5ire's implementation
+pub struct MyAllSessionHandler;
+impl OneSessionHandlerAll<u64> for MyAllSessionHandler {
+	type Key = UintAuthorityId;
+	fn on_new_session_all<'a, I: 'a>(changed: bool, validators: I, queued_validators: I)
+	where
+		I: Iterator<Item = (&'a u64, Self::Key)>,
+		u64: 'a,
+	{
+	}
+}
+
+impl sp_runtime::BoundToRuntimeAppPublic for MyAllSessionHandler {
+	type Public = UintAuthorityId;
+}
+
+// 5ire's implementation
+pub struct TestElectionDP;
+
+impl frame_election_provider_support::ElectionDataProvider for TestElectionDP {
+	type AccountId = u64;
+	type BlockNumber = u64;
+	type MaxVotesPerVoter = MaxNominations;
+
+	fn desired_targets() -> frame_election_provider_support::data_provider::Result<u32> {
+		frame_election_provider_support::data_provider::Result::Ok(0u32)
+	}
+	fn electable_targets(
+		_maybe_max_len: frame_election_provider_support::DataProviderBounds,
+	) -> frame_election_provider_support::data_provider::Result<Vec<Self::AccountId>> {
+		frame_election_provider_support::data_provider::Result::Ok(Vec::<u64>::new())
+	}
+	fn electing_voters(
+		_maybe_max_len: frame_election_provider_support::DataProviderBounds,
+	) -> frame_election_provider_support::data_provider::Result<
+		Vec<frame_election_provider_support::VoterOf<Self>>,
+	> {
+		frame_election_provider_support::data_provider::Result::Err("not implemented!!")
+	}
+	fn next_election_prediction(_now: Self::BlockNumber) -> Self::BlockNumber {
+		0u64
+	}
+}
 
 /// Custom `SessionHandler` since we use `TestSessionKeys` as `Keys`.
 impl pallet_session::Config for Test {
@@ -117,6 +168,9 @@ impl pallet_session::Config for Test {
 	type SessionHandler = <TestSessionKeys as OpaqueKeys>::KeyTypeIdProviders;
 	type Keys = TestSessionKeys;
 	type WeightInfo = ();
+	type AllSessionHandler = (MyAllSessionHandler,);
+	type DataProvider = TestElectionDP;
+	type TargetsBound = MaxOnChainElectableTargets;
 }
 
 impl pallet_session::historical::Config for Test {
@@ -173,6 +227,8 @@ parameter_types! {
 
 impl pallet_esg::Config for Test {
 	type RuntimeEvent = RuntimeEvent;
+	type MaxFileSize = ConstU32<1024000>;
+	type WeightInfo = ();
 }
 
 pub struct OnChainSeqPhragmen;
@@ -213,7 +269,8 @@ impl pallet_staking::Config for Test {
 	type EventListeners = ();
 	type BenchmarkingConfig = pallet_staking::TestBenchmarkingConfig;
 	type WeightInfo = ();
-	type ScoreEsg = EsgScore;
+	type ESG = EsgScore;
+	type Reliability = EsgScore;
 }
 
 impl pallet_offences::Config for Test {

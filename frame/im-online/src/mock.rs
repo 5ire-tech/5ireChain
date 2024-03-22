@@ -1,6 +1,6 @@
 // This file is part of Substrate.
 
-// Copyright (C) Parity Technologies (UK) Ltd.
+// Copyright (C) 2019-2022 Parity Technologies (UK) Ltd.
 // SPDX-License-Identifier: Apache-2.0
 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,38 +20,43 @@
 #![allow(unused_imports)]
 #![cfg(test)]
 
-use sp_std::collections::btree_map::BTreeMap;
-
+use frame_election_provider_support::bounds::{ElectionBounds, ElectionBoundsBuilder};
 use pallet_session::historical as pallet_session_historical;
 use sp_core::H256;
 use sp_runtime::{
 	curve::PiecewiseLinear,
-	testing::{TestXt, UintAuthorityId},
+	testing::{Header, TestXt, UintAuthorityId},
 	traits::{BlakeTwo256, ConvertInto, IdentityLookup, Zero},
 	BuildStorage, Perbill, Permill,
 };
 use sp_staking::{
 	offence::{OffenceError, ReportOffence},
-	SessionIndex,
+	EraIndex, SessionIndex,
 };
+use sp_std::collections::btree_map::BTreeMap;
+
+use crate as imonline;
+use crate::Config;
 
 use frame_election_provider_support::{onchain, SequentialPhragmen, VoteWeight};
 use frame_support::{
 	assert_ok, parameter_types,
 	traits::{
-		ConstU32, ConstU64, Currency, FindAuthor, GenesisBuild, Get, Hooks, Imbalance,
-		OnUnbalanced, OneSessionHandler,
+		ConstU128, ConstU32, ConstU64, Currency, FindAuthor, Get, Hooks, Imbalance, OnUnbalanced,
+		OneSessionHandler,
 	},
 	weights::{constants::RocksDbWeight, Weight},
 	Parameter,
 };
-use pallet_staking::{BalanceOf, Exposure, ExposureOf, RewardDestination, ValidatorPrefs};
+use pallet_staking::{
+	BalanceOf, Exposure, ExposureOf, FixedNominationsQuota, RewardDestination, ValidatorPrefs,
+};
+use sp_staking::currency_to_vote::SaturatingCurrencyToVote;
 
 type AccountId = u64;
 type AccountIndex = u64;
 type BlockNumber = u64;
 type Balance = u128;
-type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
 
 const THRESHOLDS: [sp_npos_elections::VoteWeight; 9] =
@@ -60,11 +65,8 @@ const THRESHOLDS: [sp_npos_elections::VoteWeight; 9] =
 pub const INIT_TIMESTAMP: u64 = 30_000;
 pub const BLOCK_TIME: u64 = 1000;
 
-use crate as imonline;
-use crate::Config;
-
 frame_support::construct_runtime!(
-	pub struct Test
+	pub enum Test
 	{
 		Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
 		EsgScore: pallet_esg::{Pallet, Call, Storage, Event<T>},
@@ -75,6 +77,7 @@ frame_support::construct_runtime!(
 		Historical: pallet_session_historical::{Pallet},
 		Staking: pallet_staking::{Pallet, Call, Config<T>, Storage, Event<T>},
 		VoterBagsList: pallet_bags_list::<Instance1>::{Pallet, Call, Storage, Event<T>},
+		Authorship: pallet_authorship,
 	}
 );
 
@@ -91,8 +94,6 @@ pallet_staking_reward_curve::build! {
 
 parameter_types! {
 	pub MaxOnChainElectableTargets: u16 = 1250;
-	pub BlockWeights: frame_system::limits::BlockWeights =
-	frame_system::limits::BlockWeights::simple_max(frame_support::weights::Weight::from_ref_time(1024));
 
 	// pub const Period: u64 = 1;
 	// pub const Offset: u64 = 0;
@@ -116,12 +117,12 @@ parameter_types! {
 	pub static MockCurrentSessionProgress: Option<Option<Permill>> = None;
 	pub static BagThresholds: &'static [sp_npos_elections::VoteWeight] = &THRESHOLDS;
 	pub static LedgerSlashPerEra: (BalanceOf<Test>, BTreeMap<EraIndex, BalanceOf<Test>>) = (Zero::zero(), BTreeMap::new());
-
 	pub static Validators: Option<Vec<u64>> = Some(vec![
 		1,
 		2,
 		3,
 	]);
+	pub static ElectionsBounds: ElectionBounds = ElectionBoundsBuilder::default().build();
 }
 
 pub struct TestSessionManager;
@@ -148,10 +149,6 @@ pub type Extrinsic = TestXt<RuntimeCall, ()>;
 type IdentificationTuple = (u64, u64);
 type Offence = crate::UnresponsivenessOffence<IdentificationTuple>;
 
-parameter_types! {
-	pub static Offences: Vec<(Vec<u64>, Offence)> = vec![];
-}
-
 /// A mock offence report handler.
 pub struct OffenceHandler;
 impl ReportOffence<u64, IdentificationTuple, Offence> for OffenceHandler {
@@ -166,15 +163,19 @@ impl ReportOffence<u64, IdentificationTuple, Offence> for OffenceHandler {
 }
 
 pub fn new_test_ext(n: u64) -> sp_io::TestExternalities {
-	let t = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap();
+	let t = frame_system::GenesisConfig::<Test>::default().build_storage().unwrap();
 	let mut result: sp_io::TestExternalities = t.into();
 	// Set the default keys, otherwise session will discard the validator.
 	result.execute_with(|| {
 		for i in 1..=n {
 			System::inc_providers(&i);
 			// i'm using controller id; i same as that of stash id; i
-			Staking::bond(RuntimeOrigin::signed(i), i, 1500, RewardDestination::Controller)
-				.unwrap();
+			Staking::bond(
+				RuntimeOrigin::signed(i),
+				(100 + (100 * i)) as u128,
+				RewardDestination::Controller,
+			)
+			.unwrap();
 			Staking::validate(RuntimeOrigin::signed(i), ValidatorPrefs::default()).unwrap();
 			Session::set_keys(RuntimeOrigin::signed(i), (i).into(), vec![]).unwrap();
 		}
@@ -196,41 +197,34 @@ impl frame_system::Config for Test {
 	type BaseCallFilter = frame_support::traits::Everything;
 	type BlockWeights = ();
 	type BlockLength = ();
-	type DbWeight = RocksDbWeight;
+	type DbWeight = ();
 	type RuntimeOrigin = RuntimeOrigin;
 	type Nonce = u64;
 	type RuntimeCall = RuntimeCall;
 	type Hash = H256;
-	type Hashing = ::sp_runtime::traits::BlakeTwo256;
-	type AccountId = AccountId;
+	type Hashing = BlakeTwo256;
+	type AccountId = u64;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Block = Block;
 	type RuntimeEvent = RuntimeEvent;
-	type BlockHashCount = frame_support::traits::ConstU64<250>;
+	type BlockHashCount = ConstU64<250>;
 	type Version = ();
 	type PalletInfo = PalletInfo;
-	type AccountData = pallet_balances::AccountData<Balance>;
+	type AccountData = pallet_balances::AccountData<u128>;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
 	type SystemWeightInfo = ();
 	type SS58Prefix = ();
 	type OnSetCode = ();
-	type MaxConsumers = frame_support::traits::ConstU32<16>;
-}
-
-parameter_types! {
-	pub const Period: u64 = 1;
-	pub const Offset: u64 = 0;
+	type MaxConsumers = ConstU32<16>;
 }
 
 impl pallet_session::Config for Test {
 	type WeightInfo = ();
 	type DataProvider = Staking;
 	type Keys = UintAuthorityId;
-
 	type ValidatorId = u64;
 	type ValidatorIdOf = ConvertInto;
-
 	type RuntimeEvent = RuntimeEvent;
 	type SessionHandler = (ImOnline,);
 	type AllSessionHandler = (ImOnline,);
@@ -240,26 +234,26 @@ impl pallet_session::Config for Test {
 	type SessionManager = pallet_session::historical::NoteHistoricalRoot<Test, TestSessionManager>;
 }
 
-impl pallet_session::historical::Config for Runtime {
-	type FullIdentification = u64;
-	type FullIdentificationOf = ConvertInto;
-}
-
 impl pallet_balances::Config for Test {
-	type MaxLocks = frame_support::traits::ConstU32<1024>;
+	type MaxLocks = ();
 	type MaxReserves = ();
 	type ReserveIdentifier = [u8; 8];
-	type Balance = Balance;
-	type RuntimeEvent = RuntimeEvent;
+	type Balance = u128;
 	type DustRemoval = ();
-	type ExistentialDeposit = ExistentialDeposit;
+	type RuntimeEvent = RuntimeEvent;
+	type ExistentialDeposit = ConstU128<1>;
 	type AccountStore = System;
 	type WeightInfo = ();
+	type FreezeIdentifier = ();
+	type MaxFreezes = ();
+	type RuntimeHoldReason = ();
+	type MaxHolds = ();
 }
+
 impl pallet_esg::Config for Test {
-	type RuntimeEvent = RuntimeEvent;
 	type WeightInfo = ();
 	type MaxFileSize = ConstU32<102400>;
+	type RuntimeEvent = RuntimeEvent;
 }
 
 type VoterBagsListInstance = pallet_bags_list::Instance1;
@@ -274,7 +268,7 @@ impl pallet_bags_list::Config<VoterBagsListInstance> for Test {
 
 pub struct ImOnlineSession;
 impl pallet_staking::SessionInterface<AccountId> for ImOnlineSession {
-	fn disable_validator(validator_index: u32) -> bool {
+	fn disable_validator(_validator_index: u32) -> bool {
 		true
 	}
 
@@ -282,23 +276,22 @@ impl pallet_staking::SessionInterface<AccountId> for ImOnlineSession {
 		Validators::get().unwrap()
 	}
 
-	fn prune_historical_up_to(up_to: SessionIndex) {}
+	fn prune_historical_up_to(_up_to: SessionIndex) {}
 }
 
 impl pallet_staking::Config for Test {
-	type MaxNominations = MaxNominations;
 	type Currency = Balances;
 	type CurrencyBalance = <Self as pallet_balances::Config>::Balance;
 	type UnixTime = Timestamp;
-	type CurrencyToVote = frame_support::traits::SaturatingCurrencyToVote;
+	type CurrencyToVote = SaturatingCurrencyToVote;
 	type RewardRemainder = RewardRemainderMock;
 	type RuntimeEvent = RuntimeEvent;
 	type Slash = ();
 	type Reward = MockReward;
 	type SessionsPerEra = SessionsPerEra;
 	type SlashDeferDuration = SlashDeferDuration;
-	type SlashCancelOrigin = frame_system::EnsureRoot<AccountId>;
 	type BondingDuration = BondingDuration;
+	type AdminOrigin = frame_system::EnsureRoot<u64>;
 	type SessionInterface = ImOnlineSession;
 	type EraPayout = pallet_staking::ConvertCurve<RewardCurve>;
 	type NextNewSession = Session;
@@ -309,17 +302,24 @@ impl pallet_staking::Config for Test {
 	type VoterList = VoterBagsList;
 	type TargetList = pallet_staking::UseValidatorsMap<Self>;
 	type MaxUnlockingChunks = MaxUnlockingChunks;
+	type NominationsQuota = FixedNominationsQuota<16>;
 	type HistoryDepth = HistoryDepth;
-	type OnStakerSlash = OnStakerSlashMock<Test>;
+	type EventListeners = ();
 	type BenchmarkingConfig = pallet_staking::TestBenchmarkingConfig;
 	type WeightInfo = ();
 	type ESG = EsgScore;
 	type Reliability = ImOnline;
 }
 
-impl pallet_authorship::Config for Runtime {
-	type FindAuthor = ();
-	type EventHandler = ImOnline;
+impl pallet_session::historical::Config for Test {
+	type FullIdentification = u64;
+	type FullIdentificationOf = ConvertInto;
+}
+
+impl pallet_authorship::Config for Test {
+	type FindAuthor = Author11;
+
+	type EventHandler = crate::Pallet<Test>;
 }
 
 impl pallet_timestamp::Config for Test {
@@ -336,8 +336,7 @@ impl onchain::Config for OnChainSeqPhragmen {
 	type DataProvider = Staking;
 	type WeightInfo = ();
 	type MaxWinners = MaxWinners;
-	type VotersBound = ConstU32<{ u32::MAX }>;
-	type TargetsBound = ConstU32<{ u32::MAX }>;
+	type Bounds = ElectionsBounds;
 }
 
 pub struct RewardRemainderMock;
@@ -356,25 +355,6 @@ impl OnUnbalanced<pallet_staking::PositiveImbalanceOf<Test>> for MockReward {
 	fn on_unbalanced(_: pallet_staking::PositiveImbalanceOf<Test>) {
 		RewardOnUnbalanceWasCalled::set(true);
 	}
-}
-
-pub struct OnStakerSlashMock<T: Config>(core::marker::PhantomData<T>);
-impl<T: Config> sp_staking::OnStakerSlash<AccountId, Balance> for OnStakerSlashMock<T> {
-	fn on_slash(
-		_pool_account: &AccountId,
-		slashed_bonded: Balance,
-		slashed_chunks: &BTreeMap<EraIndex, Balance>,
-	) {
-		LedgerSlashPerEra::set((slashed_bonded, slashed_chunks.clone()));
-	}
-}
-
-parameter_types! {
-	pub static MockCurrentSessionProgress: Option<Option<Permill>> = None;
-}
-
-parameter_types! {
-	pub static MockAverageSessionLength: Option<u64> = None;
 }
 
 pub struct TestNextSessionRotation;
@@ -430,8 +410,10 @@ pub fn advance_session() {
 	let now = System::block_number().max(1);
 	System::set_block_number(now + 1);
 	Session::rotate_session();
+	// assert_eq!(vec![1,2,3,4], Session::validators(), "[adv] before set keys");
 	let keys = Session::validators().into_iter().map(UintAuthorityId).collect();
 	ImOnline::set_keys(keys);
+
 	assert_eq!(Session::current_index(), (now / Period::get()) as u32);
 }
 
