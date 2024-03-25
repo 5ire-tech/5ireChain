@@ -4,7 +4,7 @@ import {killNodes, polkadotApi, spawnNodes} from "../utils/util";
 import {Keyring} from "@polkadot/api";
 import {addressToEvm} from "@polkadot/util-crypto";
 import {waitForEvent} from "../utils/setup";
-import { Web3 } from "web3";
+import Web3  from "web3";
 
 // Setup the API and Alice Account
 async function init() {
@@ -31,7 +31,7 @@ describe("Swap EVM tokens to Native tokens test", function () {
     const web3 = new Web3(
       new Web3.providers.HttpProvider("http://127.0.0.1:9933")
     );
-    const addressString = web3.utils.bytesToHex(aliceEthAccount);
+    const addressString = web3.utils.bytesToHex(Array.from(aliceEthAccount));
     // @ts-ignore
     let {data: aliceBalanceBefore} =  await polkadotApi.query.system.account(alice.address);
 
