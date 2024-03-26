@@ -4,6 +4,7 @@ import { ChildProcess, execSync } from "child_process";
 import fs from "fs";
 import { sleep, start5ireChainNode } from "./setup";
 import Web3 from "web3";
+import { JsonRpcResponse } from "web3-core-helpers";
 
 export let polkadotApi: ApiPromise;
 
@@ -43,15 +44,16 @@ export async function killNodes() {
 
 export const spawnNodeForTestEVM = async () => {
   await removeTmp();
-  aliceNode = start5ireChainNode("alice", { tmp: true, printLogs: true });
+  aliceNode = start5ireChainNode("alice", { tmp: true, printLogs: false });
 
   console.log("started alice node");
-  
+  polkadotApi = await ApiPromise.create();
   
   return true;
 };
 
 export async function killNodeForTestEVM() {
+  await polkadotApi.disconnect();
   aliceNode?.kill("SIGINT");
   await sleep(2 * SECONDS);
 }
@@ -76,4 +78,33 @@ export async function removeTmp() {
     console.log(`tmp directory doesn't exists anymore ${tmpDir}`);
   }
 
+}
+
+export async function customRequest(web3: Web3, method: string, params: any[]) {
+	return new Promise<JsonRpcResponse>((resolve, reject) => {
+		(web3.currentProvider as any).send(
+			{
+				jsonrpc: "2.0",
+				id: 1,
+				method,
+				params,
+			},
+			(error: Error | null, result?: JsonRpcResponse) => {
+				if (error) {
+					reject(
+						`Failed to send custom request (${method} (${params.join(",")})): ${
+							error.message || error.toString()
+						}`
+					);
+				}
+        else if (result === undefined) {
+          reject(new Error("Result is undefined"));
+        }
+        else {
+          resolve(result);
+        }
+				
+			}
+		);
+	});
 }
