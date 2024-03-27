@@ -18,12 +18,10 @@ import { Wallet, ethers } from "ethers";
 let web3: Web3;
 let aliceEthAccount: Wallet;
 
+const ERC20_ABI = require("./contracts/MyToken.json").abi;
+const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
 const TEST_ACCOUNT = "0xdd33Af49c851553841E94066B54Fd28612522901";
-const TEST_ACCOUNT_PRIVATE_KEY =
-  "0x4ca933bffe83185dda76e7913fc96e5c97cdb7ca1fbfcc085d6376e6f564ef71";
-const TRANFER_VALUE = "1"; // 1 5IRE must be higher than ExistentialDeposit
-//const GAS_PRICE = "0x3B9ACA00"; // 1000000000
-
+let contractAddress: string;
 // Keyring needed to sign using Alice account
 const keyring = new Keyring({ type: "sr25519" });
 
@@ -80,48 +78,79 @@ describe("EVM related Balance", function () {
     await killNodeForTestEVM();
   });
 
-  step("get nonce", async function () {
-    this.timeout(20000);
+  step("create the contract", async function () {
+    this.timeout(40000);
+    const erc20Contract = new web3.eth.Contract(ERC20_ABI);
 
-    expect(
-      await web3.eth.getTransactionCount(aliceEthAccount.address, "latest")
-    ).to.eq(0);
+    const deployTx = erc20Contract.deploy({
+      data: ERC20_BYTECODES,
+      arguments: [],
+    });
+
+    const gas = await deployTx.estimateGas({ from: aliceEthAccount.address });
+
     const gasPrice = await web3.eth.getGasPrice();
-    const tx = await web3.eth.accounts.signTransaction(
+
+    const txSign = await web3.eth.accounts.signTransaction(
       {
         from: aliceEthAccount.address,
-        to: TEST_ACCOUNT,
-        value: web3.utils.toHex(web3.utils.toWei(TRANFER_VALUE, "ether")),
-        gasPrice: web3.utils.toHex(gasPrice),
-        gas: "0x100000",
+        data: deployTx.encodeABI(),
+        gasPrice,
+        gas,
       },
       aliceEthAccount.privateKey
     );
-    const rep = await customRequest(web3, "eth_sendRawTransaction", [
-      tx.rawTransaction,
+
+    let receipt = await customRequest(web3, "eth_sendRawTransaction", [
+      txSign.rawTransaction,
     ]);
     await sleep(2 * SECONDS);
-    expect(
-      await web3.eth.getTransactionCount(aliceEthAccount.address, "latest")
-    ).to.eq(1);
+    const latestBlock = await web3.eth.getBlock("latest");
+    expect(latestBlock.transactions.length).to.equal(1);
+
+    const txHash = latestBlock.transactions[0];
+    const tx = await web3.eth.getTransaction(txHash);
+
+    expect(tx.hash).to.equal(txHash);
+    const rep = await web3.eth.getTransactionReceipt(txHash);
+    contractAddress = rep.contractAddress || "";
   });
 
-  step("stalled nonce", async function () {
-    let gasPrice = await web3.eth.getGasPrice();
-    const tx = await web3.eth.accounts.signTransaction(
+  step("call sign transaction the method", async function () {
+    const contract = new web3.eth.Contract(ERC20_ABI, contractAddress, {
+      from: aliceEthAccount.address,
+      gasPrice: "0x3B9ACA00",
+    });
+    let amountTransfer = web3.utils.toWei("1", "ether");
+    const data = contract.methods
+      .transfer(TEST_ACCOUNT, amountTransfer)
+      .encodeABI();
+    const signedTx = await web3.eth.accounts.signTransaction(
       {
-        from: aliceEthAccount.address,
-        to: TEST_ACCOUNT,
-        value: web3.utils.toHex(web3.utils.toWei("2", "ether")),
-        gasPrice: web3.utils.toHex(Number(gasPrice)),
-        gas: "0x100000",
-        nonce: 0,
+        to: contractAddress,
+        data,
+        gas: 200000,
       },
       aliceEthAccount.privateKey
     );
-    let result = await customRequest(web3, "eth_sendRawTransaction", [
-      tx.rawTransaction,
+    await customRequest(web3, "eth_sendRawTransaction", [
+      signedTx.rawTransaction,
     ]);
-    expect(result?.error?.message).to.be.equal("nonce too low");
+    await sleep(2 * SECONDS);
+    expect(await contract.methods.balanceOf(TEST_ACCOUNT).call()).to.eq(
+      amountTransfer
+    );
+  });
+
+  step("call query the method", async function () {
+    const contract = new web3.eth.Contract(ERC20_ABI, contractAddress, {
+      from: aliceEthAccount.address,
+      gasPrice: "0x3B9ACA00",
+    });
+    let expectedTotalSupply = BigInt(2 ** 256) - BigInt(1);
+
+    expect(await contract.methods.totalSupply().call()).to.eq(
+      expectedTotalSupply.toString()
+    );
   });
 });

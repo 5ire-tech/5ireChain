@@ -9,7 +9,6 @@ import {
   spawnNodeForTestEVM,
 } from "../utils/util";
 import { sleep, waitForEvent } from "../utils/setup";
-import { addressToEvm } from "@polkadot/util-crypto";
 import Keyring from "@polkadot/keyring";
 import { Wallet, ethers } from "ethers";
 

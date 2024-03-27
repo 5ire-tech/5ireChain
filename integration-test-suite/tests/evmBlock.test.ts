@@ -5,7 +5,6 @@ import {
 import { BLOCK_TIME, ETH_BLOCK_GAS_LIMIT, SECONDS } from "../utils/constants";
 import { expect } from "chai";
 import { step } from "mocha-steps";
-import { sleep } from "../utils/setup";
 import Web3 from "web3";
 let web3: Web3;
 describe("EVM related Block", function () {
