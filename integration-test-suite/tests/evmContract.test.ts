@@ -56,7 +56,7 @@ async function init() {
   return aliceEthAccount;
 }
 
-describe("EVM related Balance", function () {
+describe("EVM related Contract", function () {
   this.timeout(100 * BLOCK_TIME);
   before(async () => {
     await spawnNodeForTestEVM();
@@ -136,7 +136,7 @@ describe("EVM related Balance", function () {
     await customRequest(web3, "eth_sendRawTransaction", [
       signedTx.rawTransaction,
     ]);
-    await sleep(2 * SECONDS);
+    await sleep(3 * SECONDS);
     expect(await contract.methods.balanceOf(TEST_ACCOUNT).call()).to.eq(
       amountTransfer
     );

@@ -58,7 +58,7 @@ async function init() {
   return aliceEthAccount;
 }
 
-describe("EVM related Balance", function () {
+describe("EVM related Nonce", function () {
   this.timeout(100 * BLOCK_TIME);
   before(async () => {
     await spawnNodeForTestEVM();
@@ -100,7 +100,7 @@ describe("EVM related Balance", function () {
     const rep = await customRequest(web3, "eth_sendRawTransaction", [
       tx.rawTransaction,
     ]);
-    await sleep(2 * SECONDS);
+    await sleep(3 * SECONDS);
     expect(
       await web3.eth.getTransactionCount(aliceEthAccount.address, "latest")
     ).to.eq(1);
