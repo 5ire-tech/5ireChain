@@ -26,8 +26,10 @@ https://docs.substrate.io/install/
 ## Connect to 5ireChain Thunder testnet
 
 ### Pull Docker Image
-
+```bash
 docker pull 5irechain/5ire-thunder-node:0.12
+```
+
 
 ### Run docker image
 
@@ -80,7 +82,7 @@ cargo build --release --features firechain-qa
 ### Run a single dev node
 
 ```bash
-./target/release/firechain-node --chain qa-dev --alice --tmp
+./target/release/firechain-node --chain qa-dev --alice
 ```
 
 ## Contributions & Code of Conduct
