@@ -1,6 +1,6 @@
 [package]
 name = "firechain-node"
-version = "4.0.0-dev"
+version = "1.0.0"
 description = "Client node"
 authors = ["5ireChain"]
 edition = "2021"

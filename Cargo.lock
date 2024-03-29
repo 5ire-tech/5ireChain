@@ -2588,7 +2588,7 @@ dependencies = [
 
 [[package]]
 name = "firechain-mainnet-runtime"
-version = "4.0.0-dev"
+version = "1.0.0"
 dependencies = [
  "firechain-runtime-core-primitives",
  "fp-account",
@@ -2694,7 +2694,7 @@ dependencies = [
 
 [[package]]
 name = "firechain-node"
-version = "4.0.0-dev"
+version = "1.0.0"
 dependencies = [
  "array-bytes",
  "assert_cmd",
@@ -2812,7 +2812,7 @@ dependencies = [
 
 [[package]]
 name = "firechain-qa-runtime"
-version = "4.0.0-dev"
+version = "1.0.0"
 dependencies = [
  "firechain-runtime-core-primitives",
  "fp-account",
@@ -2918,7 +2918,7 @@ dependencies = [
 
 [[package]]
 name = "firechain-runtime-core-primitives"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "node-primitives",
  "sp-runtime",
@@ -2926,7 +2926,7 @@ dependencies = [
 
 [[package]]
 name = "firechain-thunder-runtime"
-version = "4.0.0-dev"
+version = "1.0.0"
 dependencies = [
  "firechain-runtime-core-primitives",
  "fp-account",
