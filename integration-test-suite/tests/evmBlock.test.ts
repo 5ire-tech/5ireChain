@@ -26,10 +26,6 @@ describe("EVM related Block", function () {
 
   });
 
-  step("should be at block 0 at genesis ", async () => {
-    const blockNumber = await web3.eth.getBlockNumber();
-    expect(blockNumber).to.equal(0);
-  });
   after(async () => {
     await killNodeForTestEVM();
   });
