@@ -115,7 +115,7 @@ frame-system-rpc-runtime-api = { workspace = true }
 fc-api = { workspace = true }
 fc-cli = { workspace = true }
 fc-consensus = { workspace = true }
-fc-db = { workspace = true }
+fc-db = { workspace = true, features = ["rocksdb"] }
 fc-mapping-sync = { workspace = true }
 fc-rpc = { workspace = true, default-features = false }
 fc-rpc-core = { workspace = true }
