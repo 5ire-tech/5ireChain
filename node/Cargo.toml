@@ -1,6 +1,6 @@
 [package]
 name = "firechain-node"
-version = "4.0.0-dev"
+version = "1.0.0"
 description = "Client node"
 authors = ["5ireChain"]
 edition = "2021"
@@ -129,11 +129,11 @@ fc-storage = { workspace = true }
 
 
 # Local Dependencies
-firechain-qa-runtime = {  path = "../runtime/firechain-qa-runtime" }
-firechain-mainnet-runtime = {  path = "../runtime/firechain-mainnet-runtime" }
-firechain-thunder-runtime = {  path = "../runtime/firechain-thunder-runtime" }
+firechain-qa-runtime = {  workspace = true }
+firechain-mainnet-runtime = {  workspace = true }
+firechain-thunder-runtime = {  workspace = true }
 node-primitives = { workspace = true, default-features = false  }
-firechain-runtime-core-primitives = {path="../runtime/core-primitives"}
+firechain-runtime-core-primitives = { workspace = true }
 
 [build-dependencies]
 substrate-build-script-utils = { workspace = true, optional = true }
@@ -147,11 +147,8 @@ substrate-frame-cli = { optional = true, workspace = true }
 # CLI-specific dependencies
 
 try-runtime-cli = { optional = true, workspace = true }
-node-inspect = { optional = true, workspace = true }
 
 [dev-dependencies]
-substrate-cli-test-utils = { workspace = true }
-
 sc-client-db = { workspace = true }
 futures = "0.3.21"
 tempfile = "3.1.0"
