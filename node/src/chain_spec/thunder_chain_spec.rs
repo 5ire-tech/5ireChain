@@ -520,8 +520,7 @@ pub fn development_genesis(
 			accounts: {
 				let mut map = BTreeMap::new();
 				map.insert(
-					// H160 address of Alice dev account
-					// Derived from SS58 (42 prefix) address
+
 					// SS58: 5Ge11vgR8YoB7xJPEj4j1eRmvx6vKBLk3uq1nv37eeEbYmR9
 					// hex: 0xca55cbeb97bf4ad51541ec60a784381b5df71bab3c605ee98f48c9cd8e790d70
 
@@ -536,8 +535,7 @@ pub fn development_genesis(
 					},
 				);
 				map.insert(
-					// H160 address of Bob dev account
-					// Derived from SS58 (42 prefix) address
+
 					// SS58: 5CrF9cwmf3SvradcJP7jU5BfXqGGniAt5jCMi6XeCNo2LBDB
 					// hex: 0x22bb61e352da49e18ca6d292cb7ed667678fa88870860efb4c8bdf91e8a44a01
 					
@@ -552,8 +550,7 @@ pub fn development_genesis(
 					},
 				);
 				map.insert(
-					// H160 address of Bob dev account
-					// Derived from SS58 (42 prefix) address
+
 					// SS58: 5FFVZ9cfrRTHf4eaXLZfGkDwot1ULv46ddgT3fLcs4fxe6CS
 					// hex: 0x8ceefcc55493e13574f43c75a59142c0de950bdc431ffc1b12add8c786e7cc6c
 					
