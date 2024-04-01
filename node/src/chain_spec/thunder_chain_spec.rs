@@ -526,7 +526,7 @@ pub fn development_genesis(
 					// hex: 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d
 					// Using the full hex key, truncating to the first 20 bytes (the first 40 hex
 					// chars)
-					H160::from_str("d43593c715fdd31c61141abd04a99fd6822c8558")
+					H160::from_str("48Df7B35247786418a7e279e508325952B9Fc92F")
 						.expect("internal H160 is valid; qed"),
 					GenesisAccount {
 						balance: U256::from_str("0xfffffffffffffffffffff")
@@ -543,7 +543,7 @@ pub fn development_genesis(
 					// hex: 0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48
 					// Using the full hex key, truncating to the first 20 bytes (the first 40 hex
 					// chars)
-					H160::from_str("8eaf04151687736326c9fea17e25fc5287613693")
+					H160::from_str("74E4214c9C3D9726E1A0B57357C4dd117641c536")
 						.expect("internal H160 is valid; qed"),
 					GenesisAccount {
 						balance: U256::from_str("0xfffffffffffffffffffff")
@@ -560,7 +560,7 @@ pub fn development_genesis(
 					// hex: 0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48
 					// Using the full hex key, truncating to the first 20 bytes (the first 40 hex
 					// chars)
-					H160::from_str("05E053aB0f66422d243C1F14Da2091CD56F51F73")
+					H160::from_str("FE31f14425993A3d9aeDEd195C56999eBE097d92")
 						.expect("internal H160 is valid; qed"),
 					GenesisAccount {
 						balance: U256::from_str("0xfffffffffffffffffffff")
