@@ -1,8 +1,8 @@
 [package]
 name = "firechain-mainnet-runtime"
-version = "4.0.0-dev"
-authors = ["5ire Team <admin@5ire.org>"]
-description = "5ire chain node runtime"
+version = "1.0.0"
+authors = ["5ire Team <support@5ire.org>"]
+description = "5ire chain Mainnet runtime"
 edition = "2021"
 build = "build.rs"
 license = "Apache-2.0"
