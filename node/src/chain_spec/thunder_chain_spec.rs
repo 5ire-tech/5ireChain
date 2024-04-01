@@ -522,10 +522,9 @@ pub fn development_genesis(
 				map.insert(
 					// H160 address of Alice dev account
 					// Derived from SS58 (42 prefix) address
-					// SS58: 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
-					// hex: 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d
-					// Using the full hex key, truncating to the first 20 bytes (the first 40 hex
-					// chars)
+					// SS58: 5Ge11vgR8YoB7xJPEj4j1eRmvx6vKBLk3uq1nv37eeEbYmR9
+					// hex: 0xca55cbeb97bf4ad51541ec60a784381b5df71bab3c605ee98f48c9cd8e790d70
+
 					H160::from_str("48Df7B35247786418a7e279e508325952B9Fc92F")
 						.expect("internal H160 is valid; qed"),
 					GenesisAccount {
@@ -539,10 +538,9 @@ pub fn development_genesis(
 				map.insert(
 					// H160 address of Bob dev account
 					// Derived from SS58 (42 prefix) address
-					// SS58: 5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty
-					// hex: 0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48
-					// Using the full hex key, truncating to the first 20 bytes (the first 40 hex
-					// chars)
+					// SS58: 5CrF9cwmf3SvradcJP7jU5BfXqGGniAt5jCMi6XeCNo2LBDB
+					// hex: 0x22bb61e352da49e18ca6d292cb7ed667678fa88870860efb4c8bdf91e8a44a01
+					
 					H160::from_str("74E4214c9C3D9726E1A0B57357C4dd117641c536")
 						.expect("internal H160 is valid; qed"),
 					GenesisAccount {
@@ -556,10 +554,9 @@ pub fn development_genesis(
 				map.insert(
 					// H160 address of Bob dev account
 					// Derived from SS58 (42 prefix) address
-					// SS58: 5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty
-					// hex: 0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48
-					// Using the full hex key, truncating to the first 20 bytes (the first 40 hex
-					// chars)
+					// SS58: 5FFVZ9cfrRTHf4eaXLZfGkDwot1ULv46ddgT3fLcs4fxe6CS
+					// hex: 0x8ceefcc55493e13574f43c75a59142c0de950bdc431ffc1b12add8c786e7cc6c
+					
 					H160::from_str("FE31f14425993A3d9aeDEd195C56999eBE097d92")
 						.expect("internal H160 is valid; qed"),
 					GenesisAccount {
