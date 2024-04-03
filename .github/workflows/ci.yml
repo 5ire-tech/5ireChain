@@ -32,7 +32,8 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           cache-on-failure: true
-
+          key: ${{ runner.os }}-cargo-index-${{ github.ref_name }}-${{ hashFiles('**/Cargo.lock') }}
+          
       - uses: webfactory/ssh-agent@v0.5.4
         with:
           ssh-private-key: "${{ secrets.READ_DEPLOY_KEY }}"
