@@ -12,3 +12,8 @@ export const ETH_BLOCK_POV_LIMIT = 5 * 1024 * 1024; // The same configuration as
 export const GENESIS_ACCOUNT = "0xd43593c715fdd31c61141abd04a99fd6822c8558";
 export const GENESIS_ACCOUNT_BALANCE = "19342813113834066795298815";
 export const EXISTENTIAL_DEPOSIT = 0; // The minimum amount required to keep an account open
+
+export const GENESIS_ACCOUNTS: string[] =['0x48Df7B35247786418a7e279e508325952B9Fc92F', 
+                                          '0x74E4214c9C3D9726E1A0B57357C4dd117641c536',
+                                          '0xFE31f14425993A3d9aeDEd195C56999eBE097d92'
+                                        ] //Genesis account addresses
