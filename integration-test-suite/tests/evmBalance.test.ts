@@ -1,10 +1,10 @@
 import Web3 from "web3";
 import {
   BLOCK_TIME,
-  EXISTENTIAL_DEPOSIT,
-  GENESIS_ACCOUNT,
+  EXISTENTIAL_DEPOSIT,  
   GENESIS_ACCOUNT_BALANCE,
   SECONDS,
+  GENESIS_ACCOUNTS,
 } from "../utils/constants";
 import {
   customRequest,
@@ -83,9 +83,10 @@ describe("EVM related Balance", function () {
     await killNodeForTestEVM();
   });
   step("genesis balance is setup correctly", async function () {
-    expect(await web3.eth.getBalance(GENESIS_ACCOUNT)).to.equal(
-      GENESIS_ACCOUNT_BALANCE
-    );
+    for(let address of GENESIS_ACCOUNTS){
+      expect(await web3.eth.getBalance(address)).to.equal(GENESIS_ACCOUNT_BALANCE);
+      console.log(address + " has expected balance");
+    };
   });
 
   step("balance to be updated after transfer", async function () {
@@ -166,7 +167,7 @@ describe("EVM related Balance", function () {
     const tx = await web3.eth.accounts.signTransaction(
       {
         from: TEST_ACCOUNT,
-        to: GENESIS_ACCOUNT,
+        to: GENESIS_ACCOUNTS[0],
         value: Number(testAccountBalance) + 1,
         gasPrice: gasPrice,
         gas: "0x100000",
