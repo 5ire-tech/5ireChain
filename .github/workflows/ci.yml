@@ -24,7 +24,7 @@ jobs:
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          toolchain: nightly
+          toolchain: 1.74.0
           targets: wasm32-unknown-unknown
           components: rustfmt
 
