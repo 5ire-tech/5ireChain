@@ -7,7 +7,7 @@ import { expect } from "chai";
 import { step } from "mocha-steps";
 import Web3 from "web3";
 let web3: Web3;
-describe("EVM related Block", function () {
+describe("EVM related Block using web3js/ethersjs", function () {
   this.timeout(100 * BLOCK_TIME);
 
   before(async () => {
