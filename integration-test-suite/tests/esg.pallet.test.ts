@@ -56,7 +56,7 @@ describe("ESG Pallet Integration tests", function () {
 
     await registerOracleFailedOracleRegisteredAlreadyForNonSudo(alice, bob);
 
-    // Insert ESG Scores by non-sudo user which we inserted in 2nd last step.
+    // // Insert ESG Scores by non-sudo user which we inserted in 2nd last step.
     await insertEsgScores(bob, charlie, jsonData);
   });
 
@@ -179,7 +179,7 @@ async function registerOracleFailedOracleRegisteredAlready( alice: KeyringPair, 
       } else if (result.status.isFinalized) {
         const data = JSON.stringify(result.events);
         const dataStr = JSON.parse(data)
-        const filteredErrorData = dataStr.filter((item: any) => item.event.index === "0x1600");
+        const filteredErrorData = dataStr.filter((item: any) => item.event.index === "0x1300");
         expect(filteredErrorData[0].event.data[0].err.module.error).to.equal("0x05000000");
         console.log(`Error found: ${filteredErrorData[0].event.data[0].err.module.error}`);
 
@@ -341,8 +341,8 @@ async function deRegisterOracleForOracleNotExist(alice: KeyringPair, charlie: Ke
        } else if (result.status.isFinalized) {
          const data = JSON.stringify(result.events);
          console.log(data);
-         const dataStr = JSON.parse(data)
-         const filteredErrorData = dataStr.filter((item: any) => item.event.index === "0x1600");
+         const dataStr = JSON.parse(data);
+         const filteredErrorData = dataStr.filter((item: any) => item.event.index === "0x1300");
          expect(filteredErrorData[0].event.data[0].err.module.error).to.equal("0x03000000");
          console.log(`Error found: ${filteredErrorData[0].event.data[0].err.module.error}`);
        }
@@ -433,7 +433,7 @@ async function registerOracleFailedOracleRegisteredAlreadyForNonSudo( alice: Key
       } else if (result.status.isFinalized) {
         const data = JSON.stringify(result.events);
         const dataStr = JSON.parse(data)
-        const filteredErrorData = dataStr.filter((item: any) => item.event.index === "0x1600");
+        const filteredErrorData = dataStr.filter((item: any) => item.event.index === "0x1300");
         expect(filteredErrorData[0].event.data[0].err.module.error).to.equal("0x05000000");
         console.log(`Error found: ${filteredErrorData[0].event.data[0].err.module.error}`);
 
