@@ -103,7 +103,10 @@ describe("EVM related tests", function () {
    // @ts-ignore
     const { data: aliceBalanceAfter} = await api.query.system.account(aliceSubstrateAccount.address);
     expect(  aliceBalanceAfter.free.toBigInt() > aliceBalanceBefore.free.toBigInt()).true;
-
+    const addressString = web3.utils.bytesToHex(Array.from(aliceEvmAccount));
+    let aliceEvmBalance = await web3.eth.getBalance(addressString);
+    let expectationAliceEvmBalance = web3.utils.toWei('5','ether');
+    expect(aliceEvmBalance).to.equal(expectationAliceEvmBalance);
   });
 
   // Should create and execute contract
