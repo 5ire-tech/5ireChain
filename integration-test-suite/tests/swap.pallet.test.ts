@@ -2,9 +2,10 @@ import { expect } from "chai";
 import { BLOCK_TIME } from "../utils/constants";
 import { killNodes, polkadotApi, spawnNodes } from "../utils/util";
 import { ApiPromise, Keyring, WsProvider } from "@polkadot/api";
-import { sudoTx, waitForEvent } from "../utils/setup";
+import { sleep, sudoTx, waitForEvent } from "../utils/setup";
 import { addressToEvm } from "@polkadot/util-crypto";
 import Web3  from "web3";
+import { step } from "mocha-steps";
 
 // Setup the API and Alice Account
 async function init() {
@@ -27,7 +28,7 @@ describe("Swap token tests", function () {
   });
 
   // Should swap native token to evm token
-  it("Swap native tokens to evm tokens ", async () => {
+  step("Swap native tokens to evm tokens ", async () => {
     const { charlie, charlieEthAccount } = await init();
     const web3 = new Web3(
       new Web3.providers.HttpProvider("http://127.0.0.1:9944")
@@ -58,10 +59,45 @@ describe("Swap token tests", function () {
 
     await waitForEvent(polkadotApi, "balances", "Transfer");
     let charlieBalanceAfter = await web3.eth.getBalance(addressString);
-    //let expectationBalanceAfter = web3.utils.toBigInt("10000000000000000000");
-    let expectationBalanceAfter = BigInt("10000000000000000000");
-   // expect(charlieBalanceAfter).to.equal(expectationBalanceAfter);
-   expect(charlieBalanceAfter > charlieBalance).true;
+    let expectationBalanceAfter = web3.utils.toWei('10','ether');
+    expect(charlieBalanceAfter).to.equal(expectationBalanceAfter);
+  });
+
+  // Should swap evm token to native token
+  step("Swap evm tokens to native tokens ", async () => {
+    const { charlie, charlieEthAccount } = await init();
+    const web3 = new Web3(
+      new Web3.providers.HttpProvider("http://127.0.0.1:9933")
+    );
+    //const addressString = web3.utils.bytesToHex(Array.from(aliceEthAccount));
+    // @ts-ignore
+    let {data: charlieBalanceBefore} =  await polkadotApi.query.system.account(charlie.address);
+
+    //Create a extrinsic, withdraw 5 5ire coin from Alice
+    const amount = polkadotApi.createType("Balance", "5000000000000000000");
+    const transaction = await polkadotApi.tx.evm.withdraw(charlieEthAccount, amount);
+
+    const unsub = await transaction.signAndSend(charlie,  {tip: 200000000, nonce: -1}, (result) => {
+      console.log(`Swap is ${result.status}`);
+      if (result.status.isInBlock) {
+        console.log(`Swap included at blockHash ${result.status.asInBlock}`);
+        console.log(`Waiting for finalization... (can take a minute)`);
+      } else if (result.status.isFinalized) {
+        console.log(`events are ${result.events}`);
+        result.events.forEach(({ event: { data, method, section }, phase }) => {
+          console.log('\t', phase.toString(), `: ${section}.${method}`, data.toString());
+        });
+        console.log(`Swap finalized at blockHash ${result.status.asFinalized}`);
+        unsub();
+      }
+    });
+
+    await waitForEvent(polkadotApi, "balances", "Transfer");
+    await sleep(2000);
+   // @ts-ignore
+    const { data: charlieBalanceAfter} = await polkadotApi.query.system.account(charlie.address);
+    expect(  charlieBalanceAfter.free.toBigInt() > charlieBalanceBefore.free.toBigInt()).true;
+
   });
 
   after(async () => {

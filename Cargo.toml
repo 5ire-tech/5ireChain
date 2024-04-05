@@ -14,8 +14,8 @@ edition = "2021"
 repository = "https://github.com/5ire-tech/5ireChain"
 
 [workspace.dependencies]
-async-trait = "0.1"
-bn = { package = "substrate-bn", version = "0.6", default-features = false }
+# async-trait = "0.1"
+# bn = { package = "substrate-bn", version = "0.6", default-features = false }
 clap = { version = "4.3", features = ["derive", "deprecated"] }
 environmental = { version = "1.1.4", default-features = false }
 ethereum = { version = "0.14.0", default-features = false }
@@ -25,21 +25,19 @@ futures = "0.3.28"
 hash-db = { version = "0.16.0", default-features = false }
 hex = { version = "0.4.3", default-features = false, features = ["alloc"] }
 hex-literal = "0.4.1"
-impl-serde = { version = "0.4.0", default-features = false }
+# impl-serde = { version = "0.4.0", default-features = false }
 jsonrpsee = "0.16.2"
 kvdb-rocksdb = "0.19.0"
 libsecp256k1 = { version = "0.7.1", default-features = false }
 log = { version = "0.4.17", default-features = false }
-num_enum = { version = "0.7.0", default-features = false }
-parity-db = "0.4.9"
-parking_lot = "0.12.1"
+# num_enum = { version = "0.7.0", default-features = false }
+# parity-db = "0.4.9"
+# parking_lot = "0.12.1"
 rlp = { version = "0.5.2", default-features = false }
 
 scale-info = { version = "2.9.0", default-features = false, features = ["derive"] }
 serde = { version = "1.0", default-features = false, features = ["derive", "alloc"] }
 serde_json = "1.0"
-sqlx = { version = "0.7.1", default-features = false, features = ["macros"] }
-thiserror = "1.0"
 tokio = "1.29.1"
 # Substrate Client
 sc-basic-authorship = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
