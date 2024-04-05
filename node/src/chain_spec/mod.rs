@@ -1,11 +1,11 @@
 pub mod fake_chain_spec;
 
+#[cfg(feature = "firechain-mainnet")]
+pub mod mainnet_chain_spec;
 #[cfg(feature = "firechain-qa")]
 pub mod qa_chain_spec;
 #[cfg(feature = "firechain-thunder")]
 pub mod thunder_chain_spec;
-#[cfg(feature = "firechain-mainnet")]
-pub mod mainnet_chain_spec;
 
 #[cfg(not(feature = "firechain-qa"))]
 pub mod firechain_qa {
