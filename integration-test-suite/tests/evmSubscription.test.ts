@@ -77,7 +77,7 @@ async function sendTransaction(web3: Web3) {
   return tx;
 }
 
-describe("EVM related Subscription", function () {
+describe("EVM related Subscription using web3js/ethersjs", function () {
   this.timeout(100 * BLOCK_TIME);
   let subscription: any;
   let logsGenerated = 0;

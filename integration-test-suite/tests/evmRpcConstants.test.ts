@@ -10,7 +10,7 @@ import { expect } from "chai";
 
 let web3: Web3;
 
-describe("EVM related RPC Constants", function () {
+describe("EVM related RPC Constants using web3js/ethersjs", function () {
   this.timeout(100 * BLOCK_TIME);
   before(async () => {
     await spawnNodeForTestEVM();

@@ -14,8 +14,8 @@ edition = "2021"
 repository = "https://github.com/5ire-tech/5ireChain"
 
 [workspace.dependencies]
-async-trait = "0.1"
-bn = { package = "substrate-bn", version = "0.6", default-features = false }
+# async-trait = "0.1"
+# bn = { package = "substrate-bn", version = "0.6", default-features = false }
 clap = { version = "4.3", features = ["derive", "deprecated"] }
 environmental = { version = "1.1.4", default-features = false }
 ethereum = { version = "0.14.0", default-features = false }
@@ -25,21 +25,19 @@ futures = "0.3.28"
 hash-db = { version = "0.16.0", default-features = false }
 hex = { version = "0.4.3", default-features = false, features = ["alloc"] }
 hex-literal = "0.4.1"
-impl-serde = { version = "0.4.0", default-features = false }
+# impl-serde = { version = "0.4.0", default-features = false }
 jsonrpsee = "0.16.2"
 kvdb-rocksdb = "0.19.0"
 libsecp256k1 = { version = "0.7.1", default-features = false }
 log = { version = "0.4.17", default-features = false }
-num_enum = { version = "0.7.0", default-features = false }
-parity-db = "0.4.9"
-parking_lot = "0.12.1"
+# num_enum = { version = "0.7.0", default-features = false }
+# parity-db = "0.4.9"
+# parking_lot = "0.12.1"
 rlp = { version = "0.5.2", default-features = false }
 
 scale-info = { version = "2.9.0", default-features = false, features = ["derive"] }
 serde = { version = "1.0", default-features = false, features = ["derive", "alloc"] }
 serde_json = "1.0"
-sqlx = { version = "0.7.1", default-features = false, features = ["macros"] }
-thiserror = "1.0"
 tokio = "1.29.1"
 # Substrate Client
 sc-basic-authorship = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
@@ -49,9 +47,7 @@ sc-cli = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot
 sc-client-api = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
 sc-client-db = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
 sc-consensus = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
-sc-consensus-aura = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
 sc-consensus-grandpa = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
-sc-consensus-manual-seal = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
 sc-executor = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
 sc-keystore = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
 sc-network = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
@@ -75,7 +71,6 @@ sc-consensus-grandpa-rpc = { version = "0.10.0-dev", git = "https://github.com/p
 sc-consensus-slots = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
 sc-network-statement = { version = "0.10.0-dev",git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
 sc-rpc-spec-v2 = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
-sc-service-test = { version = "2.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
 sc-statement-store = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
 sc-storage-monitor = { version = "0.1.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
 sc-sync-state-rpc = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
@@ -85,7 +80,6 @@ sp-api = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-
 sp-block-builder = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
 sp-blockchain = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
 sp-consensus = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
-sp-consensus-aura = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
 sp-consensus-grandpa = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
 sp-core = { version = "21.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
 sp-database = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
@@ -110,7 +104,6 @@ sp-statement-store = { version = "4.0.0-dev", git = "https://github.com/parityte
 sp-tracing = { version = "10.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0"  }
 sp-transaction-storage-proof = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
 substrate-state-trie-migration-rpc = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0"  }
-substrate-rpc-client = { git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
 sp-staking = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
 sp-application-crypto = { version = "23.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
 sp-npos-elections = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
@@ -123,7 +116,6 @@ frame-support = { version = "4.0.0-dev", git = "https://github.com/paritytech/po
 frame-system = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
 frame-system-benchmarking = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
 frame-system-rpc-runtime-api = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
-pallet-aura = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
 pallet-balances = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
 pallet-sudo = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
 pallet-timestamp = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
@@ -201,29 +193,30 @@ try-runtime-cli = { git = "https://github.com/paritytech/polkadot-sdk.git", bran
 substrate-frame-cli = {  git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
 frame-try-runtime = { version = "0.10.0-dev", default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0"}
 # Frontier Client
-fc-api = { version = "1.0.0-dev", path = "client/api" }
-fc-cli = { version = "1.0.0-dev", path = "client/cli", default-features = false }
-fc-consensus = { version = "2.0.0-dev", path = "client/consensus" }
-fc-db = { version = "2.0.0-dev", path = "client/db", default-features = false }
-fc-mapping-sync = { version = "2.0.0-dev", path = "client/mapping-sync", default-features = false }
-fc-rpc = { version = "2.0.0-dev", path = "client/rpc", default-features = false }
-fc-rpc-core = { version = "1.1.0-dev", path = "client/rpc-core" }
-fc-storage = { version = "1.0.0-dev", path = "client/storage" }
+# git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0"
+fc-api = { version = "1.0.0-dev", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0" }
+fc-cli = { version = "1.0.0-dev", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
+fc-consensus = { version = "2.0.0-dev", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0" }
+fc-db = { version = "2.0.0-dev", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
+fc-mapping-sync = { version = "2.0.0-dev", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
+fc-rpc = { version = "2.0.0-dev", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
+fc-rpc-core = { version = "1.1.0-dev", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0" }
+fc-storage = { version = "1.0.0-dev", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0" }
 # Frontier Primitive
-fp-account = { version = "1.0.0-dev", path = "primitives/account", default-features = false }
-fp-consensus = { version = "2.0.0-dev", path = "primitives/consensus", default-features = false }
-fp-dynamic-fee = { version = "1.0.0", path = "primitives/dynamic-fee", default-features = false }
-fp-ethereum = { version = "1.0.0-dev", path = "primitives/ethereum", default-features = false }
-fp-evm = { version = "3.0.0-dev", path = "primitives/evm", default-features = false }
-fp-rpc = { version = "3.0.0-dev", path = "primitives/rpc", default-features = false }
-fp-self-contained = { version = "1.0.0-dev", path = "primitives/self-contained", default-features = false }
-fp-storage = { version = "2.0.0", path = "primitives/storage", default-features = false }
+fp-account = { version = "1.0.0-dev", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
+fp-consensus = { version = "2.0.0-dev", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
+fp-dynamic-fee = { version = "1.0.0", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
+fp-ethereum = { version = "1.0.0-dev", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
+fp-evm = { version = "3.0.0-dev", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
+fp-rpc = { version = "3.0.0-dev", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
+fp-self-contained = { version = "1.0.0-dev", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
+fp-storage = { version = "2.0.0", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
 # Frontier FRAME
-pallet-base-fee = { version = "1.0.0", path = "frame/base-fee", default-features = false }
-pallet-dynamic-fee = { version = "4.0.0-dev", path = "frame/dynamic-fee", default-features = false }
+pallet-base-fee = { version = "1.0.0", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
+pallet-dynamic-fee = { version = "4.0.0-dev", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
 pallet-ethereum = { version = "4.0.0-dev", path = "frame/ethereum", default-features = false }
 pallet-evm = { version = "6.0.0-dev", path = "frame/evm", default-features = false }
-pallet-evm-chain-id = { version = "1.0.0-dev", path = "frame/evm-chain-id", default-features = false }
+pallet-evm-chain-id = { version = "1.0.0-dev", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
 pallet-evm-precompile-modexp = { version = "2.0.0-dev", path = "frame/evm/precompile/modexp", default-features = false }
 pallet-evm-precompile-sha3fips = { version = "2.0.0-dev", path = "frame/evm/precompile/sha3fips", default-features = false }
 pallet-evm-precompile-simple = { version = "2.0.0-dev", path = "frame/evm/precompile/simple", default-features = false }

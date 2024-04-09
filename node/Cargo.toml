@@ -78,7 +78,6 @@ jsonrpc-core = "18.0.0"
 sc-rpc = { workspace = true }
 sp-api = { workspace = true }
 sc-rpc-api = { workspace = true }
-sc-service-test = { workspace = true }
 sc-block-builder = { workspace = true }
 sp-tracing = { workspace = true }
 sp-blockchain = { workspace = true }
@@ -112,19 +111,19 @@ frame-system-rpc-runtime-api = { workspace = true }
 
 
 # Frontier
-fc-api = { path = "../client/api" }
-fc-cli = { path = "../client/cli" }
-fc-consensus = { path = "../client/consensus" }
-fc-db = { path = "../client/db" }
-fc-mapping-sync = { path = "../client/mapping-sync" }
-fc-rpc = { path = "../client/rpc", default-features = false }
-fc-rpc-core = { path = "../client/rpc-core" }
-fp-consensus = { path = "../primitives/consensus" }
-fp-dynamic-fee = { path = "../primitives/dynamic-fee" }
-fp-evm = { version = "3.0.0-dev", path = "../primitives/evm", default-features = false }
-fp-rpc = { path = "../primitives/rpc" }
-fp-storage = { path = "../primitives/storage" }
-pallet-evm = { path = "../frame/evm" }
+fc-api = { workspace = true }
+fc-cli = { workspace = true }
+fc-consensus = { workspace = true }
+fc-db = { workspace = true, features = ["rocksdb"] }
+fc-mapping-sync = { workspace = true }
+fc-rpc = { workspace = true, default-features = false }
+fc-rpc-core = { workspace = true }
+fp-consensus = { workspace = true }
+fp-dynamic-fee = { workspace = true }
+fp-evm = { workspace = true, default-features = false }
+fp-rpc = { workspace = true }
+fp-storage = { workspace = true }
+pallet-evm = { workspace = true }
 fc-storage = { workspace = true }
 
 
@@ -150,19 +149,6 @@ try-runtime-cli = { optional = true, workspace = true }
 
 [dev-dependencies]
 sc-client-db = { workspace = true }
-futures = "0.3.21"
-tempfile = "3.1.0"
-assert_cmd = "2.0.2"
-nix = { version = "0.26.1", features = ["signal"] }
-serde_json = "1.0"
-regex = "1.6.0"
-platforms = "3.0"
-soketto = "0.7.1"
-criterion = { version = "0.4.0", features = ["async_tokio"] }
-tokio = { version = "1.22.0", features = ["macros", "time", "parking_lot"] }
-tokio-util = { version = "0.7.4", features = ["compat"] }
-wait-timeout = "0.2"
-substrate-rpc-client = { workspace = true }
 pallet-timestamp = { workspace = true }
 
 [features]

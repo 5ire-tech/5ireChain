@@ -61,7 +61,7 @@ async function init() {
   return aliceEthAccount;
 }
 
-describe("EVM related Balance", function () {
+describe("EVM related Balance using web3js/ethersjs", function () {
   this.timeout(100 * BLOCK_TIME);
   before(async () => {
     await spawnNodeForTestEVM();

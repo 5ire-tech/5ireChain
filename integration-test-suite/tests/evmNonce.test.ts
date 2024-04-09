@@ -58,7 +58,7 @@ async function init() {
   return aliceEthAccount;
 }
 
-describe("EVM related Nonce", function () {
+describe("EVM related Nonce using web3js/ethersjs", function () {
   this.timeout(100 * BLOCK_TIME);
   before(async () => {
     await spawnNodeForTestEVM();
