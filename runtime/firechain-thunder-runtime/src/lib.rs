@@ -161,7 +161,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("5ire-Node"),
 	impl_name: create_runtime_str!("5ire-Node"),
 	authoring_version: 1,
-	spec_version: 119,
+	spec_version: 100,
 	impl_version: 0,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
