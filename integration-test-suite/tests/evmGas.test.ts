@@ -57,4 +57,19 @@ describe("EVM related Gas using web3js/ethersjs", function () {
       .estimateGas({ from: GENESIS_ACCOUNTS[0] });
     expect(gasEstimation).to.eq(21632);
   });
+
+  it("estimate gas with gasPrice value is 0x0 ", async function () {
+    let result = await web3.eth.estimateGas({
+        from: GENESIS_ACCOUNTS[0],
+        data: ERC20_BYTECODES,
+        gasPrice: "0x0",
+    });
+    expect(result).to.equal(894198);
+    result = await web3.eth.estimateGas({
+        from: GENESIS_ACCOUNTS[0],
+        data: ERC20_BYTECODES,
+    });
+    expect(result).to.equal(894198);
+});
+
 });
