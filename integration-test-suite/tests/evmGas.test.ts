@@ -7,6 +7,7 @@ import {
   TEST_ACCOUNT,
   ETH_BLOCK_GAS_LIMIT,
   GENESIS_ACCOUNT_0_PRIVATE_KEY,
+  INVALID_OPCODE_BYTECODE,
 } from "../utils/constants";
 import {
   customRequest,
@@ -17,6 +18,7 @@ import {
 import { sleep } from "../utils/setup";
 
 import { expect } from "chai";
+import { step } from "mocha-steps";
 let web3: Web3;
 
 const TRANSFER_VALUE = "1";
@@ -25,6 +27,7 @@ const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
 
 describe("EVM related Gas using web3js/ethersjs", function () {
   this.timeout(100 * BLOCK_TIME);
+  let contractAddess;
   before(async () => {
     await spawnNodeForTestEVM();
     // Create instance web3
@@ -156,6 +159,31 @@ describe("EVM related Gas using web3js/ethersjs", function () {
     ]);
     expect((createReceipt as any).error.message).to.equal("exceeds block gas limit");
   });
+  
+  it("EVM related Invalid opcode Estimate Gas using web3js/ethersjs", async function () {
+    
+    const tx = await web3.eth.accounts.signTransaction(
+      {
+        from: GENESIS_ACCOUNTS[0],
+        data: INVALID_OPCODE_BYTECODE,
+        value: "0x00",
+        gasPrice: "0x3B9ACA00",
+        gas: "0x100000",
+      },
+      GENESIS_ACCOUNT_0_PRIVATE_KEY
+    );
+    const txHash = await customRequest(web3, "eth_sendRawTransaction", [tx.rawTransaction]);
+    await sleep(3000);
+    contractAddess = (await web3.eth.getTransactionReceipt(txHash.result)).contractAddress;
+    expect(contractAddess).to.not.null;
 
+    let estimate = await web3.eth.estimateGas({
+			from: GENESIS_ACCOUNTS[0],
+			to: contractAddess,
+			data: "0x28b5e32b", // selector for the contract's `call` method
+		});
+		expect(estimate).to.equal(43323);
+  });
 
 });
+
