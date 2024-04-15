@@ -1,5 +1,5 @@
 import Web3 from "web3";
-import { BLOCK_TIME, SECONDS, GENESIS_ACCOUNTS } from "../utils/constants";
+import { BLOCK_TIME, SECONDS, GENESIS_ACCOUNTS, TEST_CONTRACT_ADDRESS, TEST_ACCOUNT } from "../utils/constants";
 import {
   customRequest,
   killNodeForTestEVM,
@@ -11,10 +11,8 @@ import { sleep } from "../utils/setup";
 import { expect } from "chai";
 let web3: Web3;
 
-const TEST_ACCOUNT = "0xdd33Af49c851553841E94066B54Fd28612522901";
-const TEST_ACCOUNT_PRIVATE_KEY =
-  "0x4ca933bffe83185dda76e7913fc96e5c97cdb7ca1fbfcc085d6376e6f564ef71";
 
+const TRANSFER_VALUE = "1";
 const ERC20_ABI = require("./contracts/MyToken.json").abi;
 const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
 
@@ -46,5 +44,17 @@ describe("EVM related Gas using web3js/ethersjs", function () {
       data: ERC20_BYTECODES,
     });
     expect(gasEstimation).to.eq(894198);
+  });
+
+  it("estimate gas for contract call", async function () {
+    const erc20Contract = new web3.eth.Contract(
+      ERC20_ABI, TEST_CONTRACT_ADDRESS
+    );
+
+    let amount = web3.utils.toWei(TRANSFER_VALUE, "ether");
+    let gasEstimation = await erc20Contract.methods
+      .transfer(TEST_ACCOUNT, amount)
+      .estimateGas({ from: GENESIS_ACCOUNTS[0] });
+    expect(gasEstimation).to.eq(21632);
   });
 });
