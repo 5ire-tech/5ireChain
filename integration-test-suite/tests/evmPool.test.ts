@@ -21,6 +21,7 @@ import chaiAsPromised from "chai-as-promised";
 let web3: Web3;
 
 const TEST_ACCOUNT = "0xdd33Af49c851553841E94066B54Fd28612522901";
+const TEST_ACCOUNT_2 = GENESIS_ACCOUNTS[1];
 const TEST_ACCOUNT_PRIVATE_KEY =
   "0x4ca933bffe83185dda76e7913fc96e5c97cdb7ca1fbfcc085d6376e6f564ef71";
 const TRANFER_VALUE = "1"; // 1 5IRE must be higher than ExistentialDeposit
@@ -104,36 +105,117 @@ describe("EVM related Pool using web3js/ethersjs", function () {
   });
 
   it("EVM RPC pool error - already known", async function () {
-    let tx1 = await createRawTransfer(
+    const nonce = await web3.eth.getTransactionCount(GENESIS_ACCOUNTS[0]);
+    let gasPrice = await web3.eth.getGasPrice();
+    let tx = await createRawTransferLegacy(
       GENESIS_ACCOUNTS[0],
       TEST_ACCOUNT,
       "1",
+      21000,
+      web3.utils.toHex(gasPrice),
+      nonce,
       GENESIS_ACCOUNT_0_PRIVATE_KEY
     );
-    await web3.eth.sendSignedTransaction(tx1.rawTransaction as string);
+    await web3.eth.sendSignedTransaction(tx.rawTransaction as string);
+    let result = await customRequest(web3, "eth_sendRawTransaction", [
+      tx.rawTransaction,
+    ]);
+    expect(result?.error?.message).to.be.equal("already known");
+  });
+
+  it("EVM RPC pool error - exceeds block gas limit", async function () {
+    const nonce = await web3.eth.getTransactionCount(
+      GENESIS_ACCOUNTS[0],
+      "latest"
+    );
+    let gasPriceTx = web3.utils.toWei("15", "gwei");
+    let tx = await createRawTransferLegacy(
+      GENESIS_ACCOUNTS[0],
+      TEST_ACCOUNT,
+      "1",
+      10_000_000_000,
+      web3.utils.toHex(gasPriceTx),
+      nonce,
+      GENESIS_ACCOUNT_0_PRIVATE_KEY
+    );
+
+    let result = await customRequest(web3, "eth_sendRawTransaction", [
+      tx.rawTransaction,
+    ]);
+    expect(result?.error?.message).to.be.equal("exceeds block gas limit");
+  });
+
+  it("EVM RPC pool error - max priority fee per gas higher than max fee per gas", async function () {
+    const nonce = await web3.eth.getTransactionCount(
+      GENESIS_ACCOUNTS[0],
+      "latest"
+    );
+
     expect(
-        web3.eth.sendSignedTransaction(tx1.rawTransaction as string)
-    ).to.be.rejectedWith(Error, "already known");
+      createRawTransferEIP1559(
+        GENESIS_ACCOUNTS[0],
+        TEST_ACCOUNT,
+        "1",
+        21000,
+        100_000_000_000,
+        200_000_000_000,
+        nonce,
+        GENESIS_ACCOUNT_0_PRIVATE_KEY
+      )
+    ).rejectedWith(Error, "maxFeePerGas cannot be less than maxPriorityFeePerGas");
   });
 });
 
-async function createRawTransfer(
+async function createRawTransferLegacy(
   from: string,
   to: string,
   amount: string,
+  gas: number,
+  gasPrice: string,
+  nonce: number,
   privateKey: string
-) {
-  const transaction = {
-    from: from,
-    to: to,
-    value: web3.utils.toWei(amount, "ether"),
-    gas: 21000,
-  };
+): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const transaction = {
+      from: from,
+      to: to,
+      value: web3.utils.toWei(amount, "ether"),
+      gas: gas,
+      gasPrice: gasPrice,
+      nonce: nonce,
+    };
 
-  try {
-    const tx = await web3.eth.accounts.signTransaction(transaction, privateKey);
-    return tx;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+    web3.eth.accounts
+      .signTransaction(transaction, privateKey)
+      .then((signedTx) => resolve(signedTx))
+      .catch((error) => reject(new Error(error.message)));
+  });
+}
+
+async function createRawTransferEIP1559(
+  from: string,
+  to: string,
+  amount: string,
+  gas: number,
+  maxFeePerGas: number,
+  maxPriorityFeePerGas: number,
+  nonce: number,
+  privateKey: string
+): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const transaction = {
+      from: from,
+      to: to,
+      value: web3.utils.toWei(amount, "ether"),
+      gas: gas,
+      maxFeePerGas: maxFeePerGas,
+      maxPriorityFeePerGas: maxPriorityFeePerGas,
+      nonce: nonce,
+    };
+
+    web3.eth.accounts
+      .signTransaction(transaction, privateKey)
+      .then((signedTx) => resolve(signedTx))
+      .catch((error) => reject(new Error(error.message)));
+  });
 }
