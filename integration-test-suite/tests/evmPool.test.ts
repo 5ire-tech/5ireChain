@@ -13,9 +13,10 @@ import {
 } from "../utils/util";
 import { sleep, waitForEvent } from "../utils/setup";
 
-import { expect } from "chai";
+import { expect, use } from "chai";
 import { step } from "mocha-steps";
 import { Wallet, ethers } from "ethers";
+import chaiAsPromised from "chai-as-promised";
 
 let web3: Web3;
 
@@ -32,6 +33,7 @@ let contractAddress: string;
 describe("EVM related Pool using web3js/ethersjs", function () {
   this.timeout(100 * BLOCK_TIME);
   before(async () => {
+    use(chaiAsPromised);
     await spawnNodeForTestEVM();
     // Create instance web3
     web3 = new Web3(
@@ -86,15 +88,52 @@ describe("EVM related Pool using web3js/ethersjs", function () {
     const data = contract.methods
       .transfer(TEST_ACCOUNT, amountTransfer)
       .encodeABI();
-    expect(web3.eth.accounts.signTransaction(
-      {
-        to: contractAddress,
-        data,
-        // we intentionally set gas too low 
-        gas: 2000,
-      },
-      GENESIS_ACCOUNT_0_PRIVATE_KEY
-    )).to.throw;
 
+    // Issue: Intrinsic gas too low
+    expect(
+      web3.eth.accounts.signTransaction(
+        {
+          to: contractAddress,
+          data,
+          // we intentionally set gas too low
+          gas: 2000,
+        },
+        GENESIS_ACCOUNT_0_PRIVATE_KEY
+      )
+    ).to.throw;
+  });
+
+  it("EVM RPC pool error - already known", async function () {
+    let tx1 = await createRawTransfer(
+      GENESIS_ACCOUNTS[0],
+      TEST_ACCOUNT,
+      "1",
+      GENESIS_ACCOUNT_0_PRIVATE_KEY
+    );
+    await web3.eth.sendSignedTransaction(tx1.rawTransaction as string);
+    expect(
+        web3.eth.sendSignedTransaction(tx1.rawTransaction as string)
+    ).to.be.rejectedWith(Error, "already known");
   });
 });
+
+async function createRawTransfer(
+  from: string,
+  to: string,
+  amount: string,
+  privateKey: string
+) {
+  const transaction = {
+    from: from,
+    to: to,
+    value: web3.utils.toWei(amount, "ether"),
+    gas: 21000,
+  };
+
+  try {
+    const tx = await web3.eth.accounts.signTransaction(transaction, privateKey);
+    return tx;
+  } catch (error) {
+    throw new Error(error as string);
+  }
+}
