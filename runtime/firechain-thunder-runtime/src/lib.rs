@@ -72,7 +72,6 @@ use sp_inherents::{CheckInherentsResult, InherentData};
 #[cfg(feature = "with-paritydb-weights")]
 use frame_support::weights::constants::ParityDbWeight as RuntimeDbWeight;
 // Frontier
-use fp_evm::weight_per_gas;
 use fp_rpc::TransactionStatus;
 //
 use pallet_ethereum::{
@@ -1617,16 +1616,15 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 		None
 	}
 }
-const BLOCK_GAS_LIMIT: u64 = 75_000_000;
-const MAX_POV_SIZE: u64 = 5 * 1024 * 1024;
 
 parameter_types! {
 	pub const ChainId: u64 = 997;
 	pub BlockGasLimit: U256 = U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT.ref_time() / WEIGHT_PER_GAS);
-	pub const GasLimitPovSizeRatio: u64 = BLOCK_GAS_LIMIT.saturating_div(MAX_POV_SIZE);
+	pub const GasLimitPovSizeRatio: u64 = 4;
 	pub PrecompilesValue: FrontierPrecompiles<Runtime> = FrontierPrecompiles::<_>::new();
-	pub WeightPerGas: Weight = Weight::from_parts(weight_per_gas(BLOCK_GAS_LIMIT, NORMAL_DISPATCH_RATIO, WEIGHT_PER_GAS), 0);
+	pub WeightPerGas: Weight = Weight::from_parts(WEIGHT_PER_GAS, 0);
 }
+
 parameter_types! {
 	pub BoundDivision: U256 = U256::from(1024);
 }
