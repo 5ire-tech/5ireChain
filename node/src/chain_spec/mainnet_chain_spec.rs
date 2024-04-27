@@ -583,7 +583,7 @@ fn development_config_genesis() -> RuntimeGenesisConfig {
 pub fn development_config() -> ChainSpec {
 	ChainSpec::from_genesis(
 		"Development",
-		"mainnet_5ireChian_dev",
+		"mainnet_5ireChain_dev",
 		ChainType::Development,
 		development_config_genesis,
 		vec![],
