@@ -15,22 +15,20 @@ name = "firechain-node"
 
 [dependencies]
 array-bytes = "6.1"
-# clap = { version = "3.1.18", features = ["derive"] }
 clap = { version = "4.2.5", features = ["derive"], optional = true }
 
-#clap_complete = { version = "4.0.2", optional = true }
 hex-literal = "0.3.4"
 codec = { package = "parity-scale-codec", version = "3.6.1" }
 rand = "0.8"
 jsonrpsee = { version = "0.16.2", features = ["server"] }
 hex = { version = "0.4", default-features = false }
-serde_json = "1.0.85"
+serde_json = { workspace = true }
 serde = { version = "1.0.163", features = ["derive"] }
-log = "0.4.17"
-#rand = "0.8"
+log = { workspace = true }
 
 
-futures = "0.3.21"
+
+futures = { workspace = true }
 sc-cli = { workspace = true }
 sp-core = { workspace = true }
 sc-executor = { workspace = true }
@@ -91,8 +89,6 @@ pallet-transaction-payment-rpc-runtime-api = { workspace = true }
 #pallet-contracts-rpc = {   workspace = true  }
 substrate-state-trie-migration-rpc = { workspace = true }
 sc-authority-discovery = { workspace = true }
-pallet-assets = { workspace = true }
-pallet-asset-tx-payment = { workspace = true }
 sp-storage = { workspace = true }
 sp-trie = { workspace = true }
 sp-statement-store = { workspace = true }
@@ -104,7 +100,6 @@ frame-benchmarking-cli = { optional = true, workspace = true }
 # Cli for try runtime
 try-runtime-cli = { optional = true, workspace = true }
 # frame dependencies
-pallet-im-online = { workspace = true }
 frame-system = { workspace = true }
 pallet-transaction-payment = { workspace = true }
 frame-system-rpc-runtime-api = { workspace = true }
