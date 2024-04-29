@@ -6,7 +6,7 @@ export const ACC1_PK =
 export const ACC2_PK =
   "0x0000000000000000000000000000000000000000000000000000000000000002";
 
-export const ETH_BLOCK_GAS_LIMIT = 75000000; // The same configuration as runtime
+export const ETH_BLOCK_GAS_LIMIT = 30000000; // The same configuration as runtime
 export const ETH_BLOCK_POV_LIMIT = 5 * 1024 * 1024; // The same configuration as runtime
 
 export const GENESIS_ACCOUNT_BALANCE = "19342813113834066795298815";
