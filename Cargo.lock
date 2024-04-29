@@ -2520,6 +2520,7 @@ dependencies = [
  "mmr-rpc",
  "node-primitives",
  "pallet-evm 6.0.0-dev",
+ "pallet-im-online 4.0.0-dev",
  "pallet-timestamp",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc",
