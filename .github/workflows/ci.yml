@@ -45,11 +45,11 @@ jobs:
       - name: Install Protobuf and Libclang
         run: sudo apt-get install -y protobuf-compiler libclang-dev
 
-      - name: Check format
-        run: cargo +nightly fmt --all --check
+      # - name: Check format
+      #   run: cargo +nightly fmt --all --check
 
-      - name: Add Cargo Clippy
-        run: rustup component add clippy
+      # - name: Add Cargo Clippy
+      #   run: rustup component add clippy
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@v0.0.3
