@@ -29,7 +29,6 @@ use fp_evm::GenesisAccount;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sc_chain_spec::ChainSpecExtension;
 use sc_service::ChainType;
-use sc_telemetry::TelemetryEndpoints;
 use serde::{Deserialize, Serialize};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
@@ -328,7 +327,7 @@ pub fn testnet_genesis(
 	root_key: AccountId,
 	endowed_accounts: Option<Vec<AccountId>>,
 ) -> RuntimeGenesisConfig {
-	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
+	let endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
 		vec![
 			get_account_id_from_seed::<sr25519::Public>("Alice"),
 			get_account_id_from_seed::<sr25519::Public>("Bob"),
@@ -344,14 +343,16 @@ pub fn testnet_genesis(
 			get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
 		]
 	});
+
+	let mut endowed_accounts_validator: Vec<AccountId> = Vec::new();
 	// endow all authorities and nominators.
 	initial_authorities
 		.iter()
 		.map(|x| &x.0)
 		.chain(initial_nominators.iter())
 		.for_each(|x| {
-			if !endowed_accounts.contains(x) {
-				endowed_accounts.push(x.clone())
+			if !endowed_accounts_validator.contains(x) {
+				endowed_accounts_validator.push(x.clone())
 			}
 		});
 
@@ -374,13 +375,27 @@ pub fn testnet_genesis(
 
 
 	// Based on current tokenomics 
-	const ENDOWMENT: Balance = 2 * DOLLARS;
+	// Initial validators Balance
+	// Total Balance = Bonding Balance(16_000_000 5IRE) + Tranferrable Balance(2 5IRE)
+	// Bonding Balance: Staking
+	// Trafferable Balance: Charge Fee
+	const ENDOWMENT_AUTHORITY: Balance = 16_000_002 * DOLLARS;
+	
 	const STASH: Balance = 16_000_000 * DOLLARS;
+
+	// Pre-minted sudo key for charging transaction fee
+	const ENDOWMENT_SUDO: Balance = 10 * DOLLARS;
+
+	let mut endowed_balance: Vec<(AccountId, Balance)> = endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT_SUDO)).collect();
+	let endowed_validator_balance: Vec<(AccountId, Balance)> = endowed_accounts_validator.iter().cloned().map(|x| (x, ENDOWMENT_AUTHORITY)).collect();
+	
+	endowed_balance.extend(endowed_validator_balance);
+
 
 	RuntimeGenesisConfig {
 		system: SystemConfig { code: wasm_binary_unwrap().to_vec(), ..Default::default() },
 		balances: BalancesConfig {
-			balances: endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT)).collect(),
+			balances: endowed_balance,
 		},
 		indices: IndicesConfig { indices: vec![] },
 		session: SessionConfig {
