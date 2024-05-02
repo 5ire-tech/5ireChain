@@ -45,7 +45,6 @@ pub use node_primitives::{AccountId, Balance, Signature};
 
 type AccountPublic = <Signature as Verify>::Signer;
 
-
 const DEFAULT_PROTOCOL_ID: &str = "thunder-5ire";
 /// Node `ChainSpec` extensions.
 ///
@@ -373,30 +372,31 @@ pub fn testnet_genesis(
 		}))
 		.collect::<Vec<_>>();
 
-
-	// Based on current tokenomics 
+	// Based on current tokenomics
 	// Initial validators Balance
-	// Total Balance = Bonding Balance(16_000_000 5IRE) + Tranferrable Balance(2 5IRE)
+	// Total Balance = Bonding Balance(1_000_000 5IRE) + Tranferrable Balance(2 5IRE)
 	// Bonding Balance: Staking
 	// Trafferable Balance: Charge Fee
-	const ENDOWMENT_AUTHORITY: Balance = 16_000_002 * DOLLARS;
-	
-	const STASH: Balance = 16_000_000 * DOLLARS;
+	const ENDOWMENT_AUTHORITY: Balance = 1_000_002 * DOLLARS;
+
+	const STASH: Balance = 1_000_000 * DOLLARS;
 
 	// Pre-minted sudo key for charging transaction fee
 	const ENDOWMENT_SUDO: Balance = 10 * DOLLARS;
 
-	let mut endowed_balance: Vec<(AccountId, Balance)> = endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT_SUDO)).collect();
-	let endowed_validator_balance: Vec<(AccountId, Balance)> = endowed_accounts_validator.iter().cloned().map(|x| (x, ENDOWMENT_AUTHORITY)).collect();
-	
-	endowed_balance.extend(endowed_validator_balance);
+	let mut endowed_balance: Vec<(AccountId, Balance)> =
+		endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT_SUDO)).collect();
+	let endowed_validator_balance: Vec<(AccountId, Balance)> = endowed_accounts_validator
+		.iter()
+		.cloned()
+		.map(|x| (x, ENDOWMENT_AUTHORITY))
+		.collect();
 
+	endowed_balance.extend(endowed_validator_balance);
 
 	RuntimeGenesisConfig {
 		system: SystemConfig { code: wasm_binary_unwrap().to_vec(), ..Default::default() },
-		balances: BalancesConfig {
-			balances: endowed_balance,
-		},
+		balances: BalancesConfig { balances: endowed_balance },
 		indices: IndicesConfig { indices: vec![] },
 		session: SessionConfig {
 			keys: initial_authorities
@@ -511,7 +511,6 @@ pub fn development_genesis(
 			(x.clone(), x.clone(), STASH, StakerStatus::Nominator(nominations))
 		}))
 		.collect::<Vec<_>>();
-
 
 	const ENDOWMENT: Balance = 5_000_000_000 * DOLLARS;
 	const STASH: Balance = ENDOWMENT / 1000;
