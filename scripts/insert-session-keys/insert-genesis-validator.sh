@@ -25,7 +25,7 @@ function insert_keys {
     done < $validator_file
 }
 
-insert_keys "validator1" 9944
+insert_keys "validator1" 9946
 insert_keys "validator2" 9947
 insert_keys "validator3" 9948
 insert_keys "validator4" 9949
