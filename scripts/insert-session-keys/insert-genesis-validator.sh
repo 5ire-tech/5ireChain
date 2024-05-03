@@ -26,9 +26,6 @@ function insert_keys {
 }
 
 insert_keys "validator1" 9944
-insert_keys "validator2" 9945
-insert_keys "validator3" 9946
-insert_keys "validator4" 9947
-insert_keys "validator5" 9948
-insert_keys "validator6" 9949
-insert_keys "validator7" 9950
+insert_keys "validator2" 9947
+insert_keys "validator3" 9948
+insert_keys "validator4" 9949
