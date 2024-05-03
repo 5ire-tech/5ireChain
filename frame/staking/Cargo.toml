@@ -44,7 +44,6 @@ sp-core = { workspace = true }
 sp-npos-elections = { workspace = true }
 pallet-balances = { workspace = true }
 pallet-timestamp = { workspace = true }
-pallet-staking-reward-curve = { path = "reward-curve" }
 pallet-bags-list = { workspace = true }
 substrate-test-utils = { workspace = true }
 frame-benchmarking = { workspace = true }

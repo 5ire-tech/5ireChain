@@ -24,10 +24,9 @@ use frame_election_provider_support::{
 };
 use frame_support::{
 	defensive,
-	dispatch::WithPostDispatchInfo,
 	pallet_prelude::*,
 	traits::{
-		Currency, Defensive, DefensiveResult, EstimateNextNewSession, Get, Imbalance,
+		Currency, Defensive,EstimateNextNewSession, Get,
 		LockableCurrency, OnUnbalanced, TryCollect, UnixTime, WithdrawReasons,
 	},
 	weights::Weight,
@@ -141,142 +140,7 @@ impl<T: Config> Pallet<T> {
 
 		Ok(used_weight)
 	}
-
-	pub(super) fn do_payout_stakers(
-		validator_stash: T::AccountId,
-		era: EraIndex,
-	) -> DispatchResultWithPostInfo {
-		// Validate input data
-		let current_era = CurrentEra::<T>::get().ok_or_else(|| {
-			Error::<T>::InvalidEraToReward
-				.with_weight(T::WeightInfo::payout_stakers_alive_staked(0))
-		})?;
-		let history_depth = T::HistoryDepth::get();
-		ensure!(
-			era <= current_era && era >= current_era.saturating_sub(history_depth),
-			Error::<T>::InvalidEraToReward
-				.with_weight(T::WeightInfo::payout_stakers_alive_staked(0))
-		);
-
-		// Note: if era has no reward to be claimed, era may be future. better not to update
-		// `ledger.claimed_rewards` in this case.
-		let era_payout = <ErasValidatorReward<T>>::get(&era).ok_or_else(|| {
-			Error::<T>::InvalidEraToReward
-				.with_weight(T::WeightInfo::payout_stakers_alive_staked(0))
-		})?;
-
-		let controller = Self::bonded(&validator_stash).ok_or_else(|| {
-			Error::<T>::NotStash.with_weight(T::WeightInfo::payout_stakers_alive_staked(0))
-		})?;
-		let mut ledger = <Ledger<T>>::get(&controller).ok_or(Error::<T>::NotController)?;
-
-		ledger
-			.claimed_rewards
-			.retain(|&x| x >= current_era.saturating_sub(history_depth));
-
-		match ledger.claimed_rewards.binary_search(&era) {
-			Ok(_) =>
-				return Err(Error::<T>::AlreadyClaimed
-					.with_weight(T::WeightInfo::payout_stakers_alive_staked(0))),
-			Err(pos) => ledger
-				.claimed_rewards
-				.try_insert(pos, era)
-				// Since we retain era entries in `claimed_rewards` only upto
-				// `HistoryDepth`, following bound is always expected to be
-				// satisfied.
-				.defensive_map_err(|_| Error::<T>::BoundNotMet)?,
-		}
-
-		let exposure = <ErasStakersClipped<T>>::get(&era, &ledger.stash);
-
-		// Input data seems good, no errors allowed after this point
-
-		<Ledger<T>>::insert(&controller, &ledger);
-
-		// Get Era reward points. It has TOTAL and INDIVIDUAL
-		// Find the fraction of the era reward that belongs to the validator
-		// Take that fraction of the eras rewards to split to nominator and validator
-		//
-		// Then look at the validator, figure out the proportion of their reward
-		// which goes to them and each of their nominators.
-
-		let era_reward_points = <ErasRewardPoints<T>>::get(&era);
-		let total_reward_points = era_reward_points.total;
-		let validator_reward_points = era_reward_points
-			.individual
-			.get(&ledger.stash)
-			.copied()
-			.unwrap_or_else(Zero::zero);
-
-		// Nothing to do if they have no reward points.
-		if validator_reward_points.is_zero() {
-			return Ok(Some(T::WeightInfo::payout_stakers_alive_staked(0)).into())
-		}
-
-		// This is the fraction of the total reward that the validator and the
-		// nominators will get.
-		let validator_total_reward_part =
-			Perbill::from_rational(validator_reward_points, total_reward_points);
-
-		// This is how much validator + nominators are entitled to.
-		let validator_total_payout = validator_total_reward_part * era_payout;
-
-		let validator_prefs = Self::eras_validator_prefs(&era, &validator_stash);
-		// Validator first gets a cut off the top.
-		let validator_commission = validator_prefs.commission;
-		let validator_commission_payout = validator_commission * validator_total_payout;
-
-		let validator_leftover_payout = validator_total_payout - validator_commission_payout;
-		// Now let's calculate how this is split to the validator.
-		let validator_exposure_part = Perbill::from_rational(exposure.own, exposure.total);
-		let validator_staking_payout = validator_exposure_part * validator_leftover_payout;
-
-		Self::deposit_event(Event::<T>::PayoutStarted {
-			era_index: era,
-			validator_stash: ledger.stash.clone(),
-		});
-
-		let mut total_imbalance = PositiveImbalanceOf::<T>::zero();
-		// We can now make total validator payout:
-		if let Some(imbalance) =
-			Self::make_payout(&ledger.stash, validator_staking_payout + validator_commission_payout)
-		{
-			Self::deposit_event(Event::<T>::Rewarded {
-				stash: ledger.stash,
-				amount: imbalance.peek(),
-			});
-			total_imbalance.subsume(imbalance);
-		}
-
-		// Track the number of payout ops to nominators. Note:
-		// `WeightInfo::payout_stakers_alive_staked` always assumes at least a validator is paid
-		// out, so we do not need to count their payout op.
-		let mut nominator_payout_count: u32 = 0;
-
-		// Lets now calculate how this is split to the nominators.
-		// Reward only the clipped exposures. Note this is not necessarily sorted.
-		for nominator in exposure.others.iter() {
-			let nominator_exposure_part = Perbill::from_rational(nominator.value, exposure.total);
-
-			let nominator_reward: BalanceOf<T> =
-				nominator_exposure_part * validator_leftover_payout;
-			// We can now make nominator payout:
-			if let Some(imbalance) = Self::make_payout(&nominator.who, nominator_reward) {
-				// Note: this logic does not count payouts for `RewardDestination::None`.
-				nominator_payout_count += 1;
-				let e =
-					Event::<T>::Rewarded { stash: nominator.who.clone(), amount: imbalance.peek() };
-				Self::deposit_event(e);
-				total_imbalance.subsume(imbalance);
-			}
-		}
-
-		T::Reward::on_unbalanced(total_imbalance);
-		debug_assert!(nominator_payout_count <= T::MaxNominatorRewardedPerValidator::get());
-		Ok(Some(T::WeightInfo::payout_stakers_alive_staked(nominator_payout_count)).into())
-	}
-
-	/// Update the ledger for a controller.
+    /// Update the ledger for a controller.
 	///
 	/// This will also update the stash lock.
 	pub(crate) fn update_ledger(controller: &T::AccountId, ledger: &StakingLedger<T>) {
@@ -456,12 +320,6 @@ impl<T: Config> Pallet<T> {
 			let issuance = T::Currency::total_issuance();
 			let (validator_payout, remainder) =
 				T::EraPayout::era_payout(staked, issuance, era_duration);
-
-			Self::deposit_event(Event::<T>::EraPaid {
-				era_index: active_era.index,
-				validator_payout,
-				remainder,
-			});
 
 			// Set ending era reward.
 			<ErasValidatorReward<T>>::insert(&active_era.index, validator_payout);

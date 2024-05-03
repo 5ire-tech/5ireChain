@@ -173,7 +173,6 @@ pallet-root-testing = { version = "1.0.0-dev", git = "https://github.com/parityt
 # Pallet implementation
 pallet-esg = { version = "1.0.0", path = "frame/esg", default-features = false}
 pallet-staking = { version = "4.0.0-dev", path = "frame/staking", default-features = false}
-pallet-staking-reward-curve = { version = "4.0.0-dev", path = "frame/staking/reward-curve", default-features = false}
 pallet-staking-runtime-api = { version = "4.0.0-dev", path = "frame/staking/runtime-api", default-features = false}
 pallet-session = { version = "4.0.0-dev", path = "frame/session", default-features = false}
 pallet-session-benchmarking = { version = "4.0.0-dev", path = "frame/session/benchmarking", default-features = false}

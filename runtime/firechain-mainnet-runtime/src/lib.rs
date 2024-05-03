@@ -87,7 +87,6 @@ use precompiles::FrontierPrecompiles;
 use frame_election_provider_support::bounds::ElectionBoundsBuilder;
 use sp_runtime::{
 	create_runtime_str,
-	curve::PiecewiseLinear,
 	generic, impl_opaque_keys,
 	traits::{
 		self, AccountIdConversion, BlakeTwo256, Block as BlockT, Bounded, ConvertInto,
@@ -547,23 +546,10 @@ impl pallet_session::historical::Config for Runtime {
 	type FullIdentification = pallet_staking::Exposure<AccountId, Balance>;
 	type FullIdentificationOf = pallet_staking::ExposureOf<Runtime>;
 }
-
-pallet_staking_reward_curve::build! {
-	const REWARD_CURVE: PiecewiseLinear<'static> = curve!(
-		min_inflation: 0_025_000,
-		max_inflation: 0_100_000,
-		ideal_stake: 0_500_000,
-		falloff: 0_050_000,
-		max_piece_count: 40,
-		test_precision: 0_005_000,
-	);
-}
-
 parameter_types! {
 	pub const SessionsPerEra: sp_staking::SessionIndex = 1;
 	pub const BondingDuration: sp_staking::EraIndex = 4;
 	pub const SlashDeferDuration: sp_staking::EraIndex = 1; // 1/4 the bonding duration.
-	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
 	pub const MaxNominatorRewardedPerValidator: u32 = 256;
 	pub const OffendingValidatorsThreshold: Perbill = Perbill::from_percent(17);
 	pub OffchainRepeat: BlockNumber = 5;
@@ -594,7 +580,8 @@ impl pallet_staking::Config for Runtime {
 		pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 3, 4>,
 	>;
 	type SessionInterface = Self;
-	type EraPayout = pallet_staking::ConvertCurve<RewardCurve>;
+	type EraPayout = ();
+
 	type NextNewSession = Session;
 	type MaxNominatorRewardedPerValidator = MaxNominatorRewardedPerValidator;
 	type OffendingValidatorsThreshold = OffendingValidatorsThreshold;
@@ -1114,7 +1101,6 @@ parameter_types! {
 	pub const ProposalBond: Permill = Permill::from_percent(5);
 	pub const ProposalBondMinimum: Balance = DOLLARS;
 	pub const SpendPeriod: BlockNumber = DAYS;
-	pub const Burn: Permill = Permill::from_percent(50);
 	pub const TipCountdown: BlockNumber = DAYS;
 	pub const TipFindersFee: Percent = Percent::from_percent(20);
 	pub const TipReportDepositBase: Balance = DOLLARS;
@@ -1122,6 +1108,7 @@ parameter_types! {
 	pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
 	pub const MaximumReasonLength: u32 = 300;
 	pub const MaxApprovals: u32 = 100;
+	pub const Burn: Permill = Permill::from_percent(50);
 	pub const MaxBalance: Balance = Balance::max_value();
 }
 
