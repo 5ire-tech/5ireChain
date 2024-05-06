@@ -38,10 +38,9 @@ use frame_support::{
 	pallet_prelude::Get,
 	parameter_types,
 	traits::{
-		tokens::GetSalary, AsEnsureOriginWithArg, ConstBool, ConstU128, ConstU16, ConstU32,
-		Currency, EitherOfDiverse, EqualPrivilegeOnly, Everything, FindAuthor, Imbalance,
-		InstanceFilter, KeyOwnerProofSystem, LockIdentifier, Nothing, OnFinalize, OnUnbalanced,
-		WithdrawReasons,
+		AsEnsureOriginWithArg, ConstBool, ConstU128, ConstU16, ConstU32, Currency, EitherOfDiverse,
+		EqualPrivilegeOnly, Everything, FindAuthor, Imbalance, InstanceFilter, KeyOwnerProofSystem,
+		LockIdentifier, Nothing, OnFinalize, OnUnbalanced, WithdrawReasons,
 	},
 	weights::{
 		constants::{
@@ -1480,18 +1479,6 @@ impl pallet_assets::Config<Instance2> for Runtime {
 	type CallbackHandle = ();
 	#[cfg(feature = "runtime-benchmarks")]
 	type BenchmarkHelper = ();
-}
-
-parameter_types! {
-	pub const Budget: Balance = 10_000 * DOLLARS;
-	pub TreasuryAccount: AccountId = Treasury::account_id();
-}
-
-pub struct SalaryForRank;
-impl GetSalary<u16, AccountId, Balance> for SalaryForRank {
-	fn get_salary(a: u16, _: &AccountId) -> Balance {
-		Balance::from(a) * 1000 * DOLLARS
-	}
 }
 
 impl pallet_core_fellowship::Config for Runtime {
