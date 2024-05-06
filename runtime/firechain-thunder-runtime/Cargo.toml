@@ -92,7 +92,6 @@ pallet-root-testing = { workspace = true }
 pallet-session = { workspace = true, features = [ "historical" ] }
 pallet-session-benchmarking = { workspace = true, optional = true }
 pallet-staking = { workspace = true}
-pallet-staking-reward-curve = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false}
 pallet-staking-runtime-api = { workspace = true }
 pallet-state-trie-migration = { workspace = true }
 pallet-scheduler = { workspace = true}

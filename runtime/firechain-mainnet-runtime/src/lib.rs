@@ -619,7 +619,7 @@ impl pallet_reward::Config for Runtime{
 	type TotalMinutesPerYear = TotalMinutesPerYear;
 	type EraMinutes = EraMinutes;
 	type TotalReward = TotalReward;
-	type PalletId=RewardPalletId;
+	type PalletId= RewardPalletId;
 
 }
 
