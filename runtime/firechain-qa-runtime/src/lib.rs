@@ -595,7 +595,8 @@ impl pallet_staking::Config for Runtime {
 	>;
 	type SessionInterface = Self;
 	type EraPayout = pallet_staking::ConvertCurve<RewardCurve>;
-	type NextNewSession = Session;
+	type RewardDistribution =Reward;
+    type NextNewSession = Session;
 	type MaxNominatorRewardedPerValidator = MaxNominatorRewardedPerValidator;
 	type OffendingValidatorsThreshold = OffendingValidatorsThreshold;
 	type ElectionProvider = ElectionProviderMultiPhase;
@@ -612,6 +613,35 @@ impl pallet_staking::Config for Runtime {
 	type ESG = EsgScore;
 	type Reliability = ImOnline;
 }
+
+
+parameter_types! {
+	pub const EraMinutes:u32 = 720;
+	pub const DecimalPrecision:u32 = 18;
+	pub const TotalMinutesPerYear:u32 = 525600; 
+	pub const TotalReward :u32 = 1113158;
+}
+
+impl pallet_reward::Config for Runtime{
+	type RewardCurrency = Balances;
+	type Balance = Balance ;
+	type RuntimeEvent = RuntimeEvent;
+	type DataProvider = <Runtime as pallet_election_provider_multi_phase::Config>::DataProvider;
+	type ValidatorIdOf = pallet_staking::StashOf<Self>;
+	type ValidatorSet = Historical;
+	type Validators = Historical;
+	type ValidatorId = pallet_staking::StashOf<Self>;
+	type Precision = DecimalPrecision;
+	type TotalMinutesPerYear = TotalMinutesPerYear;
+	type EraMinutes = EraMinutes;
+	type TotalReward = TotalReward;
+	type PalletId=RewardPalletId;
+
+
+}
+
+
+
 
 impl pallet_fast_unstake::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
@@ -1120,6 +1150,8 @@ parameter_types! {
 	pub const TipReportDepositBase: Balance = DOLLARS;
 	pub const DataDepositPerByte: Balance = CENTS;
 	pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
+	pub const RewardPalletId: PalletId = PalletId(*b"py/rewrd");
+
 	pub const MaximumReasonLength: u32 = 300;
 	pub const MaxApprovals: u32 = 100;
 	pub const MaxBalance: Balance = Balance::max_value();
@@ -1760,7 +1792,7 @@ construct_runtime!(
 		FastUnstake: pallet_fast_unstake,
 		Pov: frame_benchmarking_pallet_pov,
 		EsgScore: pallet_esg,
-
+		Reward:pallet_reward,
 		Ethereum: pallet_ethereum,
 		EVM: pallet_evm,
 		DynamicFee: pallet_dynamic_fee,

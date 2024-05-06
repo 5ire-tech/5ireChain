@@ -2445,6 +2445,7 @@ dependencies = [
  "pallet-recovery",
  "pallet-referenda",
  "pallet-remark",
+ "pallet-reward",
  "pallet-root-testing",
  "pallet-scheduler",
  "pallet-session 4.0.0-dev",
@@ -2654,6 +2655,7 @@ dependencies = [
  "pallet-recovery",
  "pallet-referenda",
  "pallet-remark",
+ "pallet-reward",
  "pallet-root-testing",
  "pallet-scheduler",
  "pallet-session 4.0.0-dev",
@@ -2768,6 +2770,7 @@ dependencies = [
  "pallet-recovery",
  "pallet-referenda",
  "pallet-remark",
+ "pallet-reward",
  "pallet-root-testing",
  "pallet-scheduler",
  "pallet-session 4.0.0-dev",
@@ -6576,6 +6579,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-reward"
+version = "1.0.0"
+dependencies = [
+ "frame-benchmarking",
+ "frame-election-provider-support",
+ "frame-support",
+ "frame-system",
+ "log",
+ "pallet-balances",
+ "pallet-session 4.0.0-dev",
+ "pallet-staking 4.0.0-dev",
+ "pallet-timestamp",
+ "pallet-treasury",
+ "parity-scale-codec",
+ "scale-info",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-staking",
+ "sp-std",
+]
+
+[[package]]
 name = "pallet-root-testing"
 version = "1.0.0-dev"
 source = "git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.1.0#c8d2251cafadc108ba2f1f8a3208dc547ff38901"
@@ -6691,6 +6717,7 @@ dependencies = [
  "pallet-offences",
  "pallet-session 4.0.0-dev",
  "pallet-timestamp",
+ "pallet-treasury",
  "parity-scale-codec",
  "rand_chacha 0.2.2",
  "scale-info",

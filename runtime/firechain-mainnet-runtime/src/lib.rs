@@ -104,7 +104,6 @@ use sp_std::{marker::PhantomData, prelude::*};
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 use static_assertions::const_assert;
-
 #[cfg(any(feature = "std", test))]
 pub use frame_system::Call as SystemCall;
 #[cfg(any(feature = "std", test))]
@@ -570,7 +569,7 @@ impl pallet_staking::Config for Runtime {
 	type RewardRemainder = Treasury;
 	type RuntimeEvent = RuntimeEvent;
 	type Slash = Treasury; // send the slashed funds to the treasury.
-	type Reward = (); // rewards are minted from the void
+	type Reward =  (); // rewards are minted from the void
 	type SessionsPerEra = SessionsPerEra;
 	type BondingDuration = BondingDuration;
 	type SlashDeferDuration = SlashDeferDuration;
@@ -581,8 +580,8 @@ impl pallet_staking::Config for Runtime {
 	>;
 	type SessionInterface = Self;
 	type EraPayout = ();
-
-	type NextNewSession = Session;
+	type RewardDistribution = Reward;
+    type NextNewSession = Session;
 	type MaxNominatorRewardedPerValidator = MaxNominatorRewardedPerValidator;
 	type OffendingValidatorsThreshold = OffendingValidatorsThreshold;
 	type ElectionProvider = ElectionProviderMultiPhase;
@@ -598,6 +597,30 @@ impl pallet_staking::Config for Runtime {
 	type BenchmarkingConfig = StakingBenchmarkingConfig;
 	type ESG = EsgScore;
 	type Reliability = ImOnline;
+}
+
+parameter_types! {
+	pub const EraMinutes:u32 = 2;
+	pub const DecimalPrecision:u32 = 18;
+	pub const TotalMinutesPerYear:u32 = 525600; 
+	pub const TotalReward :u32 = 20564830;
+}
+
+impl pallet_reward::Config for Runtime{
+	type RewardCurrency = Balances;
+	type Balance = Balance ;
+	type RuntimeEvent = RuntimeEvent;
+	type DataProvider = <Runtime as pallet_election_provider_multi_phase::Config>::DataProvider;
+	type ValidatorIdOf = pallet_staking::StashOf<Self>;
+	type ValidatorSet = Historical;
+	type Validators = Historical;
+	type ValidatorId = pallet_staking::StashOf<Self>;
+	type Precision = DecimalPrecision;
+	type TotalMinutesPerYear = TotalMinutesPerYear;
+	type EraMinutes = EraMinutes;
+	type TotalReward = TotalReward;
+	type PalletId=RewardPalletId;
+
 }
 
 impl pallet_fast_unstake::Config for Runtime {
@@ -1106,9 +1129,9 @@ parameter_types! {
 	pub const TipReportDepositBase: Balance = DOLLARS;
 	pub const DataDepositPerByte: Balance = CENTS;
 	pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
+	pub const RewardPalletId: PalletId = PalletId(*b"py/rewrd");
 	pub const MaximumReasonLength: u32 = 300;
 	pub const MaxApprovals: u32 = 100;
-	pub const Burn: Permill = Permill::from_percent(50);
 	pub const MaxBalance: Balance = Balance::max_value();
 }
 
@@ -1129,7 +1152,7 @@ impl pallet_treasury::Config for Runtime {
 	type ProposalBondMinimum = ProposalBondMinimum;
 	type ProposalBondMaximum = ();
 	type SpendPeriod = SpendPeriod;
-	type Burn = Burn;
+	type Burn = ();
 	type BurnDestination = ();
 	type SpendFunds = Bounties;
 	type WeightInfo = pallet_treasury::weights::SubstrateWeight<Runtime>;
@@ -1700,7 +1723,7 @@ construct_runtime!(
 		System: frame_system,
 		Utility: pallet_utility,
 		Babe: pallet_babe,
-		Timestamp: pallet_timestamp,
+		Timestamp: pallet_timestamp,	
 		// Authorship must be before session in order to note author in the correct session and era
 		// for im-online and staking.
 		Authorship: pallet_authorship,
@@ -1752,11 +1775,13 @@ construct_runtime!(
 		FastUnstake: pallet_fast_unstake,
 		Pov: frame_benchmarking_pallet_pov,
 		EsgScore: pallet_esg,
-
+		Reward:pallet_reward,
 		Ethereum: pallet_ethereum,
 		EVM: pallet_evm,
 		DynamicFee: pallet_dynamic_fee,
 		BaseFee: pallet_base_fee,
+		
+
 	}
 );
 

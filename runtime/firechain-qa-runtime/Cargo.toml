@@ -115,6 +115,7 @@ pallet-transaction-payment-rpc-runtime-api = { workspace = true }
 pallet-transaction-storage = { workspace = true }
 pallet-vesting = { workspace = true }
 pallet-esg = { workspace = true }
+pallet-reward={ workspace = true }
 
 # Frontier
 fp-account = { workspace = true, features = ["serde"] }
@@ -223,6 +224,8 @@ std = [
 	"pallet-alliance/std",
 	"substrate-wasm-builder",
 	"pallet-esg/std",
+	"pallet-reward/std",
+
 	#frontier
 	'fp-rpc/std',
 	'fp-evm/std',
@@ -287,6 +290,8 @@ runtime-benchmarks = [
 	"frame-system-benchmarking/runtime-benchmarks",
 	"pallet-esg/runtime-benchmarks",
 	"pallet-ethereum/runtime-benchmarks",
+	"pallet-reward/runtime-benchmarks",
+
 ]
 try-runtime = [
 	"frame-try-runtime/try-runtime",

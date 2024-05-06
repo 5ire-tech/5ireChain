@@ -32,6 +32,7 @@ use frame_support::{
 	weights::Weight,
 };
 use pallet_esg::traits::ERScoresTrait;
+use crate::{Rewards};
 
 use frame_system::{pallet_prelude::BlockNumberFor, RawOrigin};
 use pallet_session::historical;
@@ -49,7 +50,7 @@ use sp_std::prelude::*;
 use crate::{
 	election_size_tracker::StaticTracker, log, slashing, weights::WeightInfo, ActiveEraInfo,
 	BalanceOf, EraPayout, Exposure, ExposureOf, Forcing, IndividualExposure, MaxNominationsOf,
-	MaxWinnersOf, Nominations, NominationsQuota, PositiveImbalanceOf, RewardDestination,
+	MaxWinnersOf, Nominations, NominationsQuota, RewardDestination,
 	SessionInterface, StakingLedger, ValidatorPrefs,
 };
 
@@ -156,29 +157,6 @@ impl<T: Config> Pallet<T> {
 			Self::deposit_event(Event::<T>::Chilled { stash: stash.clone() });
 			T::Reliability::chilled_validator_status(stash.clone());
 			T::Reliability::reset_score_of_chilled_waiting_validator(stash.clone());
-		}
-	}
-
-	/// Actually make a payment to a staker. This uses the currency's reward function
-	/// to pay the right payee for the given staker account.
-	fn make_payout(stash: &T::AccountId, amount: BalanceOf<T>) -> Option<PositiveImbalanceOf<T>> {
-		let dest = Self::payee(stash);
-		match dest {
-			RewardDestination::Controller => Self::bonded(stash)
-				.map(|controller| T::Currency::deposit_creating(&controller, amount)),
-			RewardDestination::Stash => T::Currency::deposit_into_existing(stash, amount).ok(),
-			RewardDestination::Staked => Self::bonded(stash)
-				.and_then(|c| Self::ledger(&c).map(|l| (c, l)))
-				.and_then(|(controller, mut l)| {
-					l.active += amount;
-					l.total += amount;
-					let r = T::Currency::deposit_into_existing(stash, amount).ok();
-					Self::update_ledger(&controller, &l);
-					r
-				}),
-			RewardDestination::Account(dest_account) =>
-				Some(T::Currency::deposit_creating(&dest_account, amount)),
-			RewardDestination::None => None,
 		}
 	}
 
@@ -320,6 +298,12 @@ impl<T: Config> Pallet<T> {
 			let issuance = T::Currency::total_issuance();
 			let (validator_payout, remainder) =
 				T::EraPayout::era_payout(staked, issuance, era_duration);
+
+				let _ = T::RewardDistribution::calculate_reward();
+				let reward = T::RewardDistribution::payout_validators();
+				reward.iter().for_each(|accounts| {
+					let _ = T::RewardDistribution::claim_rewards(accounts.clone());
+				});
 
 			// Set ending era reward.
 			<ErasValidatorReward<T>>::insert(&active_era.index, validator_payout);
@@ -581,14 +565,15 @@ impl<T: Config> Pallet<T> {
 	///
 	/// COMPLEXITY: Complexity is `number_of_validator_to_reward x current_elected_len`.
 	pub fn reward_by_ids(validators_points: impl IntoIterator<Item = (T::AccountId, u32)>) {
-		if let Some(active_era) = Self::active_era() {
+	let reward =	if let Some(active_era) = Self::active_era() {
 			<ErasRewardPoints<T>>::mutate(active_era.index, |era_rewards| {
 				for (validator, points) in validators_points.into_iter() {
 					*era_rewards.individual.entry(validator).or_default() += points;
 					era_rewards.total += points;
 				}
 			});
-		}
+		};
+		reward
 	}
 
 	/// Helper to set a new `ForceEra` mode.

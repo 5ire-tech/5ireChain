@@ -39,8 +39,11 @@ use sp_runtime::{
 };
 use sp_staking::{EraIndex, SessionIndex};
 use sp_std::prelude::*;
-
+//use pallet_treasury::Rewards;
 mod impls;
+//use pallet_treasury::TreasuryAccountId;
+
+use crate::{Rewards};
 
 pub use impls::*;
 
@@ -91,6 +94,10 @@ pub mod pallet {
 			Moment = BlockNumberFor<Self>,
 			Balance = Self::CurrencyBalance,
 		>;
+		/// The reward distribution for validator and nominator
+
+		type RewardDistribution :Rewards<Self::AccountId>;
+
 		/// Just the `Currency::Balance` type; we have this item to allow us to constrain it to
 		/// `From<u64>`.
 		type CurrencyBalance: sp_runtime::traits::AtLeast32BitUnsigned
@@ -100,6 +107,8 @@ pub mod pallet {
 			+ sp_std::fmt::Debug
 			+ Default
 			+ From<u64>
+			+ From<u128>
+			+ Into<u128>
 			+ TypeInfo
 			+ MaxEncodedLen;
 		/// Time used for computing era duration.
