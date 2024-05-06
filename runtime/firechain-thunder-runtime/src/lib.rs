@@ -210,7 +210,7 @@ const AVERAGE_ON_INITIALIZE_RATIO: Perbill = Perbill::from_percent(10);
 /// We allow `Normal` extrinsics to fill up the block up to 75%, the rest can be used
 /// by  Operational  extrinsics.
 const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
-/// We allow for 2 seconds of compute with a 6 second average block time, with maximum proof size.
+/// We allow for 1 seconds of compute with a 3 second average block time, with maximum proof size.
 const MAXIMUM_BLOCK_WEIGHT: Weight =
 	Weight::from_parts(WEIGHT_REF_TIME_PER_SECOND.saturating_mul(1), u64::MAX);
 
@@ -555,9 +555,9 @@ pallet_staking_reward_curve::build! {
 }
 
 parameter_types! {
-	pub const SessionsPerEra: sp_staking::SessionIndex = 12;
-	pub const BondingDuration: sp_staking::EraIndex = 24 * 28;
-	pub const SlashDeferDuration: sp_staking::EraIndex = 24 * 7; // 1/4 the bonding duration.
+	pub const SessionsPerEra: sp_staking::SessionIndex = 6;
+	pub const BondingDuration: sp_staking::EraIndex = 28; // 14 days
+	pub const SlashDeferDuration: sp_staking::EraIndex = BondingDuration::get() - 1; // 13 days
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
 	pub const MaxNominatorRewardedPerValidator: u32 = 256;
 	pub const OffendingValidatorsThreshold: Perbill = Perbill::from_percent(17);
@@ -1601,7 +1601,7 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 			let authority_id = Babe::authorities()[author_index as usize].clone().0;
 			return Some(H160::from_slice(
 				&sp_core::crypto::ByteArray::to_raw_vec(&authority_id)[4..24],
-			))
+			));
 		}
 		None
 	}
