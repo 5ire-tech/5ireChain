@@ -251,6 +251,54 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 			array_bytes::hex2array_unchecked("16ecef00d8a379ce55a2550c7d2e0d327f52329c0e2231b2ee37948c1e126b48")
 				.unchecked_into(),
 		),
+		(
+			//Stash Account
+			// 5GRGkzgyTv3wrPThbHGh4aguKasKq1pwqzDsVhVJjGsKrsWJ
+			array_bytes::hex_n_into_unchecked("c0a099bc0bff2d8eb7e6fb32b0b939464b516d5a8ddd50018f8e8ed227f3db0a"),
+			// Controller Account
+			// 5GZabnXPPR2a448pnjXoC66cQJAMuAuat3peEj8XcLogaJMs
+			array_bytes::hex_n_into_unchecked("c6f69f64c46aa13695c1a581aa2893e9ccff4b82b87fa74276b15cac77c60868"),
+			// Grandpa Key
+			// 5DzD9fLwBRwhy7ygrbGDjuErrE6v6T7ER12NjzZn3KXLDgaY
+			array_bytes::hex2array_unchecked("550ad94f214f3d77b73aa0483d3c9af49adc558d75c31762a4633b2a14aa223f")
+				.unchecked_into(),
+			// Babe Key
+			// 5GpvxhVyf1EwLuNFtRCFyMMux1HwB3YJW7cdMUSJiSAyxgNY
+			array_bytes::hex2array_unchecked("d2abd7efd568b2886495959ad6a7265c75f489055d83bd07c1be7fb7ba665d33")
+				.unchecked_into(),
+			// Imonline Key
+			// 5CrWgTST4iTkSqmhpGYXFE4CDyCZBmutMg55jAA72HPEyRfv
+			array_bytes::hex2array_unchecked("22efaaa5dd393aff796e5a4755ced6ef1d4f5afcba50e5ff5d3c95febb520d3f")
+				.unchecked_into(),
+			// Authority Discovery Key
+			// 5Fn8U4UhKLsFJ9MzDgTs3A8sUsyNZ5Gw2BhvssfXEJv78QwH
+			array_bytes::hex2array_unchecked("a44c9b76b9de9bbd10e16783e558316d7cba3a75c178e00c76bea2e335fa9c3a")
+				.unchecked_into(),
+		),
+		(
+			//Stash Account
+			// 5DXDekNJA1bn7YA5LnFJdytqbuHR2didC8sUrxEMjxubynYn
+			array_bytes::hex_n_into_unchecked("4074e93f5910a8b4a1292d148d46a5762eb463fb0b138db99f94abe8f17b212b"),
+			// Controller Account
+			// 5HgcVTCmd4yVwKtMFdHtwDuCy5JFT7wd4SKpYkMCmNMo5Enq
+			array_bytes::hex_n_into_unchecked("f88ff05e8f628ba9495668b20c88902c0fdfac2996b6274386b7db1117f73254"),
+			// Grandpa Key
+			// 5Ei4KEpsPP4QQHUcUCkvZqTfaNmTh3crMccwxRXpTumWqy9s
+			array_bytes::hex2array_unchecked("74f56a3df0974c8cbf3e55f927093055cb554ebf3c103e355e769ead057e3cd4")
+				.unchecked_into(),
+			// Babe Key
+			// 5DjtR1njvNgq5TBHmGmvsb3DCCPbprvLRmztHMQuxaYWpyoY
+			array_bytes::hex2array_unchecked("4a1e5834c0ada51b1384edbb632101c5c07d603ba0b6dfc6521936cb768e3d01")
+				.unchecked_into(),
+			// Imonline Key
+			// 5Ew7rRdk4PbhVdCh3Wm4Fnbp8DH7nZA4KqjgM9HDLneZrYdU
+			array_bytes::hex2array_unchecked("7eeb83a33b343c3827ffe91d030fe22b4da3a279b9ef00f86c92d289ad58d766")
+				.unchecked_into(),
+			// Authority Discovery Key
+			// 5E2h3fVUeDGK2PhaGVQ43TwxXeCPo6uTdbLGPLo2byN8TU8x
+			array_bytes::hex2array_unchecked("56ef3f7be05d5a14d0903b2b9cfb0305d91e6aa23425b60c7fb2af77e495b72a")
+				.unchecked_into(),
+		),
 	];
 
 	let root_key: AccountId = array_bytes::hex_n_into_unchecked(
@@ -374,15 +422,15 @@ pub fn testnet_genesis(
 
 	// Based on current tokenomics
 	// Initial validators Balance
-	// Total Balance = Bonding Balance(1_000_000 5IRE) + Tranferrable Balance(2 5IRE)
+	// Total Balance = Bonding Balance(100_000 5IRE) + Tranferrable Balance(2 5IRE)
 	// Bonding Balance: Staking
 	// Trafferable Balance: Charge Fee
-	const ENDOWMENT_AUTHORITY: Balance = 1_000_002 * DOLLARS;
+	const ENDOWMENT_AUTHORITY: Balance = 100_002 * DOLLARS;
 
-	const STASH: Balance = 1_000_000 * DOLLARS;
+	const STASH: Balance = 100_000 * DOLLARS;
 
 	// Pre-minted sudo key for charging transaction fee
-	const ENDOWMENT_SUDO: Balance = 10 * DOLLARS;
+	const ENDOWMENT_SUDO: Balance = 20 * DOLLARS;
 
 	let mut endowed_balance: Vec<(AccountId, Balance)> =
 		endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT_SUDO)).collect();
