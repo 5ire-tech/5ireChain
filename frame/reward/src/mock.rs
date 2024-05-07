@@ -1,23 +1,26 @@
 #![cfg(test)]
-use crate::{ self as pallet_reward };
-use frame_support::{ parameter_types, traits::{ ConstU16, ConstU64 } };
-use sp_runtime::BuildStorage;
-use sp_runtime::traits::IdentityLookup;
-use sp_runtime::traits::BlakeTwo256;
-use sp_runtime::testing::H256;
-use pallet_session::historical as pallet_session_historical;
-use frame_support::traits::ConstU128;
-use sp_runtime::Permill;
+use crate::{self as pallet_reward};
 use frame_election_provider_support::{
 	bounds::{ElectionBounds, ElectionBoundsBuilder},
-	 SequentialPhragmen,
+	SequentialPhragmen,
 };
 use frame_support::pallet_prelude::ConstU32;
+use frame_support::traits::ConstU128;
+use frame_support::{
+	parameter_types,
+	traits::{ConstU16, ConstU64},
+};
+use pallet_session::historical as pallet_session_historical;
+use sp_runtime::testing::H256;
+use sp_runtime::traits::BlakeTwo256;
+use sp_runtime::traits::IdentityLookup;
+use sp_runtime::BuildStorage;
+use sp_runtime::Permill;
 
 pub type RewardBalance = pallet_balances::Pallet<Test>;
 use frame_support::pallet_prelude::Weight;
-use sp_runtime::Perbill;
 use frame_support::PalletId;
+use sp_runtime::Perbill;
 
 parameter_types! {
 	pub BlockWeights: frame_system::limits::BlockWeights =
@@ -25,11 +28,11 @@ parameter_types! {
 }
 
 frame_support::construct_runtime!(
-	pub enum Test	
+	pub enum Test
 	{
-        System: frame_system::{Pallet, Call, Config<T>, Storage, Event<T>},
+		System: frame_system::{Pallet, Call, Config<T>, Storage, Event<T>},
 		Reward: pallet_reward,
-        Balances: pallet_balances,
+		Balances: pallet_balances,
 		Staking: pallet_staking,
 		Session:pallet_session,
 		Treasury :pallet_treasury,
@@ -79,7 +82,6 @@ impl pallet_session::historical::Config for Test {
 	type FullIdentificationOf = pallet_staking::ExposureOf<Test>;
 }
 
-
 impl pallet_session::Config for Test {
 	type SessionManager = pallet_session::historical::NoteHistoricalRoot<Test, Staking>;
 	type Keys = SessionKeys;
@@ -120,7 +122,6 @@ impl pallet_timestamp::Config for Test {
 	type WeightInfo = ();
 }
 
-
 impl pallet_staking::Config for Test {
 	type RewardRemainder = ();
 	type CurrencyToVote = ();
@@ -140,7 +141,8 @@ impl pallet_staking::Config for Test {
 	type MaxNominatorRewardedPerValidator = ConstU32<64>;
 	type OffendingValidatorsThreshold = OffendingValidatorsThreshold;
 	type NextNewSession = Session;
-	type ElectionProvider = frame_election_provider_support::onchain::OnChainExecution<OnChainSeqPhragmen>;
+	type ElectionProvider =
+		frame_election_provider_support::onchain::OnChainExecution<OnChainSeqPhragmen>;
 	type GenesisElectionProvider = Self::ElectionProvider;
 	type VoterList = pallet_staking::UseNominatorsAndValidatorsMap<Self>;
 	type TargetList = pallet_staking::UseValidatorsMap<Self>;
@@ -186,10 +188,9 @@ parameter_types! {
 	pub const MotionDuration: BlockNumber = MOTION_DURATION_IN_BLOCKS;
 	pub const MaxProposals: u32 = 100;
 	pub const MaxMembers: u32 = 100;
-    pub MaxProposalWeight: Weight = sp_runtime::Perbill::from_percent(50) * BlockWeights::get().max_block;
-    
-}
+	pub MaxProposalWeight: Weight = sp_runtime::Perbill::from_percent(50) * BlockWeights::get().max_block;
 
+}
 
 parameter_types! {
 	pub const MaxLocks: u32 = 50;
@@ -222,7 +223,7 @@ impl pallet_treasury::Config for Test {
 	type PalletId = TreasuryPalletId;
 	type Currency = pallet_balances::Pallet<Test>;
 	type ApproveOrigin = frame_system::EnsureRoot<AccountId>;
-	type RejectOrigin =frame_system::EnsureRoot<AccountId>;
+	type RejectOrigin = frame_system::EnsureRoot<AccountId>;
 	type RuntimeEvent = RuntimeEvent;
 	type OnSlash = ();
 	type MyReward = Reward;
@@ -236,14 +237,30 @@ impl pallet_treasury::Config for Test {
 	type SpendOrigin = frame_system::EnsureRootWithSuccess<Self::AccountId, SpendLimit>;
 }
 
+parameter_types! {
+	pub const EraMinutes:u32 = 720;
+	pub const DecimalPrecision:u32 = 18;
+	pub const TotalMinutesPerYear:u32 = 525600; 
+	pub const TotalReward :u32 = 1113158;
+	pub const RewardPalletId: PalletId = PalletId(*b"py/rewrd");
+}
+
+
 impl pallet_reward::Config for Test {
 	type RuntimeEvent = RuntimeEvent;
-	type TreasuryAccount = Treasury;
-	type RewardCurrency = Balances ;
+	type RewardCurrency = Balances;
+	type Balance = Balance;
+	type RuntimeEvent = RuntimeEvent;
 	type DataProvider = Staking;
 	type ValidatorIdOf = pallet_staking::StashOf<Self>;
 	type ValidatorSet = Historical;
-	
+	type Validators = Historical;
+	type ValidatorId = pallet_staking::StashOf<Self>;
+	type Precision = DecimalPrecision;
+	type TotalMinutesPerYear = TotalMinutesPerYear;
+	type EraMinutes = EraMinutes;
+	type TotalReward = TotalReward;
+	type PalletId =RewardPalletId;
 }
 
 // Build genesis storage according to the mock runtime.

@@ -24,6 +24,9 @@ fn transfer_balance(){
 fn get_rewards(){
     new_test_ext().execute_with(||{
         System::set_block_number(1);
+        // before get reward
+        let before_total_balance = RewardBalance::total_balance(&account(1));
+        assert_eq!(before_total_balance, 10);
         transfer_balance();
         assert_ok!(crate::Pallet::<Test>::get_rewards(RuntimeOrigin::signed(account(1))));
     });
