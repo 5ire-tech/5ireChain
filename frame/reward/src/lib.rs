@@ -233,11 +233,7 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 			let validator = T::ValidatorId::convert(validator_id.clone()).unwrap();
 			let validator_points = Self::retrieve_validator_point(validator.clone());
 			let era_reward = Self::calculate_era_reward();
-<<<<<<< HEAD
 			let total_reward = era_reward as f64;
-=======
-			let total_reward = (era_reward as f64) * (validators.len() as f64);
->>>>>>> 4f67521 (inflation removed and total supply constant (#117))
 			let reward = Self::calculate_validator_reward(validator_points.into(), total_reward);
 			let nominators = Self::check_nominators(validator.clone());
 			if nominators.is_empty() {
