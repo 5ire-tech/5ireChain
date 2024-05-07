@@ -597,6 +597,7 @@ impl pallet_staking::Config for Runtime {
 	type ESG = EsgScore;
 	type Reliability = ImOnline;
 }
+
 parameter_types! {
 	pub const EraMinutes:u32 = 720;
 	pub const DecimalPrecision:u32 = 18;
