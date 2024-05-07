@@ -497,6 +497,7 @@ pub fn testnet_genesis(
 		ethereum: Default::default(),
 		dynamic_fee: Default::default(),
 		base_fee: Default::default(),
+		reward:Default::default(),
 	}
 }
 
@@ -667,6 +668,7 @@ pub fn development_genesis(
 		ethereum: EthereumConfig { _marker: Default::default() },
 		dynamic_fee: Default::default(),
 		base_fee: Default::default(),
+		reward:Default::default(),
 	}
 }
 

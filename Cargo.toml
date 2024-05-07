@@ -173,7 +173,6 @@ pallet-root-testing = { version = "1.0.0-dev", git = "https://github.com/parityt
 # Pallet implementation
 pallet-esg = { version = "1.0.0", path = "frame/esg", default-features = false}
 pallet-staking = { version = "4.0.0-dev", path = "frame/staking", default-features = false}
-pallet-staking-reward-curve = { version = "4.0.0-dev", path = "frame/staking/reward-curve", default-features = false}
 pallet-staking-runtime-api = { version = "4.0.0-dev", path = "frame/staking/runtime-api", default-features = false}
 pallet-session = { version = "4.0.0-dev", path = "frame/session", default-features = false}
 pallet-session-benchmarking = { version = "4.0.0-dev", path = "frame/session/benchmarking", default-features = false}
@@ -181,6 +180,8 @@ pallet-babe = { version = "4.0.0-dev", path = "frame/babe", default-features = f
 pallet-authority-discovery = { version = "4.0.0-dev", path = "frame/authority-discovery" , default-features = false}
 pallet-im-online = { version = "4.0.0-dev", path = "frame/im-online", default-features = false }
 pallet-grandpa = { version = "4.0.0-dev", path = "frame/grandpa", default-features = false }
+pallet-reward = { version = "1.0.0", path = "frame/reward", default-features = false}
+
 
 # Substrate Utility
 frame-benchmarking-cli = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
