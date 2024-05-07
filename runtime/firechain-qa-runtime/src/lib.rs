@@ -599,11 +599,12 @@ impl pallet_staking::Config for Runtime {
 	type Reliability = ImOnline;
 }
 
+
 parameter_types! {
-	pub const EraMinutes:u32 = 720;
+	pub const EraMinutes:u32 = 2;
 	pub const DecimalPrecision:u32 = 18;
-	pub const TotalMinutesPerYear:u32 = 525600;
-	pub const TotalReward :u32 = 1113158;
+	pub const TotalMinutesPerYear:u32 = 525600; 
+	pub const TotalReward :u32 = 20564830;
 }
 
 impl pallet_reward::Config for Runtime {
