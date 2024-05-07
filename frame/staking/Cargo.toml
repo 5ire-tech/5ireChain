@@ -33,7 +33,7 @@ frame-election-provider-support = { workspace = true , default-features = false}
 log = { version = "0.4.17", default-features = false }
 pallet-esg = { workspace = true }
 pallet-im-online = { workspace = true }
-
+pallet-treasury={workspace = true,default-features = false}
 # Optional imports for benchmarking
 frame-benchmarking = { workspace = true , optional = true }
 rand_chacha = { version = "0.2", default-features = false, optional = true }
@@ -44,7 +44,6 @@ sp-core = { workspace = true }
 sp-npos-elections = { workspace = true }
 pallet-balances = { workspace = true }
 pallet-timestamp = { workspace = true }
-pallet-staking-reward-curve = { path = "reward-curve" }
 pallet-bags-list = { workspace = true }
 substrate-test-utils = { workspace = true }
 frame-benchmarking = { workspace = true }
@@ -78,6 +77,7 @@ std = [
 	"sp-tracing/std",
 	"pallet-esg/std",
 	"pallet-im-online/std",
+	"pallet-treasury/std",
 ]
 runtime-benchmarks = [
 	"frame-benchmarking/runtime-benchmarks",

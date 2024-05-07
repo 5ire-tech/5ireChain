@@ -37,7 +37,6 @@ frame-election-provider-support = { workspace = true }
 pallet-balances = { workspace = true }
 pallet-offences = { workspace = true }
 pallet-staking = { workspace = true }
-pallet-staking-reward-curve = { workspace = true }
 pallet-timestamp = { workspace = true }
 sp-keyring = { workspace = true }
 pallet-esg = { workspace = true }
