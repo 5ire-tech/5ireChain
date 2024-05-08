@@ -159,7 +159,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("firechain-node-thunder"),
 	impl_name: create_runtime_str!("5ire"),
 	authoring_version: 1,
-	spec_version: 100,
+	spec_version: 101,
 	impl_version: 0,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
@@ -602,7 +602,7 @@ parameter_types! {
 	pub const EraMinutes:u32 = 720;
 	pub const DecimalPrecision:u32 = 18;
 	pub const TotalMinutesPerYear:u32 = 525600; 
-	pub const TotalReward :u32 = 1113158;
+	pub const TotalReward :u32 = 20564830;
 }
 
 impl pallet_reward::Config for Runtime{
@@ -1691,7 +1691,7 @@ impl pallet_evm::Config for Runtime {
 	type Runner = pallet_evm::runner::stack::Runner<Self>;
 	type OnChargeTransaction = pallet_evm::EVMCurrencyAdapter<Balances, DealWithFees>;
 	type OnCreate = ();
-	type FindAuthor = FindAuthorTruncated<Babe>;
+	type Author = FindAuthorTruncated<Babe>;
 	type GasLimitPovSizeRatio = GasLimitPovSizeRatio;
 	type Timestamp = Timestamp;
 	type WeightInfo = pallet_evm::weights::SubstrateWeight<Self>;

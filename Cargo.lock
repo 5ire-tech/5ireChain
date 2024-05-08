@@ -6060,6 +6060,7 @@ dependencies = [
  "hex-literal 0.4.1",
  "impl-trait-for-tuples",
  "log",
+ "pallet-authorship",
  "pallet-balances",
  "pallet-evm-precompile-simple",
  "pallet-timestamp",
