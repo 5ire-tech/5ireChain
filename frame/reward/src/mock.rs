@@ -203,7 +203,6 @@ impl frame_system::Config for Test {
 parameter_types! {
 	pub const MaxLocks: u32 = 50;
 	pub const MaxReserves: u32 = 50;
-	pub const BurnPalletId: PalletId = PalletId(*b"py/burns");
 }
 
 impl pallet_balances::Config for Test {
@@ -320,6 +319,8 @@ impl ExtBuilder {
 				(21, (self.balance_factor * 1000).into()),
 				(31, (self.balance_factor * 500).into()),
 				(41, (self.balance_factor * 1000).into()),
+				// normal user
+				(1, (self.balance_factor * 1000).into()),
 			],
 		}
 		.assimilate_storage(&mut storage)
