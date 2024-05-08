@@ -159,11 +159,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("firechain-node-thunder"),
 	impl_name: create_runtime_str!("5ire"),
 	authoring_version: 1,
-<<<<<<< HEAD
 	spec_version: 102,
-=======
-	spec_version: 101,
->>>>>>> 0b1e9b5 (Features/app 1158 (#126))
 	impl_version: 0,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
