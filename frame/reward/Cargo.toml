@@ -21,14 +21,15 @@ frame-election-provider-support = { workspace = true, default-features = false }
 log = "0.4.21"
 
 [dev-dependencies]
-pallet-timestamp = { workspace = true, default-features = false }
-pallet-session = { workspace = true, default-features = false }
-sp-io = { workspace = true, default-features = false }
-sp-core = { workspace = true, default-features = false }
-pallet-balances = { workspace = true, default-features = false }
-pallet-esg = { workspace = true, default-features = false }
-pallet-im-online = { workspace = true, default-features = false }
-pallet-offences = { workspace = true, default-features = false }
+pallet-timestamp = { workspace = true}
+pallet-session = { workspace = true}
+sp-io = { workspace = true}
+sp-core = { workspace = true}
+pallet-balances = { workspace = true}
+pallet-esg = { workspace = true}
+pallet-im-online = { workspace = true}
+pallet-offences = { workspace = true}
+sp-state-machine = { workspace = true}
 
 [features]
 default = ["std"]

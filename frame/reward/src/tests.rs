@@ -1,23 +1,13 @@
 use crate::mock::*;
 use frame_support::assert_ok;
-use frame_support::traits::Currency;
-
-type AccountIdOf<Test> = <Test as frame_system::Config>::AccountId;
-
-
-
-
-fn transfer_balance(){
-    System::set_block_number(1);
-    let _ =  RewardBalance::deposit_creating(&2,150000000000);
-    let _ = RewardBalance::transfer(who(2), 3, 15000);
-}
 
 #[test]
-fn get_rewards(){
-    new_test_ext().execute_with(||{
-        System::set_block_number(1);
-        transfer_balance();
-        //assert_ok!(Reward::get_rewards(RuntimeOrigin::signed(account(1))));
-    });
+fn get_rewards_should_work() {
+	ExtBuilder::default().build_and_execute(|| {
+		start_session(1);
+
+		assert_eq!(active_era(), 0);
+		assert_eq!(RewardBalance::free_balance(11), 1000);
+		assert_ok!(Reward::get_rewards(who(11), 11));
+	});
 }
