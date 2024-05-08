@@ -1,27 +1,49 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
 
-# Set SSH_AUTH_SOCK to the path of your SSH agent socket
-export SSH_AUTH_SOCK="location to your SSH_auth_sock"
+# Function to build Docker image
+build_image() {
+    docker build -t 5ireqa -f firechain_builder.Dockerfile ../
+}
 
-pushd .
+# Function to upload image to AWS ECR
+upload_to_ecr() {
+    # QA Account ID
+    aws_account_id="392225661532"
+    ecr_repo="firechain-qa"
 
-# Change to the project root and support calls from symlinks
-cd $(dirname "$(dirname "$(realpath "${BASH_SOURCE[0]}")")")
+    # Prompt for AWS region
+    read -p "Enter AWS region: " aws_region
 
-# Find the current version from Cargo.toml
-VERSION=$(grep "^version" ./node/Cargo.toml | egrep -o "([0-9\.]+)")
-GITUSER=5ire-tech
-GITREPO=5ire-evm-base
+    # Prompt for AWS profile
+    read -p "Enter AWS profile: " aws_profile
 
-# Build the image
-echo "Building ${GITUSER}/${GITREPO}:latest docker image, hang on!"
-sudo DOCKER_BUILDKIT=1 docker build --ssh default=$SSH_AUTH_SOCK -t ${GITUSER}/${GITREPO}:latest -f docker/firechain_builder.Dockerfile .
+    # Tag image with timestamp
+    timestamp=$(date +%Y%m%d%H%M%S)
+    docker tag 5ireqa:latest "$aws_account_id.dkr.ecr.$aws_region.amazonaws.com/$ecr_repo:$timestamp"
 
-docker tag ${GITUSER}/${GITREPO}:latest ${GITUSER}/${GITREPO}:v${VERSION}
+    # Authenticate Docker client with AWS ECR
+    aws ecr get-login-password --region "$aws_region" --profile "$aws_profile" | docker login --username AWS --password-stdin "$aws_account_id.dkr.ecr.$aws_region.amazonaws.com"
 
-# Show the list of available images for this repo
-echo "Image is ready"
-docker images | grep ${GITREPO}
+    # Push image to AWS ECR
+    docker push "$aws_account_id.dkr.ecr.$aws_region.amazonaws.com/$ecr_repo:$timestamp"
+}
 
-popd
+# Main function
+main() {
+    # Build Docker image
+    build_image
+
+    # Ask user if they want to upload to AWS ECR
+    read -p "Do you want to upload the image to AWS ECR? (yes/no): " upload_choice
+
+    if [ "$upload_choice" == "yes" ]; then
+
+        # Upload image to AWS ECR
+        upload_to_ecr
+    else
+        echo "Skipping upload to AWS ECR."
+    fi
+}
+
+# Execute main function
+main
