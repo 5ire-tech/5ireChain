@@ -546,7 +546,7 @@ impl pallet_session::historical::Config for Runtime {
 	type FullIdentificationOf = pallet_staking::ExposureOf<Runtime>;
 }
 parameter_types! {
-	pub const SessionsPerEra: sp_staking::SessionIndex = 1;
+	pub const SessionsPerEra: sp_staking::SessionIndex = 6;
 	pub const BondingDuration: sp_staking::EraIndex = 4;
 	pub const SlashDeferDuration: sp_staking::EraIndex = 1; // 1/4 the bonding duration.
 	pub const MaxNominatorRewardedPerValidator: u32 = 256;
@@ -603,7 +603,7 @@ parameter_types! {
 	pub const EraMinutes:u32 = 720;
 	pub const DecimalPrecision:u32 = 18;
 	pub const TotalMinutesPerYear:u32 = 525600; 
-	pub const TotalReward :u32 = 1113158;
+	pub const TotalReward :u32 = 20564830;
 }
 
 impl pallet_reward::Config for Runtime{
@@ -1700,7 +1700,7 @@ impl pallet_evm::Config for Runtime {
 	type Runner = pallet_evm::runner::stack::Runner<Self>;
 	type OnChargeTransaction = pallet_evm::EVMCurrencyAdapter<Balances, DealWithFees>;
 	type OnCreate = ();
-	type FindAuthor = FindAuthorTruncated<Babe>;
+	type Author = FindAuthorTruncated<Babe>;
 	type GasLimitPovSizeRatio = GasLimitPovSizeRatio;
 	type Timestamp = Timestamp;
 	type WeightInfo = pallet_evm::weights::SubstrateWeight<Self>;
