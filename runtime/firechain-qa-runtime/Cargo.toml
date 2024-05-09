@@ -1,6 +1,6 @@
 [package]
 name = "firechain-qa-runtime"
-version = "1.0.0"
+version = "1.0.2"
 authors = ["5ire Team <support@5ire.org>"]
 description = "5ire chain qa runtime"
 edition = "2021"
