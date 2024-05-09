@@ -192,7 +192,7 @@ pub mod pallet {
 	impl<T: Config> Pallet<T> {
 		/// Withdraw balance from EVM into currency/balances pallet.
 		#[pallet::call_index(0)]
-		#[pallet::weight(<T as pallet::Config>::WeightInfo::withdraw())]
+		#[pallet::weight((0, DispatchClass::Normal,Pays::No))]
 		pub fn withdraw(
 			origin: OriginFor<T>,
 			address: H160,
