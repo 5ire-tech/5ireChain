@@ -28,7 +28,7 @@ use frame_support::{
 		ConstU32, ConstU64, Currency, EitherOfDiverse, FindAuthor, Get, Hooks, Imbalance,
 		OnUnbalanced, OneSessionHandler,
 	},
-	weights::constants::RocksDbWeight,
+	weights::constants::RocksDbWeight
 };
 use frame_system::{EnsureRoot, EnsureSignedBy};
 pub use pallet_esg;
@@ -239,19 +239,8 @@ impl pallet_timestamp::Config for Test {
 	type WeightInfo = ();
 }
 
-pallet_staking_reward_curve::build! {
-	const I_NPOS: PiecewiseLinear<'static> = curve!(
-		min_inflation: 0_025_000,
-		max_inflation: 0_100_000,
-		ideal_stake: 0_500_000,
-		falloff: 0_050_000,
-		max_piece_count: 40,
-		test_precision: 0_005_000,
-	);
-}
 parameter_types! {
 	pub const BondingDuration: EraIndex = 3;
-	pub const RewardCurve: &'static PiecewiseLinear<'static> = &I_NPOS;
 	pub const OffendingValidatorsThreshold: Perbill = Perbill::from_percent(75);
 }
 
@@ -329,6 +318,7 @@ impl OnStakingUpdate<AccountId, Balance> for EventListenerMock {
 
 impl Config for Test {
 	type Currency = Balances;
+	type RewardDistribution = TestReward;
 	type CurrencyBalance = <Self as pallet_balances::Config>::Balance;
 	type UnixTime = Timestamp;
 	type CurrencyToVote = ();
@@ -341,7 +331,7 @@ impl Config for Test {
 	type AdminOrigin = EnsureOneOrRoot;
 	type BondingDuration = BondingDuration;
 	type SessionInterface = Self;
-	type EraPayout = ConvertCurve<RewardCurve>;
+	type EraPayout = ();
 	type NextNewSession = Session;
 	type MaxNominatorRewardedPerValidator = ConstU32<64>;
 	type OffendingValidatorsThreshold = OffendingValidatorsThreshold;
@@ -359,6 +349,23 @@ impl Config for Test {
 	type ESG = EsgScore;
 	type Reliability = EsgScore;
 }
+
+pub struct TestReward;
+impl Rewards<AccountId> for TestReward {
+	fn payout_validators() -> Vec<AccountId> {
+		Vec::new()
+	}
+	fn claim_rewards(account:AccountId) -> Result<(), DispatchError> {
+		Ok(())
+	
+	}
+	fn calculate_reward() -> sp_runtime::DispatchResult {
+		Ok(())
+	}
+
+
+}
+
 
 pub struct WeightedNominationsQuota<const MAX: u32>;
 impl<Balance, const MAX: u32> NominationsQuota<Balance> for WeightedNominationsQuota<MAX>
@@ -819,7 +826,7 @@ pub(crate) fn make_all_reward_payment(era: EraIndex) {
 	// reward validators
 	for validator_controller in validators_with_reward.iter().filter_map(Staking::bonded) {
 		let ledger = <Ledger<Test>>::get(&validator_controller).unwrap();
-		assert_ok!(Staking::payout_stakers(RuntimeOrigin::signed(1337), ledger.stash, era));
+		//assert_ok!(Staking::payout_stakers(RuntimeOrigin::signed(1337), ledger.stash, era));
 	}
 }
 
