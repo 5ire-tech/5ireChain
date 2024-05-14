@@ -28,7 +28,7 @@ use frame_support::{
 		ConstU32, ConstU64, Currency, EitherOfDiverse, FindAuthor, Get, Hooks, Imbalance,
 		OnUnbalanced, OneSessionHandler,
 	},
-	weights::constants::RocksDbWeight
+	weights::constants::RocksDbWeight, PalletId
 };
 use frame_system::{EnsureRoot, EnsureSignedBy};
 pub use pallet_esg;
@@ -316,7 +316,7 @@ impl OnStakingUpdate<AccountId, Balance> for EventListenerMock {
 	}
 }
 
-impl Config for Test {
+impl pallet_staking::Config for Test {
 	type Currency = Balances;
 	type RewardDistribution = TestReward;
 	type CurrencyBalance = <Self as pallet_balances::Config>::Balance;
@@ -353,13 +353,18 @@ impl Config for Test {
 pub struct TestReward;
 impl Rewards<AccountId> for TestReward {
 	fn payout_validators() -> Vec<AccountId> {
-		Vec::new()
+		let mut validators = vec![11, 21, 31, 41, 51];
+		let mut nominators = vec![100, 101];
+
+		validators.append(&mut nominators);
+		validators
 	}
 	fn claim_rewards(account:AccountId) -> Result<(), DispatchError> {
 		Ok(())
 	
 	}
 	fn calculate_reward() -> sp_runtime::DispatchResult {
+	
 		Ok(())
 	}
 
@@ -605,6 +610,8 @@ impl ExtBuilder {
 		}
 		.assimilate_storage(&mut storage);
 
+
+
 		let mut ext = sp_io::TestExternalities::from(storage);
 
 		if self.initialize_first_session {
@@ -716,6 +723,8 @@ pub(crate) fn current_total_payout_for_duration(duration: u64) -> Balance {
 		Balances::total_issuance(),
 		duration,
 	);
+	let _ = <Test as Config>::RewardDistribution::calculate_reward();
+
 	assert!(payout > 0);
 	payout
 }

@@ -6717,6 +6717,7 @@ dependencies = [
  "pallet-esg",
  "pallet-im-online 4.0.0-dev",
  "pallet-offences",
+ "pallet-reward",
  "pallet-session 4.0.0-dev",
  "pallet-timestamp",
  "pallet-treasury",
