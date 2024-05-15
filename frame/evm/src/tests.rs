@@ -921,6 +921,7 @@ fn refunds_should_work() {
 fn refunds_and_priority_should_work() {
 	new_test_ext().execute_with(|| {
 		let author = EVM::find_author();
+
 		let before_tip = EVM::account_basic(&author).0.balance;
 		let before_call = EVM::account_basic(&H160::default()).0.balance;
 		// We deliberately set a base fee + max tip > max fee.
