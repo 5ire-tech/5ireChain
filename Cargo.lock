@@ -6032,6 +6032,7 @@ dependencies = [
  "frame-system",
  "hex",
  "libsecp256k1",
+ "pallet-authorship",
  "pallet-balances",
  "pallet-evm 6.0.0-dev",
  "pallet-timestamp",

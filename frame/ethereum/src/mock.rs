@@ -46,6 +46,7 @@ frame_support::construct_runtime! {
 		Timestamp: pallet_timestamp::{Pallet, Call, Storage},
 		EVM: pallet_evm::{Pallet, Call, Storage, Config<T>, Event<T>},
 		Ethereum: crate::{Pallet, Call, Storage, Event, Origin},
+		Authorship: pallet_authorship
 	}
 }
 
@@ -168,7 +169,7 @@ impl pallet_evm::Config for Test {
 	type Runner = pallet_evm::runner::stack::Runner<Self>;
 	type OnChargeTransaction = ();
 	type OnCreate = ();
-	type FindAuthor = FindAuthorTruncated;
+	type Author = FindAuthorTruncated;
 	type GasLimitPovSizeRatio = GasLimitPovSizeRatio;
 	type Timestamp = Timestamp;
 	type WeightInfo = ();
@@ -184,6 +185,25 @@ impl Config for Test {
 	type PostLogContent = PostBlockAndTxnHashes;
 	type ExtraDataLength = ConstU32<30>;
 }
+
+
+// For pallet authorship
+pub struct TestAuthor;
+impl FindAuthor<AccountId32> for TestAuthor {
+	fn find_author<'a, I>(_digests: I) -> Option<AccountId32>
+	where
+		I: 'a + IntoIterator<Item = (ConsensusEngineId, &'a [u8])>,
+	{
+		Some(address_build(0).account_id)
+	}
+}
+
+
+impl pallet_authorship::Config for Test {
+	type FindAuthor = TestAuthor;
+	type EventHandler = ();
+}
+
 
 impl fp_self_contained::SelfContainedCall for RuntimeCall {
 	type SignedInfo = H160;
