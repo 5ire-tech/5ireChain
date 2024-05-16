@@ -10,7 +10,7 @@ export const ETH_BLOCK_GAS_LIMIT = 30000000; // The same configuration as runtim
 export const ETH_BLOCK_POV_LIMIT = 5 * 1024 * 1024; // The same configuration as runtime
 
 export const GENESIS_ACCOUNT_BALANCE = "19342813113834066795298815";
-export const EXISTENTIAL_DEPOSIT = 0; // The minimum amount required to keep an account open
+export const EXISTENTIAL_DEPOSIT = 1; // The minimum amount required to keep an account open
 
 export const GENESIS_ACCOUNTS: string[] = [
   "0x48Df7B35247786418a7e279e508325952B9Fc92F",
