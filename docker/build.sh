@@ -7,7 +7,7 @@ ENVIRONMENT="qa"
 usage() {
   echo "Usage: $0 [-e environment] [-h|--help]"
   echo "Options:"
-  echo "  -e  Specify the environment for which docker image will be created"
+  echo "  -e  Specify the environment for which docker image will be created (default: qa)"
   echo "  -h, --help  Display this help message"
   exit 1
 }
@@ -17,6 +17,10 @@ while getopts ":e:h-:" opt; do
   case $opt in
     e)
       ENVIRONMENT="$OPTARG"
+      if [ "$ENVIORNMENT" != "qa" ] || [ "$ENVIORNMENT" != "thunder" ]; then
+        echo "Invalid Enviornment '$ENVIRONMENT'. Only 'qa' and 'thunder' envrionments are allowed at the moment"
+        exit 1
+      fi
       ;;
     h | - | --help)
       usage
@@ -40,4 +44,4 @@ shift $((OPTIND - 1))
 # Display the selected environment
 echo "creating docker image for $ENVIRONMENT environment"
 
-docker build -t 5irenode:$environment -f firechain_builder.Dockerfile ../ --build-arg environment=$ENVIRONMENT
+docker build -t 5irenode:$ENVIRONMENT -f firechain_builder.Dockerfile ../ --build-arg environment=$ENVIRONMENT
