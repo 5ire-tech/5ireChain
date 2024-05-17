@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Default environment
-ENVIRONMENT="qa"
+TAG=$(date +'%Y-%m-%d_%H-%M-%S')
+echo $TAG
 
 # Display usage information
 usage() {
   echo "Usage: $0 [-e environment] [-h|--help]"
   echo "Options:"
-  echo "  -e  Specify the environment for which docker image will be created"
+  echo "  -e  Specify the environment for which docker image will be uploaded"
   echo "  -h, --help  Display this help message"
   exit 1
 }
@@ -34,10 +34,10 @@ while getopts ":e:h-:" opt; do
   esac
 done
 
-# Shift the options so that $1 now refers to the first non-option argument
-shift $((OPTIND - 1))
+docker images | grep latest | awk '{print $1}' | grep 5irenode
+if [ $? -ne 0 ]; then  
+  echo "No image exists for $environment. Please run the script with --build flag" 
+  exit 1
+fi
 
-# Display the selected environment
-echo "creating docker image for $ENVIRONMENT environment"
-
-docker build -t 5irenode:$environment -f firechain_builder.Dockerfile ../ --build-arg environment=$ENVIRONMENT
+docker tag 5irenode$environment <to be decided>:$TAG 
