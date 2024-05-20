@@ -112,6 +112,9 @@ In all communications and contributions, this project follows the [Contributor C
 - **Engage with the community**: Participate in discussions and provide feedback on other contributions.
 - **Stay consistent**: Ensure your contributions are coherent with the rest of the documentation and do not overlap or contradict existing content.
 
+### Blockchain Scripts
+Scripts are created to use up the process of building and running nodes. For more details please refer to [README.md](docker/README.md)
+
 ### Contact and support
 
 - For docs issues (technical or language) open an issue here.

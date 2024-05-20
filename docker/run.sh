@@ -111,8 +111,8 @@ case $command in
   validator)
     docker run --name 5ire"$environment" -rm -it -p 30333:30333 -p 9944:9944 5irenode:$environment \
       --base-path /5ire/data --chain /5ire/specs/5ire-$environment-specRaw.json --port 30333 \
-      --rpc-port 9944 --pruning archive --name TestValidator --rpc-external --rpc-cors all \
-      --rpc-methods Unsafe --unsafe-rpc-external --rpc-max-connections 40000 --validator \
+      --rpc-port 9944 --name TestValidator --rpc-external --rpc-cors all \
+      --rpc-methods Unsafe --unsafe-rpc-external --validator \
       --bootnodes "/ip4/$bootnode_ip/tcp/30333/p2p/$bootnode_id"
     ;;
   archivenode)
