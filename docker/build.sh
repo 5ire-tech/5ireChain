@@ -17,8 +17,8 @@ while getopts ":e:h-:" opt; do
   case $opt in
     e)
       ENVIRONMENT="$OPTARG"
-      if [ "$ENVIORNMENT" != "qa" ] || [ "$ENVIORNMENT" != "thunder" ]; then
-        echo "Invalid Enviornment '$ENVIRONMENT'. Only 'qa' and 'thunder' envrionments are allowed at the moment"
+      if [ "$ENVIRONMENT" != "qa" ] && [ "$ENVIRONMENT" != "thunder" ]; then
+        echo "Invalid Environment '$ENVIRONMENT'. Only 'qa' and 'thunder' envrionments are allowed at the moment"
         exit 1
       fi
       ;;

@@ -52,7 +52,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     -e)
       environment="$2"
-      if [ "$environment" != "qa" ] || [ "$environment" != "thunder" ]; then
+      if [ "$environment" != "qa" ] && [ "$environment" != "thunder" ]; then
         echo "Invalid Environment '$environment'. Only 'qa' and 'thunder' envrionments are allowed at the moment"
         exit 1
       fi
