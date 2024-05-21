@@ -7,7 +7,7 @@ bootnode_id=""
 build_docker=false
 environment="qa"
 
-# Display usage information
+# Display usage ination
 usage() {
   echo "Usage: $0 [-e <environmnent>] [-f|--fullnode] [-v|--validator] [-a|--archivenode] -b|--bootnode <bootnode_ip_address> -bid|--bootnode-id <bootnode_id> [--build] [-h|--help]"
   echo "NOTE: Only one of -f | --fullnode, -v | --validator, or -a | --archivenode is mandatory."
@@ -102,21 +102,21 @@ echo "Starting Docker container for 5irechain node"
 
 case $command in
   fullnode)
-    docker run --name 5ire"$environment" -rm -it -p 30333:30333 -p 9944:9944 5irenode:$environment \
+    docker run --name 5ire"$environment" -it -p 30333:30333 -p 9944:9944 5irenode:$environment \
       --base-path /5ire/data --chain /5ire/specs/5ire-$environment-specRaw.json --port 30333 \
       --rpc-port 9944 --pruning archive --name TestFullnode --rpc-external --rpc-cors all \
       --rpc-methods Unsafe --unsafe-rpc-external --rpc-max-connections 40000 \
       --bootnodes "/ip4/$bootnode_ip/tcp/30333/p2p/$bootnode_id"
     ;;
   validator)
-    docker run --name 5ire"$environment" -rm -it -p 30333:30333 -p 9944:9944 5irenode:$environment \
+    docker run --name 5ire"$environment" -it -p 30333:30333 -p 9944:9944 5irenode:$environment \
       --base-path /5ire/data --chain /5ire/specs/5ire-$environment-specRaw.json --port 30333 \
       --rpc-port 9944 --name TestValidator --rpc-external --rpc-cors all \
       --rpc-methods Unsafe --unsafe-rpc-external --validator \
       --bootnodes "/ip4/$bootnode_ip/tcp/30333/p2p/$bootnode_id"
     ;;
   archivenode)
-    docker run --name 5ire"$environment" -rm -it -p 30333:30333 -p 9944:9944 5irenode:$environment \
+    docker run --name 5ire"$environment" -it -p 30333:30333 -p 9944:9944 5irenode:$environment \
       --base-path /5ire/data --chain /5ire/specs/5ire-$environment-specRaw.json --pruning archive \
       --name TestArchive --no-telemetry --bootnodes "/ip4/$bootnode_ip/tcp/30333/p2p/$bootnode_id"
     ;;
