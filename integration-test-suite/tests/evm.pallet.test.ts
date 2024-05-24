@@ -180,7 +180,7 @@ async function createContract(evmAddress: any, alice: KeyringPair) {
             const dataStr = JSON.parse(data);
 
             const filteredData = dataStr.filter(
-              (item: any) => item.event.index === "0x3601"
+              (item: any) => item.event.index === "0x3701"
             );
             const contractAddress = filteredData[0].event.data[0];
             expect(contractAddress).not.undefined;
