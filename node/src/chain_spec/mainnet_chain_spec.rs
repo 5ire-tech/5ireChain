@@ -379,6 +379,7 @@ pub fn testnet_genesis(
 		ethereum: Default::default(),
 		dynamic_fee: Default::default(),
 		base_fee: Default::default(),
+		reward:Default::default(),
 	}
 }
 
@@ -565,7 +566,8 @@ pub fn development_genesis(
 		ethereum: EthereumConfig { _marker: Default::default() },
 		dynamic_fee: Default::default(),
 		base_fee: Default::default(),
-	}
+		reward:Default::default(),
+  }
 }
 
 fn development_config_genesis() -> RuntimeGenesisConfig {
@@ -583,7 +585,7 @@ fn development_config_genesis() -> RuntimeGenesisConfig {
 pub fn development_config() -> ChainSpec {
 	ChainSpec::from_genesis(
 		"Development",
-		"mainnet_5ireChian_dev",
+		"mainnet_5ireChain_dev",
 		ChainType::Development,
 		development_config_genesis,
 		vec![],

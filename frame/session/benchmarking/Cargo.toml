@@ -29,7 +29,6 @@ codec = { package = "parity-scale-codec", version = "3.6.1", features = ["derive
 scale-info = "2.1.1"
 frame-election-provider-support = { workspace = true }
 pallet-balances = { workspace = true }
-pallet-staking-reward-curve = { workspace = true }
 pallet-timestamp = { workspace = true }
 sp-core = { workspace = true }
 sp-io = { workspace = true }

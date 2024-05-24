@@ -39,8 +39,11 @@ use sp_runtime::{
 };
 use sp_staking::{EraIndex, SessionIndex};
 use sp_std::prelude::*;
-
+//use pallet_treasury::Rewards;
 mod impls;
+//use pallet_treasury::TreasuryAccountId;
+
+use crate::{Rewards};
 
 pub use impls::*;
 
@@ -91,6 +94,10 @@ pub mod pallet {
 			Moment = BlockNumberFor<Self>,
 			Balance = Self::CurrencyBalance,
 		>;
+		/// The reward distribution for validator and nominator
+
+		type RewardDistribution :Rewards<Self::AccountId>;
+
 		/// Just the `Currency::Balance` type; we have this item to allow us to constrain it to
 		/// `From<u64>`.
 		type CurrencyBalance: sp_runtime::traits::AtLeast32BitUnsigned
@@ -100,6 +107,8 @@ pub mod pallet {
 			+ sp_std::fmt::Debug
 			+ Default
 			+ From<u64>
+			+ From<u128>
+			+ Into<u128>
 			+ TypeInfo
 			+ MaxEncodedLen;
 		/// Time used for computing era duration.
@@ -1392,7 +1401,6 @@ pub mod pallet {
 			<Invulnerables<T>>::put(invulnerables);
 			Ok(())
 		}
-
 		/// Force a current staker to become completely unstaked, immediately.
 		///
 		/// The dispatch origin must be Root.
@@ -1465,29 +1473,7 @@ pub mod pallet {
 			Ok(())
 		}
 
-		/// Pay out all the stakers behind a single validator for a single era.
-		///
-		/// - `validator_stash` is the stash account of the validator. Their nominators, up to
-		///   `T::MaxNominatorRewardedPerValidator`, will also receive their rewards.
-		/// - `era` may be any era between `[current_era - history_depth; current_era]`.
-		///
-		/// The origin of this call must be _Signed_. Any account can call this function, even if
-		/// it is not one of the stakers.
-		///
-		/// ## Complexity
-		/// - At most O(MaxNominatorRewardedPerValidator).
-		#[pallet::call_index(18)]
-		#[pallet::weight(T::WeightInfo::payout_stakers_alive_staked(
-			T::MaxNominatorRewardedPerValidator::get()
-		))]
-		pub fn payout_stakers(
-			origin: OriginFor<T>,
-			validator_stash: T::AccountId,
-			era: EraIndex,
-		) -> DispatchResultWithPostInfo {
-			ensure_signed(origin)?;
-			Self::do_payout_stakers(validator_stash, era)
-		}
+	
 
 		/// Rebond a portion of the stash scheduled to be unlocked.
 		///

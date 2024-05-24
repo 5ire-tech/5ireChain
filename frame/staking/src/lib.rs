@@ -321,6 +321,7 @@ use sp_std::{collections::btree_map::BTreeMap, prelude::*};
 pub use weights::WeightInfo;
 
 pub use pallet::{pallet::*, UseNominatorsAndValidatorsMap, UseValidatorsMap};
+use frame_support::pallet_prelude::DispatchError;
 
 pub(crate) const LOG_TARGET: &str = "runtime::staking";
 
@@ -426,10 +427,10 @@ pub struct ValidatorPrefs {
 pub struct UnlockChunk<Balance: HasCompact + MaxEncodedLen> {
 	/// Amount of funds to be unlocked.
 	#[codec(compact)]
-	value: Balance,
+	pub value: Balance,
 	/// Era number at which point it'll be unlocked.
 	#[codec(compact)]
-	era: EraIndex,
+	pub era: EraIndex,
 }
 
 /// The ledger of a (bonded) stash.
@@ -773,6 +774,15 @@ pub trait NominationsQuota<Balance> {
 	/// Returns the voter's nomination quota based on its balance and a curve.
 	fn curve(balance: Balance) -> u32;
 }
+
+///rewars trait
+
+pub trait Rewards<AccountId>{
+	fn payout_validators() -> Vec<AccountId>;
+	fn claim_rewards(account:AccountId) -> Result<(), DispatchError>;
+	fn calculate_reward() -> sp_runtime::DispatchResult;
+}
+
 
 /// A nomination quota that allows up to MAX nominations for all validators.
 pub struct FixedNominationsQuota<const MAX: u32>;

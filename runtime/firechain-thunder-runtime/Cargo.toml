@@ -1,6 +1,6 @@
 [package]
 name = "firechain-thunder-runtime"
-version = "1.0.0"
+version = "1.0.2"
 authors = ["5ire Team <support@5ire.org>"]
 description = "5ire chain Thunder Testnet runtime"
 edition = "2021"
@@ -92,7 +92,6 @@ pallet-root-testing = { workspace = true }
 pallet-session = { workspace = true, features = [ "historical" ] }
 pallet-session-benchmarking = { workspace = true, optional = true }
 pallet-staking = { workspace = true}
-pallet-staking-reward-curve = { workspace = true }
 pallet-staking-runtime-api = { workspace = true }
 pallet-state-trie-migration = { workspace = true }
 pallet-scheduler = { workspace = true}
@@ -105,7 +104,7 @@ pallet-transaction-payment-rpc-runtime-api = { workspace = true}
 pallet-transaction-storage = { workspace = true }
 pallet-vesting = { workspace = true }
 pallet-esg = { workspace = true}
-
+pallet-reward={workspace=true}
 # Frontier
 fp-account = { workspace = true, features = ["serde"] }
 fp-evm = { workspace = true, features = ["serde"] }
@@ -214,6 +213,7 @@ std = [
 	"pallet-alliance/std",
 	"substrate-wasm-builder",
 	"pallet-esg/std",
+	"pallet-reward/std",
 	#frontier
 	'fp-rpc/std',
 	'fp-evm/std',
@@ -278,6 +278,7 @@ runtime-benchmarks = [
 	"frame-system-benchmarking/runtime-benchmarks",
 	"pallet-esg/runtime-benchmarks",
 	"pallet-ethereum/runtime-benchmarks",
+	"pallet-reward/runtime-benchmarks",
 ]
 try-runtime = [
 	"frame-try-runtime/try-runtime",

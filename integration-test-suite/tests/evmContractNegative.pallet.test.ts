@@ -202,10 +202,11 @@ async function createContract(
             console.log(data);
 
             const dataStr = JSON.parse(data);
-
+            // Get contract address 
             const filteredData = dataStr.filter(
-              (item: any) => item.event.index === "0x3601"
+              (item: any) => item.event.index === "0x3701"
             );
+
             const contractAddress = filteredData[0].event.data[0];
             expect(contractAddress).not.undefined;
 
@@ -448,7 +449,8 @@ async function createContractWithInvalidNonceFailure(
           const filteredData = dataStr.filter(
             (item: any) => item.event.index === "0x0001"
           );
-          expect(filteredData[0].event.data[0].module.index == 54).true; //EVM
+          console.log(filteredData[0].event.data[0]);
+          expect(filteredData[0].event.data[0].module.index == 55).true; //EVM
           expect(filteredData[0].event.data[0].module.error == "0x05000000")
             .true; //InvalidNonce, index 5
 
@@ -506,7 +508,7 @@ async function createContractWithGasPriceTooLowFailure(
             (item: any) => item.event.index === "0x0001"
           );
           console.log(`filteredData ${JSON.stringify(filteredData)}`);
-          expect(filteredData[0].event.data[0].module.index == 54).true; //EVM
+          expect(filteredData[0].event.data[0].module.index == 55).true; //EVM
           expect(filteredData[0].event.data[0].module.error == "0x06000000")
             .true; //GasPriceTooLow
 
@@ -563,7 +565,7 @@ async function createContractWithGasLimitTooLowFailure(
             (item: any) => item.event.index === "0x0001"
           );
           console.log(`filteredData ${JSON.stringify(filteredData)}`);
-          expect(filteredData[0].event.data[0].module.index == 54).true; //EVM
+          expect(filteredData[0].event.data[0].module.index == 55).true; //EVM
           expect(filteredData[0].event.data[0].module.error == "0x06000000")
             .true; //GasLimitTooLow
 
@@ -685,8 +687,8 @@ async function createContractWithInsufficientBalanceFailure(
               (item: any) => item.event.index === "0x0001"
             );
             console.log(`filteredData ${JSON.stringify(filteredData)}`);
-            expect(filteredData[0].event.data[0].module.index == 6).true; //Balance
-            expect(filteredData[0].event.data[0].module.error == "0x02000000")
+            expect(filteredData[0].event.data[0].module.index == 55).true; //EVM
+            expect(filteredData[0].event.data[0].module.error == "0x00000000")// BalanceLow
               .true; //InsufficientBalance
 
             unsub();

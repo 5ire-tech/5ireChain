@@ -33,6 +33,7 @@ sp-std = { workspace = true }
 # Frontier
 fp-account = { workspace = true }
 fp-evm = { workspace = true, features = ["serde"] }
+pallet-authorship ={workspace= true, default-features = false}
 
 [dev-dependencies]
 hex = { workspace = true }
