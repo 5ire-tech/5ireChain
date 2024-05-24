@@ -125,7 +125,7 @@ pub mod pallet {
 	pub struct Pallet<T>(PhantomData<T>);
 
 	#[pallet::config]
-	pub trait Config: frame_system::Config {
+	pub trait Config: frame_system::Config + pallet_authorship::Config {
 		/// Calculator for current gas price.
 		type FeeCalculator: FeeCalculator;
 
@@ -171,7 +171,7 @@ pub mod pallet {
 		type OnCreate: OnCreate<Self>;
 
 		/// Find author for the current block.
-		type FindAuthor: FindAuthor<H160>;
+		type Author: FindAuthor<H160>;
 
 		/// Gas limit Pov size ratio.
 		type GasLimitPovSizeRatio: Get<u64>;
@@ -192,7 +192,7 @@ pub mod pallet {
 	impl<T: Config> Pallet<T> {
 		/// Withdraw balance from EVM into currency/balances pallet.
 		#[pallet::call_index(0)]
-		#[pallet::weight(<T as pallet::Config>::WeightInfo::withdraw())]
+		#[pallet::weight((0, DispatchClass::Normal,Pays::No))]
 		pub fn withdraw(
 			origin: OriginFor<T>,
 			address: H160,
@@ -865,7 +865,9 @@ impl<T: Config> Pallet<T> {
 		let digest = <frame_system::Pallet<T>>::digest();
 		let pre_runtime_digests = digest.logs.iter().filter_map(|d| d.as_pre_runtime());
 
-		T::FindAuthor::find_author(pre_runtime_digests).unwrap_or_default()
+		T::Author::find_author(pre_runtime_digests).unwrap_or_default()
+
+	
 	}
 }
 
@@ -985,8 +987,9 @@ where
 	fn pay_priority_fee(tip: Self::LiquidityInfo) {
 		// Default Ethereum behaviour: issue the tip to the block author.
 		if let Some(tip) = tip {
-			let account_id = T::AddressMapping::into_account_id(<Pallet<T>>::find_author());
-			let _ = C::deposit_into_existing(&account_id, tip.peek());
+			let author = pallet_authorship::Pallet::<T>::author().unwrap();
+
+		   let _=C::resolve_creating(&author, tip);
 		}
 	}
 }

@@ -147,7 +147,7 @@ sc-client-db = { workspace = true }
 pallet-timestamp = { workspace = true }
 
 [features]
-default = []
+default = ["rpc-binary-search-estimate"]
 all = ["cli", "firechain-qa", "firechain-mainnet", "firechain-thunder"]
 cli = [
 	"sc-cli",
@@ -180,3 +180,6 @@ try-runtime = [
 	"firechain-thunder-runtime/try-runtime",
 	"try-runtime-cli/try-runtime",
 ]
+
+rpc-binary-search-estimate = ["fc-rpc/rpc-binary-search-estimate"]
+

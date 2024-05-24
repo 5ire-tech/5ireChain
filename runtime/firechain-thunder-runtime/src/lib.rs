@@ -86,7 +86,6 @@ use precompiles::FrontierPrecompiles;
 
 use sp_runtime::{
 	create_runtime_str,
-	curve::PiecewiseLinear,
 	generic, impl_opaque_keys,
 	traits::{
 		self, AccountIdConversion, BlakeTwo256, Block as BlockT, Bounded, ConvertInto,
@@ -160,7 +159,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("firechain-node-thunder"),
 	impl_name: create_runtime_str!("5ire"),
 	authoring_version: 1,
-	spec_version: 100,
+	spec_version: 102,
 	impl_version: 0,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
@@ -210,7 +209,7 @@ const AVERAGE_ON_INITIALIZE_RATIO: Perbill = Perbill::from_percent(10);
 /// We allow `Normal` extrinsics to fill up the block up to 75%, the rest can be used
 /// by  Operational  extrinsics.
 const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
-/// We allow for 2 seconds of compute with a 6 second average block time, with maximum proof size.
+/// We allow for 1 seconds of compute with a 3 second average block time, with maximum proof size.
 const MAXIMUM_BLOCK_WEIGHT: Weight =
 	Weight::from_parts(WEIGHT_REF_TIME_PER_SECOND.saturating_mul(1), u64::MAX);
 
@@ -451,7 +450,7 @@ impl pallet_indices::Config for Runtime {
 }
 
 parameter_types! {
-	pub const ExistentialDeposit: Balance = DOLLARS;
+	pub const ExistentialDeposit: Balance = DOLLARS/10; 
 	// For weight estimation, we assume that the most locks on an individual account will be 50.
 	// This number may need to be adjusted in the future if this assumption no longer holds true.
 	pub const MaxLocks: u32 = 50;
@@ -543,22 +542,11 @@ impl pallet_session::historical::Config for Runtime {
 	type FullIdentificationOf = pallet_staking::ExposureOf<Runtime>;
 }
 
-pallet_staking_reward_curve::build! {
-	const REWARD_CURVE: PiecewiseLinear<'static> = curve!(
-		min_inflation: 0_025_000,
-		max_inflation: 0_100_000,
-		ideal_stake: 0_500_000,
-		falloff: 0_050_000,
-		max_piece_count: 40,
-		test_precision: 0_005_000,
-	);
-}
 
 parameter_types! {
-	pub const SessionsPerEra: sp_staking::SessionIndex = 12;
-	pub const BondingDuration: sp_staking::EraIndex = 24 * 28;
-	pub const SlashDeferDuration: sp_staking::EraIndex = 24 * 7; // 1/4 the bonding duration.
-	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
+	pub const SessionsPerEra: sp_staking::SessionIndex = 6;
+	pub const BondingDuration: sp_staking::EraIndex = 28; // 14 days
+	pub const SlashDeferDuration: sp_staking::EraIndex = BondingDuration::get() - 1; // 13 days
 	pub const MaxNominatorRewardedPerValidator: u32 = 256;
 	pub const OffendingValidatorsThreshold: Perbill = Perbill::from_percent(17);
 	pub OffchainRepeat: BlockNumber = 5;
@@ -589,7 +577,9 @@ impl pallet_staking::Config for Runtime {
 		pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 3, 4>,
 	>;
 	type SessionInterface = Self;
-	type EraPayout = pallet_staking::ConvertCurve<RewardCurve>;
+	type EraPayout = ();
+	type RewardDistribution = Reward;
+
 	type NextNewSession = Session;
 	type MaxNominatorRewardedPerValidator = MaxNominatorRewardedPerValidator;
 	type OffendingValidatorsThreshold = OffendingValidatorsThreshold;
@@ -606,6 +596,32 @@ impl pallet_staking::Config for Runtime {
 	type BenchmarkingConfig = StakingBenchmarkingConfig;
 	type ESG = EsgScore;
 	type Reliability = ImOnline;
+}
+
+parameter_types! {
+	pub const EraMinutes:u32 = 720;
+	pub const DecimalPrecision:u32 = 18;
+	pub const TotalMinutesPerYear:u32 = 525600; 
+	pub const TotalReward :u32 = 20564830;
+}
+
+impl pallet_reward::Config for Runtime{
+	//type TreasuryAccount = Treasury;
+	type RewardCurrency = Balances;
+	type Balance = Balance;
+	type RuntimeEvent = RuntimeEvent;
+	type DataProvider = <Runtime as pallet_election_provider_multi_phase::Config>::DataProvider;
+	type ValidatorIdOf = pallet_staking::StashOf<Self>;
+	type ValidatorSet = Historical;
+	type Validators = Historical;
+	type ValidatorId = pallet_staking::StashOf<Self>;
+	type Precision = DecimalPrecision;
+	type TotalMinutesPerYear = TotalMinutesPerYear;
+	type EraMinutes = EraMinutes;
+	type TotalReward = TotalReward;
+	type PalletId =RewardPalletId;
+
+
 }
 
 impl pallet_fast_unstake::Config for Runtime {
@@ -1115,7 +1131,8 @@ parameter_types! {
 	pub const TipReportDepositBase: Balance = DOLLARS;
 	pub const DataDepositPerByte: Balance = CENTS;
 	pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
-	pub const MaximumReasonLength: u32 = 300;
+	pub const RewardPalletId: PalletId = PalletId(*b"py/rewrd");
+    pub const MaximumReasonLength: u32 = 300;
 	pub const MaxApprovals: u32 = 100;
 	pub const MaxBalance: Balance = Balance::max_value();
 }
@@ -1137,7 +1154,7 @@ impl pallet_treasury::Config for Runtime {
 	type ProposalBondMinimum = ProposalBondMinimum;
 	type ProposalBondMaximum = ();
 	type SpendPeriod = SpendPeriod;
-	type Burn = Burn;
+	type Burn = ();
 	type BurnDestination = ();
 	type SpendFunds = Bounties;
 	type WeightInfo = pallet_treasury::weights::SubstrateWeight<Runtime>;
@@ -1601,7 +1618,7 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 			let authority_id = Babe::authorities()[author_index as usize].clone().0;
 			return Some(H160::from_slice(
 				&sp_core::crypto::ByteArray::to_raw_vec(&authority_id)[4..24],
-			))
+			));
 		}
 		None
 	}
@@ -1674,7 +1691,7 @@ impl pallet_evm::Config for Runtime {
 	type Runner = pallet_evm::runner::stack::Runner<Self>;
 	type OnChargeTransaction = pallet_evm::EVMCurrencyAdapter<Balances, DealWithFees>;
 	type OnCreate = ();
-	type FindAuthor = FindAuthorTruncated<Babe>;
+	type Author = FindAuthorTruncated<Babe>;
 	type GasLimitPovSizeRatio = GasLimitPovSizeRatio;
 	type Timestamp = Timestamp;
 	type WeightInfo = pallet_evm::weights::SubstrateWeight<Self>;
@@ -1749,7 +1766,7 @@ construct_runtime!(
 		FastUnstake: pallet_fast_unstake,
 		Pov: frame_benchmarking_pallet_pov,
 		EsgScore: pallet_esg,
-
+		Reward:pallet_reward,
 		Ethereum: pallet_ethereum,
 		EVM: pallet_evm,
 		DynamicFee: pallet_dynamic_fee,

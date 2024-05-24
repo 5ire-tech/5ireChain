@@ -37,7 +37,6 @@ frame-election-provider-support = { workspace = true }
 pallet-balances = { workspace = true }
 pallet-offences = { workspace = true }
 pallet-staking = { path = "../staking" }
-pallet-staking-reward-curve = { path = "../staking/reward-curve" }
 sp-core = { workspace = true }
 
 [features]
