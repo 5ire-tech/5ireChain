@@ -547,6 +547,10 @@ parameter_types! {
 	pub const SessionsPerEra: sp_staking::SessionIndex = 6;
 	pub const BondingDuration: sp_staking::EraIndex = 28; // 14 days
 	pub const SlashDeferDuration: sp_staking::EraIndex = BondingDuration::get() - 1; // 13 days
+<<<<<<< HEAD
+=======
+	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
+>>>>>>> 0fa5f2d (Update latest chain spec for new thunder GA (#115))
 	pub const MaxNominatorRewardedPerValidator: u32 = 256;
 	pub const OffendingValidatorsThreshold: Perbill = Perbill::from_percent(17);
 	pub OffchainRepeat: BlockNumber = 5;
