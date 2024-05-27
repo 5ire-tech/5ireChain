@@ -53,7 +53,11 @@ describe("EVM related Gas using web3js/ethersjs", function () {
       from: GENESIS_ACCOUNTS[0],
       data: ERC20_BYTECODES,
     });
+<<<<<<< HEAD
     expect(gasEstimation).to.eq(935922);
+=======
+    expect(gasEstimation).to.eq(894198);
+>>>>>>> 43ad2d3 (Add gas tests  (#110))
   });
 
   it("estimate gas for contract call", async function () {
@@ -66,7 +70,11 @@ describe("EVM related Gas using web3js/ethersjs", function () {
     let gasEstimation = await erc20Contract.methods
       .transfer(TEST_ACCOUNT, amount)
       .estimateGas({ from: GENESIS_ACCOUNTS[0] });
+<<<<<<< HEAD
     expect(gasEstimation).to.eq(22371);
+=======
+    expect(gasEstimation).to.eq(21632);
+>>>>>>> 43ad2d3 (Add gas tests  (#110))
   });
 
   it("estimate gas with gasPrice value is 0x0 ", async function () {
@@ -75,12 +83,20 @@ describe("EVM related Gas using web3js/ethersjs", function () {
       data: ERC20_BYTECODES,
       gasPrice: "0x0",
     });
+<<<<<<< HEAD
     expect(result).to.equal(935922);
+=======
+    expect(result).to.equal(894198);
+>>>>>>> 43ad2d3 (Add gas tests  (#110))
     result = await web3.eth.estimateGas({
       from: GENESIS_ACCOUNTS[0],
       data: ERC20_BYTECODES,
     });
+<<<<<<< HEAD
     expect(result).to.equal(935922);
+=======
+    expect(result).to.equal(894198);
+>>>>>>> 43ad2d3 (Add gas tests  (#110))
   });
 
   it("tx gas limit below ETH_BLOCK_GAS_LIMIT", async function () {
@@ -182,7 +198,11 @@ describe("EVM related Gas using web3js/ethersjs", function () {
 			to: contractAddess,
 			data: "0x28b5e32b", // selector for the contract's `call` method
 		});
+<<<<<<< HEAD
 		expect(estimate).to.equal(85699);
+=======
+		expect(estimate).to.equal(43323);
+>>>>>>> 43ad2d3 (Add gas tests  (#110))
   });
 
 });
