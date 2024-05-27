@@ -4,20 +4,23 @@ WORKDIR /5ire
 
 COPY . /5ire
 
+ARG environment
+
 ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 
 RUN apt-get update && apt-get install -y protobuf-compiler libclang-dev
 
-RUN cargo build --release --features firechain-thunder
+RUN cargo build --release --features firechain-${environment}
 
-FROM debian:bullseye-slim
+FROM debian:stable-slim
+
+ARG environment
 
 WORKDIR /5ire
 
 COPY --from=builder /5ire/target/release/firechain-node /5ire/firechain-node
 
-
-COPY --from=builder /5ire/specs/5ire-thunder-specRaw.json /5ire/specs/5ire-thunder-specRaw.json
+COPY --from=builder /5ire/specs/5ire-${environment}-specRaw.json /5ire/specs/5ire-${environment}-specRaw.json
 
 RUN set -eux; \
     apt-get update; \
