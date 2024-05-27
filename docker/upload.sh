@@ -23,7 +23,11 @@ while [[ $# -gt 0 ]]; do
   case $1 in
     -e)
       environment="$2"
+<<<<<<< HEAD
       if [ "$environment" != "qa" ] && [ "$environment" != "thunder" ]; then
+=======
+      if [ "$environment" != "qa" ] || [ "$environment" != "thunder" ]; then
+>>>>>>> cdb6b8a (updated validator nodes flags, added scripts readme & added upload.sh)
         echo "Invalid Environment '$environment'. Only 'qa' and 'thunder' envrionments are allowed at the moment"
         exit 1
       fi
@@ -67,4 +71,8 @@ if [ "$environment" == "qa" ]; then
 elif [ "$environment" == "thunder" ]; then
   docker tag 5irenode$environment 5irechain/5ire-thunder-node:$TAG
   docker push 5irechain/5ire-thunder-node:$TAG
+<<<<<<< HEAD
 fi
+=======
+fi
+>>>>>>> cdb6b8a (updated validator nodes flags, added scripts readme & added upload.sh)
