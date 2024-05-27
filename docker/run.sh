@@ -102,21 +102,33 @@ echo "Starting Docker container for 5irechain node"
 
 case $command in
   fullnode)
+<<<<<<< HEAD
     docker run --name 5ire$environment -d -p 30333:30333 -p 9944:9944 5irenode:$environment \
+=======
+    docker run --name 5ire"$environment" -it -p 30333:30333 -p 9944:9944 5irenode:$environment \
+>>>>>>> 480bfa1 (made scripts executable and fixed run issue)
       --base-path /5ire/data --chain /5ire/specs/5ire-$environment-specRaw.json --port 30333 \
       --rpc-port 9944 --pruning archive --name TestFullnode --rpc-external --rpc-cors all \
       --rpc-methods Unsafe --unsafe-rpc-external --rpc-max-connections 40000 \
       --bootnodes "/ip4/$bootnode_ip/tcp/30333/p2p/$bootnode_id"
     ;;
   validator)
+<<<<<<< HEAD
     docker run --name 5ire$environment -d -p 30333:30333 -p 9944:9944 5irenode:$environment \
+=======
+    docker run --name 5ire"$environment" -it -p 30333:30333 -p 9944:9944 5irenode:$environment \
+>>>>>>> 480bfa1 (made scripts executable and fixed run issue)
       --base-path /5ire/data --chain /5ire/specs/5ire-$environment-specRaw.json --port 30333 \
       --rpc-port 9944 --name TestValidator --rpc-external --rpc-cors all \
       --rpc-methods Unsafe --unsafe-rpc-external --validator \
       --bootnodes "/ip4/$bootnode_ip/tcp/30333/p2p/$bootnode_id"
     ;;
   archivenode)
+<<<<<<< HEAD
     docker run --name 5ire$environment -d -p 30333:30333 -p 9944:9944 5irenode:$environment \
+=======
+    docker run --name 5ire"$environment" -it -p 30333:30333 -p 9944:9944 5irenode:$environment \
+>>>>>>> 480bfa1 (made scripts executable and fixed run issue)
       --base-path /5ire/data --chain /5ire/specs/5ire-$environment-specRaw.json --pruning archive \
       --name TestArchive --no-telemetry --bootnodes "/ip4/$bootnode_ip/tcp/30333/p2p/$bootnode_id"
     ;;
