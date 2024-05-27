@@ -115,6 +115,11 @@ Implemented ESG interface to convert the ESG score into weight and incorporate i
 
 ### **Esg Pallet:** 
 An oracle loads the `ESG` score from off-chain storage to on-chain storage. Then `ESG` interface is tightly coupled with the other pallets and is used as a factor in calculating reward for validators and nominators.
+### **Reward Pallet:**
+
++ The Reward Pallet is a module in the Substrate blockchain framework designed to manage and distribute rewards to participants based on their contributions within the network.
+
++ This pallet facilitates the allocation of rewards to validators and nominators for their involvement in staking activities.
 
 ## **5. Roadmap**
 
