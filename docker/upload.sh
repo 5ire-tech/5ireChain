@@ -24,10 +24,14 @@ while [[ $# -gt 0 ]]; do
     -e)
       environment="$2"
 <<<<<<< HEAD
+<<<<<<< HEAD
       if [ "$environment" != "qa" ] && [ "$environment" != "thunder" ]; then
 =======
       if [ "$environment" != "qa" ] || [ "$environment" != "thunder" ]; then
 >>>>>>> cdb6b8a (updated validator nodes flags, added scripts readme & added upload.sh)
+=======
+      if [ "$environment" != "qa" ] && [ "$environment" != "thunder" ]; then
+>>>>>>> a325111 (fixed environment check)
         echo "Invalid Environment '$environment'. Only 'qa' and 'thunder' envrionments are allowed at the moment"
         exit 1
       fi
