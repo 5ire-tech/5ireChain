@@ -162,7 +162,11 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to 0. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
+<<<<<<< HEAD
 	spec_version: 102,
+=======
+	spec_version: 101,
+>>>>>>> 0b1e9b5 (Features/app 1158 (#126))
 	impl_version: 0,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
