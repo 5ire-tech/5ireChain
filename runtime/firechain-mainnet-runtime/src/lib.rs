@@ -603,7 +603,11 @@ parameter_types! {
 	pub const EraMinutes:u32 = 720;
 	pub const DecimalPrecision:u32 = 18;
 	pub const TotalMinutesPerYear:u32 = 525600; 
+<<<<<<< HEAD
 	pub const TotalReward :u32 = 20564830;
+=======
+	pub const TotalReward :u32 = 1113158;
+>>>>>>> 4f67521 (inflation removed and total supply constant (#117))
 }
 
 impl pallet_reward::Config for Runtime{
