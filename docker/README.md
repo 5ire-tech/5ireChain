@@ -7,6 +7,7 @@ This script creates a Docker image for the 5irechain blockchain node. By default
 Usage:  
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 ```bash
 ./build.sh [-e <environment>] [-h | --help]  
 ```
@@ -16,11 +17,17 @@ bash ./build.sh [-e <environment>] [-h | --help]
 =======
 ./build.sh [-e <environment>] [-h | --help]  
 >>>>>>> 480bfa1 (made scripts executable and fixed run issue)
+=======
+```bash
+./build.sh [-e <environment>] [-h | --help]  
+```
+>>>>>>> 2c4c3ce (updated readme and running docker container in detach mode)
 
 2. run.sh
 This script runs a Docker container for the 5irechain node in one of the following modes: fullnode, validator, or archivenode. Only one mode should be passed using flags -f | --fullnode, -v | --validator, or -a | --archivenode. Additionally, provide the bootnode IP using -b | --bootnode flag and the bootnode ID using -bid | --bootnode-id flag. You can use the -e flag to specify the environment. By default, it will look for an existing image. Use the --build flag to create a new image before running.
 
 Usage:  
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 ```bash
@@ -32,15 +39,24 @@ bash ./run.sh [-f | --fullnode] [-v | --validator] [-a | --archivenode] [-b <boo
 =======
 ./run.sh [-f | --fullnode] [-v | --validator] [-a | --archivenode] [-b <bootnode_ip>] [-bid <bootnode_id>] [-e <environment>] [--build] [-h | --help]  
 >>>>>>> 480bfa1 (made scripts executable and fixed run issue)
+=======
+```bash
+./run.sh [-f | --fullnode] [-v | --validator] [-a | --archivenode] [-b <bootnode_ip>] [-bid <bootnode_id>] [-e <environment>] [--build] [-h | --help]  
+```
+>>>>>>> 2c4c3ce (updated readme and running docker container in detach mode)
 
 3. upload.sh
 This script uploads the Docker image to the respective ECR repository based on the environment selected. Use the -e flag to specify the environment. Use the --build flag to build a new Docker image before uploading. For the QA environment, specify the AWS profile using the --profile flag. By default, it will use the default profile. For the Thunder (testnet) environment, the image is uploaded to the public 5irechain repo.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 2c4c3ce (updated readme and running docker container in detach mode)
 Usage:
 ```bash  
 ./upload.sh [-e <environment>] [--build] [--profile <aws_profile>] [-h | --help]  
 ```
+<<<<<<< HEAD
 =======
 Usage:  
 <<<<<<< HEAD
@@ -49,6 +65,8 @@ bash ./upload.sh [-e <environment>] [--build] [--profile <aws_profile>] [-h | --
 =======
 ./upload.sh [-e <environment>] [--build] [--profile <aws_profile>] [-h | --help]  
 >>>>>>> 480bfa1 (made scripts executable and fixed run issue)
+=======
+>>>>>>> 2c4c3ce (updated readme and running docker container in detach mode)
 
 Note: All scripts should be executed from inside the docker folder.
 
