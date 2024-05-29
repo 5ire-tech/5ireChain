@@ -33,7 +33,7 @@ use serde::{Deserialize, Serialize};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
 use sp_consensus_grandpa::AuthorityId as GrandpaId;
-use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public, H160, U256};
+use sp_core::{crypto::UncheckedInto, Pair, Public, H160, U256};
 use sp_runtime::{
 	traits::{IdentifyAccount, Verify},
 	Perbill,
@@ -41,7 +41,18 @@ use sp_runtime::{
 use std::{collections::BTreeMap, str::FromStr};
 
 pub use firechain_thunder_runtime::{EVMConfig, RuntimeGenesisConfig};
-pub use node_primitives::{AccountId, Balance, Signature};
+// pub use node_primitives::{AccountId, Balance, Signature};
+use firechain_runtime_core_primitives::opaque::{
+	AccountId, AccountIndex, Balance, BlockNumber, Hash, Header, Moment, Nonce, Signature,
+};
+use hex_literal::hex;
+use sp_core::ecdsa;
+
+const ALITH: &str = "0xf24FF3a9CF04c71Dbc94D0b566f7A27B94566cac";
+const CHARLETH: &str = "0x1B1Afe03Fc576fD6ca3eA57701Cf7c134Ca0256A";
+const DOROTHY: &str = "0xa6beEA3E3D0DD5EB2eE5961ba9BB14bCC1Aa0158";
+const ETHAN: &str = "0x10fe10ce77db20f9E23496CD11bCdeC7DE538be2";
+const FAITH: &str = "0x5Ad36E29de0706D8CF51d91306e2201bCc701E97";
 
 type AccountPublic = <Signature as Verify>::Signer;
 
@@ -86,10 +97,10 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 		(
 			// Stash Account
 			// 5CrQp2Mv9tK6SeGhMDmJo63AV3ejdSNtiaEpW5XTsY5k3R3B
-			array_bytes::hex_n_into_unchecked("22dbe873a9de6183e47416db21be8980377f487c9bf312a92fd3c63a89f0693c"),
+			hex!("22dbe873a9de6183e47416db21be8980377f487c9bf312a92fd3c63a89f0693c").into(),
 			// Controller Account
 			// 5FA47XaUdjCNVuejzcRfaESScqRfpdA1QPyLk73Pijev5Lvn
-			array_bytes::hex_n_into_unchecked("88c91da59f9f0738039984fea3be6cba36907fe9f6ec051beaa15544f212a90f"),
+			hex!("88c91da59f9f0738039984fea3be6cba36907fe9f6ec051beaa15544f212a90f").into(),
 			// Grandpa Key
 			// 5DXUP46kzDACCrQq5MmuBVK8qJWn8RNWJPECss26YEPDQYeX
 			array_bytes::hex2array_unchecked("40a67ea6de9044df14a8d2f59cd92b49d269c98b879c2ee4d37bbafe7a5514cc")
@@ -110,10 +121,10 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 		(
 			//Stash Account
 			// 5CJdffZVQw4jzw2ubBfKbM26VnSiYvjdkE3LNRbcH4VY9Gqs
-			array_bytes::hex_n_into_unchecked("0a9f54f3c073bc6e138cfe4c1df07f62cb668de695fe64ab6abff0c968065600"),
+			hex!("0a9f54f3c073bc6e138cfe4c1df07f62cb668de695fe64ab6abff0c968065600").into(),
 			// Controller Account
 			// 5FsMGf43hazfhpz56yKDRv9RWQPs21mC3F69gZKuMyV5ZrcM
-			array_bytes::hex_n_into_unchecked("a847ef2ffc18eab119bdb65eeb7afd1119cd4e30c2924e69c4d85877a07b7225"),
+			hex!("a847ef2ffc18eab119bdb65eeb7afd1119cd4e30c2924e69c4d85877a07b7225").into(),
 			// Grandpa Key
 			// 5ECE279NXB91SiEm9nUV8PRSMUYtH1rAinQ1fRFeBkg8r7eU
 			array_bytes::hex2array_unchecked("5e34b8b558953d248289383732c3ebd8910f01442f7dc71380011a5e3b0d5f3a")
@@ -134,10 +145,10 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 		(
 			//Stash Account
 			// 5CVaBwm5ErpKB5vZAjkfyXLCDF3m2wePUvbLvr5M3iKg6MjZ
-			array_bytes::hex_n_into_unchecked("12f752d067cf98c4b2f6fc0e3e3a34d0929c3714640a27f6df052b2e9e6cc93d"),
+			hex!("12f752d067cf98c4b2f6fc0e3e3a34d0929c3714640a27f6df052b2e9e6cc93d").into(),
 			// Controller Account
 			// 5EhWbwLVarsEJTkJFjSuPKLHnaeq37j5cwXtPh8n6C1ZagfA
-			array_bytes::hex_n_into_unchecked("748aa99eb9487c4f652ffb17ea08404d3ca29f6e32baee18e97de174b81c3847"),
+			hex!("748aa99eb9487c4f652ffb17ea08404d3ca29f6e32baee18e97de174b81c3847").into(),
 			// Grandpa Key
 			// 5FkXKQLW6wsXWJpwaavhUQnm76tkFGAPwFaacudJzm578U3T
 			array_bytes::hex2array_unchecked("a31309f49d6af5074fe80972bb9c9a3bb660b25255573b4be015e977ae0a5586")
@@ -158,10 +169,10 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 		(
 			//Stash Account
 			// 5EFk47KZXsyWZojkXyoo385pg9eqsWPhimDWWSeouD1kk51F
-			array_bytes::hex_n_into_unchecked("60e3901ff4464d0bc18d42888fe14f4e42d6733b81be018ee95c4edff929c548"),
+			hex!("60e3901ff4464d0bc18d42888fe14f4e42d6733b81be018ee95c4edff929c548").into(),
 			// Controller Account
 			// 5CAg4h4nRRvoxbN1S2KLMcZKCtVXbg4k2iP3pGMrMqY2DjyN
-			array_bytes::hex_n_into_unchecked("048d700860157c2d38caae251306df0c09ffd5f4648c07e2cc106eee8a025701"),
+			hex!("048d700860157c2d38caae251306df0c09ffd5f4648c07e2cc106eee8a025701").into(),
 			// Grandpa Key
 			// 5Dr8NvyQ8ekb97wspJrz6G5oQqRo18M4njwxYKpMFnEQzaQM
 			array_bytes::hex2array_unchecked("4ee0d3043b7f828d737343852751bc002f42358ecad36e05777d735f0d849127")
@@ -182,10 +193,10 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 		(
 			//Stash Account
 			// 5ECgK4iYj8v9kSxQBTFw8Vj3So6kyKo4nD8z4L5BkmvZhcxV
-			array_bytes::hex_n_into_unchecked("5e8d3ac4adb096517fd6750e0e595b97f13f7f5c1a74106a31af934f34910c2f"),
+			hex!("5e8d3ac4adb096517fd6750e0e595b97f13f7f5c1a74106a31af934f34910c2f").into(),
 			// Controller Account
 			// 5DkZycYgNyoqs6Z9CezU3soShc5J7TWNAAvMvuPYAvF1fLaL
-			array_bytes::hex_n_into_unchecked("4aa385b5fdbad6b67e8aa2fbabcc3411938b110576e31a133a6c1e31a9d38a08"),
+			hex!("4aa385b5fdbad6b67e8aa2fbabcc3411938b110576e31a133a6c1e31a9d38a08").into(),
 			// Grandpa Key
 			// 5FnL1s6HnyhG73vNuvtJ7D9xM4c3hpfcbLhNPg8mv5Yu1tvb
 			array_bytes::hex2array_unchecked("a4737b823e65d323200d3fff98bef39e4af8a94c35b6ddbe4e6a821de05b96bb")
@@ -206,10 +217,10 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 		(
 			//Stash Account
 			// 5CJRXKUKwjZpvCcjgze5Aw7wLK8CJToHm1PPPLk3iDhAdrNS
-			array_bytes::hex_n_into_unchecked("0a7673aab3899cb3416ff5abf32fe5c4b4cf6c707bfeff22dc16ecaf0eee6e7e"),
+			hex!("0a7673aab3899cb3416ff5abf32fe5c4b4cf6c707bfeff22dc16ecaf0eee6e7e").into(),
 			// Controller Account
 			// 5Gn7JPF7UZeGRW5yPWNhUFHBMQjGb79YzMGB3btpqv4TbGrf
-			array_bytes::hex_n_into_unchecked("d084e9ae441a29c52238fac586085d859835b26bb3c6689f5ad9c9aced9f997a"),
+			hex!("d084e9ae441a29c52238fac586085d859835b26bb3c6689f5ad9c9aced9f997a").into(),
 			// Grandpa Key
 			// 5H9hXNAdU5jxUjLxhTyEUdRdmfrzFWaG3D2WV9kYSKec8TxK
 			array_bytes::hex2array_unchecked("e0fc462163f324c6be4631c673a22eb11679f32930eea70911867cfc2caa448a")
@@ -230,10 +241,10 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 		(
 			//Stash Account
 			// 5DDSa44Z12WnTbPGaBTiSxPwcjfJNVnYxVCucL5XtqR3Ct2A
-			array_bytes::hex_n_into_unchecked("32e5fbb67b8923f226485b8aabd9e8e3084291a6d851a9ff160b37301b42d85d"),
+			hex!("32e5fbb67b8923f226485b8aabd9e8e3084291a6d851a9ff160b37301b42d85d").into(),
 			// Controller Account
 			// 5FZqqs6U57hTheTwsEqSWGxVjPQMVxxrZzWfaSqrh8SKQxvW
-			array_bytes::hex_n_into_unchecked("9aedb36829d8a3bb144e872c8efe705cb605cafd5a00c90640be65521ffa2153"),
+			hex!("9aedb36829d8a3bb144e872c8efe705cb605cafd5a00c90640be65521ffa2153").into(),
 			// Grandpa Key
 			// 5HUZ5h41HWRCBhV1eW9LeYZeCMGR7gKxCkjtfg7do2QdFz78
 			array_bytes::hex2array_unchecked("ef5d841eed522be9552a6adad9a63228440839ceffa47803a12cd54769a523e6")
@@ -254,10 +265,10 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 		(
 			//Stash Account
 			// 5GRGkzgyTv3wrPThbHGh4aguKasKq1pwqzDsVhVJjGsKrsWJ
-			array_bytes::hex_n_into_unchecked("c0a099bc0bff2d8eb7e6fb32b0b939464b516d5a8ddd50018f8e8ed227f3db0a"),
+			hex!("c0a099bc0bff2d8eb7e6fb32b0b939464b516d5a8ddd50018f8e8ed227f3db0a").into(),
 			// Controller Account
 			// 5GZabnXPPR2a448pnjXoC66cQJAMuAuat3peEj8XcLogaJMs
-			array_bytes::hex_n_into_unchecked("c6f69f64c46aa13695c1a581aa2893e9ccff4b82b87fa74276b15cac77c60868"),
+			hex!("c6f69f64c46aa13695c1a581aa2893e9ccff4b82b87fa74276b15cac77c60868").into(),
 			// Grandpa Key
 			// 5DzD9fLwBRwhy7ygrbGDjuErrE6v6T7ER12NjzZn3KXLDgaY
 			array_bytes::hex2array_unchecked("550ad94f214f3d77b73aa0483d3c9af49adc558d75c31762a4633b2a14aa223f")
@@ -278,10 +289,10 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 		(
 			//Stash Account
 			// 5DXDekNJA1bn7YA5LnFJdytqbuHR2didC8sUrxEMjxubynYn
-			array_bytes::hex_n_into_unchecked("4074e93f5910a8b4a1292d148d46a5762eb463fb0b138db99f94abe8f17b212b"),
+			hex!("4074e93f5910a8b4a1292d148d46a5762eb463fb0b138db99f94abe8f17b212b").into(),
 			// Controller Account
 			// 5HgcVTCmd4yVwKtMFdHtwDuCy5JFT7wd4SKpYkMCmNMo5Enq
-			array_bytes::hex_n_into_unchecked("f88ff05e8f628ba9495668b20c88902c0fdfac2996b6274386b7db1117f73254"),
+			hex!("f88ff05e8f628ba9495668b20c88902c0fdfac2996b6274386b7db1117f73254").into(),
 			// Grandpa Key
 			// 5Ei4KEpsPP4QQHUcUCkvZqTfaNmTh3crMccwxRXpTumWqy9s
 			array_bytes::hex2array_unchecked("74f56a3df0974c8cbf3e55f927093055cb554ebf3c103e355e769ead057e3cd4")
@@ -301,10 +312,10 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 		),
 	];
 
-	let root_key: AccountId = array_bytes::hex_n_into_unchecked(
+	let root_key: AccountId = hex!(
 		// 5DqjKokJMesbvPzZMDxAdufXk27bEJGU2K6eoBK73gFB3hzD
-		"4e9337d0ef398b146c9d89da14ea4f71d0d2701199088d728f9ef67c8e64c51c",
-	);
+		"4e9337d0ef398b146c9d89da14ea4f71d0d2701199088d728f9ef67c8e64c51c"
+	).into();
 
 	let endowed_accounts: Vec<AccountId> = vec![root_key.clone()];
 
@@ -351,13 +362,23 @@ pub fn authority_keys_from_seed(
 	seed: &str,
 ) -> (AccountId, AccountId, GrandpaId, BabeId, ImOnlineId, AuthorityDiscoveryId) {
 	(
-		get_account_id_from_seed::<sr25519::Public>(&format!("{}//stash", seed)),
-		get_account_id_from_seed::<sr25519::Public>(seed),
+		array_bytes::hex_n_into_unchecked::<_, _, 20>(ALITH),
+		get_account_id_from_seed::<ecdsa::Public>(seed),
 		get_from_seed::<GrandpaId>(seed),
 		get_from_seed::<BabeId>(seed),
 		get_from_seed::<ImOnlineId>(seed),
 		get_from_seed::<AuthorityDiscoveryId>(seed),
 	)
+}
+fn testnet_accounts() -> Vec<AccountId> {
+	vec![
+		array_bytes::hex_n_into_unchecked::<_, _, 20>(ALITH),
+		// array_bytes::hex_n_into_unchecked::<_, _, 20>(BALTATHAR),
+		array_bytes::hex_n_into_unchecked::<_, _, 20>(CHARLETH),
+		array_bytes::hex_n_into_unchecked::<_, _, 20>(DOROTHY),
+		array_bytes::hex_n_into_unchecked::<_, _, 20>(ETHAN),
+		array_bytes::hex_n_into_unchecked::<_, _, 20>(FAITH),
+	]
 }
 
 /// Helper function to create RuntimeGenesisConfig for testing
@@ -376,18 +397,18 @@ pub fn testnet_genesis(
 ) -> RuntimeGenesisConfig {
 	let endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
 		vec![
-			get_account_id_from_seed::<sr25519::Public>("Alice"),
-			get_account_id_from_seed::<sr25519::Public>("Bob"),
-			get_account_id_from_seed::<sr25519::Public>("Charlie"),
-			get_account_id_from_seed::<sr25519::Public>("Dave"),
-			get_account_id_from_seed::<sr25519::Public>("Eve"),
-			get_account_id_from_seed::<sr25519::Public>("Ferdie"),
-			get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Charlie//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Dave//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
+			get_account_id_from_seed::<ecdsa::Public>("Alice"),
+			get_account_id_from_seed::<ecdsa::Public>("Bob"),
+			get_account_id_from_seed::<ecdsa::Public>("Charlie"),
+			get_account_id_from_seed::<ecdsa::Public>("Dave"),
+			get_account_id_from_seed::<ecdsa::Public>("Eve"),
+			get_account_id_from_seed::<ecdsa::Public>("Ferdie"),
+			get_account_id_from_seed::<ecdsa::Public>("Alice//stash"),
+			get_account_id_from_seed::<ecdsa::Public>("Bob//stash"),
+			get_account_id_from_seed::<ecdsa::Public>("Charlie//stash"),
+			get_account_id_from_seed::<ecdsa::Public>("Dave//stash"),
+			get_account_id_from_seed::<ecdsa::Public>("Eve//stash"),
+			get_account_id_from_seed::<ecdsa::Public>("Ferdie//stash"),
 		]
 	});
 
@@ -470,7 +491,7 @@ pub fn testnet_genesis(
 		elections: ElectionsConfig::default(),
 		council: CouncilConfig::default(),
 		technical_committee: TechnicalCommitteeConfig::default(),
-		sudo: SudoConfig { key: Some(root_key) },
+		sudo: SudoConfig {key: Some(array_bytes::hex_n_into_unchecked::<_, _, 20>(ALITH),), },
 		babe: BabeConfig {
 			epoch_config: Some(firechain_thunder_runtime::BABE_GENESIS_EPOCH_CONFIG),
 			..Default::default()
@@ -518,18 +539,18 @@ pub fn development_genesis(
 ) -> RuntimeGenesisConfig {
 	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
 		vec![
-			get_account_id_from_seed::<sr25519::Public>("Alice"),
-			get_account_id_from_seed::<sr25519::Public>("Bob"),
-			get_account_id_from_seed::<sr25519::Public>("Charlie"),
-			get_account_id_from_seed::<sr25519::Public>("Dave"),
-			get_account_id_from_seed::<sr25519::Public>("Eve"),
-			get_account_id_from_seed::<sr25519::Public>("Ferdie"),
-			get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Charlie//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Dave//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
+			get_account_id_from_seed::<ecdsa::Public>("Alice"),
+			get_account_id_from_seed::<ecdsa::Public>("Bob"),
+			get_account_id_from_seed::<ecdsa::Public>("Charlie"),
+			get_account_id_from_seed::<ecdsa::Public>("Dave"),
+			get_account_id_from_seed::<ecdsa::Public>("Eve"),
+			get_account_id_from_seed::<ecdsa::Public>("Ferdie"),
+			get_account_id_from_seed::<ecdsa::Public>("Alice//stash"),
+			get_account_id_from_seed::<ecdsa::Public>("Bob//stash"),
+			get_account_id_from_seed::<ecdsa::Public>("Charlie//stash"),
+			get_account_id_from_seed::<ecdsa::Public>("Dave//stash"),
+			get_account_id_from_seed::<ecdsa::Public>("Eve//stash"),
+			get_account_id_from_seed::<ecdsa::Public>("Ferdie//stash"),
 		]
 	});
 	// endow all authorities and nominators.
@@ -676,7 +697,7 @@ fn development_config_genesis() -> RuntimeGenesisConfig {
 	development_genesis(
 		vec![authority_keys_from_seed("Alice")],
 		vec![],
-		get_account_id_from_seed::<sr25519::Public>("Alice"),
+		array_bytes::hex_n_into_unchecked::<_, _, 20>(ALITH),
 		None,
 		42, //passing chain_id = 42.  Need to change??
 	)
@@ -706,7 +727,7 @@ fn local_testnet_genesis() -> RuntimeGenesisConfig {
 	testnet_genesis(
 		vec![authority_keys_from_seed("Alice"), authority_keys_from_seed("Bob")],
 		vec![],
-		get_account_id_from_seed::<sr25519::Public>("Alice"),
+		get_account_id_from_seed::<ecdsa::Public>("Alice"),
 		None,
 	)
 }

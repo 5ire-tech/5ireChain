@@ -36,7 +36,11 @@ use grandpa::{
 	FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState,
 };
 use jsonrpsee::RpcModule;
-use node_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Nonce};
+use node_primitives::{Balance, Block, BlockNumber, Hash, Nonce};
+use firechain_runtime_core_primitives::opaque::AccountId;
+// use firechain_runtime_core_primitives::opaque::{
+// 	AccountId, AccountIndex, Balance, BlockNumber, Hash, Header, Moment, Nonce, Signature,
+// };
 use sc_client_api::{
 	backend::{Backend, StorageProvider},
 	client::BlockchainEvents,
