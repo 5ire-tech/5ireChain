@@ -23,18 +23,24 @@ Prior to starting a 5ireChain node, you must set up your development environment
 
 https://docs.substrate.io/install/
 
-## Connect to 5ireChain Thunder testnet
+## Connect to 5ireChain GA Thunder testnet
 
-### Pull Docker Image
+### Pull Docker Image 
 ```bash
-docker pull 5irechain/5ire-thunder-node:0.12
+docker pull 5irechain/5ire-thunder-node:ga
 ```
 
 
-### Run docker image
+### Run docker image with full-node role
 
 ```bash
-docker run  -p 30333:30333  -p 9933:9933 -p 9944:9944 5irechain/5ire-thunder-node:0.12  --port 30333 --no-telemetry --name 5ire-thunder-archive --base-path /5ire/data --keystore-path /5ire/data   --node-key-file /5ire/secrets/node.key --chain /5ire/thunder-chain-spec.json --bootnodes /ip4/13.215.176.156/tcp/30333/ws/p2p/12D3KooWSCPiw5WquLQ1rZCbVUU8U95tgGU55EEuRZryxVJZyB7a --pruning archive --ws-external --rpc-external --rpc-cors all
+docker run -d -p 30333:30333 -p 9944:9944 5irechain/5ire-thunder-node:ga --no-telemetry --base-path /5ire/data/ --chain /5ire/specs/5ire-thunder-SpecRaw.json --bootnodes /ip4/18.220.218.66/tcp/30333/p2p/12D3KooWA33HomkBqsKNqEbaP3ubXCSxHmqDNNPDf2qPzmiS9FsL --pruning archive --rpc-external --rpc-cors all
+```
+
+### Run docker image with validator role
+
+```bash
+docker run -d -p 30333:30333 -p 9944:9944 5irechain/5ire-thunder-node:ga --no-telemetry --base-path /5ire/data --chain /5ire/specs/5ire-thunder-SpecRaw.json --bootnodes /ip4/18.220.218.66/tcp/30333/p2p/12D3KooWA33HomkBqsKNqEbaP3ubXCSxHmqDNNPDf2qPzmiS9FsL --validator
 ```
 
 ## Connect to 5ireChain Local Network
