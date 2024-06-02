@@ -29,7 +29,6 @@ use fp_evm::GenesisAccount;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sc_chain_spec::ChainSpecExtension;
 use sc_service::ChainType;
-use sc_telemetry::TelemetryEndpoints;
 use serde::{Deserialize, Serialize};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
@@ -46,7 +45,7 @@ pub use node_primitives::{AccountId, Balance, Signature};
 
 type AccountPublic = <Signature as Verify>::Signer;
 
-const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
+
 const DEFAULT_PROTOCOL_ID: &str = "mainnet-5ire";
 /// Node `ChainSpec` extensions.
 ///
@@ -75,7 +74,7 @@ fn session_keys(
 	SessionKeys { grandpa, babe, im_online, authority_discovery }
 }
 
-fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
+fn staging_mainnet_config_genesis() -> RuntimeGenesisConfig {
 	#[rustfmt::skip]
 		let initial_authorities: Vec<(
 		AccountId,
@@ -193,19 +192,16 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 	testnet_genesis(initial_authorities, vec![], root_key, Some(endowed_accounts))
 }
 
-/// Mainnet testnet config.
-pub fn staging_testnet_config() -> ChainSpec {
+/// 5ireChain mainnet config.
+pub fn staging_mainnet_config() -> ChainSpec {
 	let boot_nodes = vec![];
 	ChainSpec::from_genesis(
 		"5ireChain Mainnet",
 		"mainnet_5ireChain_staging",
 		ChainType::Live,
-		staging_testnet_config_genesis,
+		staging_mainnet_config_genesis,
 		boot_nodes,
-		Some(
-			TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
-				.expect("Staging telemetry url is valid; qed"),
-		),
+		None,
 		Some(DEFAULT_PROTOCOL_ID),
 		None,
 		Some(
@@ -259,30 +255,17 @@ pub fn testnet_genesis(
 	root_key: AccountId,
 	endowed_accounts: Option<Vec<AccountId>>,
 ) -> RuntimeGenesisConfig {
-	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
-		vec![
-			get_account_id_from_seed::<sr25519::Public>("Alice"),
-			get_account_id_from_seed::<sr25519::Public>("Bob"),
-			get_account_id_from_seed::<sr25519::Public>("Charlie"),
-			get_account_id_from_seed::<sr25519::Public>("Dave"),
-			get_account_id_from_seed::<sr25519::Public>("Eve"),
-			get_account_id_from_seed::<sr25519::Public>("Ferdie"),
-			get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Charlie//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Dave//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
-		]
-	});
+	let endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| vec![]);
+
+	let mut endowed_accounts_validator: Vec<AccountId> = Vec::new();
 	// endow all authorities and nominators.
 	initial_authorities
 		.iter()
 		.map(|x| &x.0)
 		.chain(initial_nominators.iter())
 		.for_each(|x| {
-			if !endowed_accounts.contains(x) {
-				endowed_accounts.push(x.clone())
+			if !endowed_accounts_validator.contains(x) {
+				endowed_accounts_validator.push(x.clone())
 			}
 		});
 
@@ -303,16 +286,31 @@ pub fn testnet_genesis(
 		}))
 		.collect::<Vec<_>>();
 
-	let num_endowed_accounts = endowed_accounts.len();
+	// Based on current tokenomics
+	// Initial validators Balance
+	// Total Balance = Bonding Balance(100_000 5IRE) + Tranferrable Balance(2 5IRE)
+	// Bonding Balance: Staking
+	// Trafferable Balance: Charge Fee
+	const ENDOWMENT_AUTHORITY: Balance = 100_002 * DOLLARS;
 
-	const ENDOWMENT: Balance = 10_000_000 * DOLLARS;
-	const STASH: Balance = ENDOWMENT / 1000;
+	const STASH: Balance = 100_000 * DOLLARS;
+
+	// Pre-minted sudo key for charging transaction fee
+	const ENDOWMENT_SUDO: Balance = 20 * DOLLARS;
+
+	let mut endowed_balance: Vec<(AccountId, Balance)> =
+		endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT_SUDO)).collect();
+	let endowed_validator_balance: Vec<(AccountId, Balance)> = endowed_accounts_validator
+		.iter()
+		.cloned()
+		.map(|x| (x, ENDOWMENT_AUTHORITY))
+		.collect();
+
+	endowed_balance.extend(endowed_validator_balance);
 
 	RuntimeGenesisConfig {
 		system: SystemConfig { code: wasm_binary_unwrap().to_vec(), ..Default::default() },
-		balances: BalancesConfig {
-			balances: endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT)).collect(),
-		},
+		balances: BalancesConfig { balances: endowed_balance },
 		indices: IndicesConfig { indices: vec![] },
 		session: SessionConfig {
 			keys: initial_authorities
@@ -335,26 +333,12 @@ pub fn testnet_genesis(
 			..Default::default()
 		},
 		democracy: DemocracyConfig::default(),
-		elections: ElectionsConfig {
-			members: endowed_accounts
-				.iter()
-				.take((num_endowed_accounts + 1) / 2)
-				.cloned()
-				.map(|member| (member, STASH))
-				.collect(),
-		},
+		elections: ElectionsConfig::default(),
 		council: CouncilConfig::default(),
-		technical_committee: TechnicalCommitteeConfig {
-			members: endowed_accounts
-				.iter()
-				.take((num_endowed_accounts + 1) / 2)
-				.cloned()
-				.collect(),
-			phantom: Default::default(),
-		},
+		technical_committee: TechnicalCommitteeConfig::default(),
 		sudo: SudoConfig { key: Some(root_key) },
 		babe: BabeConfig {
-			epoch_config: Some(firechain_qa_runtime::BABE_GENESIS_EPOCH_CONFIG),
+			epoch_config: Some(firechain_mainnet_runtime::BABE_GENESIS_EPOCH_CONFIG),
 			..Default::default()
 		},
 		im_online: ImOnlineConfig { keys: vec![] },
@@ -379,7 +363,7 @@ pub fn testnet_genesis(
 		ethereum: Default::default(),
 		dynamic_fee: Default::default(),
 		base_fee: Default::default(),
-		reward:Default::default(),
+		reward: Default::default(),
 	}
 }
 
@@ -443,7 +427,6 @@ pub fn development_genesis(
 		}))
 		.collect::<Vec<_>>();
 
-	let num_endowed_accounts = endowed_accounts.len();
 
 	const ENDOWMENT: Balance = 5_000_000_000 * DOLLARS;
 	const STASH: Balance = ENDOWMENT / 1000;
@@ -475,26 +458,12 @@ pub fn development_genesis(
 			..Default::default()
 		},
 		democracy: DemocracyConfig::default(),
-		elections: ElectionsConfig {
-			members: endowed_accounts
-				.iter()
-				.take((num_endowed_accounts + 1) / 2)
-				.cloned()
-				.map(|member| (member, STASH))
-				.collect(),
-		},
+		elections: ElectionsConfig::default(),
 		council: CouncilConfig::default(),
-		technical_committee: TechnicalCommitteeConfig {
-			members: endowed_accounts
-				.iter()
-				.take((num_endowed_accounts + 1) / 2)
-				.cloned()
-				.collect(),
-			phantom: Default::default(),
-		},
+		technical_committee: TechnicalCommitteeConfig::default(),
 		sudo: SudoConfig { key: Some(root_key) },
 		babe: BabeConfig {
-			epoch_config: Some(firechain_qa_runtime::BABE_GENESIS_EPOCH_CONFIG),
+			epoch_config: Some(firechain_mainnet_runtime::BABE_GENESIS_EPOCH_CONFIG),
 			..Default::default()
 		},
 		im_online: ImOnlineConfig { keys: vec![] },
@@ -566,8 +535,8 @@ pub fn development_genesis(
 		ethereum: EthereumConfig { _marker: Default::default() },
 		dynamic_fee: Default::default(),
 		base_fee: Default::default(),
-		reward:Default::default(),
-  }
+		reward: Default::default(),
+	}
 }
 
 fn development_config_genesis() -> RuntimeGenesisConfig {
@@ -600,7 +569,7 @@ pub fn development_config() -> ChainSpec {
 	)
 }
 
-fn local_testnet_genesis() -> RuntimeGenesisConfig {
+fn local_mainnet_genesis() -> RuntimeGenesisConfig {
 	testnet_genesis(
 		vec![authority_keys_from_seed("Alice"), authority_keys_from_seed("Bob")],
 		vec![],
@@ -609,13 +578,13 @@ fn local_testnet_genesis() -> RuntimeGenesisConfig {
 	)
 }
 
-/// Local testnet config (multivalidator Alice + Bob)
-pub fn local_testnet_config() -> ChainSpec {
+/// Local mainnet config (multivalidator Alice + Bob)
+pub fn local_mainnet_config() -> ChainSpec {
 	ChainSpec::from_genesis(
-		"Local Testnet",
+		"5ireChain Local Testnet",
 		"mainnet_5ireChain_local",
 		ChainType::Local,
-		local_testnet_genesis,
+		local_mainnet_genesis,
 		vec![],
 		None,
 		None,

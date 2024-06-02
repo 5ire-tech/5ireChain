@@ -37,7 +37,7 @@ use frame_support::{
 	pallet_prelude::Get,
 	parameter_types,
 	traits::{
-		tokens::GetSalary, AsEnsureOriginWithArg, ConstBool, ConstU128, ConstU16, ConstU32,
+		AsEnsureOriginWithArg, ConstBool, ConstU128, ConstU16, ConstU32,
 		Currency, EitherOfDiverse, EqualPrivilegeOnly, Everything, FindAuthor, Imbalance,
 		InstanceFilter, KeyOwnerProofSystem, LockIdentifier, Nothing, OnFinalize, OnUnbalanced,
 		WithdrawReasons,
@@ -547,8 +547,8 @@ impl pallet_session::historical::Config for Runtime {
 }
 parameter_types! {
 	pub const SessionsPerEra: sp_staking::SessionIndex = 6;
-	pub const BondingDuration: sp_staking::EraIndex = 4;
-	pub const SlashDeferDuration: sp_staking::EraIndex = 1; // 1/4 the bonding duration.
+	pub const BondingDuration: sp_staking::EraIndex = 28; // 14 days
+	pub const SlashDeferDuration: sp_staking::EraIndex = BondingDuration::get() - 1; // 13 days
 	pub const MaxNominatorRewardedPerValidator: u32 = 256;
 	pub const OffendingValidatorsThreshold: Perbill = Perbill::from_percent(17);
 	pub OffchainRepeat: BlockNumber = 5;
@@ -1486,17 +1486,7 @@ parameter_types! {
 	pub const LiquidityWithdrawalFee: Permill = Permill::from_percent(0);  // should be non-zero if AllowMultiAssetPools is true, otherwise can be zero.
 }
 
-parameter_types! {
-	pub const Budget: Balance = 10_000 * DOLLARS;
-	pub TreasuryAccount: AccountId = Treasury::account_id();
-}
 
-pub struct SalaryForRank;
-impl GetSalary<u16, AccountId, Balance> for SalaryForRank {
-	fn get_salary(a: u16, _: &AccountId) -> Balance {
-		Balance::from(a) * 1000 * DOLLARS
-	}
-}
 
 impl pallet_core_fellowship::Config for Runtime {
 	type WeightInfo = ();
@@ -1845,7 +1835,6 @@ mod benches {
 		[pallet_timestamp, Timestamp]
 		[pallet_transaction_storage, TransactionStorage]
 		[pallet_treasury, Treasury]
-		[pallet_asset_rate, AssetRate]
 		[pallet_utility, Utility]
 		[pallet_vesting, Vesting]
 		[pallet_evm, EVM]
