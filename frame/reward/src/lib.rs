@@ -234,7 +234,7 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 			let validator_points = Self::retrieve_validator_point(validator.clone());
 			let era_reward = Self::calculate_era_reward();
 			let total_reward = era_reward as f64;
-			let reward = Self::calculate_validator_reward(validator_points.into(), total_reward);
+			let reward = Self::calculate_validator_era_reward(validator_points.into(), total_reward);
 			let nominators = Self::check_nominators(validator.clone());
 			if nominators.is_empty() {
 				Self::allocate_validator_rewards(
@@ -245,20 +245,27 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 			}
 			let validator_commission = Self::validator_commission(validator.clone());
 			let validator_share = ((reward as f64) * (validator_commission as f64)) / 100.0;
-			let nominator_share = reward - validator_share;
+			let exposure = ErasStakers::<T>::get(Self::current_era(), validator.clone());
+			let total_stake = exposure.total;
+			let validator_stake = exposure.own;
+			let remaining_reward = reward - validator_share;
+			let validator_own_share_reward = Self::calculate_validator_reward_share(
+				validator_stake.into(),
+				total_stake.into(),
+				remaining_reward
+			);
+			let total_validator_reward = validator_share + validator_own_share_reward;
 			Self::allocate_validator_rewards(
 				validator.clone(),
-				Self::convert_float64_to_unsigned128(validator_share).into()
+				Self::convert_float64_to_unsigned128(total_validator_reward).into()
 			);
 
 			nominators.iter().for_each(|nominator| {
 				let nominator_stake = nominator.value;
-				let exposure = ErasStakers::<T>::get(Self::current_era(), validator.clone());
-				let total_stake = exposure.total;
 				let nominator_reward = Self::calculate_nominator_reward(
 					nominator_stake.into(),
 					total_stake.into(),
-					nominator_share.into()
+					remaining_reward.into()
 				);
 				Self::allocate_nominator_reward(
 					nominator.who.clone(),
@@ -328,6 +335,16 @@ impl<T: Config> Pallet<T> {
 		era_reward.into()
 	}
 
+	/// Compute the reward share for a validator based on their stake.
+	pub fn calculate_validator_reward_share(share: u128, total_stake: u128, reward: f64) -> f64 {
+		let precision = T::Precision::get();
+		let scaled_share = share / (10u128).pow(precision);
+		let scaled_total_stake: u64 = (total_stake / (10u128).pow(precision)) as u64;
+		let division: f64 = ((scaled_share as f64) / (scaled_total_stake as f64)) as f64;
+		let total_reward = division * reward;
+		total_reward
+	}
+
 	/// Compute the reward of the nominator
 	pub fn calculate_nominator_reward(share: u128, total_stake: u128, reward: f64) -> f64 {
 		let precision = T::Precision::get();
@@ -370,12 +387,12 @@ impl<T: Config> Pallet<T> {
 	/// Distributes rewards to the specified validator.
 	fn distribute_validator_reward(account: T::AccountId) -> DispatchResult {
 		let reward = ValidatorRewardAccounts::<T>::get(account.clone());
+		if reward.is_zero(){
+			return Ok(());
+		}
 		Self::transfer(Self::account_id(), account.clone(), reward, KeepAlive)?;
 		ValidatorRewardAccounts::<T>::remove(account.clone());
-		
-		//BeneficialRewardRecord::<T>::insert(account.clone(), reward);
 		Self::store_reward_received(account,reward);
-
 		Ok(())
 	}
 
@@ -386,12 +403,8 @@ impl<T: Config> Pallet<T> {
 			return Ok(());
 		}
 		Self::transfer(Self::account_id(), account.clone(), reward, KeepAlive)?;
-		// let staking_account = T::LiquidStakeVault::staking_account();
-		// if account != staking_account {
-		// 	NominatorRewardAccounts::<T>::remove(account.clone());
-		// }
-	//	BeneficialRewardRecord::<T>::insert(account.clone(), reward);
-	  Self::store_reward_received(account,reward);
+		NominatorRewardAccounts::<T>::remove(account.clone());
+	  	Self::store_reward_received(account,reward);
        Ok(())
 	}
 
@@ -406,15 +419,16 @@ impl<T: Config> Pallet<T> {
 		let era = active_era.index;
 		era
 	}
-/// Store the received reward for a specific account.
-fn store_reward_received(account:T::AccountId,reward:T::Balance){
-	let earlier_reward = BeneficialRewardRecord::<T>::get(account.clone());
-	let new_reward = reward + earlier_reward;
-	BeneficialRewardRecord::<T>::insert(account.clone(), new_reward);
-}
+
+	/// Store the received reward for a specific account.
+	fn store_reward_received(account:T::AccountId,reward:T::Balance){
+		let earlier_reward = BeneficialRewardRecord::<T>::get(account.clone());
+		let new_reward = reward + earlier_reward;
+		BeneficialRewardRecord::<T>::insert(account.clone(), new_reward);
+	}
 
 	/// Compute the reward of the validator
-	fn calculate_validator_reward(validator_points: u32, era_reward: f64) -> f64 {
+	fn calculate_validator_era_reward(validator_points: u32, era_reward: f64) -> f64 {
 		let era_reward_points = <ErasRewardPoints<T>>::get(Self::active_era());
 		let total_points = era_reward_points.total as u32;
 		let reward = ((validator_points as f64) / (total_points as f64)) * (era_reward as f64);
