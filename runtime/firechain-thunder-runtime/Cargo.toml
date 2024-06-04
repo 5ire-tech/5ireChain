@@ -1,6 +1,6 @@
 [package]
 name = "firechain-thunder-runtime"
-version = "1.0.3"
+version = "1.0.4"
 authors = ["5ire Team <support@5ire.org>"]
 description = "5ire chain Thunder Testnet runtime"
 edition = "2021"
