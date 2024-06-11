@@ -6638,6 +6638,7 @@ dependencies = [
 name = "pallet-session"
 version = "4.0.0-dev"
 dependencies = [
+ "array-bytes",
  "frame-election-provider-support",
  "frame-support",
  "frame-system",
@@ -6784,13 +6785,15 @@ dependencies = [
 [[package]]
 name = "pallet-sudo"
 version = "4.0.0-dev"
-source = "git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.1.0#c8d2251cafadc108ba2f1f8a3208dc547ff38901"
 dependencies = [
+ "array-bytes",
  "frame-benchmarking",
  "frame-support",
  "frame-system",
+ "log",
  "parity-scale-codec",
  "scale-info",
+ "sp-core",
  "sp-io",
  "sp-runtime",
  "sp-std",

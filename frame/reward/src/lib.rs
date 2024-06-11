@@ -3,32 +3,37 @@
 // This pallet facilitates the allocation of rewards to validators and nominators for their involvement in staking activities.
 
 #![cfg_attr(not(feature = "std"), no_std)]
+use frame_election_provider_support::{DataProviderBounds, ElectionDataProvider};
 use frame_support::pallet_prelude::DispatchResult;
-pub use pallet::*;
-use pallet_staking::{ CurrentEra, Validators, ErasRewardPoints, ErasStakers, IndividualExposure };
-use parity_scale_codec::Codec;
-use scale_info::prelude::{ vec::Vec, fmt::Debug };
-use sp_runtime::{ FixedPointOperand, traits::{ Convert, AtLeast32BitUnsigned } };
-use frame_support::PalletId;
-use pallet_staking::Rewards;
 use frame_support::traits::{
 	Currency,
-	LockableCurrency,
-	ValidatorSet,
-	Get,
 	//reward::Rewards,
 	ExistenceRequirement,
 	ExistenceRequirement::KeepAlive,
+	Get,
+	LockableCurrency,
+	ValidatorSet,
 };
-use frame_election_provider_support::{ ElectionDataProvider, DataProviderBounds };
+use frame_support::PalletId;
+pub use pallet::*;
+use pallet_staking::Rewards;
+use pallet_staking::{CurrentEra, ErasRewardPoints, ErasStakers, IndividualExposure, Validators};
+use parity_scale_codec::Codec;
+use scale_info::prelude::{fmt::Debug, vec::Vec};
 use sp_runtime::traits::AccountIdConversion;
 use sp_runtime::traits::Zero;
+use sp_runtime::{
+	traits::{AtLeast32BitUnsigned, Convert},
+	FixedPointOperand,
+};
 
 #[cfg(test)]
 mod mock;
 
 #[cfg(test)]
 mod tests;
+
+pub mod migrations;
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -41,37 +46,43 @@ pub mod pallet {
 	pub struct Pallet<T>(_);
 
 	#[pallet::config]
-	pub trait Config: frame_system::Config + pallet_staking::Config  {
+	pub trait Config: frame_system::Config + pallet_staking::Config {
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 		type ValidatorSet: frame_support::traits::ValidatorSetWithIdentification<Self::AccountId>;
 		type Validators: frame_support::traits::ValidatorSet<Self::AccountId>;
 		type DataProvider: ElectionDataProvider<
 			AccountId = <Self::ValidatorSet as ValidatorSet<Self::AccountId>>::ValidatorId,
-			BlockNumber = BlockNumberFor<Self>
+			BlockNumber = BlockNumberFor<Self>,
 		>;
 		#[pallet::constant]
 		type PalletId: Get<PalletId>;
 		type ValidatorId: Convert<
-			<<Self as Config>::Validators as ValidatorSet<<Self as frame_system::Config>::AccountId>>::ValidatorId,
-			Option<Self::AccountId>
+			<<Self as Config>::Validators as ValidatorSet<
+				<Self as frame_system::Config>::AccountId,
+			>>::ValidatorId,
+			Option<Self::AccountId>,
 		>;
 		type ValidatorIdOf: Convert<
 			Self::AccountId,
-			Option<<<Self as Config>::ValidatorSet as ValidatorSet<<Self as frame_system::Config>::AccountId>>::ValidatorId>
+			Option<
+				<<Self as Config>::ValidatorSet as ValidatorSet<
+					<Self as frame_system::Config>::AccountId,
+				>>::ValidatorId,
+			>,
 		>;
-		type Balance: Parameter +
-			Member +
-			AtLeast32BitUnsigned +
-			Codec +
-			Default +
-			From<u128> +
-			Into<u128> +
-			Copy +
-			MaybeSerializeDeserialize +
-			Debug +
-			MaxEncodedLen +
-			TypeInfo +
-			FixedPointOperand;
+		type Balance: Parameter
+			+ Member
+			+ AtLeast32BitUnsigned
+			+ Codec
+			+ Default
+			+ From<u128>
+			+ Into<u128>
+			+ Copy
+			+ MaybeSerializeDeserialize
+			+ Debug
+			+ MaxEncodedLen
+			+ TypeInfo
+			+ FixedPointOperand;
 
 		#[pallet::constant]
 		type TotalReward: Get<u32>;
@@ -81,48 +92,31 @@ pub mod pallet {
 		#[pallet::constant]
 		type TotalMinutesPerYear: Get<u32>;
 		type EraMinutes: Get<u32>;
-		
+
 		type RewardCurrency: LockableCurrency<
 			Self::AccountId,
 			Moment = BlockNumberFor<Self>,
-			Balance = Self::Balance
+			Balance = Self::Balance,
 		>;
 	}
-
-
 
 	/// The era reward which are distributed among the validator and nominator
 	#[pallet::storage]
 	#[pallet::getter(fn total_rewards)]
-	pub type BeneficialRewardRecord<T: Config> = StorageMap<
-		_,
-		Blake2_128Concat,
-		T::AccountId,
-		T::Balance,
-		ValueQuery
-	>;
+	pub type BeneficialRewardRecord<T: Config> =
+		StorageMap<_, Blake2_128Concat, T::AccountId, T::Balance, ValueQuery>;
 
 	/// Specifics regarding the rewards distributed within the designated era of the validator
 	#[pallet::storage]
 	#[pallet::getter(fn validator_reward_accounts)]
-	pub type ValidatorRewardAccounts<T: Config> = StorageMap<
-		_,
-		Blake2_128Concat,
-		T::AccountId,
-		T::Balance,
-		ValueQuery
-	>;
+	pub type ValidatorRewardAccounts<T: Config> =
+		StorageMap<_, Blake2_128Concat, T::AccountId, T::Balance, ValueQuery>;
 
 	/// Specifics regarding the rewards distributed within the designated era of the nominator
 	#[pallet::storage]
 	#[pallet::getter(fn nominator_reward_accounts)]
-	pub type NominatorRewardAccounts<T: Config> = StorageMap<
-		_,
-		Blake2_128Concat,
-		T::AccountId,
-		T::Balance,
-		ValueQuery
-	>;
+	pub type NominatorRewardAccounts<T: Config> =
+		StorageMap<_, Blake2_128Concat, T::AccountId, T::Balance, ValueQuery>;
 
 	/// Era reward accounts
 	#[pallet::storage]
@@ -138,14 +132,9 @@ pub mod pallet {
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
 		/// The rewards has been succesfully distributed
-		Distributed {
-			who: T::AccountId,
-			balance: T::Balance,
-		},
+		Distributed { who: T::AccountId, balance: T::Balance },
 		/// The reward will be distributed after completely the era
-		Rewarded {
-			who: T::AccountId,
-		},
+		Rewarded { who: T::AccountId },
 	}
 
 	#[pallet::error]
@@ -162,7 +151,6 @@ pub mod pallet {
 		WaitTheEraToComplete,
 	}
 
-
 	#[pallet::genesis_config]
 	#[derive(frame_support::DefaultNoBound)]
 	pub struct GenesisConfig<T: Config> {
@@ -174,7 +162,6 @@ pub mod pallet {
 		fn build(&self) {
 			let account = <Pallet<T>>::account_id();
 			RewardAccount::<T>::put(account)
-
 		}
 	}
 
@@ -202,13 +189,12 @@ pub mod pallet {
 }
 
 impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
-
 	/// List of the validators who will recieve reward after the era
 	fn payout_validators() -> Vec<T::AccountId> {
 		let validators = EraRewardsVault::<T>::get().unwrap_or_else(Vec::new);
 		validators
 	}
-	
+
 	/// Distributing rewards to validators and nominators.
 	fn claim_rewards(validator: T::AccountId) -> DispatchResult {
 		let nominators = Self::check_nominators(validator.clone());
@@ -230,61 +216,66 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 		let validators = T::Validators::validators();
 
 		validators.iter().for_each(|validator_id| {
-			let validator = T::ValidatorId::convert(validator_id.clone()).unwrap();
-			let validator_points = Self::retrieve_validator_point(validator.clone());
-			let era_reward = Self::calculate_era_reward();
-			let total_reward = era_reward as f64;
-			let reward = Self::calculate_validator_era_reward(validator_points.into(), total_reward);
-			let nominators = Self::check_nominators(validator.clone());
-			if nominators.is_empty() {
-				Self::allocate_validator_rewards(
-					validator.clone(),
-					Self::convert_float64_to_unsigned128(reward).into()
-				);
-				return;
-			}
-			let validator_commission = Self::validator_commission(validator.clone());
-			let validator_share = ((reward as f64) * (validator_commission as f64)) / 100.0;
-			let exposure = ErasStakers::<T>::get(Self::current_era(), validator.clone());
-			let total_stake = exposure.total;
-			let validator_stake = exposure.own;
-			let remaining_reward = reward - validator_share;
-			let validator_own_share_reward = Self::calculate_validator_reward_share(
-				validator_stake.into(),
-				total_stake.into(),
-				remaining_reward
-			);
-			let total_validator_reward = validator_share + validator_own_share_reward;
-			Self::allocate_validator_rewards(
-				validator.clone(),
-				Self::convert_float64_to_unsigned128(total_validator_reward).into()
-			);
+			let validator = T::ValidatorId::convert(validator_id.clone());
+			match validator {
+				Some(validator) => {
+					let validator_points = Self::retrieve_validator_point(validator.clone());
+					let era_reward = Self::calculate_era_reward();
+					let total_reward = era_reward as f64;
+					let reward =
+						Self::calculate_validator_era_reward(validator_points.into(), total_reward);
+					let nominators = Self::check_nominators(validator.clone());
+					if nominators.is_empty() {
+						Self::allocate_validator_rewards(
+							validator.clone(),
+							Self::convert_float64_to_unsigned128(reward).into(),
+						);
+						return;
+					}
+					let validator_commission = Self::validator_commission(validator.clone());
+					let validator_share = ((reward as f64) * (validator_commission as f64)) / 100.0;
+					let exposure = ErasStakers::<T>::get(Self::current_era(), validator.clone());
+					let total_stake = exposure.total;
+					let validator_stake = exposure.own;
+					let remaining_reward = reward - validator_share;
+					let validator_own_share_reward = Self::calculate_validator_reward_share(
+						validator_stake.into(),
+						total_stake.into(),
+						remaining_reward,
+					);
+					let total_validator_reward = validator_share + validator_own_share_reward;
+					Self::allocate_validator_rewards(
+						validator.clone(),
+						Self::convert_float64_to_unsigned128(total_validator_reward).into(),
+					);
 
-			nominators.iter().for_each(|nominator| {
-				let nominator_stake = nominator.value;
-				let nominator_reward = Self::calculate_nominator_reward(
-					nominator_stake.into(),
-					total_stake.into(),
-					remaining_reward.into()
-				);
-				Self::allocate_nominator_reward(
-					nominator.who.clone(),
-					Self::convert_float64_to_unsigned128(nominator_reward).into()
-				);
-			});
+					nominators.iter().for_each(|nominator| {
+						let nominator_stake = nominator.value;
+						let nominator_reward = Self::calculate_nominator_reward(
+							nominator_stake.into(),
+							total_stake.into(),
+							remaining_reward.into(),
+						);
+						Self::allocate_nominator_reward(
+							nominator.who.clone(),
+							Self::convert_float64_to_unsigned128(nominator_reward).into(),
+						);
+					});
+				},
+				None => return,
+			}
 		});
 		Ok(())
 	}
 }
 
 impl<T: Config> Pallet<T> {
-	
 	/// Transfer an amount to the accounts with respecting the `keep_alive` requirements.
 	fn transfer(
 		who: T::AccountId,
 		dest: T::AccountId,
 		amount: T::Balance,
-		existence_requirement: ExistenceRequirement
+		existence_requirement: ExistenceRequirement,
 	) -> DispatchResult {
 		T::RewardCurrency::transfer(&who, &dest, amount, existence_requirement)?;
 		Self::deposit_event(Event::Distributed { who: dest, balance: amount });
@@ -293,9 +284,8 @@ impl<T: Config> Pallet<T> {
 
 	/// Validation of an account to determine its validator status.
 	fn verify_validator(account: T::AccountId) -> DispatchResult {
-		let all_validators = T::DataProvider::electable_targets(
-			DataProviderBounds::default()
-		).unwrap();
+		let all_validators =
+			T::DataProvider::electable_targets(DataProviderBounds::default()).unwrap();
 		let val = all_validators
 			.iter()
 			.any(|c| T::ValidatorIdOf::convert(account.clone()) == Some(c.clone()));
@@ -307,7 +297,7 @@ impl<T: Config> Pallet<T> {
 	}
 
 	/// Calculates the commission for the validator.
-	fn validator_commission(validator: T::AccountId) -> u32{
+	fn validator_commission(validator: T::AccountId) -> u32 {
 		let validator_prefs = Validators::<T>::get(validator.clone());
 		let validator_commission = validator_prefs.commission.deconstruct();
 		let precision: u32 = 7;
@@ -325,7 +315,7 @@ impl<T: Config> Pallet<T> {
 		Ok(())
 	}
 
-	/// Compute the total era reward 
+	/// Compute the total era reward
 	pub fn calculate_era_reward() -> f64 {
 		let total_minutes_per_year = T::TotalMinutesPerYear::get();
 		let era_minutes = T::EraMinutes::get();
@@ -387,25 +377,25 @@ impl<T: Config> Pallet<T> {
 	/// Distributes rewards to the specified validator.
 	fn distribute_validator_reward(account: T::AccountId) -> DispatchResult {
 		let reward = ValidatorRewardAccounts::<T>::get(account.clone());
-		if reward.is_zero(){
+		if reward.is_zero() {
 			return Ok(());
 		}
 		Self::transfer(Self::account_id(), account.clone(), reward, KeepAlive)?;
 		ValidatorRewardAccounts::<T>::remove(account.clone());
-		Self::store_reward_received(account,reward);
+		Self::store_reward_received(account, reward);
 		Ok(())
 	}
 
 	/// Distributes rewards to the specified nominator.
 	fn distribute_nominator_reward(account: T::AccountId) -> DispatchResult {
 		let reward = NominatorRewardAccounts::<T>::get(account.clone());
-		if reward.is_zero(){
+		if reward.is_zero() {
 			return Ok(());
 		}
 		Self::transfer(Self::account_id(), account.clone(), reward, KeepAlive)?;
 		NominatorRewardAccounts::<T>::remove(account.clone());
-	  	Self::store_reward_received(account,reward);
-       Ok(())
+		Self::store_reward_received(account, reward);
+		Ok(())
 	}
 
 	/// Current era index
@@ -421,7 +411,7 @@ impl<T: Config> Pallet<T> {
 	}
 
 	/// Store the received reward for a specific account.
-	fn store_reward_received(account:T::AccountId,reward:T::Balance){
+	fn store_reward_received(account: T::AccountId, reward: T::Balance) {
 		let earlier_reward = BeneficialRewardRecord::<T>::get(account.clone());
 		let new_reward = reward + earlier_reward;
 		BeneficialRewardRecord::<T>::insert(account.clone(), new_reward);
@@ -437,7 +427,7 @@ impl<T: Config> Pallet<T> {
 
 	/// Determine whether the validator has nominators in the current era.
 	fn check_nominators(
-		validator: T::AccountId
+		validator: T::AccountId,
 	) -> Vec<IndividualExposure<T::AccountId, <T as pallet_staking::Config>::CurrencyBalance>> {
 		let exposure = ErasStakers::<T>::get(Self::current_era(), validator.clone());
 		let nominators = exposure.others;

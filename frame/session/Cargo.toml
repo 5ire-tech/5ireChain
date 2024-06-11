@@ -29,6 +29,7 @@ sp-std = { workspace = true}
 sp-trie = { workspace = true, optional = true}
 sp-state-machine = { workspace = true}
 frame-election-provider-support = { workspace = true }
+array-bytes = "6.1"
 
 [features]
 default = [ "historical", "std" ]

@@ -348,4 +348,5 @@ try-runtime = [
 	"pallet-evm/try-runtime",
 	"pallet-base-fee/try-runtime",
 	"pallet-dynamic-fee/try-runtime",
+	"pallet-reward/try-runtime",
 ]
