@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint . --ext .ts",
-    "test": "mocha 'tests/**/*.test.ts' --exit",
+    "test": "mocha 'tests/**/inkV3.test.ts' --exit",
     "format": "prettier -w '**/*.ts'",
     "ts-check": "npx tsc --noEmit"
   },

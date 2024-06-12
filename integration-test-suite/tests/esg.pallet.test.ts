@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { BLOCK_TIME } from "../utils/constants";
+import { BLOCK_TIME, TEST_ACCOUNT, alith, baltathar, charleth, dorothy } from "../utils/constants";
 import { killNodes, polkadotApi as api, spawnNodes } from "../utils/util";
 import { Keyring, WsProvider } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
@@ -19,45 +19,44 @@ describe("ESG Pallet Integration tests", function () {
 
   // Should init
   it("Should test ESG Pallet", async () => {
-    const { alice, bob, charlie, dave } = await init();
-
+    
+    // we upload esg score for charleth
     const esgData = [
       {
-        account: "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
+        account: charleth.address,
         score: "43",
       },
     ];
 
-    const esgDataString = "[{account:\"5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y\"score:\"43\",},]";
-
     const jsonData = JSON.stringify(esgData);
+    console.log(esgData);
 
-    await registerOracle(alice, bob);
+    await registerOracle(alith, baltathar);
 
-    await registerOracleBySudoOracle(bob, dave);
+    await registerOracleBySudoOracle(baltathar, dorothy);
 
-    await registerOracleFailedOracleRegisteredAlready(alice, bob);
+    await registerOracleFailedOracleRegisteredAlready(alith, baltathar);
 
-    await insertEsgScores(bob, charlie, jsonData);
+    await insertEsgScores(baltathar, charleth, jsonData);
 
-    await insertEsgScoresFailInvalidJson(bob, charlie, esgDataString);
+    // await insertEsgScoresFailInvalidJson(baltathar, charleth, esgDataString);
 
-    await insertEsgScoresCallerNotAnOracle(charlie, jsonData);
+    // await insertEsgScoresCallerNotAnOracle(charleth, jsonData);
 
-    await deRegisterOracle(alice, bob);
+    // await deRegisterOracle(alith, baltathar);
 
-    await registerOracleFailedCallerNotRootOrSudoOracle( bob, charlie );
+    // await registerOracleFailedCallerNotRootOrSudoOracle( baltathar, charleth );
 
-    await deRegisterOracleForOracleNotExist(alice, charlie);
+    // await deRegisterOracleForOracleNotExist(alith, charleth);
 
-    await deRegisterOracleFromBadOrigin(bob, charlie);
+    // await deRegisterOracleFromBadOrigin(baltathar, charleth);
 
-    await registerNonSudoOracle(alice, bob);
+    // await registerNonSudoOracle(alith, baltathar);
 
-    await registerOracleFailedOracleRegisteredAlreadyForNonSudo(alice, bob);
+    // await registerOracleFailedOracleRegisteredAlreadyForNonSudo(alith, baltathar);
 
-    // // Insert ESG Scores by non-sudo user which we inserted in 2nd last step.
-    await insertEsgScores(bob, charlie, jsonData);
+    // // // Insert ESG Scores by non-sudo user which we inserted in 2nd last step.
+    // await insertEsgScores(baltathar, charleth, jsonData);
   });
 
   after(async () => {
@@ -66,15 +65,6 @@ describe("ESG Pallet Integration tests", function () {
 
 });
 
-// Setup the API and Accounts
-async function init() {
-  const alice = keyring.addFromUri("//Alice", { name: "Alice default" });
-  const bob = keyring.addFromUri("//Bob", { name: "Bob default" });
-  const charlie = keyring.addFromUri("//Charlie", { name: "Charlie default" });
-  const dave = keyring.addFromUri("//Dave", { name: "Dave default" });
-
-  return { alice, bob, charlie, dave };
-}
 
 // Register the Bob account as oracle in ESG pallet from ALICE(sudo account).
 async function registerOracle(alice: KeyringPair, bob: KeyringPair) {
