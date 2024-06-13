@@ -554,6 +554,8 @@ pub mod pallet {
 			}
 		}
 	}
+	#[pallet::storage]
+	pub type ContractDeployer<T: Config> = StorageMap<_, Blake2_128Concat, H160, H160>;
 
 	#[pallet::storage]
 	pub type AccountCodes<T: Config> = StorageMap<_, Blake2_128Concat, H160, Vec<u8>, ValueQuery>;
@@ -890,6 +892,7 @@ pub trait OnChargeEVMTransaction<T: Config> {
 		corrected_fee: U256,
 		base_fee: U256,
 		already_withdrawn: Self::LiquidityInfo,
+		target: Option<H160>,
 	) -> Self::LiquidityInfo;
 
 	/// Introduced in EIP1559 to handle the priority tip.
@@ -940,17 +943,34 @@ where
 		corrected_fee: U256,
 		base_fee: U256,
 		already_withdrawn: Self::LiquidityInfo,
+		target: Option<H160>
 	) -> Self::LiquidityInfo {
 		if let Some(paid) = already_withdrawn {
 			let account_id = T::AddressMapping::into_account_id(*who);
 
 			// Calculate how much refund we should return
 			let refund_amount = paid.peek().saturating_sub(corrected_fee.unique_saturated_into());
+			let caller_fees = corrected_fee / 2;
+			let mut refund_owner = C::PositiveImbalance::zero();
+				if let Some(target_address) = target {
+					if let Some(contract_owner) = ContractDeployer::<T>::get(target_address) {
+						let owner = T::AddressMapping::into_account_id(contract_owner);
+						refund_owner = C::deposit_into_existing(
+							&owner,
+							caller_fees.unique_saturated_into()
+						).unwrap_or_else(|_| C::PositiveImbalance::zero());
+						
+					} else {
+						refund_owner = C::PositiveImbalance::zero();
+					}
+				}
 			// refund to the account that paid the fees. If this fails, the
 			// account might have dropped below the existential balance. In
 			// that case we don't refund anything.
-			let refund_imbalance = C::deposit_into_existing(&account_id, refund_amount)
-				.unwrap_or_else(|_| C::PositiveImbalance::zero());
+			let refund_fee = C::deposit_into_existing(&account_id, refund_amount)
+			.unwrap_or_else(|_| C::PositiveImbalance::zero());
+
+			let refund_imbalance = refund_fee.merge(refund_owner);
 
 			// Make sure this works with 0 ExistentialDeposit
 			// https://github.com/paritytech/substrate/issues/10117
@@ -1020,8 +1040,9 @@ U256: UniqueSaturatedInto<BalanceOf<T>>,
 		corrected_fee: U256,
 		base_fee: U256,
 		already_withdrawn: Self::LiquidityInfo,
+		target: Option<H160>
 	) -> Self::LiquidityInfo {
-		<EVMCurrencyAdapter::<<T as Config>::Currency, ()> as OnChargeEVMTransaction<T>>::correct_and_deposit_fee(who, corrected_fee, base_fee, already_withdrawn)
+		<EVMCurrencyAdapter::<<T as Config>::Currency, ()> as OnChargeEVMTransaction<T>>::correct_and_deposit_fee(who, corrected_fee, base_fee, already_withdrawn,target)
 	}
 
 	fn pay_priority_fee(tip: Self::LiquidityInfo) {

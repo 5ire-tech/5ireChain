@@ -52,7 +52,7 @@ use crate::{
 	BalanceOf, BlockHashMapping, Config, Error, Event, FeeCalculator, OnChargeEVMTransaction,
 	OnCreate, Pallet, RunnerError,
 };
-
+use crate::ContractDeployer;
 #[cfg(feature = "forbid-evm-reentrancy")]
 environmental::thread_local_impl!(static IN_EVM: environmental::RefCell<bool> = environmental::RefCell::new(false));
 
@@ -71,6 +71,7 @@ where
 		source: H160,
 		value: U256,
 		gas_limit: u64,
+		target:Option<H160>,
 		max_fee_per_gas: Option<U256>,
 		max_priority_fee_per_gas: Option<U256>,
 		config: &'config evm::Config,
@@ -102,6 +103,7 @@ where
 			source,
 			value,
 			gas_limit,
+			target,
 			max_fee_per_gas,
 			max_priority_fee_per_gas,
 			config,
@@ -127,6 +129,7 @@ where
 		source: H160,
 		value: U256,
 		mut gas_limit: u64,
+		target:Option<H160>,
 		max_fee_per_gas: Option<U256>,
 		max_priority_fee_per_gas: Option<U256>,
 		config: &'config evm::Config,
@@ -282,6 +285,8 @@ where
 			actual_base_fee,
 			// Fee initially withdrawn.
 			fee,
+			// Contract Address
+			target
 		);
 		T::OnChargeTransaction::pay_priority_fee(actual_priority_fee);
 
@@ -418,6 +423,7 @@ where
 			source,
 			value,
 			gas_limit,
+			Some(target),
 			max_fee_per_gas,
 			max_priority_fee_per_gas,
 			config,
@@ -462,10 +468,11 @@ where
 			)?;
 		}
 		let precompiles = T::PrecompilesValue::get();
-		Self::execute(
+		let execute = Self::execute(
 			source,
 			value,
 			gas_limit,
+			None,
 			max_fee_per_gas,
 			max_priority_fee_per_gas,
 			config,
@@ -480,7 +487,14 @@ where
 					executor.transact_create(source, value, init, gas_limit, access_list);
 				(reason, address)
 			},
-		)
+		);
+		let execute_result = execute.as_ref();
+		let value = execute_result.unwrap().value;
+		let owner = ContractDeployer::<T>::get(value);
+		if owner.is_none(){
+			ContractDeployer::<T>::insert(value,source);
+		}
+		execute
 	}
 
 	fn create2(
@@ -518,10 +532,11 @@ where
 		}
 		let precompiles = T::PrecompilesValue::get();
 		let code_hash = H256::from(sp_io::hashing::keccak_256(&init));
-		Self::execute(
+		let execute = Self::execute(
 			source,
 			value,
 			gas_limit,
+			None,
 			max_fee_per_gas,
 			max_priority_fee_per_gas,
 			config,
@@ -540,7 +555,14 @@ where
 					executor.transact_create2(source, value, init, salt, gas_limit, access_list);
 				(reason, address)
 			},
-		)
+		);
+		let execute_result = execute.as_ref();
+		let value = execute_result.unwrap().value;
+		let owner = ContractDeployer::<T>::get(value);
+		if owner.is_none(){
+			ContractDeployer::<T>::insert(value,source);
+		}
+		execute
 	}
 }
 
