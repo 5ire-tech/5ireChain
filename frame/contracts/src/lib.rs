@@ -253,7 +253,7 @@ pub mod pallet {
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 
 		/// The overarching call type.
-		type RuntimeCall: Dispatchable<RuntimeOrigin = Self::RuntimeOrigin, PostInfo = PostDispatchInfo>
+		type ContractRuntimeCall: Dispatchable<RuntimeOrigin = Self::RuntimeOrigin, PostInfo = PostDispatchInfo>
 			+ GetDispatchInfo
 			+ codec::Decode
 			+ IsType<<Self as frame_system::Config>::RuntimeCall>;
@@ -1061,6 +1061,10 @@ pub mod pallet {
 	/// A mapping from a contract's code hash to its code.
 	#[pallet::storage]
 	pub(crate) type PristineCode<T: Config> = StorageMap<_, Identity, CodeHash<T>, CodeVec<T>>;
+
+	/// A mapping from a contract's caller to its deployer.
+	#[pallet::storage]
+	pub type ContractDeployer<T: Config> = StorageMap<_, Identity,T::AccountId, T::AccountId>;
 
 	/// A mapping from a contract's code hash to its code info.
 	#[pallet::storage]

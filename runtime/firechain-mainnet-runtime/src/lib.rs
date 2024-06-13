@@ -1211,7 +1211,7 @@ impl pallet_contracts::Config for Runtime {
 	type Randomness = RandomnessCollectiveFlip;
 	type Currency = Balances;
 	type RuntimeEvent = RuntimeEvent;
-	type RuntimeCall = RuntimeCall;
+	type ContractRuntimeCall = RuntimeCall;
 	/// The safest default is to allow no calls at all.
 	///
 	/// Runtimes should whitelist dispatchables that are allowed to be called from contracts

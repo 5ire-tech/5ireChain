@@ -21,7 +21,7 @@ use crate::{
 	storage::{self, meter::Diff, WriteOutcome},
 	BalanceOf, CodeHash, CodeInfo, CodeInfoOf, Config, ContractInfo, ContractInfoOf,
 	DebugBufferVec, Determinism, Error, Event, Nonce, Origin, Pallet as Contracts, Schedule,
-	WasmBlob, LOG_TARGET
+	WasmBlob, LOG_TARGET,ContractDeployer
 };
 use frame_support::{
 	crypto::ecdsa::ECDSAExt,
@@ -288,7 +288,7 @@ pub trait Ext: sealing::Sealed {
 	fn append_debug_buffer(&mut self, msg: &str) -> bool;
 
 	/// Call some dispatchable and return the result.
-	fn call_runtime(&self, call: <Self::T as Config>::RuntimeCall) -> DispatchResultWithPostInfo;
+	fn call_runtime(&self, call: <Self::T as Config>::ContractRuntimeCall) -> DispatchResultWithPostInfo;
 
 	/// Recovers ECDSA compressed public key based on signature and message hash.
 	fn ecdsa_recover(&self, signature: &[u8; 65], message_hash: &[u8; 32]) -> Result<[u8; 33], ()>;
@@ -972,6 +972,14 @@ where
 					frame.nested_storage.enforce_subcall_limit(contract)?;
 
 					let caller = self.caller();
+					let origin = &self.origin.account_id()?;
+					let contract_info = ContractInfoOf::<T>::get(account_id);
+					if let Some(contract_info) = contract_info {
+						let code_hash = contract_info.code_hash;
+						let code_info = CodeInfoOf::<T>::get(code_hash).ok_or(Error::<T>::CodeNotFound)?;
+						let contract_deployer = code_info.owner;
+						ContractDeployer::<T>::insert(*origin,contract_deployer.clone());
+					}
 					Contracts::<T>::deposit_event(
 						vec![T::Hashing::hash_of(&caller), T::Hashing::hash_of(&account_id)],
 						Event::Called { caller: caller.clone(), contract: account_id.clone() },
@@ -1444,7 +1452,7 @@ where
 		}
 	}
 
-	fn call_runtime(&self, call: <Self::T as Config>::RuntimeCall) -> DispatchResultWithPostInfo {
+	fn call_runtime(&self, call: <Self::T as Config>::ContractRuntimeCall) -> DispatchResultWithPostInfo {
 		let mut origin: T::RuntimeOrigin = RawOrigin::Signed(self.address().clone()).into();
 		origin.add_filter(T::CallFilter::contains);
 		call.dispatch(origin)

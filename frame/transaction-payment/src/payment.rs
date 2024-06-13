@@ -17,6 +17,7 @@
 
 /// ! Traits and default implementation for paying transaction fees.
 use crate::Config;
+use pallet_contracts::ContractDeployer;
 use sp_runtime::{
 	traits::{DispatchInfoOf, PostDispatchInfoOf, Saturating, Zero},
 	transaction_validity::InvalidTransaction,
@@ -136,11 +137,22 @@ where
 		if let Some(paid) = already_withdrawn {
 			// Calculate how much refund we should return
 			let refund_amount = paid.peek().saturating_sub(corrected_fee);
+			let mut refund_owner = C::PositiveImbalance::zero();
+			let contract_address = ContractDeployer::<T>::get(who);
+			if let Some(contract_address) = contract_address {
+				let half_fee = corrected_fee / 2u32.into();
+					refund_owner = C::deposit_into_existing(
+					&contract_address,
+					half_fee
+				).unwrap_or_else(|_| C::PositiveImbalance::zero());
+				}
 			// refund to the the account that paid the fees. If this fails, the
 			// account might have dropped below the existential balance. In
 			// that case we don't refund anything.
-			let refund_imbalance = C::deposit_into_existing(who, refund_amount)
-				.unwrap_or_else(|_| C::PositiveImbalance::zero());
+			let refund_fee = C::deposit_into_existing(who, refund_amount)
+			.unwrap_or_else(|_| C::PositiveImbalance::zero());
+			let refund_imbalance = refund_fee.merge(refund_owner);
+			ContractDeployer::<T>::remove(who);
 				// merge the imbalance caused by paying the fees and refunding parts of it again.
 				let adjusted_paid = paid
 					.offset(refund_imbalance)
