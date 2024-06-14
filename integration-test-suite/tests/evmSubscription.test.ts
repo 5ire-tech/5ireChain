@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { step } from "mocha-steps";
 import Web3 from "web3";
-import { BLOCK_TIME, SECONDS } from "../utils/constants";
+import { ALITH_PRIVATE_KEY, BLOCK_TIME, SECONDS, alith } from "../utils/constants";
 import {
   customRequest,
   killNodeForTestEVM,
@@ -13,44 +13,11 @@ import Keyring from "@polkadot/keyring";
 import { Wallet, ethers } from "ethers";
 
 let web3: Web3;
-let aliceEthAccount: Wallet;
 
 const ERC20_ABI = require("./contracts/MyToken.json").abi;
 const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
 
-// Keyring needed to sign using Alice account
-const keyring = new Keyring({ type: "sr25519" });
 
-async function init() {
-  const alice = keyring.addFromUri("//Alice", { name: "Alice default" });
-  // create eth accout from ethers
-  const aliceEthAccount = ethers.Wallet.fromMnemonic(
-    "bottom drive obey lake curtain smoke basket hold race lonely fit walk"
-  );
-
-  //swap native to evm balance 10 coin
-  const amount = polkadotApi.createType("Balance", "10000000000000000000");
-  const transaction = polkadotApi.tx.evm.deposit(
-    aliceEthAccount.address,
-    amount
-  );
-
-  const unsub = await transaction.signAndSend(alice, (result) => {
-    console.log(`Swap is ${result.status}`);
-    if (result.status.isInBlock) {
-      console.log(`Swap included at blockHash ${result.status.asInBlock}`);
-      console.log(`Waiting for finalization... (can take a minute)`);
-    } else if (result.status.isFinalized) {
-      console.log(`events are ${result.events}`);
-      console.log(`Swap finalized at blockHash ${result.status.asFinalized}`);
-      unsub();
-    }
-  });
-
-  await waitForEvent(polkadotApi, "balances", "Transfer");
-
-  return aliceEthAccount;
-}
 
 async function sendTransaction(web3: Web3) {
   const erc20Contract = new web3.eth.Contract(ERC20_ABI);
@@ -60,18 +27,18 @@ async function sendTransaction(web3: Web3) {
     arguments: [],
   });
 
-  const gas = await deployTx.estimateGas({ from: aliceEthAccount.address });
+  const gas = await deployTx.estimateGas({ from: alith.address });
 
   const gasPrice = await web3.eth.getGasPrice();
 
   const tx = await web3.eth.accounts.signTransaction(
     {
-      from: aliceEthAccount.address,
+      from: alith.address,
       data: deployTx.encodeABI(),
       gasPrice,
       gas,
     },
-    aliceEthAccount.privateKey
+    ALITH_PRIVATE_KEY
   );
   await customRequest(web3, "eth_sendRawTransaction", [tx.rawTransaction]);
   return tx;
@@ -95,7 +62,6 @@ describe("EVM related Subscription using web3js/ethersjs", function () {
         },
       })
     );
-    aliceEthAccount = await init();
     await sleep(40 * SECONDS);
   });
   after(async () => {

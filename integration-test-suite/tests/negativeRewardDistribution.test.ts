@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { BLOCK_TIME } from "../utils/constants";
+import { BLOCK_TIME, alith, baltathar } from "../utils/constants";
 import {
   killNodes,
   polkadotApi as api,
@@ -9,8 +9,7 @@ import {
 import { Keyring } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { waitForEvent, waitNfinalizedBlocks } from "../utils/setup";
-// Keyring needed to sign using Alice account
-const keyring = new Keyring({ type: "sr25519" });
+
 
 // We should test within 5 eras  ( 200 blocks)
 
@@ -22,28 +21,27 @@ describe("Negative Reward Distribution tests", function () {
   });
 
   it("Negative test Reward Distribution with NoSuchValidator  ", async () => {
-    const { alice, aliceStash } = await init();
+
     // wait to new era
     await waitNfinalizedBlocks(polkadotApi, 45, 1000);
 
     // Payout fail with invalid validator 
-    await payoutInValidValidator(alice);
+    await payoutInValidValidator(baltathar);
     
     await waitNfinalizedBlocks(polkadotApi, 2, 1000);
 
   });
 
   it("Negative test Reward Distribution with Already Claimed ", async () => {
-    const { alice, aliceStash } = await init();
     // wait to new era
     await waitNfinalizedBlocks(polkadotApi, 45, 1000);
 
     // // Valid payout transaction
-    await payoutSuccess(alice, aliceStash);
+    await payoutSuccess(alith);
 
     await waitForEvent(api, "reward", "Rewarded");
     // // Invalid payout transaction Already Claimed
-    await payoutAlreadyClaimed(alice, aliceStash);
+    await payoutAlreadyClaimed(alith);
 
     // await waitNfinalizedBlocks(polkadotApi, 2, 1000);
   });
@@ -53,25 +51,18 @@ describe("Negative Reward Distribution tests", function () {
   });
 });
 
-// Setup the API and Accounts
-async function init() {
-  const alice = keyring.addFromUri("//Alice", { name: "Alice default" });
-  const aliceStash = keyring.addFromUri("//Alice//stash");
-  const bobStash = keyring.addFromUri("//Bob//stash");
-  return { alice, aliceStash, bobStash };
-}
 
 // Payout Transaction
 // alice : stash account
 // alice_stash : controller account
 
-async function payoutSuccess(alice: KeyringPair, aliceStash: KeyringPair) {
+async function payoutSuccess(alith: KeyringPair) {
   console.log(`\n Payout Success`);
-  const payout = await api.tx.reward.getRewards(aliceStash.address);
+  const payout = await api.tx.reward.getRewards(alith.address);
 
   const transaction = new Promise<{}>(async (resolve, reject) => {
     const unsub = await payout.signAndSend(
-      alice,
+      alith,
       { tip: 2000, nonce: -1 },
       (result) => {
         console.log(`Payout transaction is ${result.status}`);
@@ -90,13 +81,13 @@ async function payoutSuccess(alice: KeyringPair, aliceStash: KeyringPair) {
 }
 
 // Alice is is not validator 
-async function payoutInValidValidator(alice: KeyringPair) {
+async function payoutInValidValidator(baltathar: KeyringPair) {
   console.log(`\n Payout InValid Validator`);
-  const payout = await api.tx.reward.getRewards(alice.address);
+  const payout = await api.tx.reward.getRewards(baltathar.address);
 
   const transaction = new Promise<{}>(async (resolve, reject) => {
     const unsub = await payout.signAndSend(
-      alice,
+      baltathar,
       { tip: 2000, nonce: -1 },
       (result) => {
         console.log(`Payout transaction is ${result.status}`);
@@ -126,15 +117,14 @@ async function payoutInValidValidator(alice: KeyringPair) {
 }
 
 async function payoutAlreadyClaimed(
-  alice: KeyringPair,
-  aliceStash: KeyringPair
+  alith: KeyringPair,
 ) {
   console.log(`\n Payout fail due to AlreadyClaimed`);
-  const payout = await api.tx.reward.getRewards(aliceStash.address);
+  const payout = await api.tx.reward.getRewards(alith.address);
 
   const transaction = new Promise<{}>(async (resolve, reject) => {
     const unsub = await payout.signAndSend(
-      alice,
+      alith,
       { tip: 2000, nonce: -1 },
       (result) => {
         console.log(`Payout transaction is ${result.status}`);

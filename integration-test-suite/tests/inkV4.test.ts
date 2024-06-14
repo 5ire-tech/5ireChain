@@ -181,7 +181,7 @@ const queryTransaction = async (
   const contract = new ContractPromise(api, contractFile, contractAddress);
 
   // Query value from contract
-  const { result, output } = await contract.query.get(alith.address, {
+  const { result, output } = await contract.query.get(alith.publicKey, {
     gasLimit,
     storageDepositLimit,
   });
