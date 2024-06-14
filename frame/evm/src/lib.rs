@@ -557,6 +557,7 @@ pub mod pallet {
 		}
 	}
 
+	// Mapping of contract addresses to their deployer accounts
 	#[pallet::storage]
 	pub type ContractDeployer<T: Config> = StorageMap<_, Blake2_128Concat, H160, H160>;
 
@@ -953,11 +954,18 @@ where
 
 			// Calculate how much refund we should return
 			let refund_amount = paid.peek().saturating_sub(corrected_fee.unique_saturated_into());
+			// `contract_deployer_revenue` is half of the `corrected_fee`, representing the revenue to be allocated to the contract deployer.
 			let contract_deployer_revenue = corrected_fee / 2;
+			// deployer_imbalance` is initialized as zero, representing an imbalance in the contract deployer's 
+			// account, which will be adjusted later if the contract owner is found.
 			let mut deployer_imbalance = C::PositiveImbalance::zero();
 				if let Some(target_address) = target {
+					  // If target_address` exists in the `ContractDeployer` mapping, retrieve the contract owner.
 					if let Some(contract_owner) = ContractDeployer::<T>::get(target_address) {
+						// Converts the `contract_owner` address into an account ID format.
 						let owner = T::AddressMapping::into_account_id(contract_owner);
+						  // Attempts to deposit the `contract_deployer_revenue` into the owner's account, updating 
+       					 // `deployer_imbalance`
 						deployer_imbalance = C::deposit_into_existing(
 							&owner,
 							contract_deployer_revenue.unique_saturated_into()
