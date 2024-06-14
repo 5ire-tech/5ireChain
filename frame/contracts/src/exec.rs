@@ -21,7 +21,7 @@ use crate::{
 	storage::{self, meter::Diff, WriteOutcome},
 	BalanceOf, CodeHash, CodeInfo, CodeInfoOf, Config, ContractInfo, ContractInfoOf,
 	DebugBufferVec, Determinism, Error, Event, Nonce, Origin, Pallet as Contracts, Schedule,
-	WasmBlob, LOG_TARGET,ContractDeployer
+	WasmBlob, LOG_TARGET, ContractDeployer
 };
 use frame_support::{
 	crypto::ecdsa::ECDSAExt,

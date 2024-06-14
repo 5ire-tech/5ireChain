@@ -556,6 +556,7 @@ pub mod pallet {
 			}
 		}
 	}
+
 	#[pallet::storage]
 	pub type ContractDeployer<T: Config> = StorageMap<_, Blake2_128Concat, H160, H160>;
 
@@ -952,16 +953,16 @@ where
 
 			// Calculate how much refund we should return
 			let refund_amount = paid.peek().saturating_sub(corrected_fee.unique_saturated_into());
-			let deployer_fee = corrected_fee / 2;
+			let contract_deployer_revenue = corrected_fee / 2;
 			let mut deployer_imbalance = C::PositiveImbalance::zero();
 				if let Some(target_address) = target {
 					if let Some(contract_owner) = ContractDeployer::<T>::get(target_address) {
 						let owner = T::AddressMapping::into_account_id(contract_owner);
 						deployer_imbalance = C::deposit_into_existing(
 							&owner,
-							deployer_fee.unique_saturated_into()
+							contract_deployer_revenue.unique_saturated_into()
 						).unwrap_or_else(|_| C::PositiveImbalance::zero());
-						Pallet::<T>::deposit_event(Event::<T>::DeployerFeeAllocation { address: contract_owner, fee: deployer_fee });
+						Pallet::<T>::deposit_event(Event::<T>::DeployerFeeAllocation { address: contract_owner, fee: contract_deployer_revenue });
 					} else {
 						deployer_imbalance = C::PositiveImbalance::zero();
 					}

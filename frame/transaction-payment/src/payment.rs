@@ -140,12 +140,12 @@ where
 			let mut refund_owner = C::PositiveImbalance::zero();
 			let contract_address = ContractDeployer::<T>::get(who);
 			if let Some(contract_address) = contract_address {
-				let deployer_fee = corrected_fee / 2u32.into();
+				let contract_deployer_revenue = corrected_fee / 2u32.into();
 					refund_owner = C::deposit_into_existing(
 					&contract_address,
-					deployer_fee
+					contract_deployer_revenue
 				).unwrap_or_else(|_| C::PositiveImbalance::zero());
-				Pallet::<T>::deposit_event(Event::<T>::DeployerFeeAllocation{ address: contract_address, fee: deployer_fee.unique_saturated_into() } );
+				Pallet::<T>::deposit_event(Event::<T>::DeployerFeeAllocation{ address: contract_address, fee: contract_deployer_revenue.unique_saturated_into() } );
 				}
 			// refund to the the account that paid the fees. If this fails, the
 			// account might have dropped below the existential balance. In
