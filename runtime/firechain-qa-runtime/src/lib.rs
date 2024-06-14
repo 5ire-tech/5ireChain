@@ -118,7 +118,7 @@ pub use sp_runtime::BuildStorage;
 pub mod impls;
 #[cfg(not(feature = "runtime-benchmarks"))]
 use impls::AllianceIdentityVerifier;
-use impls::{AllianceProposalProvider, Author};
+use impls::AllianceProposalProvider;
 
 /// Constant values used within the runtime.
 pub mod constants;
@@ -188,21 +188,18 @@ pub struct DealWithFees;
 impl OnUnbalanced<NegativeImbalance> for DealWithFees {
 	fn on_unbalanceds<B>(mut fees_then_tips: impl Iterator<Item = NegativeImbalance>) {
 		if let Some(fees) = fees_then_tips.next() {
-			// for fees, 80% to treasury, 20% to author
-			let mut split = fees.ration(80, 20);
+			// for fees, 100% to treasury
+			let mut split = fees;
 			if let Some(tips) = fees_then_tips.next() {
-				// for tips, if any, 80% to treasury, 20% to author (though this can be anything)
-				tips.ration_merge_into(80, 20, &mut split);
+				// for tips, if any, 100% to treasury (though this can be anything)
+				tips.merge_into(&mut split);
 			}
-			Treasury::on_unbalanced(split.0);
-			Author::on_unbalanced(split.1);
+			Treasury::on_unbalanced(split);
 		}
 	}
 	fn on_nonzero_unbalanced(amount: NegativeImbalance) {
-		// for fees, 80% to treasury, 20% to author
-		let split = amount.ration(80, 20);
-		Treasury::on_unbalanced(split.0);
-		Author::on_unbalanced(split.1);
+		// for fees, 100% to treasury
+		Treasury::on_unbalanced(amount);
 	}
 }
 
