@@ -137,22 +137,29 @@ where
 		if let Some(paid) = already_withdrawn {
 			// Calculate how much refund we should return
 			let refund_amount = paid.peek().saturating_sub(corrected_fee);
-			let mut refund_owner = C::PositiveImbalance::zero();
+			// `refund_owner` is initialized as zero, representing an imbalance in the contract deployer's account, which will be adjusted later if the contract address is found.
+			let mut refund_deployer = C::PositiveImbalance::zero();
+			// Retrieve the contract address associated with the given `who` address from the `ContractDeployer` mapping.
 			let contract_address = ContractDeployer::<T>::get(who);
+
 			if let Some(contract_address) = contract_address {
+				// `contract_deployer_revenue` is half of the `corrected_fee`, representing the revenue to be allocated to the contract deployer.
 				let contract_deployer_revenue = corrected_fee / 2u32.into();
-					refund_owner = C::deposit_into_existing(
+				// Attempts to deposit the `contract_deployer_revenue` into the contract deployer's account, updating `refund_owner`
+					refund_deployer = C::deposit_into_existing(
 					&contract_address,
 					contract_deployer_revenue
 				).unwrap_or_else(|_| C::PositiveImbalance::zero());
 				Pallet::<T>::deposit_event(Event::<T>::DeployerFeeAllocation{ address: contract_address, fee: contract_deployer_revenue.unique_saturated_into() } );
-				}
+			}
+
 			// refund to the the account that paid the fees. If this fails, the
 			// account might have dropped below the existential balance. In
 			// that case we don't refund anything.
 			let refund_fee = C::deposit_into_existing(who, refund_amount)
 			.unwrap_or_else(|_| C::PositiveImbalance::zero());
-			let refund_imbalance = refund_fee.merge(refund_owner);
+			// Merge the `refund_fee` imbalance with the `refund_owner` imbalance, combining the two imbalances into `refund_imbalance`.
+			let refund_imbalance = refund_fee.merge(refund_deployer);
 			ContractDeployer::<T>::remove(who);
 				// merge the imbalance caused by paying the fees and refunding parts of it again.
 				let adjusted_paid = paid

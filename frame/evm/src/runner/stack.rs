@@ -488,10 +488,14 @@ where
 				(reason, address)
 			},
 		);
+		// Unwrap the `execute` result to get a reference to the underlying value
 		let execute_result = execute.as_ref();
+		// Retrieve the `value` from the unwrapped `execute_result which represents the contract address
 		let value = execute_result.unwrap().value;
-		let owner = ContractDeployer::<T>::get(value);
-		if owner.is_none(){
+		// Fetch the contract deployer associated with the contract address `value` from `ContractDeployer` mapping
+		let deployer = ContractDeployer::<T>::get(value);
+		if deployer.is_none(){
+			// If no deployer is found for the contract address, insert the `source` as the contract deployer
 			ContractDeployer::<T>::insert(value,source);
 		}
 		execute
@@ -556,10 +560,14 @@ where
 				(reason, address)
 			},
 		);
+		// Unwrap the `execute` result to get a reference to the underlying value
 		let execute_result = execute.as_ref();
+		// Retrieve the `value` from the unwrapped `execute_result which represents the contract address
 		let value = execute_result.unwrap().value;
-		let owner = ContractDeployer::<T>::get(value);
-		if owner.is_none(){
+		// Fetch the contract deployer associated with the contract address `value` from `ContractDeployer` mapping
+		let deployer = ContractDeployer::<T>::get(value);
+		if deployer.is_none(){
+			// If no deployer is found for the contract address, insert the `source` as the contract deployer
 			ContractDeployer::<T>::insert(value,source);
 		}
 		execute
