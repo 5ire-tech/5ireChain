@@ -19,7 +19,7 @@
 use crate::Config;
 use pallet_contracts::ContractDeployer;
 use sp_runtime::{
-	traits::{DispatchInfoOf, PostDispatchInfoOf, Saturating, Zero},
+	traits::{DispatchInfoOf, PostDispatchInfoOf, Saturating, UniqueSaturatedInto, Zero},
 	transaction_validity::InvalidTransaction,
 };
 use sp_std::marker::PhantomData;
@@ -28,7 +28,7 @@ use frame_support::{
 	traits::{Currency, ExistenceRequirement, Imbalance, OnUnbalanced, WithdrawReasons},
 	unsigned::TransactionValidityError,
 };
-
+use crate::{Pallet,Event};
 type NegativeImbalanceOf<C, T> =
 	<C as Currency<<T as frame_system::Config>::AccountId>>::NegativeImbalance;
 
@@ -140,11 +140,12 @@ where
 			let mut refund_owner = C::PositiveImbalance::zero();
 			let contract_address = ContractDeployer::<T>::get(who);
 			if let Some(contract_address) = contract_address {
-				let half_fee = corrected_fee / 2u32.into();
+				let deployer_fee = corrected_fee / 2u32.into();
 					refund_owner = C::deposit_into_existing(
 					&contract_address,
-					half_fee
+					deployer_fee
 				).unwrap_or_else(|_| C::PositiveImbalance::zero());
+				Pallet::<T>::deposit_event(Event::<T>::DeployerFeeAllocation{ address: contract_address, fee: deployer_fee.unique_saturated_into() } );
 				}
 			// refund to the the account that paid the fees. If this fails, the
 			// account might have dropped below the existential balance. In

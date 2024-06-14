@@ -472,6 +472,8 @@ pub mod pallet {
 		/// A contract has been executed with errors. States are reverted with only gas fees
 		/// applied.
 		ExecutedFailed { address: H160 },
+		/// 50% of caller fees are allocated to the contract deployer
+		DeployerFeeAllocation { address: H160, fee:U256 },
 	}
 
 	#[pallet::error]
@@ -950,18 +952,18 @@ where
 
 			// Calculate how much refund we should return
 			let refund_amount = paid.peek().saturating_sub(corrected_fee.unique_saturated_into());
-			let caller_fees = corrected_fee / 2;
-			let mut refund_owner = C::PositiveImbalance::zero();
+			let deployer_fee = corrected_fee / 2;
+			let mut deployer_imbalance = C::PositiveImbalance::zero();
 				if let Some(target_address) = target {
 					if let Some(contract_owner) = ContractDeployer::<T>::get(target_address) {
 						let owner = T::AddressMapping::into_account_id(contract_owner);
-						refund_owner = C::deposit_into_existing(
+						deployer_imbalance = C::deposit_into_existing(
 							&owner,
-							caller_fees.unique_saturated_into()
+							deployer_fee.unique_saturated_into()
 						).unwrap_or_else(|_| C::PositiveImbalance::zero());
-						
+						Pallet::<T>::deposit_event(Event::<T>::DeployerFeeAllocation { address: contract_owner, fee: deployer_fee });
 					} else {
-						refund_owner = C::PositiveImbalance::zero();
+						deployer_imbalance = C::PositiveImbalance::zero();
 					}
 				}
 			// refund to the account that paid the fees. If this fails, the
@@ -970,7 +972,7 @@ where
 			let refund_fee = C::deposit_into_existing(&account_id, refund_amount)
 			.unwrap_or_else(|_| C::PositiveImbalance::zero());
 
-			let refund_imbalance = refund_fee.merge(refund_owner);
+			let refund_imbalance = refund_fee.merge(deployer_imbalance);
 
 			// Make sure this works with 0 ExistentialDeposit
 			// https://github.com/paritytech/substrate/issues/10117

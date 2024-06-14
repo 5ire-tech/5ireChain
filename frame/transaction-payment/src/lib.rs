@@ -406,6 +406,8 @@ pub mod pallet {
 		/// A transaction fee `actual_fee`, of which `tip` was added to the minimum inclusion fee,
 		/// has been paid by `who`.
 		TransactionFeePaid { who: T::AccountId, actual_fee: BalanceOf<T>, tip: BalanceOf<T> },
+		/// 50% of caller fees are allocated to the contract deployer
+		DeployerFeeAllocation {address: T::AccountId, fee: u128},
 	}
 
 	#[pallet::hooks]
