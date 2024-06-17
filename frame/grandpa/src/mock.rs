@@ -46,6 +46,7 @@ use sp_runtime::{
 use sp_staking::{EraIndex, SessionIndex};
 
 type Block = frame_system::mocking::MockBlock<Test>;
+type AccountId = u64;
 
 frame_support::construct_runtime!(
 	pub enum Test
@@ -206,21 +207,11 @@ impl pallet_timestamp::Config for Test {
 	type WeightInfo = ();
 }
 
-pallet_staking_reward_curve::build! {
-	const REWARD_CURVE: PiecewiseLinear<'static> = curve!(
-		min_inflation: 0_025_000u64,
-		max_inflation: 0_100_000,
-		ideal_stake: 0_500_000,
-		falloff: 0_050_000,
-		max_piece_count: 40,
-		test_precision: 0_005_000,
-	);
-}
+
 
 parameter_types! {
 	pub const SessionsPerEra: SessionIndex = 3;
 	pub const BondingDuration: EraIndex = 3;
-	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
 	pub const OffendingValidatorsThreshold: Perbill = Perbill::from_percent(17);
 	pub static ElectionsBoundsOnChain: ElectionBounds = ElectionBoundsBuilder::default().build();
 }
@@ -241,8 +232,27 @@ impl onchain::Config for OnChainSeqPhragmen {
 	type Bounds = ElectionsBoundsOnChain;
 }
 
+
+pub struct TestReward;
+impl pallet_staking::Rewards<AccountId> for TestReward {
+	fn payout_validators() -> Vec<AccountId> {
+		vec![]
+	}
+	fn claim_rewards(account:AccountId) -> Result<(), sp_runtime::DispatchError> {
+		Ok(())
+	
+	}
+	fn calculate_reward() -> sp_runtime::DispatchResult {
+	
+		Ok(())
+	}
+
+}
+
+
 impl pallet_staking::Config for Test {
 	type RewardRemainder = ();
+	type RewardDistribution = TestReward;
 	type CurrencyToVote = ();
 	type RuntimeEvent = RuntimeEvent;
 	type Currency = Balances;
@@ -255,7 +265,7 @@ impl pallet_staking::Config for Test {
 	type AdminOrigin = frame_system::EnsureRoot<Self::AccountId>;
 	type SessionInterface = Self;
 	type UnixTime = pallet_timestamp::Pallet<Test>;
-	type EraPayout = pallet_staking::ConvertCurve<RewardCurve>;
+	type EraPayout = ();
 	type MaxNominatorRewardedPerValidator = ConstU32<64>;
 	type OffendingValidatorsThreshold = OffendingValidatorsThreshold;
 	type NextNewSession = Session;

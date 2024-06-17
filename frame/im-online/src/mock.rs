@@ -49,10 +49,10 @@ use frame_support::{
 	Parameter,
 };
 use pallet_staking::{
-	BalanceOf, Exposure, ExposureOf, FixedNominationsQuota, RewardDestination, ValidatorPrefs,
+	BalanceOf, Exposure, ExposureOf, FixedNominationsQuota, RewardDestination, ValidatorPrefs, Rewards
 };
 use sp_staking::currency_to_vote::SaturatingCurrencyToVote;
-
+use sp_runtime::DispatchError;
 type AccountId = u64;
 type AccountIndex = u64;
 type BlockNumber = u64;
@@ -81,16 +81,6 @@ frame_support::construct_runtime!(
 	}
 );
 
-pallet_staking_reward_curve::build! {
-	const I_NPOS: PiecewiseLinear<'static> = curve!(
-		min_inflation: 0_025_000,
-		max_inflation: 0_100_000,
-		ideal_stake: 0_500_000,
-		falloff: 0_050_000,
-		max_piece_count: 40,
-		test_precision: 0_005_000,
-	);
-}
 
 parameter_types! {
 	pub MaxOnChainElectableTargets: u16 = 1250;
@@ -98,7 +88,6 @@ parameter_types! {
 	// pub const Period: u64 = 1;
 	// pub const Offset: u64 = 0;
 	pub const BondingDuration: EraIndex = 3;
-	pub const RewardCurve: &'static PiecewiseLinear<'static> = &I_NPOS;
 	pub const OffendingValidatorsThreshold: Perbill = Perbill::from_percent(75);
 
 	pub static MaxWinners: u32 = 100;
@@ -279,8 +268,26 @@ impl pallet_staking::SessionInterface<AccountId> for ImOnlineSession {
 	fn prune_historical_up_to(_up_to: SessionIndex) {}
 }
 
+pub struct TestReward;
+impl Rewards<AccountId> for TestReward {
+	fn payout_validators() -> Vec<AccountId> {
+		vec![]
+	}
+	fn claim_rewards(account:AccountId) -> Result<(), DispatchError> {
+		Ok(())
+	
+	}
+	fn calculate_reward() -> sp_runtime::DispatchResult {
+	
+		Ok(())
+	}
+
+
+}
+
 impl pallet_staking::Config for Test {
 	type Currency = Balances;
+	type RewardDistribution = TestReward;
 	type CurrencyBalance = <Self as pallet_balances::Config>::Balance;
 	type UnixTime = Timestamp;
 	type CurrencyToVote = SaturatingCurrencyToVote;
@@ -293,7 +300,7 @@ impl pallet_staking::Config for Test {
 	type BondingDuration = BondingDuration;
 	type AdminOrigin = frame_system::EnsureRoot<u64>;
 	type SessionInterface = ImOnlineSession;
-	type EraPayout = pallet_staking::ConvertCurve<RewardCurve>;
+	type EraPayout = ();
 	type NextNewSession = Session;
 	type MaxNominatorRewardedPerValidator = ConstU32<64>;
 	type OffendingValidatorsThreshold = OffendingValidatorsThreshold;

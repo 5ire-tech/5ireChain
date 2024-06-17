@@ -152,12 +152,6 @@ pub mod pallet {
 	pub enum Error<T> {
 		/// No validator is present
 		NoSuchValidator,
-		/// No Reward is available for the author
-		NoRewardAvailable,
-		/// No Reward is available for the author
-		AlreadyRewarded,
-		/// No Such Nominator is present
-		NoSuchNominator,
 		/// Wait for the era to complete
 		WaitTheEraToComplete,
 	}

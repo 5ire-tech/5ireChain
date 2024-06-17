@@ -40,6 +40,7 @@ pallet-timestamp = { workspace = true, features = ["default"] }
 sp-core = { workspace = true, features = ["default"] }
 # Frontier
 fp-self-contained = { workspace = true, features = ["default"] }
+pallet-authorship = { workspace = true }
 
 [features]
 default = ["std"]
