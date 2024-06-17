@@ -9,10 +9,13 @@ edition = "2021"
 [dependencies]
 sp-runtime = { workspace = true }
 node-primitives = { workspace = true }
+fp-account= {workspace=true}
 
 [features]
 default = ["std"]
 std = [
 	"sp-runtime/std",
-	"node-primitives/std"
+	"node-primitives/std",
+	"fp-account/std"
+	
 ]
