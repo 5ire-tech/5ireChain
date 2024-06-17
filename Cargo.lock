@@ -2589,7 +2589,7 @@ dependencies = [
 
 [[package]]
 name = "firechain-qa-runtime"
-version = "1.0.2"
+version = "1.0.4"
 dependencies = [
  "firechain-runtime-core-primitives",
  "fp-account",
@@ -2704,7 +2704,7 @@ dependencies = [
 
 [[package]]
 name = "firechain-thunder-runtime"
-version = "1.0.2"
+version = "1.0.4"
 dependencies = [
  "firechain-runtime-core-primitives",
  "fp-account",
@@ -6033,6 +6033,7 @@ dependencies = [
  "frame-system",
  "hex",
  "libsecp256k1",
+ "pallet-authorship",
  "pallet-balances",
  "pallet-evm 6.0.0-dev",
  "pallet-timestamp",
@@ -6588,16 +6589,19 @@ dependencies = [
  "frame-system",
  "log",
  "pallet-balances",
+ "pallet-esg",
+ "pallet-im-online 4.0.0-dev",
+ "pallet-offences",
  "pallet-session 4.0.0-dev",
  "pallet-staking 4.0.0-dev",
  "pallet-timestamp",
- "pallet-treasury",
  "parity-scale-codec",
  "scale-info",
  "sp-core",
  "sp-io",
  "sp-runtime",
  "sp-staking",
+ "sp-state-machine",
  "sp-std",
 ]
 
@@ -6715,6 +6719,7 @@ dependencies = [
  "pallet-esg",
  "pallet-im-online 4.0.0-dev",
  "pallet-offences",
+ "pallet-reward",
  "pallet-session 4.0.0-dev",
  "pallet-timestamp",
  "pallet-treasury",

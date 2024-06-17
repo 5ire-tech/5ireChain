@@ -1,30 +1,45 @@
 use crate::mock::*;
-use frame_support::assert_ok;
-use crate::AuthorBlockList;
-use frame_support::traits::Currency;
+use crate::Error;
+use frame_support::{assert_ok, assert_noop};
 
-type AccountIdOf<Test> = <Test as frame_system::Config>::AccountId;
+#[test]
+fn get_rewards_should_work() {
+	ExtBuilder::default().build_and_execute(|| {
+		start_session(1);
 
-fn account(id: u8) -> AccountIdOf<Test> {
-	[id; 20].into()
-}
-
-fn set_validator(){
-    let validator = pallet_staking::ValidatorPrefs;
-}
-
-fn transfer_balance(){
-    System::set_block_number(1);
-    let _ =  RewardBalance::deposit_creating(&account(2),150000000000);
-    let _ = RewardBalance::transfer(RuntimeOrigin::signed(account(2)), account(3), 15000);
-    AuthorBlockList::<Test>::insert(account(1), 1)
+		assert_eq!(active_era(), 0);
+		assert_eq!(RewardBalance::free_balance(11), 1000);
+		assert_ok!(Reward::get_rewards(who(11), 11));
+	});
 }
 
 #[test]
-fn get_rewards(){
-    new_test_ext().execute_with(||{
-        System::set_block_number(1);
-        transfer_balance();
-        assert_ok!(crate::Pallet::<Test>::get_rewards(RuntimeOrigin::signed(account(1))));
-    });
+fn anyone_can_call_rewards_should_work() {
+	ExtBuilder::default().build_and_execute(|| {
+		start_session(1);
+
+		assert_eq!(active_era(), 0);
+		assert_ok!(Reward::get_rewards(who(1), 11));
+	});
+}
+
+#[test]
+fn get_rewards_by_not_validator_should_not_work() {
+	ExtBuilder::default().build_and_execute(|| {
+		start_session(1);
+		assert_eq!(active_era(), 0);
+        let normal_user:u64 = 2;
+
+		assert_noop!(Reward::get_rewards(who(1), normal_user), Error::<Test>::NoSuchValidator);
+	});
+}
+
+#[test]
+fn get_multiple_rewards_in_the_same_era_should_not_work() {
+	ExtBuilder::default().build_and_execute(|| {
+		start_session(1);
+		assert_eq!(active_era(), 0);
+        assert_ok!(Reward::get_rewards(who(1), 11));
+		assert_noop!(Reward::get_rewards(who(1), 11), Error::<Test>::WaitTheEraToComplete);
+	});
 }

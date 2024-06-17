@@ -33,13 +33,14 @@ use crate::{
 	EnsureAddressNever, EnsureAddressRoot, FeeCalculator, IdentityAddressMapping,
 	IsPrecompileResult, Precompile, PrecompileHandle, PrecompileResult, PrecompileSet,
 };
-
+type AccountId = H160;
 frame_support::construct_runtime! {
 	pub enum Test {
 		System: frame_system::{Pallet, Call, Config<T>, Storage, Event<T>},
 		Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
 		Timestamp: pallet_timestamp::{Pallet, Call, Storage},
 		EVM: crate::{Pallet, Call, Storage, Config<T>, Event<T>},
+		Authorship: pallet_authorship
 	}
 }
 
@@ -149,7 +150,7 @@ impl crate::Config for Test {
 	type Runner = crate::runner::stack::Runner<Self>;
 	type OnChargeTransaction = ();
 	type OnCreate = ();
-	type FindAuthor = FindAuthorTruncated;
+	type Author = FindAuthorTruncated;
 	type GasLimitPovSizeRatio = GasLimitPovSizeRatio;
 	type Timestamp = Timestamp;
 	type WeightInfo = ();
@@ -180,4 +181,10 @@ impl PrecompileSet for MockPrecompileSet {
 			extra_cost: 0,
 		}
 	}
+}
+
+
+impl pallet_authorship::Config for Test {
+	type FindAuthor = FindAuthorTruncated;
+	type EventHandler = ();
 }

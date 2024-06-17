@@ -28,7 +28,7 @@ use frame_support::{
 	traits::{ConstU128, ConstU32, ConstU64, KeyOwnerProofSystem, OnInitialize},
 };
 use pallet_session::historical as pallet_session_historical;
-use pallet_staking::FixedNominationsQuota;
+use pallet_staking::{FixedNominationsQuota, Rewards};
 use sp_consensus_babe::{AuthorityId, AuthorityPair, Randomness, Slot, VrfSignature};
 use sp_core::{
 	crypto::{KeyTypeId, Pair, VrfSecret},
@@ -36,17 +36,17 @@ use sp_core::{
 };
 use sp_io;
 use sp_runtime::{
-	curve::PiecewiseLinear,
 	impl_opaque_keys,
 	testing::{Digest, DigestItem, Header, TestXt, UintAuthorityId},
 	traits::{Header as _, IdentityLookup, OpaqueKeys},
 	BuildStorage, Perbill,
 };
 use sp_staking::{EraIndex, SessionIndex};
-
+use sp_runtime::DispatchError;
 type DummyValidatorId = u64;
 
 type Block = frame_system::mocking::MockBlock<Test>;
+type AccountId = u64;
 
 frame_support::construct_runtime!(
 	pub enum Test
@@ -202,22 +202,11 @@ impl pallet_balances::Config for Test {
 	type MaxHolds = ();
 }
 
-pallet_staking_reward_curve::build! {
-	const REWARD_CURVE: PiecewiseLinear<'static> = curve!(
-		min_inflation: 0_025_000u64,
-		max_inflation: 0_100_000,
-		ideal_stake: 0_500_000,
-		falloff: 0_050_000,
-		max_piece_count: 40,
-		test_precision: 0_005_000,
-	);
-}
 
 parameter_types! {
 	pub const SessionsPerEra: SessionIndex = 3;
 	pub const BondingDuration: EraIndex = 3;
 	pub const SlashDeferDuration: EraIndex = 0;
-	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
 	pub const OffendingValidatorsThreshold: Perbill = Perbill::from_percent(16);
 	pub static ElectionsBounds: ElectionBounds = ElectionBoundsBuilder::default().build();
 }
@@ -232,8 +221,26 @@ impl onchain::Config for OnChainSeqPhragmen {
 	type Bounds = ElectionsBounds;
 }
 
+pub struct TestReward;
+impl Rewards<AccountId> for TestReward {
+	fn payout_validators() -> Vec<AccountId> {
+		vec![]
+	}
+	fn claim_rewards(account:AccountId) -> Result<(), DispatchError> {
+		Ok(())
+	
+	}
+	fn calculate_reward() -> sp_runtime::DispatchResult {
+	
+		Ok(())
+	}
+
+}
+
+
 impl pallet_staking::Config for Test {
 	type RewardRemainder = ();
+	type RewardDistribution = TestReward;
 	type CurrencyToVote = ();
 	type RuntimeEvent = RuntimeEvent;
 	type Currency = Balances;
@@ -246,7 +253,7 @@ impl pallet_staking::Config for Test {
 	type AdminOrigin = frame_system::EnsureRoot<Self::AccountId>;
 	type SessionInterface = Self;
 	type UnixTime = pallet_timestamp::Pallet<Test>;
-	type EraPayout = pallet_staking::ConvertCurve<RewardCurve>;
+	type EraPayout = ();
 	type MaxNominatorRewardedPerValidator = ConstU32<64>;
 	type OffendingValidatorsThreshold = OffendingValidatorsThreshold;
 	type NextNewSession = Session;

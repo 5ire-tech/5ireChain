@@ -50,6 +50,7 @@ frame-benchmarking = { workspace = true }
 frame-election-provider-support = { workspace = true }
 rand_chacha = { version = "0.2" }
 pallet-offences = { workspace = true }
+pallet-reward = { workspace = true }
 
 [features]
 default = [ "std" ]
@@ -78,6 +79,7 @@ std = [
 	"pallet-esg/std",
 	"pallet-im-online/std",
 	"pallet-treasury/std",
+	"pallet-reward/std",
 ]
 runtime-benchmarks = [
 	"frame-benchmarking/runtime-benchmarks",

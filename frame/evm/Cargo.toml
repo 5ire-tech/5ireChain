@@ -64,6 +64,7 @@ std = [
 	# Frontier
 	"fp-account/std",
 	"fp-evm/std",
+	"pallet-authorship/std"
 ]
 runtime-benchmarks = [
 	"hex",
