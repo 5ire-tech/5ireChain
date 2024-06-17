@@ -472,6 +472,8 @@ pub mod pallet {
 		/// A contract has been executed with errors. States are reverted with only gas fees
 		/// applied.
 		ExecutedFailed { address: H160 },
+		/// 50% of caller fees are allocated to the contract deployer
+		DeployerFeeAllocation { address: H160, fee:U256 },
 	}
 
 	#[pallet::error]
@@ -554,6 +556,10 @@ pub mod pallet {
 			}
 		}
 	}
+
+	// Mapping of contract addresses to their deployer accounts
+	#[pallet::storage]
+	pub type ContractDeployer<T: Config> = StorageMap<_, Blake2_128Concat, H160, H160>;
 
 	#[pallet::storage]
 	pub type AccountCodes<T: Config> = StorageMap<_, Blake2_128Concat, H160, Vec<u8>, ValueQuery>;
@@ -890,6 +896,7 @@ pub trait OnChargeEVMTransaction<T: Config> {
 		corrected_fee: U256,
 		base_fee: U256,
 		already_withdrawn: Self::LiquidityInfo,
+		target: Option<H160>,
 	) -> Self::LiquidityInfo;
 
 	/// Introduced in EIP1559 to handle the priority tip.
@@ -940,17 +947,41 @@ where
 		corrected_fee: U256,
 		base_fee: U256,
 		already_withdrawn: Self::LiquidityInfo,
+		target: Option<H160>
 	) -> Self::LiquidityInfo {
 		if let Some(paid) = already_withdrawn {
 			let account_id = T::AddressMapping::into_account_id(*who);
 
 			// Calculate how much refund we should return
 			let refund_amount = paid.peek().saturating_sub(corrected_fee.unique_saturated_into());
+			// `contract_deployer_revenue` is half of the `corrected_fee`, representing the revenue to be allocated to the contract deployer.
+			let contract_deployer_revenue = corrected_fee / 2;
+			// deployer_imbalance` is initialized as zero, representing an imbalance in the contract deployer's 
+			// account, which will be adjusted later if the contract owner is found.
+			let mut deployer_imbalance = C::PositiveImbalance::zero();
+				if let Some(target_address) = target {
+					  // If target_address` exists in the `ContractDeployer` mapping, retrieve the contract owner.
+					if let Some(contract_owner) = ContractDeployer::<T>::get(target_address) {
+						// Converts the `contract_owner` address into an account ID format.
+						let owner = T::AddressMapping::into_account_id(contract_owner);
+						  // Attempts to deposit the `contract_deployer_revenue` into the owner's account, updating 
+       					 // `deployer_imbalance`
+						deployer_imbalance = C::deposit_into_existing(
+							&owner,
+							contract_deployer_revenue.unique_saturated_into()
+						).unwrap_or_else(|_| C::PositiveImbalance::zero());
+						Pallet::<T>::deposit_event(Event::<T>::DeployerFeeAllocation { address: contract_owner, fee: contract_deployer_revenue });
+					} else {
+						deployer_imbalance = C::PositiveImbalance::zero();
+					}
+				}
 			// refund to the account that paid the fees. If this fails, the
 			// account might have dropped below the existential balance. In
 			// that case we don't refund anything.
-			let refund_imbalance = C::deposit_into_existing(&account_id, refund_amount)
-				.unwrap_or_else(|_| C::PositiveImbalance::zero());
+			let refund_fee = C::deposit_into_existing(&account_id, refund_amount)
+			.unwrap_or_else(|_| C::PositiveImbalance::zero());
+
+			let refund_imbalance = refund_fee.merge(deployer_imbalance);
 
 			// Make sure this works with 0 ExistentialDeposit
 			// https://github.com/paritytech/substrate/issues/10117
@@ -1020,8 +1051,9 @@ U256: UniqueSaturatedInto<BalanceOf<T>>,
 		corrected_fee: U256,
 		base_fee: U256,
 		already_withdrawn: Self::LiquidityInfo,
+		target: Option<H160>
 	) -> Self::LiquidityInfo {
-		<EVMCurrencyAdapter::<<T as Config>::Currency, ()> as OnChargeEVMTransaction<T>>::correct_and_deposit_fee(who, corrected_fee, base_fee, already_withdrawn)
+		<EVMCurrencyAdapter::<<T as Config>::Currency, ()> as OnChargeEVMTransaction<T>>::correct_and_deposit_fee(who, corrected_fee, base_fee, already_withdrawn,target)
 	}
 
 	fn pay_priority_fee(tip: Self::LiquidityInfo) {
