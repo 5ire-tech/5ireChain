@@ -6848,6 +6848,8 @@ dependencies = [
  "log",
  "pallet-balances",
  "pallet-contracts",
+ "pallet-insecure-randomness-collective-flip",
+ "pallet-timestamp",
  "parity-scale-codec",
  "scale-info",
  "serde",
