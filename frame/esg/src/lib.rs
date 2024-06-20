@@ -5,14 +5,16 @@ pub use pallet::*;
 #[cfg(test)]
 mod mock;
 
-#[cfg(feature = "runtime-benchmarks")]
-pub mod benchmarking;
 #[cfg(test)]
+
 pub mod tests;
+
+pub mod traits;
 
 pub mod weights;
 
-pub mod traits;
+#[cfg(feature = "runtime-benchmarks")]
+pub mod benchmarking;
 
 pub trait Sustainability<AccountId> {
 	fn get_score_of(company: firechain_runtime_core_primitives::opaque::AccountId) -> u16;
@@ -20,18 +22,17 @@ pub trait Sustainability<AccountId> {
 
 #[frame_support::pallet]
 pub mod pallet {
-	use crate::{traits::ERScoresTrait, weights::WeightInfo};
-	use core::num::IntErrorKind;
 	use frame_support::{
-		pallet_prelude::{DispatchResult, *},
 		WeakBoundedVec,
+		pallet_prelude::{DispatchResult, *},
 	};
-	use frame_system::pallet_prelude::*;
-	use serde_json::Value;
 	use sp_std::vec::Vec;
-	use sp_core::H160;
-	use firechain_runtime_core_primitives::opaque::AccountId as AccIdEth;
+	use serde_json::Value;
+	use core::num::IntErrorKind;
 	use fp_account::AccountId20;
+	use frame_system::pallet_prelude::*;
+	use crate::{traits::ERScoresTrait, weights::WeightInfo};
+	use firechain_runtime_core_primitives::opaque::AccountId as AccIdEth;
 	
 
 	#[pallet::pallet]
@@ -42,31 +43,28 @@ pub mod pallet {
 
 	#[pallet::config]
 	pub trait Config: frame_system::Config {
-		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
-
 		#[pallet::constant]
-		type MaxFileSize: Get<u32>;
-
-		/// Weight information for extrinsics in this pallet.
+		type MaxFileSize: Get<u32>;		
 		type WeightInfo: WeightInfo;
-
+		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 	}
 
+	
+	#[pallet::storage]
+	#[pallet::getter(fn get_oracle_sudo)]
+	pub type SudoOraclesStore<T> =
+	StorageValue<_, Vec<AccIdEth>, ValueQuery>;
+	
+	#[pallet::storage]
+	#[pallet::getter(fn get_oracle_nsudo)]
+	pub type NonSudoOraclesStore<T> =
+	StorageValue<_, Vec<AccIdEth>, ValueQuery>;
+	
 	#[pallet::storage]
 	#[pallet::getter(fn get_score_of)]
 	pub type ESGScoresMap<T> =
 		StorageMap<_, Blake2_128Concat, AccIdEth, u16, ValueQuery>;
-
-	#[pallet::storage]
-	#[pallet::getter(fn get_oracle_sudo)]
-	pub type SudoOraclesStore<T> =
-		StorageValue<_, Vec<AccIdEth>, ValueQuery>;
-
-	#[pallet::storage]
-	#[pallet::getter(fn get_oracle_nsudo)]
-	pub type NonSudoOraclesStore<T> =
-		StorageValue<_, Vec<AccIdEth>, ValueQuery>;
-
+	
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
@@ -91,41 +89,53 @@ pub mod pallet {
 	}
 
 	impl<T: Config> Pallet<T> {
-		/// checks if given input `ip` vec of bytes represents a invalid account id
-		/// returns true for invalid one
-		/// false for valid one
-		fn not_valid_acc_id_format(ip: &[u8]) -> bool {
+		
+		fn not_valid_addr(ip: &[u8]) -> bool {
 			ip.len() != 42 ||
 			!ip.starts_with(b"0x") ||
 			!ip[2..].iter().all(|&c| c.is_ascii_hexdigit())
 		}
 
-		/// tries to resolve origin into account id
-		/// depending on txn being simple or sudo signed, in which case returns Some()
-		/// returns None if unsigned otherwise
+		fn hexstr2bytes_unsafe(s: &str) -> Vec<u8> {
+			s.as_bytes()
+			.chunks(2)
+			.map(|chunk| u8::from_str_radix(
+				core::str::from_utf8(chunk).unwrap(), 
+				16
+			).unwrap())
+			.collect()
+		}
+
+		pub fn bytes2acc_id20(b: &[u8]) -> AccountId20 {
+			let mut d = [0u8; 20];
+			d.copy_from_slice(&b[0..20]);
+			AccountId20::from(d)
+		}
+		
+		pub fn hexstr2acc_id20(s: &str) -> AccountId20 {
+			Self::bytes2acc_id20(Self::hexstr2bytes_unsafe(s).as_slice())
+		}
+
 		fn try_resolve(origin: &OriginFor<T>, oracle: &AccIdEth) -> (Option<AccIdEth>, bool) {
 			match origin.clone().into() {
 				Ok(frame_system::RawOrigin::Root) => (Some(oracle.clone()), true),
 				Ok(frame_system::RawOrigin::Signed(id)) => (
-					Some(AccountId20::from(H160::from_slice(&&id.encode().as_slice()[0..20]))), 
+					Some(Self::bytes2acc_id20(&id.encode().as_slice()[0..20])), 
 					false
 				),
 				_ => (None, false),
 			}
 		}
 
-		/// checks if given id is an oracle of any kind
 		fn is_an_oracle(acc_id: &AccIdEth) -> bool {
 			<SudoOraclesStore<T>>::get().contains(acc_id) ||
 				<NonSudoOraclesStore<T>>::get().contains(acc_id)
 		}
 
-		/// checks given id is of a sudo oracle
 		fn is_sudo_oracle(oracle: &AccIdEth) -> bool {
 			<SudoOraclesStore<T>>::get().contains(oracle)
 		}
 
-		/// stores an id as an oracle into respective storage kind as per `is_sudo`
 		fn store_oracle(oracle: &AccIdEth, is_sudo: bool) {
 			let fn_mutate = |oracles: &mut Vec<AccIdEth>| {
 				oracles.push(oracle.clone())
@@ -137,7 +147,6 @@ pub mod pallet {
 			}
 		}
 
-		/// discard an oracle from respective storage kind as per `is_sudo`
 		fn un_store_oracle(oracle: &AccIdEth, is_sudo: bool) -> DispatchResult {
 			let fn_mutate = |oracles: &mut Vec<AccIdEth>| {
 				for (i, orc) in oracles.iter().enumerate() {
@@ -155,10 +164,6 @@ pub mod pallet {
 			}
 		}
 
-		/// this function is determined to return a u16
-		/// following treated as 0 (default):
-		/// - alphanumeric value
-		/// - negative value
 		fn parse_score(score_val: Option<&serde_json::Value>) -> u16 {
 			score_val
 				.unwrap_or(&Value::Null)
@@ -175,22 +180,14 @@ pub mod pallet {
 				.clamp(0, MAX_ESG_SCORE)
 		}
 
-		fn hexstr2bytes_unsafe(s: &str) -> Vec<u8> {
-			s.as_bytes()
-			.chunks(2)
-			.map(|chunk| u8::from_str_radix(core::str::from_utf8(chunk).unwrap(), 16).unwrap())
-			.collect()
-		}
-		/// tries to parse accoundId from given json value under key 'account'
-		/// returns Some(AccountId) if everything is ok or
-		/// returns None if something, like invalid string provided, about it is not ok
-		pub fn try_parse_acc_id(acc_val: Option<&serde_json::Value>) -> Option<AccIdEth> {
+		pub fn try_parse_addr(acc_val: Option<&serde_json::Value>) -> Option<AccIdEth> {
 			let acc = acc_val.unwrap_or(&Value::Null).as_str().unwrap_or("");
 
-			if Self::not_valid_acc_id_format(acc.as_bytes()) {
+			if Self::not_valid_addr(acc.as_bytes()) {
 				return None
 			}
-			Some(AccountId20::from(H160::from_slice(Self::hexstr2bytes_unsafe(&acc[2..]).as_slice())))
+			let acc = Self::hexstr2acc_id20(&acc[2..]);
+			Some(acc)
 		}
 	}
 
@@ -203,28 +200,24 @@ pub mod pallet {
 			json_str_bytes: WeakBoundedVec<u8, T::MaxFileSize>,
 		) -> DispatchResult {
 			let signer = ensure_signed(origin)?;
-			let signer = AccountId20::from(H160::from_slice(&&signer.encode().as_slice()[0..20]));
+			let signer = Self::bytes2acc_id20(&signer.encode().as_slice()[0..20]);
 
-			// return an error if caller is not an oracle
 			if !Self::is_an_oracle(&signer) {
 				return Err(Error::<T>::CallerNotAnOracle.into())
 			}
 
-			// try decode bytes to utf8 string slice
 			let converted_string = core::str::from_utf8(&json_str_bytes)
 				.map_or_else(|_| Err(Error::<T>::InvalidUTF8), Ok)?;
 
-			// try deserialize utf8 string slice
 			let esg_info: Value = serde_json::from_str(converted_string)
 				.map_or_else(|_| Err(Error::<T>::InvalidJson), Ok)?;
 
 			let esg_data = esg_info.as_array().map_or_else(|| Err(Error::<T>::InvalidJson), Ok)?;
 
-			// to keep track of indexes of invalid account ids in given data
 			let mut skipped_indeces = Vec::<u16>::new();
 
 			esg_data.iter().enumerate().for_each(|(i, ed)| {
-				match Self::try_parse_acc_id(ed.get("account")) {
+				match Self::try_parse_addr(ed.get("account")) {
 					Some(id) =>
 						<ESGScoresMap<T>>::mutate(&id, |v| *v = Self::parse_score(ed.get("score"))),
 					// acc_id is either invalid or
