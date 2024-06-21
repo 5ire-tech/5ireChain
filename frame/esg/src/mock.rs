@@ -1,6 +1,9 @@
 //! Esg pallet tests.
 #![allow(dead_code)]
-use sp_core::H256;
+
+use core::str::FromStr;
+
+use fp_account::AccountId20;
 use sp_core::Decode;
 use crate as pallet_esg;
 use frame_system as system;
@@ -15,6 +18,10 @@ use frame_support::traits::{
 	ConstU16, 
 	ConstU32, 
 	ConstU64, 
+};
+use sp_core::{
+	H160, 
+	H256
 };
 
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -68,5 +75,6 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
 }
 
 pub fn hexstr2acc_id20(s: &str) -> <Test as frame_system::Config>::AccountId {
-	<Test as frame_system::Config>::AccountId::decode(&mut s.as_ref()).unwrap()
+	let acc_id: AccountId20 = H160::from_str(s).map(Into::into).ok().unwrap();
+	<Test as frame_system::Config>::AccountId::decode(&mut acc_id.as_ref()).unwrap()
 }

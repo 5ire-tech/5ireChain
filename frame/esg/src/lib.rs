@@ -22,12 +22,15 @@ pub trait Sustainability<AccountId> {
 
 #[frame_support::pallet]
 pub mod pallet {
-	use frame_support::{
+	use fp_account::AccountId20;
+use frame_support::{
 		WeakBoundedVec,
 		pallet_prelude::{DispatchResult, *},
 	};
+	use sp_core::H160;
 	use sp_std::vec::Vec;
 	use serde_json::Value;
+	use core::str::FromStr;
 	use core::num::IntErrorKind;
 	use frame_system::pallet_prelude::*;
 	use crate::{traits::ERScoresTrait, weights::WeightInfo};
@@ -162,11 +165,13 @@ pub mod pallet {
 			if Self::not_valid_addr(acc.as_bytes()) {
 				return None
 			}
-			
-			match T::AccountId::decode(&mut acc[2..].as_ref()) {
-				Ok(id) => Some(id),
-				Err(_) => None,
-			}
+
+			H160::from_str(&acc[2..])
+			.map(Into::into)
+			.ok()
+			.and_then(|acc_id: AccountId20| {
+				T::AccountId::decode(&mut acc_id.as_ref()).ok()
+			})
 		}
 	}
 
