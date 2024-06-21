@@ -21,7 +21,6 @@ pub trait Sustainability<AccountId> {
 #[frame_support::pallet]
 pub mod pallet {
 	use crate::{traits::ERScoresTrait, weights::WeightInfo};
-	use bs58;
 	use core::num::IntErrorKind;
 	use frame_support::{
 		pallet_prelude::{DispatchResult, *},
@@ -30,6 +29,9 @@ pub mod pallet {
 	use frame_system::pallet_prelude::*;
 	use serde_json::Value;
 	use sp_std::vec::Vec;
+	use sp_core::H160;
+	use core::str::FromStr;
+	use fp_account::AccountId20;
 
 	#[pallet::pallet]
 	#[pallet::without_storage_info]
@@ -87,25 +89,6 @@ pub mod pallet {
 	}
 
 	impl<T: Config> Pallet<T> {
-		/// checks if given input `ip` vec of bytes represents a invalid account id
-		/// returns true for invalid one
-		/// false for valid one
-		fn not_valid_acc_id_format(ip: &[u8]) -> bool {
-			let alpha_num_tester = |c: &u8| {
-				(&48..=&57).contains(&c) || // is a digit or
-					(&65..=&90).contains(&c) || // is an uppercase or
-					(&97..=&122).contains(&c) // is a lowercase
-			};
-			if ip.len() != 48 || 				 // hasn't length of 48 or
-				ip[0] != 53 || 					 // isn't prefixed by 5 or
-				!ip.iter().all(alpha_num_tester)
-			// contains non-alphanumeric
-			{
-				return true
-			}
-			// otherwise everything is good!
-			false
-		}
 
 		/// tries to resolve origin into account id
 		/// depending on txn being simple or sudo signed, in which case returns Some()
@@ -185,16 +168,20 @@ pub mod pallet {
 		pub fn try_parse_acc_id(acc_val: Option<&serde_json::Value>) -> Option<T::AccountId> {
 			let acc = acc_val.unwrap_or(&Value::Null).as_str().unwrap_or("");
 
-			if Self::not_valid_acc_id_format(acc.as_bytes()) {
-				return None
-			}
-
 			// str to <T as Config>::AccountId
-			let mut decoded = [0; 48];
-			bs58::decode(acc).into(&mut decoded).unwrap_or(0);
-			match T::AccountId::decode(&mut &decoded[1..33]) {
-				Ok(v) => Some(v),
-				_ => None,
+			let decoded: Option<AccountId20> = H160::from_str(acc).map(Into::into).ok();
+			// convert to <T as Config>::AccountId
+			match decoded {
+				Some(account_id_20) => {
+					let mut account_as_ref = account_id_20.as_ref();
+					if let Ok(account_id) = T::AccountId::decode(&mut account_as_ref) {
+						return Some(account_id);
+					
+					}
+					else {return None};
+				
+				},
+				None => None
 			}
 		}
 	}
