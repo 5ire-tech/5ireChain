@@ -491,8 +491,8 @@ fn it_must_upload_all_valid_esg_data_with_no_skipping() {
 			(WeakBoundedVec::try_from(data.as_bytes().to_vec())).unwrap()
 		));
 
-		let company1 = Esg::hexstr2acc_id20("82a0EcfDd3174bEF5D5eA452e15219A52bf6161f");
-		let company2 = Esg::hexstr2acc_id20("Ba08C49f377a4F01c65340F431B5C65D71B972a9");
+		let company1 = hexstr2acc_id20("82a0EcfDd3174bEF5D5eA452e15219A52bf6161f");
+		let company2 = hexstr2acc_id20("Ba08C49f377a4F01c65340F431B5C65D71B972a9");
 
 		assert_eq!(Esg::get_score_of(company1), 12);
 		assert_eq!(Esg::get_score_of(company2), 40);
@@ -549,8 +549,8 @@ fn it_must_skip_for_invalid_addresses_in_esg_data() {
 			(WeakBoundedVec::try_from(wrong_address_data.as_bytes().to_vec())).unwrap()
 		));
 
-		let valid_id1 = Esg::hexstr2acc_id20("82a0EcfDd3174bEF5D5eA452e15219A52bf6161f");
-		let valid_id2 = Esg::hexstr2acc_id20("25Db9D98e4Ab6af68ac7173f580c444155B7b5C8");
+		let valid_id1 = hexstr2acc_id20("82a0EcfDd3174bEF5D5eA452e15219A52bf6161f");
+		let valid_id2 = hexstr2acc_id20("25Db9D98e4Ab6af68ac7173f580c444155B7b5C8");
 
 		assert_eq!(Esg::get_score_of(valid_id1), MAX_ESG_SCORE);
 		assert_eq!(Esg::get_score_of(valid_id2), 99);
@@ -599,9 +599,9 @@ fn it_must_handle_invalid_esg_scores() {
 			(WeakBoundedVec::try_from(esg_data_with_invalid_scores.as_bytes().to_vec())).unwrap()
 		));
 
-		let company1 = Esg::hexstr2acc_id20("82a0EcfDd3174bEF5D5eA452e15219A52bf6161f");
-		let company2 = Esg::hexstr2acc_id20("Ba08C49f377a4F01c65340F431B5C65D71B972a9");
-		let company3 = Esg::hexstr2acc_id20("25Db9D98e4Ab6af68ac7173f580c444155B7b5C8");
+		let company1 = hexstr2acc_id20("82a0EcfDd3174bEF5D5eA452e15219A52bf6161f");
+		let company2 = hexstr2acc_id20("Ba08C49f377a4F01c65340F431B5C65D71B972a9");
+		let company3 = hexstr2acc_id20("25Db9D98e4Ab6af68ac7173f580c444155B7b5C8");
 
 		// negative to zero
 		assert_eq!(Esg::get_score_of(company1), 0);
@@ -649,8 +649,8 @@ fn it_must_handle_scores_exceeding_set_maximum() {
 			(WeakBoundedVec::try_from(data.as_bytes().to_vec())).unwrap()
 		));
 
-		let company1 = Esg::hexstr2acc_id20("82a0EcfDd3174bEF5D5eA452e15219A52bf6161f");
-		let company2 = Esg::hexstr2acc_id20("Ba08C49f377a4F01c65340F431B5C65D71B972a9");
+		let company1 = hexstr2acc_id20("82a0EcfDd3174bEF5D5eA452e15219A52bf6161f");
+		let company2 = hexstr2acc_id20("Ba08C49f377a4F01c65340F431B5C65D71B972a9");
 
 		// 121 truncated to MAX_ESG_SCORE because it exceeds MAX_ESG_SCORE
 		assert_eq!(Esg::get_score_of(company1), MAX_ESG_SCORE);

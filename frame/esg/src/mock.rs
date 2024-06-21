@@ -1,7 +1,9 @@
 //! Esg pallet tests.
 #![allow(dead_code)]
 
+use bs58::decode;
 use sp_core::H256;
+use sp_core::Decode;
 use crate as pallet_esg;
 use frame_system as system;
 use fp_account::AccountId20;
@@ -15,7 +17,7 @@ use sp_runtime::{
 use frame_support::traits::{
 	ConstU16, 
 	ConstU32, 
-	ConstU64
+	ConstU64, IsType
 };
 
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -64,8 +66,10 @@ impl pallet_esg::Config for Test {
 	type WeightInfo = ();
 }
 
-// Build genesis storage according to the mock runtime.
 pub fn new_test_ext() -> sp_io::TestExternalities {
-	//system::GenesisConfig::default().build_storage::<Test>().unwrap().into()
 	system::GenesisConfig::<Test>::default().build_storage().unwrap().into()
+}
+
+pub fn hexstr2acc_id20(s: &str) -> <Test as frame_system::Config>::AccountId {
+	<Test as frame_system::Config>::AccountId::decode(&mut s.as_ref()).unwrap()
 }

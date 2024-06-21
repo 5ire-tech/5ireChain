@@ -17,7 +17,7 @@ pub mod weights;
 pub mod benchmarking;
 
 pub trait Sustainability<AccountId> {
-	fn get_score_of(company: firechain_runtime_core_primitives::opaque::AccountId) -> u16;
+	fn get_score_of(company: AccountId) -> u16;
 }
 
 #[frame_support::pallet]
@@ -29,10 +29,8 @@ pub mod pallet {
 	use sp_std::vec::Vec;
 	use serde_json::Value;
 	use core::num::IntErrorKind;
-	use fp_account::AccountId20;
 	use frame_system::pallet_prelude::*;
 	use crate::{traits::ERScoresTrait, weights::WeightInfo};
-	use firechain_runtime_core_primitives::opaque::AccountId as AccIdEth;
 	
 
 	#[pallet::pallet]
@@ -53,28 +51,28 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn get_oracle_sudo)]
 	pub type SudoOraclesStore<T> =
-	StorageValue<_, Vec<AccIdEth>, ValueQuery>;
+	StorageValue<_, Vec<<T as frame_system::Config>::AccountId>, ValueQuery>;
 	
 	#[pallet::storage]
 	#[pallet::getter(fn get_oracle_nsudo)]
 	pub type NonSudoOraclesStore<T> =
-	StorageValue<_, Vec<AccIdEth>, ValueQuery>;
+	StorageValue<_, Vec<<T as frame_system::Config>::AccountId>, ValueQuery>;
 	
 	#[pallet::storage]
 	#[pallet::getter(fn get_score_of)]
 	pub type ESGScoresMap<T> =
-		StorageMap<_, Blake2_128Concat, AccIdEth, u16, ValueQuery>;
+		StorageMap<_, Blake2_128Concat, <T as frame_system::Config>::AccountId, u16, ValueQuery>;
 	
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
-		ESGStored { caller: AccIdEth },
+		ESGStored { caller: <T as frame_system::Config>::AccountId },
 
-		NewOracleRegistered { is_sudo: bool, oracle: AccIdEth },
+		NewOracleRegistered { is_sudo: bool, oracle: <T as frame_system::Config>::AccountId },
 
-		OracleDeRegistered { is_sudo: bool, oracle: AccIdEth },
+		OracleDeRegistered { is_sudo: bool, oracle: <T as frame_system::Config>::AccountId },
 
-		ESGStoredWithSkip { caller: AccIdEth, skipped_indeces: Vec<u16> },
+		ESGStoredWithSkip { caller: <T as frame_system::Config>::AccountId, skipped_indeces: Vec<u16> },
 	}
 
 	#[pallet::error]
@@ -96,48 +94,25 @@ pub mod pallet {
 			!ip[2..].iter().all(|&c| c.is_ascii_hexdigit())
 		}
 
-		fn hexstr2bytes_unsafe(s: &str) -> Vec<u8> {
-			s.as_bytes()
-			.chunks(2)
-			.map(|chunk| u8::from_str_radix(
-				core::str::from_utf8(chunk).unwrap(), 
-				16
-			).unwrap())
-			.collect()
-		}
-
-		pub fn bytes2acc_id20(b: &[u8]) -> AccountId20 {
-			let mut d = [0u8; 20];
-			d.copy_from_slice(&b[0..20]);
-			AccountId20::from(d)
-		}
-		
-		pub fn hexstr2acc_id20(s: &str) -> AccountId20 {
-			Self::bytes2acc_id20(Self::hexstr2bytes_unsafe(s).as_slice())
-		}
-
-		fn try_resolve(origin: &OriginFor<T>, oracle: &AccIdEth) -> (Option<AccIdEth>, bool) {
+		fn try_resolve(origin: &OriginFor<T>, oracle: &<T as frame_system::Config>::AccountId) -> (Option<<T as frame_system::Config>::AccountId>, bool) {
 			match origin.clone().into() {
 				Ok(frame_system::RawOrigin::Root) => (Some(oracle.clone()), true),
-				Ok(frame_system::RawOrigin::Signed(id)) => (
-					Some(Self::bytes2acc_id20(&id.encode().as_slice()[0..20])), 
-					false
-				),
+				Ok(frame_system::RawOrigin::Signed(id)) => (Some(id), false),
 				_ => (None, false),
 			}
 		}
 
-		fn is_an_oracle(acc_id: &AccIdEth) -> bool {
+		fn is_an_oracle(acc_id: &<T as frame_system::Config>::AccountId) -> bool {
 			<SudoOraclesStore<T>>::get().contains(acc_id) ||
 				<NonSudoOraclesStore<T>>::get().contains(acc_id)
 		}
 
-		fn is_sudo_oracle(oracle: &AccIdEth) -> bool {
+		fn is_sudo_oracle(oracle: &<T as frame_system::Config>::AccountId) -> bool {
 			<SudoOraclesStore<T>>::get().contains(oracle)
 		}
 
-		fn store_oracle(oracle: &AccIdEth, is_sudo: bool) {
-			let fn_mutate = |oracles: &mut Vec<AccIdEth>| {
+		fn store_oracle(oracle: &<T as frame_system::Config>::AccountId, is_sudo: bool) {
+			let fn_mutate = |oracles: &mut Vec<<T as frame_system::Config>::AccountId>| {
 				oracles.push(oracle.clone())
 			};
 
@@ -147,8 +122,8 @@ pub mod pallet {
 			}
 		}
 
-		fn un_store_oracle(oracle: &AccIdEth, is_sudo: bool) -> DispatchResult {
-			let fn_mutate = |oracles: &mut Vec<AccIdEth>| {
+		fn un_store_oracle(oracle: &<T as frame_system::Config>::AccountId, is_sudo: bool) -> DispatchResult {
+			let fn_mutate = |oracles: &mut Vec<<T as frame_system::Config>::AccountId>| {
 				for (i, orc) in oracles.iter().enumerate() {
 					if orc.eq(oracle) {
 						oracles.remove(i);
@@ -180,14 +155,16 @@ pub mod pallet {
 				.clamp(0, MAX_ESG_SCORE)
 		}
 
-		pub fn try_parse_addr(acc_val: Option<&serde_json::Value>) -> Option<AccIdEth> {
+		pub fn try_parse_addr(acc_val: Option<&serde_json::Value>) -> Option<<T as frame_system::Config>::AccountId> {
 			let acc = acc_val.unwrap_or(&Value::Null).as_str().unwrap_or("");
 
 			if Self::not_valid_addr(acc.as_bytes()) {
 				return None
 			}
-			let acc = Self::hexstr2acc_id20(&acc[2..]);
-			Some(acc)
+			match T::AccountId::decode(&mut acc[2..].as_ref()) {
+				Ok(id) => Some(id),
+				Err(_) => None,
+			}
 		}
 	}
 
@@ -200,7 +177,7 @@ pub mod pallet {
 			json_str_bytes: WeakBoundedVec<u8, T::MaxFileSize>,
 		) -> DispatchResult {
 			let signer = ensure_signed(origin)?;
-			let signer = Self::bytes2acc_id20(&signer.encode().as_slice()[0..20]);
+			// let signer = Self::bytes2acc_id20(&signer.encode().as_slice()[0..20]);
 
 			if !Self::is_an_oracle(&signer) {
 				return Err(Error::<T>::CallerNotAnOracle.into())
@@ -241,7 +218,7 @@ pub mod pallet {
 		#[pallet::weight(T::WeightInfo::register_an_oracle())]
 		pub fn register_an_oracle(
 			origin: OriginFor<T>,
-			oracle: AccIdEth,
+			oracle: <T as frame_system::Config>::AccountId,
 			is_sudo_oracle: bool,
 		) -> DispatchResult {
 			let (id, is_root) = Self::try_resolve(&origin, &oracle);
@@ -274,7 +251,7 @@ pub mod pallet {
 		#[pallet::weight(T::WeightInfo::deregister_an_oracle())]
 		pub fn deregister_an_oracle(
 			origin: OriginFor<T>,
-			oracle: AccIdEth,
+			oracle: <T as frame_system::Config>::AccountId,
 			is_sudo_oracle: bool,
 		) -> DispatchResult {
 			let o = ensure_root(origin);
@@ -299,13 +276,13 @@ pub mod pallet {
 		}
 	}
 
-	impl<T: Config> ERScoresTrait<AccIdEth> for Pallet<T> {
-		fn get_score_of(org: AccIdEth) -> u16 {
+	impl<T: Config> ERScoresTrait<<T as frame_system::Config>::AccountId> for Pallet<T> {
+		fn get_score_of(org: <T as frame_system::Config>::AccountId) -> u16 {
 			ESGScoresMap::<T>::get(&org)
 		}
-		fn chilled_validator_status(_org: AccIdEth) {}
-		fn reset_chilled_validator_status(_org: AccIdEth) {}
+		fn chilled_validator_status(_org: <T as frame_system::Config>::AccountId) {}
+		fn reset_chilled_validator_status(_org: <T as frame_system::Config>::AccountId) {}
 		fn reset_score_after_era_for_chilled_active_validator() {}
-		fn reset_score_of_chilled_waiting_validator(_org: AccIdEth) {}
+		fn reset_score_of_chilled_waiting_validator(_org: <T as frame_system::Config>::AccountId) {}
 	}
 }
