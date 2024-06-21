@@ -25,7 +25,6 @@ sp-core = { workspace = true, default-features = false }
 sp-io = { workspace = true, default-features = false }
 sp-std = { workspace = true, default-features = false }
 fp-account = {workspace=true, default-features = false}
-firechain-runtime-core-primitives = {workspace = true, default-features = false}
 
 [dev-dependencies]
 sp-runtime = { workspace = true, default-features = false}
@@ -35,7 +34,6 @@ default = ["std"]
 std = [
     "serde",
     "codec/std",
-    "firechain-runtime-core-primitives/std",
     "fp-account/std",
     "frame-benchmarking/std",
     "frame-support/std",

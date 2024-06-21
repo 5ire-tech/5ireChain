@@ -1,12 +1,9 @@
 //! Esg pallet tests.
 #![allow(dead_code)]
-
-use bs58::decode;
 use sp_core::H256;
 use sp_core::Decode;
 use crate as pallet_esg;
 use frame_system as system;
-use fp_account::AccountId20;
 use sp_runtime::{
 	BuildStorage,
 	traits::{
@@ -17,7 +14,7 @@ use sp_runtime::{
 use frame_support::traits::{
 	ConstU16, 
 	ConstU32, 
-	ConstU64, IsType
+	ConstU64, 
 };
 
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -43,7 +40,7 @@ impl system::Config for Test {
 	type RuntimeCall = RuntimeCall;
 	type Hash = H256;
 	type Hashing = BlakeTwo256;
-	type AccountId = AccountId20;
+	type AccountId = fp_account::AccountId20;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type RuntimeEvent = RuntimeEvent;
 	type BlockHashCount = ConstU64<250>;

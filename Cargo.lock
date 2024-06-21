@@ -6020,7 +6020,6 @@ name = "pallet-esg"
 version = "1.0.0"
 dependencies = [
  "bs58 0.4.0",
- "firechain-runtime-core-primitives",
  "fp-account",
  "frame-benchmarking",
  "frame-support",

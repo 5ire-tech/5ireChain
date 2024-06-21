@@ -32,12 +32,13 @@ pub mod pallet {
 	use frame_system::pallet_prelude::*;
 	use crate::{traits::ERScoresTrait, weights::WeightInfo};
 	
+	const MAX_ESG_SCORE: u16 = 100;
+	const ACC_KEY: &str = "account";
+	const SCORE_KEY: &str = "score";
 
 	#[pallet::pallet]
 	#[pallet::without_storage_info]
 	pub struct Pallet<T>(_);
-
-	const MAX_ESG_SCORE: u16 = 100;
 
 	#[pallet::config]
 	pub trait Config: frame_system::Config {
@@ -68,9 +69,9 @@ pub mod pallet {
 	pub enum Event<T: Config> {
 		ESGStored { caller: <T as frame_system::Config>::AccountId },
 
-		NewOracleRegistered { is_sudo: bool, oracle: <T as frame_system::Config>::AccountId },
-
 		OracleDeRegistered { is_sudo: bool, oracle: <T as frame_system::Config>::AccountId },
+		
+		NewOracleRegistered { is_sudo: bool, oracle: <T as frame_system::Config>::AccountId },
 
 		ESGStoredWithSkip { caller: <T as frame_system::Config>::AccountId, skipped_indeces: Vec<u16> },
 	}
@@ -161,6 +162,7 @@ pub mod pallet {
 			if Self::not_valid_addr(acc.as_bytes()) {
 				return None
 			}
+			
 			match T::AccountId::decode(&mut acc[2..].as_ref()) {
 				Ok(id) => Some(id),
 				Err(_) => None,
@@ -177,7 +179,6 @@ pub mod pallet {
 			json_str_bytes: WeakBoundedVec<u8, T::MaxFileSize>,
 		) -> DispatchResult {
 			let signer = ensure_signed(origin)?;
-			// let signer = Self::bytes2acc_id20(&signer.encode().as_slice()[0..20]);
 
 			if !Self::is_an_oracle(&signer) {
 				return Err(Error::<T>::CallerNotAnOracle.into())
@@ -194,9 +195,9 @@ pub mod pallet {
 			let mut skipped_indeces = Vec::<u16>::new();
 
 			esg_data.iter().enumerate().for_each(|(i, ed)| {
-				match Self::try_parse_addr(ed.get("account")) {
+				match Self::try_parse_addr(ed.get(ACC_KEY)) {
 					Some(id) =>
-						<ESGScoresMap<T>>::mutate(&id, |v| *v = Self::parse_score(ed.get("score"))),
+						<ESGScoresMap<T>>::mutate(&id, |v| *v = Self::parse_score(ed.get(SCORE_KEY))),
 					// acc_id is either invalid or
 					// not found in json data under current index
 					None => skipped_indeces.push(i as u16),
@@ -228,8 +229,6 @@ pub mod pallet {
 				// if not signed
 				None => return Err(Error::<T>::NotSigned.into()),
 			};
-
-			log::info!("#@! root: {is_root} same?: {}", acc_id.eq(&oracle));
 
 			if Self::is_an_oracle(&oracle) {
 				return Err(Error::<T>::OracleRegisteredAlready.into())
