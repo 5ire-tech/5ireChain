@@ -41,7 +41,7 @@ describe("EVM related Gas using web3js/ethersjs", function () {
         },
       })
     );
-    await sleep(40 * SECONDS);
+    await sleep(3 * SECONDS);
   });
   after(async () => {
     await killNodeForTestEVM();
@@ -186,4 +186,3 @@ describe("EVM related Gas using web3js/ethersjs", function () {
   });
 
 });
-

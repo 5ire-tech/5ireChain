@@ -1,11 +1,10 @@
 import { expect } from "chai";
-import { BLOCK_TIME } from "../utils/constants";
+import { BLOCK_TIME, alith } from "../utils/constants";
 import { killNodes, polkadotApi, spawnNodes } from "../utils/util";
 import { CodePromise, ContractPromise } from "@polkadot/api-contract";
 import { ApiPromise, Keyring } from "@polkadot/api";
 import contractFile from "./contracts/counter.json";
 import type { WeightV2 } from "@polkadot/types/interfaces";
-import { BN } from "@polkadot/util";
 import { waitForEvent } from "../utils/setup";
 
 describe("Wasm test with new ink! version 4", function () {
@@ -18,12 +17,10 @@ describe("Wasm test with new ink! version 4", function () {
   it("Should deploy/interact/query a counter wasm contract to 5ire chain", async () => {
     console.log("Beginning deploying counter wasm contract");
 
-    const keyring = new Keyring({ type: "sr25519" });
-    const alice = keyring.addFromUri("//Alice");
 
     const gasLimit = polkadotApi.registry.createType("WeightV2", {
       refTime: 5908108255,
-      proofSize: new BN(131072),
+      proofSize: BigInt(131072),
     }) as WeightV2;
 
     const storageDepositLimit = null;
@@ -33,7 +30,7 @@ describe("Wasm test with new ink! version 4", function () {
     let wasm = contractFile.source.wasm;
     // deploy contract
     let contractAddress = await deployContract(
-      alice,
+      alith,
       polkadotApi,
       contractFileString,
       wasm,
@@ -45,7 +42,7 @@ describe("Wasm test with new ink! version 4", function () {
 
     // query transaction
     let countBefore = await queryTransaction(
-      alice,
+      alith,
       polkadotApi,
       contractFileString,
       contractAddress,
@@ -62,7 +59,7 @@ describe("Wasm test with new ink! version 4", function () {
 
     // interact contract with inc transaction
     await incTransaction(
-      alice,
+      alith,
       polkadotApi,
       contractFileString,
       contractAddress,
@@ -75,7 +72,7 @@ describe("Wasm test with new ink! version 4", function () {
 
     // query transaction
     let countAfter = await queryTransaction(
-      alice,
+      alith,
       polkadotApi,
       contractFileString,
       contractAddress,
@@ -95,7 +92,7 @@ describe("Wasm test with new ink! version 4", function () {
 });
 
 const deployContract = async (
-  alice: any,
+  alith: any,
   api: ApiPromise,
   contractFile: string,
   contractWasm: string,
@@ -118,7 +115,7 @@ const deployContract = async (
 
   address = await new Promise(async (resolve, reject) => {
     await tx.signAndSend(
-      alice,
+      alith,
       // @ts-ignore
       ({ contract, status, dispatchError }) => {
         if (status.isInBlock || status.isFinalized) {
@@ -140,7 +137,7 @@ const deployContract = async (
 };
 
 const incTransaction = async (
-  alice: any,
+  alith: any,
   api: ApiPromise,
   contractFile: string,
   contractAddress: string,
@@ -159,7 +156,7 @@ const incTransaction = async (
   });
 
   await tx.signAndSend(
-    alice,
+    alith,
     // @ts-ignore
     (result) => {
       if (result.status.isInBlock || result.status.isFinalized) {
@@ -170,7 +167,7 @@ const incTransaction = async (
 };
 
 const queryTransaction = async (
-  alice: any,
+  alith: any,
   api: ApiPromise,
   contractFile: string,
   contractAddress: string,
@@ -183,7 +180,7 @@ const queryTransaction = async (
   const contract = new ContractPromise(api, contractFile, contractAddress);
 
   // Query value from contract
-  const { result, output } = await contract.query.get(alice.address, {
+  const { result, output } = await contract.query.get(alith.publicKey, {
     gasLimit,
     storageDepositLimit,
   });

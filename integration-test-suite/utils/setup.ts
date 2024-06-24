@@ -5,9 +5,9 @@ import child from 'child_process';
 import { ECPair } from 'ecpair';
 import { ethers } from 'ethers';
 import {mnemonicGenerate} from "@polkadot/util-crypto";
-import {BN} from "@polkadot/util";
 import {WeightV2} from "@polkadot/types/interfaces";
 import {DetectCodec} from "@polkadot/types/types/detect";
+import { alith } from './constants';
 
 export const endpoint = 'ws://127.0.0.1:9944';
 export const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
@@ -301,11 +301,9 @@ export async function sudoTx(
   api: ApiPromise,
   call: SubmittableExtrinsic<'promise'>
 ): Promise<void> {
-  const keyring = new Keyring({ type: 'sr25519' });
-  const alice = keyring.addFromUri('//Alice');
   const unsub = await api.tx.sudo
       .sudo(call.method.toHex())
-      .signAndSend(alice, {tip: 2000, nonce: -1}, (result ) => {
+      .signAndSend(alith, {tip: 2000, nonce: -1}, (result ) => {
         if (result.status.isInBlock) {
           console.log(`Sudo transaction included at blockHash ${result.status.asInBlock}`);
           console.log(`Waiting for finalization... (can take a minute)`);
