@@ -2595,7 +2595,7 @@ dependencies = [
 
 [[package]]
 name = "firechain-qa-runtime"
-version = "1.0.5"
+version = "1.0.6"
 dependencies = [
  "firechain-runtime-core-primitives",
  "fp-account",
@@ -6020,6 +6020,7 @@ name = "pallet-esg"
 version = "1.0.0"
 dependencies = [
  "bs58 0.4.0",
+ "fp-account",
  "frame-benchmarking",
  "frame-support",
  "frame-system",
