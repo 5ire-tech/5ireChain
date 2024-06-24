@@ -1,7 +1,9 @@
 import Web3 from "web3";
 import {
+  ALITH_PRIVATE_KEY,
   BLOCK_TIME,
   SECONDS,
+  alith,
 } from "../utils/constants";
 import {
   customRequest,
@@ -14,47 +16,13 @@ import { sleep, waitForEvent } from "../utils/setup";
 import { expect } from "chai";
 import { step } from "mocha-steps";
 import Keyring from "@polkadot/keyring";
-import { Wallet, ethers } from "ethers";
 let web3: Web3;
-let aliceEthAccount: Wallet;
 
 const ERC20_ABI = require("./contracts/MyToken.json").abi;
 const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
 const TEST_ACCOUNT = "0xdd33Af49c851553841E94066B54Fd28612522901";
 let contractAddress: string;
-// Keyring needed to sign using Alice account
-const keyring = new Keyring({ type: "sr25519" });
 
-async function init() {
-  const alice = keyring.addFromUri("//Alice", { name: "Alice default" });
-  // create eth accout from ethers
-  const aliceEthAccount = ethers.Wallet.fromMnemonic(
-    "bottom drive obey lake curtain smoke basket hold race lonely fit walk"
-  );
-
-  //swap native to evm balance 10 coin
-  const amount = polkadotApi.createType("Balance", "10000000000000000000");
-  const transaction = polkadotApi.tx.evm.deposit(
-    aliceEthAccount.address,
-    amount
-  );
-
-  const unsub = await transaction.signAndSend(alice, (result) => {
-    console.log(`Swap is ${result.status}`);
-    if (result.status.isInBlock) {
-      console.log(`Swap included at blockHash ${result.status.asInBlock}`);
-      console.log(`Waiting for finalization... (can take a minute)`);
-    } else if (result.status.isFinalized) {
-      console.log(`events are ${result.events}`);
-      console.log(`Swap finalized at blockHash ${result.status.asFinalized}`);
-      unsub();
-    }
-  });
-
-  await waitForEvent(polkadotApi, "balances", "Transfer");
-
-  return aliceEthAccount;
-}
 
 describe("EVM related Contract using web3js/ethersjs", function () {
   this.timeout(100 * BLOCK_TIME);
@@ -71,8 +39,7 @@ describe("EVM related Contract using web3js/ethersjs", function () {
         },
       })
     );
-    aliceEthAccount = await init();
-    await sleep(40 * SECONDS);
+    await sleep(20 * SECONDS);
   });
   after(async () => {
     await killNodeForTestEVM();
@@ -87,24 +54,24 @@ describe("EVM related Contract using web3js/ethersjs", function () {
       arguments: [],
     });
 
-    const gas = await deployTx.estimateGas({ from: aliceEthAccount.address });
+    const gas = await deployTx.estimateGas({ from: alith.address });
 
     const gasPrice = await web3.eth.getGasPrice();
 
     const txSign = await web3.eth.accounts.signTransaction(
       {
-        from: aliceEthAccount.address,
+        from: alith.address,
         data: deployTx.encodeABI(),
         gasPrice,
         gas,
       },
-      aliceEthAccount.privateKey
+      ALITH_PRIVATE_KEY
     );
 
     let receipt = await customRequest(web3, "eth_sendRawTransaction", [
       txSign.rawTransaction,
     ]);
-    await sleep(2 * SECONDS);
+    await sleep(3 * SECONDS);
     const latestBlock = await web3.eth.getBlock("latest");
     expect(latestBlock.transactions.length).to.equal(1);
 
@@ -118,7 +85,7 @@ describe("EVM related Contract using web3js/ethersjs", function () {
 
   step("call sign transaction the method", async function () {
     const contract = new web3.eth.Contract(ERC20_ABI, contractAddress, {
-      from: aliceEthAccount.address,
+      from: alith.address,
       gasPrice: "0x3B9ACA00",
     });
     let amountTransfer = web3.utils.toWei("1", "ether");
@@ -131,7 +98,7 @@ describe("EVM related Contract using web3js/ethersjs", function () {
         data,
         gas: 200000,
       },
-      aliceEthAccount.privateKey
+      ALITH_PRIVATE_KEY
     );
     await customRequest(web3, "eth_sendRawTransaction", [
       signedTx.rawTransaction,
@@ -144,7 +111,7 @@ describe("EVM related Contract using web3js/ethersjs", function () {
 
   step("call query the method", async function () {
     const contract = new web3.eth.Contract(ERC20_ABI, contractAddress, {
-      from: aliceEthAccount.address,
+      from: alith.address,
       gasPrice: "0x3B9ACA00",
     });
     let expectedTotalSupply = BigInt(2 ** 256) - BigInt(1);

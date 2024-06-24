@@ -1,12 +1,9 @@
 import { expect } from 'chai';
-import { BLOCK_TIME } from '../utils/constants';
+import { BLOCK_TIME, alith, charleth } from '../utils/constants';
 import {killNodes,  polkadotApi, spawnNodes} from "../utils/util";
 import {Keyring} from "@polkadot/api";
-import {sleep, waitForEvent} from "../utils/setup";
+import {sleep, waitForEvent, waitNfinalizedBlocks} from "../utils/setup";
 
-
-// Keyring needed to sign
-const keyring = new Keyring({ type: 'sr25519' });
 
 describe('Nominator tests', function () {
   this.timeout(300 * BLOCK_TIME);
@@ -19,10 +16,9 @@ describe('Nominator tests', function () {
 
   // Should stake to become a nominator
   it('Should stake to become a nominator', async () => {
-    const ferdie = keyring.addFromUri('//Ferdie');
-    const bob = keyring.addFromUri('//Bob');
 
-    const initialValidatorsNominated = await polkadotApi.query.staking.nominators(ferdie.address);
+
+    const initialValidatorsNominated = await polkadotApi.query.staking.nominators(charleth.address);
     console.log(JSON.stringify(initialValidatorsNominated.toHuman()))
     // @ts-ignore
     expect(initialValidatorsNominated.toHuman() == null).true;
@@ -32,7 +28,7 @@ describe('Nominator tests', function () {
     const amount = polkadotApi.createType('Balance', '900000000000000000000');
     let bondValidator = polkadotApi.tx.staking.bond(amount, controller);
     const bondValidatorTransaction = new Promise<{ block: string, address: string }>(async (resolve, reject) => {
-      const unsub = await bondValidator.signAndSend(ferdie, {tip: 200, nonce: -1}, (result) => {
+      const unsub = await bondValidator.signAndSend(charleth, {tip: 200, nonce: -1}, (result) => {
         console.log(`bond nominator transaction is ${result.status}`);
         if (result.status.isInBlock) {
           console.log(`bond nominator transaction included at blockHash ${result.status.asInBlock}`);
@@ -46,12 +42,12 @@ describe('Nominator tests', function () {
     });
     await waitForEvent(polkadotApi, 'staking', 'Bonded');
 
-    const nominatedAddress = polkadotApi.registry.createType("MultiAddress", bob.address);
-    const prefs = polkadotApi.registry.createType("Vec<MultiAddress>", [bob.address]);
+    //const nominatedAddress = polkadotApi.registry.createType("MultiAddress", alith.address);
+    const prefs = polkadotApi.registry.createType("Vec<MultiAddress>", [alith.address]);
 
     let nominateValidator = polkadotApi.tx.staking.nominate(prefs);
     const nominateValidatorTransaction = new Promise<{ block: string, address: string }>(async (resolve, reject) => {
-      const unsub = await nominateValidator.signAndSend(ferdie, {tip: 200, nonce: -1}, (result) => {
+      const unsub = await nominateValidator.signAndSend(charleth, {tip: 200, nonce: -1}, (result) => {
         console.log(`nominate validator transaction is ${result.status}`);
         if (result.status.isInBlock) {
           console.log(`nominate validator transaction included at blockHash ${result.status.asInBlock}`);
@@ -63,21 +59,21 @@ describe('Nominator tests', function () {
         }
       });
     });
-    await sleep(5000);
-
-    const validatorsNominated = await polkadotApi.query.staking.nominators(ferdie.address);
+    // wait 2 eras to become active nominator
+    await waitNfinalizedBlocks(polkadotApi, 100, 1000);
+    const validatorsNominated = await polkadotApi.query.staking.nominators(charleth.address);
     console.log(JSON.stringify(validatorsNominated.toHuman()))
+
     // @ts-ignore
-    expect(validatorsNominated.toHuman().targets[0] == bob.address).true
+    expect(validatorsNominated.toHuman().targets[0] == alith.address).true
   });
 
   it('Should unbond funds from a nominator', async () => {
-    const ferdie = keyring.addFromUri('//Ferdie');
 
     const amount = polkadotApi.createType('Balance', '200000000000000000000');
     let unbondValidator = polkadotApi.tx.staking.unbond(amount);
     const unbondValidatorTransaction = new Promise<{ block: string, address: string }>(async (resolve, reject) => {
-      const unsub = await unbondValidator.signAndSend(ferdie, {tip: 200, nonce: -1}, (result) => {
+      const unsub = await unbondValidator.signAndSend(charleth, {tip: 200, nonce: -1}, (result) => {
         console.log(`unbond nominator transaction is ${result.status}`);
         if (result.status.isInBlock) {
           console.log(`unbond nominator transaction included at blockHash ${result.status.asInBlock}`);
@@ -93,11 +89,10 @@ describe('Nominator tests', function () {
   });
 
   it('Should chill a nominator', async () => {
-    const ferdie = keyring.addFromUri('//Ferdie');
 
     let call = polkadotApi.tx.staking.chill();
     const callTransaction = new Promise<{ block: string, address: string }>(async (resolve, reject) => {
-      const unsub = await call.signAndSend(ferdie, {tip: 200, nonce: -1}, (result) => {
+      const unsub = await call.signAndSend(charleth, {tip: 200, nonce: -1}, (result) => {
         console.log(`chill transaction is ${result.status}`);
         if (result.status.isInBlock) {
           console.log(`chill transaction included at blockHash ${result.status.asInBlock}`);
@@ -111,7 +106,7 @@ describe('Nominator tests', function () {
     });
     await waitForEvent(polkadotApi, 'staking', 'Chilled');
 
-    const validatorsNominated = await polkadotApi.query.staking.nominators(ferdie.address);
+    const validatorsNominated = await polkadotApi.query.staking.nominators(charleth.address);
     console.log(JSON.stringify(validatorsNominated.toHuman()))
     // @ts-ignore
     expect(validatorsNominated.toHuman() == null).true
