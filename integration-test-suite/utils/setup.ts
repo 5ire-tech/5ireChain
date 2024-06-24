@@ -2,8 +2,6 @@ import type { Codec } from '@polkadot/types-codec/types';
 import { ApiPromise, Keyring } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import child from 'child_process';
-import { ECPair } from 'ecpair';
-import { ethers } from 'ethers';
 import {mnemonicGenerate} from "@polkadot/util-crypto";
 import {WeightV2} from "@polkadot/types/interfaces";
 import {DetectCodec} from "@polkadot/types/types/detect";
@@ -337,11 +335,3 @@ export async function uncheckedSudoTx(
   });
 }
 
-
-export function ethAddressFromUncompressedPublicKey(
-  publicKey: `0x${string}`
-): `0x${string}` {
-  const pubKeyHash = ethers.utils.keccak256(publicKey); // we hash it.
-  const address = ethers.utils.getAddress(`0x${pubKeyHash.slice(-40)}`); // take the last 20 bytes and convert it to an address.
-  return address as `0x${string}`;
-}
