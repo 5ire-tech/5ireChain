@@ -1776,11 +1776,10 @@ fn crypto_hashes() {
 				CollectEvents::Skip,
 				Determinism::Enforced,
 			)
-			.result
-			.unwrap();
-			assert!(!result.did_revert());
+			.result;
+			assert!(!result.clone().expect("REASON").did_revert());
 			let expected = hash_fn(input.as_ref());
-			assert_eq!(&result.data[..*expected_size], &*expected);
+			assert_eq!(&result.unwrap().data[..*expected_size], &*expected);
 		}
 	})
 }

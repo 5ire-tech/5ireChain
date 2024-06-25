@@ -1,4 +1,3 @@
-;; This contract tests the behavior of adding / removing delegate_dependencies when delegate calling into a contract.
 (module
 	(import "seal0" "add_delegate_dependency" (func $add_delegate_dependency (param i32)))
 	(import "seal0" "remove_delegate_dependency" (func $remove_delegate_dependency (param i32)))
@@ -16,7 +15,7 @@
 	(func $assert (param i32)
 		(block $ok
 			(br_if $ok
-				(get_local 0)
+				(local.get 0)
 			)
 			(unreachable)
 		)
@@ -44,8 +43,8 @@
 		;; [0..4) - size of the call
 		;; [4..8) - action to perform
 		;; [8..42) - code hash of the callee
-		(set_local $action (i32.load (i32.const 4)))
-		(set_local $code_hash_ptr (i32.const 8))
+		(local.set $action (i32.load (i32.const 4)))
+		(local.set $code_hash_ptr (i32.const 8))
 
 		;; Assert input size == 36 (4 for action + 32 for code_hash).
 		(call $assert
@@ -56,32 +55,29 @@
 		)
 
 		;; Call add_delegate_dependency when action == 1.
-		(if (i32.eq (get_local $action) (i32.const 1))
+		(if (i32.eq (local.get $action) (i32.const 1))
 		    (then
-				(call $add_delegate_dependency (get_local $code_hash_ptr))
+				(call $add_delegate_dependency (local.get $code_hash_ptr))
 			)
-			(else)
 		)
 
 		;; Call remove_delegate_dependency when action == 2.
-		(if (i32.eq (get_local $action) (i32.const 2))
+		(if (i32.eq (local.get $action) (i32.const 2))
 		    (then
 				(call $remove_delegate_dependency
-					(get_local $code_hash_ptr)
+					(local.get $code_hash_ptr)
 				)
 			)
-			(else)
 		)
 
 		;; Call terminate when action == 3.
-		(if (i32.eq (get_local $action) (i32.const 3))
+		(if (i32.eq (local.get $action) (i32.const 3))
 		    (then
 				(call $terminate
 					(i32.const 100)	;; Pointer to beneficiary address
 				)
 				(unreachable) ;; terminate never returns
 			)
-			(else)
 		)
 	)
 
