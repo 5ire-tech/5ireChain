@@ -708,7 +708,7 @@ mod tests {
 		}
 		fn call_runtime(
 			&self,
-			call: <Self::T as Config>::RuntimeCall,
+			call: <Self::T as Config>::ContractRuntimeCall,
 		) -> DispatchResultWithPostInfo {
 			self.runtime_calls.borrow_mut().push(call);
 			Ok(Default::default())
@@ -1513,7 +1513,7 @@ mod tests {
 	(func $assert (param i32)
 		(block $ok
 			(br_if $ok
-				(get_local 0)
+				(local.get 0)
 			)
 			(unreachable)
 		)
@@ -1538,7 +1538,7 @@ mod tests {
 		)
 
 		;; Find out the size of the buffer
-		(set_local $buf_size
+		(local.set $buf_size
 			(i32.load (i32.const 32))
 		)
 
@@ -1546,7 +1546,7 @@ mod tests {
 		(call $seal_return
 			(i32.const 0)
 			(i32.const 36)
-			(get_local $buf_size)
+			(local.get $buf_size)
 		)
 
 		;; env:seal_return doesn't return, so this is effectively unreachable.
@@ -1582,7 +1582,7 @@ mod tests {
 	(func $assert (param i32)
 		(block $ok
 			(br_if $ok
-				(get_local 0)
+				(local.get 0)
 			)
 			(unreachable)
 		)
@@ -1640,7 +1640,7 @@ mod tests {
 	(func $assert (param i32)
 		(block $ok
 			(br_if $ok
-				(get_local 0)
+				 (local.get 0)
 			)
 			(unreachable)
 		)
@@ -1687,7 +1687,7 @@ mod tests {
 	(func $assert (param i32)
 		(block $ok
 			(br_if $ok
-				(get_local 0)
+				(local.get 0)
 			)
 			(unreachable)
 		)
@@ -1733,7 +1733,7 @@ mod tests {
 	(func $assert (param i32)
 		(block $ok
 			(br_if $ok
-				(get_local 0)
+				(local.get 0)
 			)
 			(unreachable)
 		)
@@ -1780,7 +1780,7 @@ mod tests {
 	(func $assert (param i32)
 		(block $ok
 			(br_if $ok
-				(get_local 0)
+				(local.get 0)
 			)
 			(unreachable)
 		)
@@ -1843,7 +1843,7 @@ mod tests {
 	(func $assert (param i32)
 		(block $ok
 			(br_if $ok
-				(get_local 0)
+				(local.get 0)
 			)
 			(unreachable)
 		)
@@ -1917,7 +1917,7 @@ mod tests {
 	(func $assert (param i32)
 		(block $ok
 			(br_if $ok
-				(get_local 0)
+				(local.get 0)
 			)
 			(unreachable)
 		)
@@ -1958,7 +1958,7 @@ mod tests {
 	(func $assert (param i32)
 		(block $ok
 			(br_if $ok
-				(get_local 0)
+				(local.get 0)
 			)
 			(unreachable)
 		)
@@ -2005,7 +2005,7 @@ mod tests {
 	(func $assert (param i32)
 		(block $ok
 			(br_if $ok
-				(get_local 0)
+				(local.get 0)
 			)
 			(unreachable)
 		)
@@ -2059,7 +2059,7 @@ mod tests {
 	(func $assert (param i32)
 		(block $ok
 			(br_if $ok
-				(get_local 0)
+				(local.get 0)
 			)
 			(unreachable)
 		)
@@ -2129,7 +2129,7 @@ mod tests {
 	(func $assert (param i32)
 		(block $ok
 			(br_if $ok
-				(get_local 0)
+				(local.get 0)
 			)
 			(unreachable)
 		)
@@ -2319,7 +2319,7 @@ mod tests {
 	(func $assert (param i32)
 		(block $ok
 			(br_if $ok
-				(get_local 0)
+				(local.get 0)
 			)
 			(unreachable)
 		)
@@ -2987,7 +2987,7 @@ mod tests {
 	(func $assert (param i32)
 		(block $ok
 			(br_if $ok
-				(get_local 0)
+				(local.get 0)
 			)
 			(unreachable)
 		)
@@ -3039,7 +3039,7 @@ mod tests {
 	(func $assert (param i32)
 		(block $ok
 			(br_if $ok
-				(get_local 0)
+				(local.get 0)
 			)
 			(unreachable)
 		)
@@ -3154,18 +3154,18 @@ mod tests {
 	(func $assert (param i32)
 		(block $ok
 			(br_if $ok
-				(get_local 0)
+				(local.get 0)
 			)
 			(unreachable)
 		)
 	)
 	(func (export "call")
 		(local $exit_code i32)
-		(set_local $exit_code
+		(local.set $exit_code
 			(call $seal_set_code_hash (i32.const 0))
 		)
 		(call $assert
-			(i32.eq (get_local $exit_code) (i32.const 0)) ;; ReturnCode::Success
+			(i32.eq (local.get $exit_code) (i32.const 0)) ;; ReturnCode::Success
 		)
 	)
 
@@ -3194,18 +3194,18 @@ mod tests {
 	(func $assert (param i32)
 		(block $ok
 			(br_if $ok
-				(get_local 0)
+				(local.get 0)
 			)
 			(unreachable)
 		)
 	)
 	(func (export "call")
 		(local $return_val i32)
-		(set_local $return_val
+		(local.set $return_val
 			(call $reentrance_count)
 		)
 		(call $assert
-			(i32.eq (get_local $return_val) (i32.const 12))
+			(i32.eq (local.get $return_val) (i32.const 12))
 		)
 	)
 
@@ -3226,18 +3226,18 @@ mod tests {
 	(func $assert (param i32)
 		(block $ok
 			(br_if $ok
-				(get_local 0)
+				(local.get 0)
 			)
 			(unreachable)
 		)
 	)
 	(func (export "call")
 		(local $return_val i32)
-		(set_local $return_val
+		(local.set $return_val
 			(call $account_reentrance_count (i32.const 0))
 		)
 		(call $assert
-			(i32.eq (get_local $return_val) (i32.const 12))
+			(i32.eq (local.get $return_val) (i32.const 12))
 		)
 	)
 
@@ -3259,7 +3259,7 @@ mod tests {
 	(func $assert (param i32)
 		(block $ok
 			(br_if $ok
-				(get_local 0)
+				(local.get 0)
 			)
 			(unreachable)
 		)

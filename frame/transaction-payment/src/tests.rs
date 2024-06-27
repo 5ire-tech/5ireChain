@@ -17,13 +17,11 @@
 
 use super::*;
 use crate as pallet_transaction_payment;
-
+use pallet_contracts::ContractDeployer;
 use codec::Encode;
-
 use sp_runtime::{
 	testing::TestXt, traits::One, transaction_validity::InvalidTransaction, BuildStorage,
 };
-
 use frame_support::{
 	assert_noop, assert_ok,
 	dispatch::{DispatchClass, DispatchInfo, GetDispatchInfo, PostDispatchInfo},
@@ -584,6 +582,44 @@ fn actual_weight_higher_than_max_refunds_nothing() {
 			assert_eq!(Balances::free_balance(2), 200 - 5 - 10 - 100 - 5);
 		});
 }
+
+#[test]
+fn test_contract_fee_handling(){
+	ExtBuilder::default()
+		.balance_factor(10)
+		.base_weight(Weight::from_parts(5, 0))
+		.build()
+		.execute_with(|| {
+			let caller_account: u64 = 1;
+            let contract_deployer: u64 = 2;
+            let tip: u64 = 10;
+
+			// Insert the contract address of the deployer
+			ContractDeployer::<Runtime>::insert(&caller_account, contract_deployer);
+
+			// Initialize the balances of the deployer and contract accounts
+			let _ = pallet_balances::Pallet::<Runtime>::deposit_creating(&caller_account, 1000);
+			let _ = pallet_balances::Pallet::<Runtime>::deposit_creating(&contract_deployer, 1000);
+			assert_eq!(Balances::free_balance(contract_deployer), 1200);
+
+			// Initialize the transaction with a tip
+			let pre_dispatch_data = ChargeTransactionPayment::<Runtime>::from(tip)
+			.pre_dispatch(&caller_account, CALL, &DispatchInfo::default(), 10)
+			.unwrap();
+
+			// Complete the transaction and handle post-dispatch fee charging
+			assert_ok!(ChargeTransactionPayment::<Runtime>::post_dispatch(
+				Some(pre_dispatch_data),
+				&DispatchInfo::default(),
+				&default_post_info(),
+				10,
+				&Ok(())
+			));
+
+			// Check that the balance of the contract account has increased correctly
+			assert_eq!(Balances::free_balance(contract_deployer), 1212);
+        });
+    }
 
 #[test]
 fn zero_transfer_on_free_transaction() {

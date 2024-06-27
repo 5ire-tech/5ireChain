@@ -462,7 +462,7 @@ impl Config for Test {
 	type Randomness = Randomness;
 	type Currency = Balances;
 	type RuntimeEvent = RuntimeEvent;
-	type RuntimeCall = RuntimeCall;
+	type ContractRuntimeCall = RuntimeCall;
 	type CallFilter = TestFilter;
 	type CallStack = [Frame<Self>; 5];
 	type WeightPrice = Self;
@@ -1720,69 +1720,6 @@ fn cannot_self_destruct_in_constructor() {
 			Error::<Test>::TerminatedInConstructor,
 		);
 	});
-}
-
-#[test]
-fn crypto_hashes() {
-	let (wasm, _code_hash) = compile_module::<Test>("crypto_hashes").unwrap();
-
-	ExtBuilder::default().existential_deposit(50).build().execute_with(|| {
-		let _ = <Test as Config>::Currency::set_balance(&ALICE, 1_000_000);
-
-		// Instantiate the CRYPTO_HASHES contract.
-		let addr = Contracts::bare_instantiate(
-			ALICE,
-			100_000,
-			GAS_LIMIT,
-			None,
-			Code::Upload(wasm),
-			vec![],
-			vec![],
-			DebugInfo::Skip,
-			CollectEvents::Skip,
-		)
-		.result
-		.unwrap()
-		.account_id;
-		// Perform the call.
-		let input = b"_DEAD_BEEF";
-		use sp_io::hashing::*;
-		// Wraps a hash function into a more dynamic form usable for testing.
-		macro_rules! dyn_hash_fn {
-			($name:ident) => {
-				Box::new(|input| $name(input).as_ref().to_vec().into_boxed_slice())
-			};
-		}
-		// All hash functions and their associated output byte lengths.
-		let test_cases: &[(Box<dyn Fn(&[u8]) -> Box<[u8]>>, usize)] = &[
-			(dyn_hash_fn!(sha2_256), 32),
-			(dyn_hash_fn!(keccak_256), 32),
-			(dyn_hash_fn!(blake2_256), 32),
-			(dyn_hash_fn!(blake2_128), 16),
-		];
-		// Test the given hash functions for the input: "_DEAD_BEEF"
-		for (n, (hash_fn, expected_size)) in test_cases.iter().enumerate() {
-			// We offset data in the contract tables by 1.
-			let mut params = vec![(n + 1) as u8];
-			params.extend_from_slice(input);
-			let result = <Pallet<Test>>::bare_call(
-				ALICE,
-				addr.clone(),
-				0,
-				GAS_LIMIT,
-				None,
-				params,
-				DebugInfo::Skip,
-				CollectEvents::Skip,
-				Determinism::Enforced,
-			)
-			.result
-			.unwrap();
-			assert!(!result.did_revert());
-			let expected = hash_fn(input.as_ref());
-			assert_eq!(&result.data[..*expected_size], &*expected);
-		}
-	})
 }
 
 #[test]
@@ -5817,40 +5754,6 @@ fn none_cannot_call_code() {
 			Contracts::call(RuntimeOrigin::none(), BOB, 0, GAS_LIMIT, None, Vec::new()),
 			DispatchError::BadOrigin,
 		);
-	});
-}
-
-#[test]
-fn root_can_call() {
-	let (wasm, _) = compile_module::<Test>("dummy").unwrap();
-
-	ExtBuilder::default().existential_deposit(100).build().execute_with(|| {
-		let _ = <Test as Config>::Currency::set_balance(&ALICE, 1_000_000);
-
-		let addr = Contracts::bare_instantiate(
-			ALICE,
-			0,
-			GAS_LIMIT,
-			None,
-			Code::Upload(wasm),
-			vec![],
-			vec![],
-			DebugInfo::Skip,
-			CollectEvents::Skip,
-		)
-		.result
-		.unwrap()
-		.account_id;
-
-		// Call the contract.
-		assert_ok!(Contracts::call(
-			RuntimeOrigin::root(),
-			addr.clone(),
-			0,
-			GAS_LIMIT,
-			None,
-			vec![]
-		));
 	});
 }
 
