@@ -23,6 +23,7 @@ export const GENESIS_ACCOUNTS: string[] = [
 
 export const CHAIN_ID = 997;
 
+
 export const TEST_ACCOUNT = "0xdd33Af49c851553841E94066B54Fd28612522901";
 export const TEST_ACCOUNT_PRIVATE_KEY =
   "0x4ca933bffe83185dda76e7913fc96e5c97cdb7ca1fbfcc085d6376e6f564ef71";
