@@ -189,21 +189,18 @@ pub struct DealWithFees;
 impl OnUnbalanced<NegativeImbalance> for DealWithFees {
 	fn on_unbalanceds<B>(mut fees_then_tips: impl Iterator<Item = NegativeImbalance>) {
 		if let Some(fees) = fees_then_tips.next() {
-			// for fees, 80% to treasury, 20% to author
-			let mut split = fees.ration(80, 20);
+			// for fees, 100% to treasury
+			let mut split = fees;
 			if let Some(tips) = fees_then_tips.next() {
-				// for tips, if any, 80% to treasury, 20% to author (though this can be anything)
-				tips.ration_merge_into(80, 20, &mut split);
+				// for tips, if any, 100% to treasury (though this can be anything)
+				tips.merge_into(&mut split);
 			}
-			Treasury::on_unbalanced(split.0);
-			Author::on_unbalanced(split.1);
+			Treasury::on_unbalanced(split);
 		}
 	}
 	fn on_nonzero_unbalanced(amount: NegativeImbalance) {
-		// for fees, 80% to treasury, 20% to author
-		let split = amount.ration(80, 20);
-		Treasury::on_unbalanced(split.0);
-		Author::on_unbalanced(split.1);
+		// for fees, 100% to treasury
+		Treasury::on_unbalanced(amount);
 	}
 }
 
@@ -1634,7 +1631,7 @@ pub const GAS_PER_SECOND: u64 = 40_000_000;
 pub const WEIGHT_PER_GAS: u64 = WEIGHT_REF_TIME_PER_SECOND / GAS_PER_SECOND;
 
 parameter_types! {
-	pub const ChainId: u64 = 997;
+	pub const ChainId: u64 = 995;
 	pub BlockGasLimit: U256 = U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT.ref_time()/ WEIGHT_PER_GAS);
 	pub const GasLimitPovSizeRatio: u64 = 4;
 	pub PrecompilesValue: FrontierPrecompiles<Runtime> = FrontierPrecompiles::<_>::new();
