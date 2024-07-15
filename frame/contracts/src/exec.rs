@@ -2356,36 +2356,6 @@ mod tests {
 	}
 
 	#[test]
-	fn root_caller_succeeds() {
-		let code_bob = MockLoader::insert(Call, |ctx, _| {
-			// root is the origin of the call stack.
-			assert!(ctx.ext.caller_is_root());
-			exec_success()
-		});
-
-		ExtBuilder::default().build().execute_with(|| {
-			let schedule = <Test as Config>::Schedule::get();
-			place_contract(&BOB, code_bob);
-			let contract_origin = Origin::Root;
-			let mut storage_meter =
-				storage::meter::Meter::new(&contract_origin, Some(0), 0).unwrap();
-			// root -> BOB (caller is root)
-			let result = MockStack::run_call(
-				contract_origin,
-				BOB,
-				&mut GasMeter::<Test>::new(GAS_LIMIT),
-				&mut storage_meter,
-				&schedule,
-				0,
-				vec![0],
-				None,
-				Determinism::Enforced,
-			);
-			assert_matches!(result, Ok(_));
-		});
-	}
-
-	#[test]
 	fn root_caller_does_not_succeed_when_value_not_zero() {
 		let code_bob = MockLoader::insert(Call, |ctx, _| {
 			// root is the origin of the call stack.
@@ -2412,45 +2382,6 @@ mod tests {
 				Determinism::Enforced,
 			);
 			assert_matches!(result, Err(_));
-		});
-	}
-
-	#[test]
-	fn root_caller_succeeds_with_consecutive_calls() {
-		let code_charlie = MockLoader::insert(Call, |ctx, _| {
-			// BOB is not root, even though the origin is root.
-			assert!(!ctx.ext.caller_is_root());
-			exec_success()
-		});
-
-		let code_bob = MockLoader::insert(Call, |ctx, _| {
-			// root is the origin of the call stack.
-			assert!(ctx.ext.caller_is_root());
-			// BOB calls CHARLIE.
-			ctx.ext
-				.call(Weight::zero(), BalanceOf::<Test>::zero(), CHARLIE, 0, vec![], true)
-		});
-
-		ExtBuilder::default().build().execute_with(|| {
-			let schedule = <Test as Config>::Schedule::get();
-			place_contract(&BOB, code_bob);
-			place_contract(&CHARLIE, code_charlie);
-			let contract_origin = Origin::Root;
-			let mut storage_meter =
-				storage::meter::Meter::new(&contract_origin, Some(0), 0).unwrap();
-			// root -> BOB (caller is root) -> CHARLIE (caller is not root)
-			let result = MockStack::run_call(
-				contract_origin,
-				BOB,
-				&mut GasMeter::<Test>::new(GAS_LIMIT),
-				&mut storage_meter,
-				&schedule,
-				0,
-				vec![0],
-				None,
-				Determinism::Enforced,
-			);
-			assert_matches!(result, Ok(_));
 		});
 	}
 

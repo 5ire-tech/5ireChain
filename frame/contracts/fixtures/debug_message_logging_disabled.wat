@@ -1,4 +1,3 @@
-;; Emit a "Hello World!" debug message but assume that logging is disabled.
 (module
 	(import "seal0" "seal_debug_message" (func $seal_debug_message (param i32 i32) (result i32)))
 	(import "env" "memory" (memory 1 1))
@@ -8,7 +7,7 @@
 	(func $assert_eq (param i32 i32)
 		(block $ok
 			(br_if $ok
-				(i32.eq (get_local 0) (get_local 1))
+				(i32.eq (local.get 0) (local.get 1))
 			)
 			(unreachable)
 		)
