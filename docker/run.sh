@@ -52,8 +52,8 @@ while [[ $# -gt 0 ]]; do
       ;;
     -e)
       environment="$2"
-      if [ "$environment" != "qa" ] && [ "$environment" != "thunder" ]; then
-        echo "Invalid Environment '$environment'. Only 'qa' and 'thunder' envrionments are allowed at the moment"
+      if [ "$environment" != "qa" ] && [ "$environment" != "thunder" ] && [ "$environment" != "mainnet" ]; then
+        echo "Invalid Environment '$environment'. Only 'qa', 'thunder' and 'mainnet' envrionments are allowed at the moment"
         exit 1
       fi
       shift 2

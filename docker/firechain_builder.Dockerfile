@@ -22,12 +22,6 @@ COPY --from=builder /5ire/target/release/firechain-node /5ire/firechain-node
 
 COPY --from=builder /5ire/specs/5ire-${environment}-specRaw.json /5ire/specs/5ire-${environment}-specRaw.json
 
-RUN set -eux; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends curl git openssh-client; \
-    apt-get clean; \
-    rm -rf /var/lib/apt/lists/*
-
 RUN ldd /5ire/firechain-node
 RUN /5ire/firechain-node --version
 
