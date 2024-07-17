@@ -23,6 +23,27 @@ Prior to starting a 5ireChain node, you must set up your development environment
 
 https://docs.substrate.io/install/
 
+## Connect to 5ireChain Mainnet
+
+### Pull Docker Image 
+```bash
+docker pull 5irechain/5ire-node:mainnet
+```
+
+
+### Run docker image with full-node role
+
+```bash
+docker run -d -p 30333:30333 -p 9944:9944 5irechain/5ire-node:mainnet --no-telemetry --base-path /5ire/data/ --chain /5ire/specs/5ire-mainnet-specRaw.json --bootnodes /ip4/44.229.117.8/tcp/30333/p2p/12D3KooWHZ98etYokeswbKfCbUrgU2U2RjEaH1t1HprVGcLcFcnD --pruning archive --rpc-external --rpc-cors all
+```
+
+### Run docker image with validator role
+
+```bash
+docker run -d -p 30333:30333 -p 9944:9944 5irechain/5ire-node:mainnet --no-telemetry --base-path /5ire/data --chain /5ire/specs/5ire-mainnet-specRaw.json --bootnodes /ip4/44.229.117.8/tcp/30333/p2p/12D3KooWHZ98etYokeswbKfCbUrgU2U2RjEaH1t1HprVGcLcFcnD --validator
+```
+
+
 ## Connect to 5ireChain GA Thunder testnet
 
 ### Pull Docker Image 
