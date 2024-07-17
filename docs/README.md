@@ -13,7 +13,7 @@ Table of Contents
 - [Roadmap](#5-roadmap)
     - [Phase 1 - Completed](#phase-1-completed---road-to-testnet)
 
-    - [Phase 2 - Ongoing](#phase-2-ongoing---road-to-mainnet)
+    - [Phase 2 - Completed](#phase-2-ongoing---road-to-mainnet)
 
     - [Phase 3 - Near Future](#phase-3---near-future)
     - [Phase 4 - Road to an Integrated Economy](#phase-4---road-to-an-integrated-economy)
@@ -111,10 +111,26 @@ Implemented ESG interface to convert the ESG score into weight and incorporate i
 
 `NOTE` : `OneSessionHandlerAll` gets all validators in the network including active, waiting to calculate the Reliability Score.
 
+### **Contract Pallet:**
+Giving back 50 % gas fee for deployer
+
+### **EVM Pallet:**
+Giving back 50 % gas fee for deployer
+
+### **Unified Address**
+Replacing Ed25519 and Schnorr signatures (Substrate) with ECDSA (Elliptic Curve Digital Signature Algorithm) signatures (ETH) in a blockchain system.
+
+Changes in the 5ireChain Codebase
++ **Update Primitives**: Modify the signature enumeration to include ECDSA and adjust the associated verification logic to ensure all components of the Substrate framework can recognize, handle, and verify ECDSA signatures correctly.
++ **Client-Side Implementation**: Update the key management system to generate and store ECDSA keys. Modify transaction signing processes to use ECDSA signatures for outgoing transactions.
++ **Account ID Compatibility**: Adjust the account ID structure to accommodate the size of ECDSA public keys, ensuring proper address generation, storage, and lookup functionality within the blockchain.
+
+
 ## **4. 5ire's pallets**
 
 ### **Esg Pallet:** 
 An oracle loads the `ESG` score from off-chain storage to on-chain storage. Then `ESG` interface is tightly coupled with the other pallets and is used as a factor in calculating reward for validators and nominators.
+
 ### **Reward Pallet:**
 
 + The Reward Pallet is a module in the Substrate blockchain framework designed to manage and distribute rewards to participants based on their contributions within the network.
@@ -132,7 +148,7 @@ An oracle loads the `ESG` score from off-chain storage to on-chain storage. Then
     + Base blockchain with multiple validators
     + Base blockchain EVM compatibility
     + Base blockchain WASM compatibility
-    ESG module integrated with consensus mechanism (centralized)
+    + ESG module integrated with consensus mechanism (centralized)
     + Blockchain explorer
     + Web Wallet
     + EVM Faucet
@@ -161,13 +177,13 @@ Dedicated 5ire Wallet Extension to interact to native and EVM chains for Google 
 - Gate.io
 - MEXC
 
-### Phase 2 (Ongoing) - Road to Mainnet
+### Phase 2 (Completed) - Road to Mainnet
 
 #### Q1 2024: Rewards Mechanism - SPoS & Reliability
 Sustainable Proof-of-Stake (SPoS) and reliability mechanism -> consensus update to use fast-forward (BABE + GRANDPA) for selection, block production and validation and ESG scores used for rewards computation. Rewards are also generated for validator nodes with reliable uptime. Rewards distributed are in addition to standard PoS rewards based on stake.
 
 
-#### Q1 2024: Sustainability Scores Service
+#### Q1 2024: (Pending) Sustainability Scores Service
 Service that persists an enterprise’s sustainability score on-chain. Based on ESG data provided, the service calculates an organization’s sustainability score that is subsequently pushed on-chain. The rewards mechanism uses the available sustainability score to determine alternate rewards.
 
 #### Q1 2024: Thunder Testnet GA Launch
@@ -184,10 +200,10 @@ The Thunder Testnet General Availability (GA) launch provides all updates to pre
 #### Q2 2024: Decentralized EVM Bridge
 A decentralized bridge that allows for users to bridge 5ire tokens between the Ethereum network and the 5ire EVM network.
 
-#### Q2 2024: Secured Wallet Transactions
+#### Q2 2024: (Pending) Secured Wallet Transactions
 Enables secure wallet transactions for large amounts where the sender can generate a key to provide to the receiver (via social mechanisms), and funds are only released once the key is input on the receiver’s side.
 
-#### Q2 2024: Wallet Inheritance
+#### Q2 2024: (Pending) Wallet Inheritance
 Sustainable wealth transfer within a decentralized network. The feature allows a user to trigger the automatic transfer of asset ownership in a web3 wallet to another wallet, depending on the requirements and preferences of the owner.
 
 #### Q2 2024: 5ireScan
