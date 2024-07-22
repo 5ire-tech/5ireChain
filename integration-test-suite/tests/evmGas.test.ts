@@ -167,7 +167,6 @@ describe("EVM related Gas using web3js/ethersjs", function () {
         from: GENESIS_ACCOUNTS[0],
         data: INVALID_OPCODE_BYTECODE,
         value: "0x00",
-        gasPrice: "0x3B9ACA00",
         gas: "0x100000",
       },
       GENESIS_ACCOUNT_0_PRIVATE_KEY

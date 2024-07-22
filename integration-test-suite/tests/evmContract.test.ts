@@ -23,7 +23,6 @@ const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
 const TEST_ACCOUNT = "0xdd33Af49c851553841E94066B54Fd28612522901";
 let contractAddress: string;
 
-
 describe("EVM related Contract using web3js/ethersjs", function () {
   this.timeout(100 * BLOCK_TIME);
   before(async () => {
@@ -85,34 +84,36 @@ describe("EVM related Contract using web3js/ethersjs", function () {
 
   step("call sign transaction the method", async function () {
     const contract = new web3.eth.Contract(ERC20_ABI, contractAddress, {
-      from: alith.address,
-      gasPrice: "0x3B9ACA00",
+      from: alith.address
     });
     let amountTransfer = web3.utils.toWei("1", "ether");
     const data = contract.methods
       .transfer(TEST_ACCOUNT, amountTransfer)
       .encodeABI();
+
     const signedTx = await web3.eth.accounts.signTransaction(
       {
         to: contractAddress,
         data,
-        gas: 200000,
+        gas:1000000,
+  
       },
       ALITH_PRIVATE_KEY
     );
     await customRequest(web3, "eth_sendRawTransaction", [
       signedTx.rawTransaction,
     ]);
-    await sleep(3 * SECONDS);
+    await sleep(4 * SECONDS);
+
     expect(await contract.methods.balanceOf(TEST_ACCOUNT).call()).to.eq(
       amountTransfer
     );
+
   });
 
   step("call query the method", async function () {
     const contract = new web3.eth.Contract(ERC20_ABI, contractAddress, {
-      from: alith.address,
-      gasPrice: "0x3B9ACA00",
+      from: alith.address
     });
     let expectedTotalSupply = BigInt(2 ** 256) - BigInt(1);
 
