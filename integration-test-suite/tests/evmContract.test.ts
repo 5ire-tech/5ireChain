@@ -8,14 +8,12 @@ import {
 import {
   customRequest,
   killNodeForTestEVM,
-  polkadotApi,
   spawnNodeForTestEVM,
 } from "../utils/util";
 import { sleep, waitForEvent } from "../utils/setup";
 
 import { expect } from "chai";
 import { step } from "mocha-steps";
-import Keyring from "@polkadot/keyring";
 let web3: Web3;
 
 const ERC20_ABI = require("./contracts/MyToken.json").abi;

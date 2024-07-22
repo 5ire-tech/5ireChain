@@ -11,10 +11,9 @@ import {
 import {
   customRequest,
   killNodeForTestEVM,
-  polkadotApi,
   spawnNodeForTestEVM,
 } from "../utils/util";
-import { sleep, waitForEvent } from "../utils/setup";
+import { sleep } from "../utils/setup";
 
 import { expect } from "chai";
 import { step } from "mocha-steps";

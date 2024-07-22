@@ -8,10 +8,9 @@ import { JsonRpcResponse } from "web3-core-helpers";
 
 export let polkadotApi: ApiPromise;
 
-export let aliceNode: ChildProcess;
-export let bobNode: ChildProcess;
-export let charlieNode: ChildProcess;
-export let web3: Web3;
+let aliceNode: ChildProcess;
+let bobNode: ChildProcess;
+let charlieNode: ChildProcess;
 
 /**
  * Used for starting up test by spawning the 5irechain node with 3 different accounts
@@ -25,8 +24,6 @@ export const spawnNodes = async () => {
   console.log("started alice, bob, charlie nodes");
 
   polkadotApi = await ApiPromise.create();
-
-  web3 = new Web3("ws://127.0.0.1:9944");
   return true;
 };
 

@@ -2,7 +2,6 @@ import { expect } from "chai";
 import { BLOCK_TIME, alith, baltathar } from "../utils/constants";
 import { killNodes, polkadotApi, spawnNodes } from "../utils/util";
 import { CodePromise, Abi, ContractPromise } from "@polkadot/api-contract";
-import { Keyring } from "@polkadot/api";
 import abiFile from "./contracts/psp22_token.json";
 import { WeightV2 } from "@polkadot/types/interfaces";
 import { sleep, waitForEvent, waitNfinalizedBlocks } from "../utils/setup";

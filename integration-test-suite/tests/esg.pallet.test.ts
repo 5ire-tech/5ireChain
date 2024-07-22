@@ -1,11 +1,9 @@
 import { expect } from "chai";
-import { BLOCK_TIME, TEST_ACCOUNT, alith, baltathar, charleth, dorothy } from "../utils/constants";
+import { BLOCK_TIME, alith, baltathar, charleth, dorothy } from "../utils/constants";
 import { killNodes, polkadotApi as api, spawnNodes } from "../utils/util";
-import { Keyring, WsProvider } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import {sudoTx, waitForEvent, sleep} from "../utils/setup";
-// Keyring needed to sign using Alice account
-const keyring = new Keyring({ type: "sr25519" });
+
 
 // This script contains the integration test for the ESG pallet.
 // ESG pallet is the pallet in 5ire-chain which is responsible to add the esg score and related transactions.

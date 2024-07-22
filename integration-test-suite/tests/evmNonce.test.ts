@@ -11,11 +11,10 @@ import {
   polkadotApi,
   spawnNodeForTestEVM,
 } from "../utils/util";
-import { sleep, waitForEvent } from "../utils/setup";
+import { sleep } from "../utils/setup";
 
 import { expect } from "chai";
 import { step } from "mocha-steps";
-import Keyring from "@polkadot/keyring";
 let web3: Web3;
 
 const TEST_ACCOUNT = "0xdd33Af49c851553841E94066B54Fd28612522901";

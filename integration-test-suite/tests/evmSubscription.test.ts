@@ -5,11 +5,9 @@ import { ALITH_PRIVATE_KEY, BLOCK_TIME, SECONDS, alith } from "../utils/constant
 import {
   customRequest,
   killNodeForTestEVM,
-  polkadotApi,
   spawnNodeForTestEVM,
 } from "../utils/util";
-import { sleep, waitForEvent } from "../utils/setup";
-import Keyring from "@polkadot/keyring";
+import { sleep } from "../utils/setup";
 
 let web3: Web3;
 

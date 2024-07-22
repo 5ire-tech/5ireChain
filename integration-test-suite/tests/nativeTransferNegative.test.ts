@@ -1,13 +1,7 @@
 import { expect } from 'chai';
 import { BLOCK_TIME, alith, baltathar } from '../utils/constants';
 import {killNodes, polkadotApi as api, polkadotApi, spawnNodes} from "../utils/util";
-import {Keyring} from "@polkadot/api";
-import {waitForEvent} from "../utils/setup";
-import {encodeAddress} from "@polkadot/util-crypto";
 
-
-// Keyring needed to sign using Alice account
-const keyring = new Keyring({ type: 'sr25519' });
 
 describe('Negative Native token tests', function () {
   this.timeout(300 * BLOCK_TIME);

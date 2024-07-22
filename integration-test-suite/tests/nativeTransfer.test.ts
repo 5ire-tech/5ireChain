@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import { BLOCK_TIME, alith, baltathar } from '../utils/constants';
 import {killNodes, polkadotApi as api, polkadotApi, spawnNodes} from "../utils/util";
-import {Keyring} from "@polkadot/api";
 import {waitForEvent} from "../utils/setup";
 
 

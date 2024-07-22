@@ -3,7 +3,6 @@ import { BLOCK_TIME, SECONDS } from "../utils/constants";
 import {
   customRequest,
   killNodeForTestEVM,
-  polkadotApi,
   spawnNodeForTestEVM,
 } from "../utils/util";
 import { sleep } from "../utils/setup";
