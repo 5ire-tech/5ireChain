@@ -1,13 +1,9 @@
 import { expect } from 'chai';
 import { BLOCK_TIME, alith, baltathar } from '../utils/constants';
 import {killNodes, polkadotApi as api, polkadotApi, spawnNodes} from "../utils/util";
-import {Keyring} from "@polkadot/api";
 import {sleep, waitForEvent, waitForTheNextSession, waitNfinalizedBlocks} from "../utils/setup";
 import {WeightV2} from "@polkadot/types/interfaces";
 
-
-// Keyring needed to sign using Alice account
-const keyring = new Keyring({ type: 'sr25519' });
 
 describe('Validator tests', function () {
   this.timeout(300 * BLOCK_TIME);

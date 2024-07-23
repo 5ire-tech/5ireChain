@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { BLOCK_TIME, alith } from "../utils/constants";
 import { killNodes, polkadotApi, spawnNodes } from "../utils/util";
 import { CodePromise, ContractPromise } from "@polkadot/api-contract";
-import { ApiPromise, Keyring } from "@polkadot/api";
+import { ApiPromise } from "@polkadot/api";
 import contractFile from "./contracts/counter.json";
 import type { WeightV2 } from "@polkadot/types/interfaces";
 import { waitForEvent } from "../utils/setup";
