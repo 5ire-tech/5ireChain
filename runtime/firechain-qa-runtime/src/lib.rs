@@ -1640,7 +1640,7 @@ impl pallet_dynamic_fee::Config for Runtime {
 	type MinGasPriceBoundDivisor = BoundDivision;
 }
 parameter_types! {
-	pub DefaultBaseFeePerGas: U256 = U256::from(5_000_000_000_00u128);
+	pub DefaultBaseFeePerGas: U256 = U256::from(1_000_000_000_00u128);
 	pub DefaultElasticity: Permill = Permill::from_parts(125_000);
 }
 pub struct BaseFeeThreshold;
