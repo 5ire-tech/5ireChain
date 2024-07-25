@@ -46,6 +46,10 @@ use firechain_runtime_core_primitives::opaque::{
 };
 use hex_literal::hex;
 
+pub fn mainnet_config() -> Result<ChainSpec, String> {
+	ChainSpec::from_json_bytes(&include_bytes!("../../../specs/5ire-mainnet-specRaw.json")[..])
+}
+
 const ALITH: &str = "0xf24FF3a9CF04c71Dbc94D0b566f7A27B94566cac";
 const CHARLETH: &str = "0x1B1Afe03Fc576fD6ca3eA57701Cf7c134Ca0256A";
 const DOROTHY: &str = "0xa6beEA3E3D0DD5EB2eE5961ba9BB14bCC1Aa0158";
