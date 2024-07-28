@@ -163,7 +163,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to 0. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 107,
+	spec_version: 108,
 	impl_version: 0,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
@@ -1645,7 +1645,7 @@ impl pallet_dynamic_fee::Config for Runtime {
 	type MinGasPriceBoundDivisor = BoundDivision;
 }
 parameter_types! {
-	pub DefaultBaseFeePerGas: U256 = U256::from(5_000_000_000_00u128);
+	pub DefaultBaseFeePerGas: U256 = U256::from(1_000_000_000_00u128);
 	pub DefaultElasticity: Permill = Permill::from_parts(125_000);
 }
 pub struct BaseFeeThreshold;
