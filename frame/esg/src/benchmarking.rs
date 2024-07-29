@@ -2,7 +2,8 @@
 
 use crate::{Pallet as Esg, *};
 use frame_benchmarking::{account, benchmarks, whitelisted_caller};
-use frame_support::{inherent::Vec, WeakBoundedVec};
+use frame_support::WeakBoundedVec;
+use sp_std::vec::Vec;
 use frame_system::RawOrigin;
 
 benchmarks! {
