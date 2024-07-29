@@ -611,7 +611,6 @@ impl pallet_reward::Config for Runtime{
 	type Balance = Balance;
 	type RuntimeEvent = RuntimeEvent;
 	type DataProvider = <Runtime as pallet_election_provider_multi_phase::Config>::DataProvider;
-	type ValidatorIdOf = pallet_staking::StashOf<Self>;
 	type ValidatorSet = Historical;
 	type Validators = Historical;
 	type ValidatorId = pallet_staking::StashOf<Self>;
