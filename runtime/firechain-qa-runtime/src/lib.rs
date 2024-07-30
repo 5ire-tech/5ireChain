@@ -617,6 +617,7 @@ impl pallet_reward::Config for Runtime {
 	type EraMinutes = EraMinutes;
 	type TotalReward = TotalReward;
 	type PalletId = RewardPalletId;
+	type WeightInfo = pallet_reward::weights::SubstrateWeightInfo<Runtime>;
 }
 
 impl pallet_fast_unstake::Config for Runtime {

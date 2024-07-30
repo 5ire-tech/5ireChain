@@ -32,9 +32,13 @@
 use frame_support::{traits::Get, weights::Weight};
 use core::marker::PhantomData;
 
+pub trait WeightInfo {
+	fn get_rewards() -> Weight;
+}
+
 /// Weight functions for `pallet_reward`.
-pub struct WeightInfo<T>(PhantomData<T>);
-impl<T: frame_system::Config> pallet_reward::WeightInfo for WeightInfo<T> {
+pub struct SubstrateWeightInfo<T>(PhantomData<T>);
+impl<T: frame_system::Config> WeightInfo for SubstrateWeightInfo<T> {
 	/// Storage: `Reward::ValidatorRewardAccounts` (r:1 w:0)
 	/// Proof: `Reward::ValidatorRewardAccounts` (`max_values`: None, `max_size`: None, mode: `Measured`)
 	/// Storage: `Reward::EraRewardsVault` (r:1 w:1)

@@ -30,6 +30,8 @@ mod benchmarking;
 mod mock;
 #[cfg(test)]
 mod tests;
+pub mod weights;
+pub use weights::WeightInfo;
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -84,6 +86,8 @@ pub mod pallet {
 			Moment = BlockNumberFor<Self>,
 			Balance = Self::Balance
 		>;
+
+		type WeightInfo: WeightInfo;
 	}
 
 
@@ -178,7 +182,7 @@ pub mod pallet {
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
 		#[pallet::call_index(0)]
-		#[pallet::weight(Weight::zero())]
+		#[pallet::weight(<T as pallet::Config>::WeightInfo::get_rewards())]
 		pub fn get_rewards(origin: OriginFor<T>, validator: T::AccountId) -> DispatchResult {
 			ensure_signed(origin)?;
 			Self::verify_validator(validator.clone())?;
