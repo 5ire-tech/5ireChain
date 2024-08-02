@@ -1,6 +1,6 @@
 [package]
 name = "firechain-mainnet-runtime"
-version = "1.0.8"
+version = "1.0.9"
 authors = ["5ire Team <support@5ire.org>"]
 description = "5ire chain Mainnet runtime"
 edition = "2021"
