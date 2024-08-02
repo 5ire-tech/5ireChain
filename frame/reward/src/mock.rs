@@ -242,6 +242,7 @@ impl pallet_reward::Config for Test {
 	type EraMinutes = EraMinutes;
 	type TotalReward = TotalReward;
 	type PalletId = RewardPalletId;
+	type WeightInfo = ();
 }
 
 pub type Extrinsic = sp_runtime::testing::TestXt<RuntimeCall, ()>;

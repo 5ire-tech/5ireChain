@@ -29,7 +29,7 @@
 #![allow(unused_imports)]
 #![allow(missing_docs)]
 
-use frame_support::{traits::Get, weights::Weight};
+use frame_support::{traits::Get, weights::{Weight, constants::RocksDbWeight}};
 use core::marker::PhantomData;
 
 pub trait WeightInfo {
@@ -52,5 +52,22 @@ impl<T: frame_system::Config> WeightInfo for SubstrateWeightInfo<T> {
 			.saturating_add(Weight::from_parts(0, 3664))
 			.saturating_add(T::DbWeight::get().reads(2))
 			.saturating_add(T::DbWeight::get().writes(1))
+	}
+}
+
+impl WeightInfo for () {
+	/// Storage: `Reward::ValidatorRewardAccounts` (r:1 w:0)
+	/// Proof: `Reward::ValidatorRewardAccounts` (`max_values`: None, `max_size`: None, mode: `Measured`)
+	/// Storage: `Reward::EraRewardsVault` (r:1 w:1)
+	/// Proof: `Reward::EraRewardsVault` (`max_values`: Some(1), `max_size`: None, mode: `Measured`)
+	fn get_rewards() -> Weight {
+		// Proof Size summary in bytes:
+		//  Measured:  `199`
+		//  Estimated: `3664`
+		// Minimum execution time: 14_000_000 picoseconds.
+		Weight::from_parts(14_000_000, 0)
+			.saturating_add(Weight::from_parts(0, 3664))
+			.saturating_add(RocksDbWeight::get().reads(2))
+			.saturating_add(RocksDbWeight::get().writes(1))
 	}
 }
