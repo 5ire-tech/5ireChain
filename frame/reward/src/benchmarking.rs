@@ -5,6 +5,7 @@ use frame_benchmarking::whitelisted_caller;
 use crate::Pallet as Reward;
 use frame_benchmarking::v2::*;
 use frame_system::RawOrigin as SystemOrigin;
+use sp_std::vec;
 
 #[benchmarks]
 mod benchmarks {

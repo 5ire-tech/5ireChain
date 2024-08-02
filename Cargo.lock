@@ -2407,7 +2407,7 @@ dependencies = [
  "pallet-assets",
  "pallet-authority-discovery",
  "pallet-authorship",
- "pallet-babe 4.0.0-dev",
+ "pallet-babe",
  "pallet-bags-list",
  "pallet-balances",
  "pallet-base-fee",
@@ -2431,20 +2431,18 @@ dependencies = [
  "pallet-evm-precompile-sha3fips",
  "pallet-evm-precompile-simple",
  "pallet-fast-unstake",
- "pallet-grandpa 4.0.0-dev",
+ "pallet-grandpa",
  "pallet-hotfix-sufficients",
  "pallet-identity",
- "pallet-im-online 4.0.0-dev",
+ "pallet-im-online",
  "pallet-indices",
  "pallet-insecure-randomness-collective-flip",
  "pallet-membership",
  "pallet-mmr",
  "pallet-multisig",
  "pallet-nomination-pools",
- "pallet-nomination-pools-benchmarking",
  "pallet-nomination-pools-runtime-api",
  "pallet-offences",
- "pallet-offences-benchmarking",
  "pallet-preimage",
  "pallet-proxy",
  "pallet-ranked-collective",
@@ -2526,7 +2524,7 @@ dependencies = [
  "mmr-rpc",
  "node-primitives",
  "pallet-evm 6.0.0-dev",
- "pallet-im-online 4.0.0-dev",
+ "pallet-im-online",
  "pallet-timestamp",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc",
@@ -2617,7 +2615,7 @@ dependencies = [
  "pallet-assets",
  "pallet-authority-discovery",
  "pallet-authorship",
- "pallet-babe 4.0.0-dev",
+ "pallet-babe",
  "pallet-bags-list",
  "pallet-balances",
  "pallet-base-fee",
@@ -2641,20 +2639,18 @@ dependencies = [
  "pallet-evm-precompile-sha3fips",
  "pallet-evm-precompile-simple",
  "pallet-fast-unstake",
- "pallet-grandpa 4.0.0-dev",
+ "pallet-grandpa",
  "pallet-hotfix-sufficients",
  "pallet-identity",
- "pallet-im-online 4.0.0-dev",
+ "pallet-im-online",
  "pallet-indices",
  "pallet-insecure-randomness-collective-flip",
  "pallet-membership",
  "pallet-mmr",
  "pallet-multisig",
  "pallet-nomination-pools",
- "pallet-nomination-pools-benchmarking",
  "pallet-nomination-pools-runtime-api",
  "pallet-offences",
- "pallet-offences-benchmarking",
  "pallet-preimage",
  "pallet-proxy",
  "pallet-ranked-collective",
@@ -2665,7 +2661,6 @@ dependencies = [
  "pallet-root-testing",
  "pallet-scheduler",
  "pallet-session 4.0.0-dev",
- "pallet-session-benchmarking",
  "pallet-staking 4.0.0-dev",
  "pallet-staking-runtime-api",
  "pallet-state-trie-migration",
@@ -2732,7 +2727,7 @@ dependencies = [
  "pallet-assets",
  "pallet-authority-discovery",
  "pallet-authorship",
- "pallet-babe 4.0.0-dev",
+ "pallet-babe",
  "pallet-bags-list",
  "pallet-balances",
  "pallet-base-fee",
@@ -2756,10 +2751,10 @@ dependencies = [
  "pallet-evm-precompile-sha3fips",
  "pallet-evm-precompile-simple",
  "pallet-fast-unstake",
- "pallet-grandpa 4.0.0-dev",
+ "pallet-grandpa",
  "pallet-hotfix-sufficients",
  "pallet-identity",
- "pallet-im-online 4.0.0-dev",
+ "pallet-im-online",
  "pallet-indices",
  "pallet-insecure-randomness-collective-flip",
  "pallet-membership",
@@ -2769,7 +2764,6 @@ dependencies = [
  "pallet-nomination-pools-benchmarking",
  "pallet-nomination-pools-runtime-api",
  "pallet-offences",
- "pallet-offences-benchmarking",
  "pallet-preimage",
  "pallet-proxy",
  "pallet-ranked-collective",
@@ -2780,7 +2774,6 @@ dependencies = [
  "pallet-root-testing",
  "pallet-scheduler",
  "pallet-session 4.0.0-dev",
- "pallet-session-benchmarking",
  "pallet-staking 4.0.0-dev",
  "pallet-staking-runtime-api",
  "pallet-state-trie-migration",
@@ -5701,30 +5694,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-babe"
-version = "4.0.0-dev"
-source = "git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.1.0#c8d2251cafadc108ba2f1f8a3208dc547ff38901"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "log",
- "pallet-authorship",
- "pallet-session 4.0.0-dev (git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.1.0)",
- "pallet-timestamp",
- "parity-scale-codec",
- "scale-info",
- "sp-application-crypto",
- "sp-consensus-babe",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-session",
- "sp-staking",
- "sp-std",
-]
-
-[[package]]
 name = "pallet-bags-list"
 version = "4.0.0-dev"
 source = "git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.1.0#c8d2251cafadc108ba2f1f8a3208dc547ff38901"
@@ -6223,29 +6192,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-grandpa"
-version = "4.0.0-dev"
-source = "git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.1.0#c8d2251cafadc108ba2f1f8a3208dc547ff38901"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "log",
- "pallet-authorship",
- "pallet-session 4.0.0-dev (git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.1.0)",
- "parity-scale-codec",
- "scale-info",
- "sp-application-crypto",
- "sp-consensus-grandpa",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-session",
- "sp-staking",
- "sp-std",
-]
-
-[[package]]
 name = "pallet-hotfix-sufficients"
 version = "1.0.0"
 dependencies = [
@@ -6300,26 +6246,6 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-npos-elections",
- "sp-runtime",
- "sp-staking",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-im-online"
-version = "4.0.0-dev"
-source = "git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.1.0#c8d2251cafadc108ba2f1f8a3208dc547ff38901"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "log",
- "pallet-authorship",
- "parity-scale-codec",
- "scale-info",
- "sp-application-crypto",
- "sp-core",
- "sp-io",
  "sp-runtime",
  "sp-staking",
  "sp-std",
@@ -6475,30 +6401,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-offences-benchmarking"
-version = "4.0.0-dev"
-source = "git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.1.0#c8d2251cafadc108ba2f1f8a3208dc547ff38901"
-dependencies = [
- "frame-benchmarking",
- "frame-election-provider-support",
- "frame-support",
- "frame-system",
- "log",
- "pallet-babe 4.0.0-dev (git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.1.0)",
- "pallet-balances",
- "pallet-grandpa 4.0.0-dev (git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.1.0)",
- "pallet-im-online 4.0.0-dev (git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.1.0)",
- "pallet-offences",
- "pallet-session 4.0.0-dev (git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.1.0)",
- "pallet-staking 4.0.0-dev (git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.1.0)",
- "parity-scale-codec",
- "scale-info",
- "sp-runtime",
- "sp-staking",
- "sp-std",
-]
-
-[[package]]
 name = "pallet-preimage"
 version = "4.0.0-dev"
 source = "git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.1.0#c8d2251cafadc108ba2f1f8a3208dc547ff38901"
@@ -6610,7 +6512,7 @@ dependencies = [
  "log",
  "pallet-balances",
  "pallet-esg",
- "pallet-im-online 4.0.0-dev",
+ "pallet-im-online",
  "pallet-offences",
  "pallet-session 4.0.0-dev",
  "pallet-staking 4.0.0-dev",
@@ -6737,7 +6639,7 @@ dependencies = [
  "pallet-bags-list",
  "pallet-balances",
  "pallet-esg",
- "pallet-im-online 4.0.0-dev",
+ "pallet-im-online",
  "pallet-offences",
  "pallet-reward",
  "pallet-session 4.0.0-dev",
@@ -6771,7 +6673,6 @@ dependencies = [
  "pallet-authorship",
  "pallet-session 4.0.0-dev (git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.1.0)",
  "parity-scale-codec",
- "rand_chacha 0.2.2",
  "scale-info",
  "serde",
  "sp-application-crypto",
