@@ -1,6 +1,6 @@
 [package]
 name = "firechain-qa-runtime"
-version = "1.0.8"
+version = "1.0.9"
 authors = ["5ire Team <support@5ire.org>"]
 description = "5ire chain qa runtime"
 edition = "2021"
@@ -87,10 +87,9 @@ pallet-membership = { workspace = true }
 pallet-mmr = { workspace = true }
 pallet-multisig = { workspace = true }
 pallet-nomination-pools = { workspace = true }
-pallet-nomination-pools-benchmarking = { workspace = true, optional = true }
 pallet-nomination-pools-runtime-api = { workspace = true }
 pallet-offences = { workspace = true }
-pallet-offences-benchmarking = { workspace = true, optional = true }
+# pallet-offences-benchmarking = { workspace = true, optional = true }
 pallet-preimage = { workspace = true }
 pallet-proxy = { workspace = true }
 pallet-insecure-randomness-collective-flip = { workspace = true }
@@ -100,7 +99,7 @@ pallet-referenda = { workspace = true }
 pallet-remark = { workspace = true }
 pallet-root-testing = { workspace = true }
 pallet-session = { workspace = true, features = ["historical"] }
-pallet-session-benchmarking = { workspace = true, optional = true }
+# pallet-session-benchmarking = { workspace = true, optional = true }
 pallet-staking = { workspace = true }
 pallet-staking-runtime-api = { workspace = true }
 pallet-state-trie-migration = { workspace = true }
@@ -140,7 +139,6 @@ substrate-wasm-builder = { workspace = true, optional = true }
 default = ["std"]
 with-tracing = ["frame-executive/with-tracing"]
 std = [
-	"pallet-offences-benchmarking?/std",
 	"pallet-election-provider-support-benchmarking?/std",
 	"frame-system-benchmarking?/std",
 	"frame-election-provider-support/std",
@@ -175,7 +173,6 @@ std = [
 	"pallet-multisig/std",
 	"pallet-nomination-pools/std",
 	"pallet-nomination-pools-runtime-api/std",
-	"pallet-nomination-pools-benchmarking?/std",
 	"pallet-identity/std",
 	"pallet-scheduler/std",
 	"node-primitives/std",
@@ -187,7 +184,6 @@ std = [
 	"pallet-insecure-randomness-collective-flip/std",
 	"sp-std/std",
 	"pallet-session/std",
-	"pallet-session-benchmarking?/std",
 	"sp-api/std",
 	"sp-runtime/std",
 	"sp-staking/std",
@@ -268,8 +264,6 @@ runtime-benchmarks = [
 	"pallet-membership/runtime-benchmarks",
 	"pallet-mmr/runtime-benchmarks",
 	"pallet-multisig/runtime-benchmarks",
-	"pallet-nomination-pools-benchmarking/runtime-benchmarks",
-	"pallet-offences-benchmarking/runtime-benchmarks",
 	"pallet-preimage/runtime-benchmarks",
 	"pallet-proxy/runtime-benchmarks",
 	"pallet-scheduler/runtime-benchmarks",
@@ -277,7 +271,6 @@ runtime-benchmarks = [
 	"pallet-referenda/runtime-benchmarks",
 	"pallet-recovery/runtime-benchmarks",
 	"pallet-remark/runtime-benchmarks",
-	"pallet-session-benchmarking/runtime-benchmarks",
 	"pallet-staking/runtime-benchmarks",
 	"pallet-state-trie-migration/runtime-benchmarks",
 	"pallet-sudo/runtime-benchmarks",

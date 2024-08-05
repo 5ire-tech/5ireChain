@@ -163,7 +163,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to 0. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 108,
+	spec_version: 109,
 	impl_version: 0,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
@@ -608,7 +608,6 @@ impl pallet_reward::Config for Runtime{
 	type Balance = Balance ;
 	type RuntimeEvent = RuntimeEvent;
 	type DataProvider = <Runtime as pallet_election_provider_multi_phase::Config>::DataProvider;
-	type ValidatorIdOf = pallet_staking::StashOf<Self>;
 	type ValidatorSet = Historical;
 	type Validators = Historical;
 	type ValidatorId = pallet_staking::StashOf<Self>;
@@ -617,7 +616,7 @@ impl pallet_reward::Config for Runtime{
 	type EraMinutes = EraMinutes;
 	type TotalReward = TotalReward;
 	type PalletId= RewardPalletId;
-
+	type WeightInfo = pallet_reward::weights::SubstrateWeightInfo<Runtime>;
 }
 
 impl pallet_fast_unstake::Config for Runtime {
@@ -1815,8 +1814,6 @@ mod benches {
 		[pallet_membership, TechnicalMembership]
 		[pallet_mmr, Mmr]
 		[pallet_multisig, Multisig]
-		[pallet_nomination_pools, NominationPoolsBench::<Runtime>]
-		[pallet_offences, OffencesBench::<Runtime>]
 		[pallet_preimage, Preimage]
 		[pallet_proxy, Proxy]
 		[pallet_ranked_collective, RankedCollective]
@@ -1824,7 +1821,6 @@ mod benches {
 		[pallet_recovery, Recovery]
 		[pallet_remark, Remark]
 		[pallet_scheduler, Scheduler]
-		[pallet_session, SessionBench::<Runtime>]
 		[pallet_staking, Staking]
 		[pallet_state_trie_migration, StateTrieMigration]
 		[pallet_sudo, Sudo]
@@ -1836,6 +1832,7 @@ mod benches {
 		[pallet_vesting, Vesting]
 		[pallet_evm, EVM]
 		[pallet_esg, EsgScore]
+		[pallet_reward, Reward]
 	);
 }
 
@@ -2432,12 +2429,9 @@ impl_runtime_apis! {
 			// Trying to add benchmarks directly to the Session Pallet caused cyclic dependency
 			// issues. To get around that, we separated the Session benchmarks into its own crate,
 			// which is why we need these two lines below.
-			use pallet_session_benchmarking::Pallet as SessionBench;
-			use pallet_offences_benchmarking::Pallet as OffencesBench;
 			use pallet_election_provider_support_benchmarking::Pallet as EPSBench;
 			use frame_system_benchmarking::Pallet as SystemBench;
 			use baseline::Pallet as BaselineBench;
-			use pallet_nomination_pools_benchmarking::Pallet as NominationPoolsBench;
 
 			let mut list = Vec::<BenchmarkList>::new();
 			list_benchmarks!(list, extra);
@@ -2450,24 +2444,19 @@ impl_runtime_apis! {
 		fn dispatch_benchmark(
 			config: frame_benchmarking::BenchmarkConfig
 		) -> Result<Vec<frame_benchmarking::BenchmarkBatch>, sp_runtime::RuntimeString> {
-			use frame_benchmarking::{baseline, Benchmarking, BenchmarkBatch,  TrackedStorageKey};
+			use frame_benchmarking::{baseline, Benchmarking, BenchmarkBatch};
+			use frame_support::traits::TrackedStorageKey;
 
 			// Trying to add benchmarks directly to the Session Pallet caused cyclic dependency
 			// issues. To get around that, we separated the Session benchmarks into its own crate,
 			// which is why we need these two lines below.
-			use pallet_session_benchmarking::Pallet as SessionBench;
-			use pallet_offences_benchmarking::Pallet as OffencesBench;
 			use pallet_election_provider_support_benchmarking::Pallet as EPSBench;
 			use frame_system_benchmarking::Pallet as SystemBench;
 			use baseline::Pallet as BaselineBench;
-			use pallet_nomination_pools_benchmarking::Pallet as NominationPoolsBench;
 
-			impl pallet_session_benchmarking::Config for Runtime {}
-			impl pallet_offences_benchmarking::Config for Runtime {}
 			impl pallet_election_provider_support_benchmarking::Config for Runtime {}
 			impl frame_system_benchmarking::Config for Runtime {}
 			impl baseline::Config for Runtime {}
-			impl pallet_nomination_pools_benchmarking::Config for Runtime {}
 
 			use frame_support::traits::WhitelistedStorageKeys;
 			let mut whitelist: Vec<TrackedStorageKey> = AllPalletsWithSystem::whitelisted_storage_keys();
