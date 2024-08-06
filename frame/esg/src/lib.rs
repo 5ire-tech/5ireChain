@@ -46,12 +46,15 @@ use frame_support::{
 	#[pallet::config]
 	pub trait Config: frame_system::Config {
 		#[pallet::constant]
-		type MaxFileSize: Get<u32>;		
+		type MaxFileSize: Get<u32>;	
+		#[pallet::constant]
+		type MaxNumOfSudoOracles: Get<u32>;
+		#[pallet::constant]
+		type MaxNumOfNonSudoOracles: Get<u32>;	
 		type WeightInfo: WeightInfo;
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 	}
 
-	
 	#[pallet::storage]
 	#[pallet::getter(fn get_oracle_sudo)]
 	pub type SudoOraclesStore<T> =
@@ -85,6 +88,8 @@ use frame_support::{
 		InvalidUTF8,
 		InvalidJson,
 		OracleNotExist,
+		MaxNumOfSudoOraclesReached,
+		MaxNumOfNonSudoOraclesReached,
 		CallerNotAnOracle,
 		OracleRegisteredAlready,
 		CallerNotRootOrSudoOracle,
@@ -115,14 +120,32 @@ use frame_support::{
 			<SudoOraclesStore<T>>::get().contains(oracle)
 		}
 
-		fn store_oracle(oracle: &<T as frame_system::Config>::AccountId, is_sudo: bool) {
+		fn store_oracle(oracle: &<T as frame_system::Config>::AccountId, is_sudo: bool) -> DispatchResult{
 			let fn_mutate = |oracles: &mut Vec<<T as frame_system::Config>::AccountId>| {
 				oracles.push(oracle.clone())
 			};
 
 			match is_sudo {
-				true => <SudoOraclesStore<T>>::mutate(fn_mutate),
-				false => <NonSudoOraclesStore<T>>::mutate(fn_mutate),
+				true => {
+					let max_num_of_sudo_oracles = T::MaxNumOfSudoOracles::get();
+					let num_of_sudo_oracles_stored = <SudoOraclesStore<T>>::decode_len().unwrap_or_default() as u32;
+					if max_num_of_sudo_oracles > num_of_sudo_oracles_stored {
+						<SudoOraclesStore<T>>::mutate(fn_mutate);
+						return Ok(());
+					} 
+					Err(Error::<T>::MaxNumOfSudoOraclesReached.into())
+				},
+
+				false => {
+					let max_num_of_non_sudo_oracles = T::MaxNumOfNonSudoOracles::get();
+					let num_of_non_sudo_oracles_stored = <NonSudoOraclesStore<T>>::decode_len().unwrap_or_default() as u32;
+
+					if max_num_of_non_sudo_oracles > num_of_non_sudo_oracles_stored {
+						<NonSudoOraclesStore<T>>::mutate(fn_mutate);
+						return Ok(());
+					} 
+					Err(Error::<T>::MaxNumOfNonSudoOraclesReached.into())
+				},
 			}
 		}
 
@@ -240,7 +263,7 @@ use frame_support::{
 			}
 
 			if is_root || Self::is_sudo_oracle(&acc_id) {
-				Self::store_oracle(&oracle, is_sudo_oracle);
+				let _ = Self::store_oracle(&oracle, is_sudo_oracle);
 			} else {
 				return Err(Error::<T>::CallerNotRootOrSudoOracle.into())
 			}

@@ -1600,10 +1600,18 @@ impl frame_benchmarking_pallet_pov::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 }
 
+parameter_types! {
+	pub const MaxFileSize: u32 = 1024000;
+	pub const MaxNumOfSudoOracles: u32 = 5;
+	pub const MaxNumOfNonSudoOracles: u32 = 100;
+}
+
 impl pallet_esg::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
-	type MaxFileSize = ConstU32<1024000>;
-	type WeightInfo = pallet_esg::weights::SubstrateWeight<Runtime>;
+	type MaxFileSize = MaxFileSize;
+	type MaxNumOfSudoOracles = MaxNumOfSudoOracles;
+	type MaxNumOfNonSudoOracles = MaxNumOfNonSudoOracles;
+	type WeightInfo = pallet_esg::weights::SubstrateWeightInfo<Runtime>;
 }
 
 pub struct FindAuthorTruncated<F>(PhantomData<F>);
