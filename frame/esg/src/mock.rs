@@ -14,10 +14,9 @@ use sp_runtime::{
 		IdentityLookup
 	},
 };
-use frame_support::traits::{
-	ConstU16, 
-	ConstU32, 
-	ConstU64, 
+use frame_support::{
+	parameter_types, 
+	traits::{ConstU16, ConstU32, ConstU64}
 };
 use sp_core::{
 	H160, 
@@ -64,10 +63,18 @@ impl system::Config for Test {
 	type Block = Block;
 }
 
-impl pallet_esg::Config for Test {
+parameter_types! {
+	pub const MaxFileSize: u32 = 1024000;
+	pub const MaxNumOfSudoOracles: u32 = 5;
+	pub const MaxNumOfNonSudoOracles: u32 = 100;
+}
+
+impl pallet_esg::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
-	type MaxFileSize = ConstU32<1024000>;
-	type WeightInfo = ();
+	type MaxFileSize = MaxFileSize;
+	type MaxNumOfSudoOracles = MaxNumOfSudoOracles;
+	type MaxNumOfNonSudoOracles = MaxNumOfNonSudoOracles;
+	type WeightInfo =();
 }
 
 pub fn new_test_ext() -> sp_io::TestExternalities {
