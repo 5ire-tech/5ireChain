@@ -5,7 +5,7 @@ members = [
 	"runtime/firechain-qa-runtime",
 	"runtime/firechain-mainnet-runtime",
 	"runtime/firechain-thunder-runtime"
-]
+, "precompiles/batch"]
 resolver = "2"
 
 [workspace.package]
@@ -39,6 +39,12 @@ scale-info = { version = "2.9.0", default-features = false, features = ["derive"
 serde = { version = "1.0", default-features = false, features = ["derive", "alloc"] }
 serde_json = "1.0"
 tokio = "1.29.1"
+num_enum = { version = "0.5.3", default-features = false }
+paste = "1.0.6"
+slices = "0.2.0"
+derive_more = "0.99"
+sha3 = { version = "0.10", default-features = false }
+
 # Substrate Client
 sc-basic-authorship = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
 sc-block-builder = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
@@ -213,17 +219,23 @@ fp-evm = { version = "3.0.0-dev", git = "https://github.com/polkadot-evm/frontie
 fp-rpc = { version = "3.0.0-dev", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
 fp-self-contained = { version = "1.0.0-dev", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
 fp-storage = { version = "2.0.0", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
+
 # Frontier FRAME
 pallet-base-fee = { version = "1.0.0", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
 pallet-dynamic-fee = { version = "4.0.0-dev", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
 pallet-ethereum = { version = "4.0.0-dev", path = "frame/ethereum", default-features = false }
 pallet-evm = { version = "6.0.0-dev", path = "frame/evm", default-features = false }
 pallet-evm-chain-id = { version = "1.0.0-dev", git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
+pallet-hotfix-sufficients = { version = "1.0.0", path = "frame/hotfix-sufficients", default-features = false }
+
+## Precompile 
 pallet-evm-precompile-modexp = { version = "2.0.0-dev", path = "frame/evm/precompile/modexp", default-features = false }
 pallet-evm-precompile-sha3fips = { version = "2.0.0-dev", path = "frame/evm/precompile/sha3fips", default-features = false }
 pallet-evm-precompile-simple = { version = "2.0.0-dev", path = "frame/evm/precompile/simple", default-features = false }
 pallet-evm-test-vector-support = { version = "1.0.0-dev", path = "frame/evm/test-vector-support" }
-pallet-hotfix-sufficients = { version = "1.0.0", path = "frame/hotfix-sufficients", default-features = false }
+pallet-evm-precompile-batch = { path = "precompiles/batch", default-features = false }
+precompile-utils = { git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
+
 # Firechain Runtine
 firechain-qa-runtime = { path = "runtime/firechain-qa-runtime", default-features = false }
 firechain-mainnet-runtime = { path = "runtime/firechain-mainnet-runtime", default-features = false }
