@@ -130,6 +130,7 @@ pallet-evm-chain-id = { workspace = true }
 pallet-evm-precompile-modexp = { workspace = true }
 pallet-evm-precompile-sha3fips = { workspace = true }
 pallet-evm-precompile-simple = { workspace = true }
+pallet-evm-precompile-batch = {workspace = true }
 pallet-hotfix-sufficients = { workspace = true }
 
 [build-dependencies]
@@ -234,6 +235,7 @@ std = [
 	'pallet-evm-precompile-sha3fips/std',
 	"pallet-evm-precompile-simple/std",
 	"firechain-runtime-core-primitives/std",
+	"pallet-evm-precompile-batch/std",
 ]
 runtime-benchmarks = [
 	"frame-benchmarking/runtime-benchmarks",

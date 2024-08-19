@@ -2656,6 +2656,7 @@ dependencies = [
  "pallet-ethereum",
  "pallet-evm 6.0.0-dev",
  "pallet-evm-chain-id",
+ "pallet-evm-precompile-batch",
  "pallet-evm-precompile-modexp",
  "pallet-evm-precompile-sha3fips",
  "pallet-evm-precompile-simple",
