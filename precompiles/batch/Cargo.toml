@@ -37,6 +37,7 @@ parity-scale-codec = { version = "3.6.1", default-features = false, features = [
 precompile-utils = { workspace = true, features = ["std", "testing"] }
 scale-info = { workspace = true, features = ["derive", "std"] }
 sp-runtime = { workspace = true, features = ["std"] }
+pallet-authorship ={ workspace= true, default-features = false}
 
 [features]
 default = ["std"]
