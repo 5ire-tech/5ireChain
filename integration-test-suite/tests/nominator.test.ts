@@ -1,8 +1,7 @@
 import { expect } from "chai";
 import { BLOCK_TIME, alith, charleth } from "../utils/constants";
 import { killNodes, polkadotApi, spawnNodes } from "../utils/util";
-import { Keyring } from "@polkadot/api";
-import { sleep, waitForEvent, waitNfinalizedBlocks } from "../utils/setup";
+import { waitForEvent, waitNfinalizedBlocks } from "../utils/setup";
 
 describe("Nominator tests", function () {
   this.timeout(300 * BLOCK_TIME);

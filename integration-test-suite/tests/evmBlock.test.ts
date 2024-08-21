@@ -1,5 +1,5 @@
 import { spawnNodeForTestEVM, killNodeForTestEVM } from "../utils/util";
-import { BLOCK_TIME, ETH_BLOCK_GAS_LIMIT, SECONDS } from "../utils/constants";
+import { BLOCK_TIME, ETH_BLOCK_GAS_LIMIT } from "../utils/constants";
 import { expect } from "chai";
 import { step } from "mocha-steps";
 import Web3 from "web3";

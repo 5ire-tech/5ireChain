@@ -17,7 +17,6 @@ import {
 import { sleep } from "../utils/setup";
 
 import { expect } from "chai";
-import { step } from "mocha-steps";
 let web3: Web3;
 
 const TRANSFER_VALUE = "1";

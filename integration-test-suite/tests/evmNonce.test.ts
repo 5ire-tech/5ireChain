@@ -8,7 +8,6 @@ import {
 import {
   customRequest,
   killNodeForTestEVM,
-  polkadotApi,
   spawnNodeForTestEVM,
 } from "../utils/util";
 import { sleep } from "../utils/setup";

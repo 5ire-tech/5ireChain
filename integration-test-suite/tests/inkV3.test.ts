@@ -4,8 +4,7 @@ import { killNodes, polkadotApi, spawnNodes } from "../utils/util";
 import { CodePromise, Abi, ContractPromise } from "@polkadot/api-contract";
 import abiFile from "./contracts/psp22_token.json";
 import { WeightV2 } from "@polkadot/types/interfaces";
-import { sleep, waitForEvent, waitNfinalizedBlocks } from "../utils/setup";
-import { BigNumber } from "ethers";
+import { waitForEvent, waitNfinalizedBlocks } from "../utils/setup";
 
 let contractAddress: string;
 let contractAbi: Abi;

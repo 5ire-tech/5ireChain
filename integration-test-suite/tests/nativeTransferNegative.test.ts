@@ -1,11 +1,6 @@
 import { expect } from "chai";
 import { BLOCK_TIME, alith, baltathar } from "../utils/constants";
-import {
-  killNodes,
-  polkadotApi as api,
-  polkadotApi,
-  spawnNodes,
-} from "../utils/util";
+import { killNodes, polkadotApi, spawnNodes } from "../utils/util";
 
 describe("Negative Native token tests", function () {
   this.timeout(300 * BLOCK_TIME);

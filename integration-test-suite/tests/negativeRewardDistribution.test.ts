@@ -6,7 +6,6 @@ import {
   spawnNodes,
   polkadotApi,
 } from "../utils/util";
-import { Keyring } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { waitForEvent, waitNfinalizedBlocks } from "../utils/setup";
 

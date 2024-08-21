@@ -1,9 +1,7 @@
-import type { Codec } from "@polkadot/types-codec/types";
 import { ApiPromise, Keyring } from "@polkadot/api";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import child from "child_process";
-import { mnemonicGenerate } from "@polkadot/util-crypto";
-import { WeightV2 } from "@polkadot/types/interfaces";
+
 import { DetectCodec } from "@polkadot/types/types/detect";
 import { alith } from "./constants";
 
