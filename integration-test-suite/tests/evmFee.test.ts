@@ -37,7 +37,7 @@ describe("EVM related Fee using web3js/ethersjs", function () {
 
     const gasPrice = await web3.eth.getGasPrice();
     // we configure in runtime 
-    expect(BigInt(gasPrice)).to.eq(250000000000n);
+    expect(BigInt(gasPrice)).to.eq(50000000000n);
   });
 
   it("Fee History should return error on non-existent blocks", async function () {

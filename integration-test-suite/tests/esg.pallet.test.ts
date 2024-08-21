@@ -142,7 +142,7 @@ async function registerOracleFailedCallerNotRootOrSudoOracle( bob: KeyringPair, 
         const data = JSON.stringify(result.events);
         const dataStr = JSON.parse(data);
         const filteredErrorData = dataStr.filter((item: any) => item.event.index === "0x0001");
-        expect(filteredErrorData[0].event.data[0].module.error).to.equal("0x06000000");
+        expect(filteredErrorData[0].event.data[0].module.error).to.equal("0x08000000");
         console.log(`Error found: ${filteredErrorData[0].event.data[0].module.error}`);
 
       }
@@ -171,7 +171,7 @@ async function registerOracleFailedOracleRegisteredAlready( alice: KeyringPair, 
         const data = JSON.stringify(result.events);
         const dataStr = JSON.parse(data)
         const filteredErrorData = dataStr.filter((item: any) => item.event.index === "0x1300");
-        expect(filteredErrorData[0].event.data[0].err.module.error).to.equal("0x05000000");
+        expect(filteredErrorData[0].event.data[0].err.module.error).to.equal("0x07000000");
         console.log(`Error found: ${filteredErrorData[0].event.data[0].err.module.error}`);
 
       }
@@ -275,7 +275,7 @@ async function insertEsgScoresCallerNotAnOracle(
         console.log(data);
         const dataStr = JSON.parse(data);
         const filteredErrorData = dataStr.filter((item: any) => item.event.index === "0x0001");
-        expect(filteredErrorData[0].event.data[0].module.error).to.equal("0x04000000");
+        expect(filteredErrorData[0].event.data[0].module.error).to.equal("0x06000000");
         console.log(`Error found: ${filteredErrorData[0].event.data[0].module.error}`);
 
       }
@@ -425,7 +425,7 @@ async function registerOracleFailedOracleRegisteredAlreadyForNonSudo( alice: Key
         const data = JSON.stringify(result.events);
         const dataStr = JSON.parse(data)
         const filteredErrorData = dataStr.filter((item: any) => item.event.index === "0x1300");
-        expect(filteredErrorData[0].event.data[0].err.module.error).to.equal("0x05000000");
+        expect(filteredErrorData[0].event.data[0].err.module.error).to.equal("0x07000000");
         console.log(`Error found: ${filteredErrorData[0].event.data[0].err.module.error}`);
 
       }
