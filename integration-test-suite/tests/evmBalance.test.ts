@@ -1,7 +1,7 @@
 import Web3 from "web3";
 import {
   BLOCK_TIME,
-  EXISTENTIAL_DEPOSIT,  
+  EXISTENTIAL_DEPOSIT,
   GENESIS_ACCOUNT_BALANCE,
   SECONDS,
   GENESIS_ACCOUNTS,
@@ -38,7 +38,7 @@ describe("EVM related Balance using web3js/ethersjs", function () {
           maxAttempts: 5,
           onTimeout: false,
         },
-      })
+      }),
     );
     await sleep(20 * SECONDS);
   });
@@ -46,18 +46,17 @@ describe("EVM related Balance using web3js/ethersjs", function () {
     await killNodeForTestEVM();
   });
   step("genesis balance is setup correctly", async function () {
-    for(let address of GENESIS_ACCOUNTS){
-      expect(await web3.eth.getBalance(address)).to.equal(GENESIS_ACCOUNT_BALANCE);
+    for (let address of GENESIS_ACCOUNTS) {
+      expect(await web3.eth.getBalance(address)).to.equal(
+        GENESIS_ACCOUNT_BALANCE,
+      );
       console.log(address + " has expected balance");
-    };
+    }
   });
 
   step("balance to be updated after transfer", async function () {
     this.timeout(40000);
-    const nonce = await web3.eth.getTransactionCount(
-      alith.address,
-      "latest"
-    );
+    const nonce = await web3.eth.getTransactionCount(alith.address, "latest");
     const INITIAL_ALICE_BALANCE = await web3.eth.getBalance(alith.address);
     console.log(INITIAL_ALICE_BALANCE);
     const gasPrice = await web3.eth.getGasPrice();
@@ -70,7 +69,7 @@ describe("EVM related Balance using web3js/ethersjs", function () {
         gas: 21000,
         nonce,
       },
-      ALITH_PRIVATE_KEY
+      ALITH_PRIVATE_KEY,
     );
     const rep = await customRequest(web3, "eth_sendRawTransaction", [
       tx.rawTransaction,
@@ -91,15 +90,12 @@ describe("EVM related Balance using web3js/ethersjs", function () {
     //   expectedAliceBalance
     // );
     expect(await web3.eth.getBalance(TEST_ACCOUNT)).to.equal(
-      expectedTestBalance
+      expectedTestBalance,
     );
   });
 
   step("gas price too low", async function () {
-    const nonce = await web3.eth.getTransactionCount(
-      alith.address,
-      "latest"
-    );
+    const nonce = await web3.eth.getTransactionCount(alith.address, "latest");
 
     let gasPrice = await web3.eth.getGasPrice();
     const tx = await web3.eth.accounts.signTransaction(
@@ -111,21 +107,18 @@ describe("EVM related Balance using web3js/ethersjs", function () {
         gas: "0x100000",
         nonce: nonce,
       },
-      ALITH_PRIVATE_KEY
+      ALITH_PRIVATE_KEY,
     );
     let result = await customRequest(web3, "eth_sendRawTransaction", [
       tx.rawTransaction,
     ]);
     expect(result?.error?.message).to.be.equal(
-      "gas price less than block base fee"
+      "gas price less than block base fee",
     );
   });
 
   step("balance insufficient", async function () {
-    const nonce = await web3.eth.getTransactionCount(
-      alith.address,
-      "latest"
-    );
+    const nonce = await web3.eth.getTransactionCount(alith.address, "latest");
     let gasPrice = await web3.eth.getGasPrice();
     let testAccountBalance = await web3.eth.getBalance(TEST_ACCOUNT);
     const tx = await web3.eth.accounts.signTransaction(
@@ -137,13 +130,13 @@ describe("EVM related Balance using web3js/ethersjs", function () {
         gas: "0x100000",
         nonce: nonce,
       },
-      TEST_ACCOUNT_PRIVATE_KEY
+      TEST_ACCOUNT_PRIVATE_KEY,
     );
     let result = await customRequest(web3, "eth_sendRawTransaction", [
       tx.rawTransaction,
     ]);
     expect(result?.error?.message).to.be.equal(
-      "insufficient funds for gas * price + value"
+      "insufficient funds for gas * price + value",
     );
   });
 });

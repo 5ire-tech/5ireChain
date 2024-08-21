@@ -38,7 +38,7 @@ describe("EVM related Gas using web3js/ethersjs", function () {
           maxAttempts: 5,
           onTimeout: false,
         },
-      })
+      }),
     );
     await sleep(3 * SECONDS);
   });
@@ -58,7 +58,7 @@ describe("EVM related Gas using web3js/ethersjs", function () {
   it("estimate gas for contract call", async function () {
     const erc20Contract = new web3.eth.Contract(
       ERC20_ABI,
-      TEST_CONTRACT_ADDRESS
+      TEST_CONTRACT_ADDRESS,
     );
 
     let amount = web3.utils.toWei(TRANSFER_VALUE, "ether");
@@ -99,7 +99,7 @@ describe("EVM related Gas using web3js/ethersjs", function () {
         gas: ETH_BLOCK_GAS_LIMIT - 1,
         gasPrice,
       },
-      GENESIS_ACCOUNT_0_PRIVATE_KEY
+      GENESIS_ACCOUNT_0_PRIVATE_KEY,
     );
     const createReceipt = await customRequest(web3, "eth_sendRawTransaction", [
       tx.rawTransaction,
@@ -125,7 +125,7 @@ describe("EVM related Gas using web3js/ethersjs", function () {
         gas: ETH_BLOCK_GAS_LIMIT,
         gasPrice,
       },
-      GENESIS_ACCOUNT_0_PRIVATE_KEY
+      GENESIS_ACCOUNT_0_PRIVATE_KEY,
     );
     const createReceipt = await customRequest(web3, "eth_sendRawTransaction", [
       tx.rawTransaction,
@@ -151,16 +151,17 @@ describe("EVM related Gas using web3js/ethersjs", function () {
         gas: ETH_BLOCK_GAS_LIMIT + 1,
         gasPrice,
       },
-      GENESIS_ACCOUNT_0_PRIVATE_KEY
+      GENESIS_ACCOUNT_0_PRIVATE_KEY,
     );
     const createReceipt = await customRequest(web3, "eth_sendRawTransaction", [
       tx.rawTransaction,
     ]);
-    expect((createReceipt as any).error.message).to.equal("exceeds block gas limit");
+    expect((createReceipt as any).error.message).to.equal(
+      "exceeds block gas limit",
+    );
   });
-  
+
   it("EVM related Invalid opcode Estimate Gas using web3js/ethersjs", async function () {
-    
     const tx = await web3.eth.accounts.signTransaction(
       {
         from: GENESIS_ACCOUNTS[0],
@@ -168,19 +169,21 @@ describe("EVM related Gas using web3js/ethersjs", function () {
         value: "0x00",
         gas: "0x100000",
       },
-      GENESIS_ACCOUNT_0_PRIVATE_KEY
+      GENESIS_ACCOUNT_0_PRIVATE_KEY,
     );
-    const txHash = await customRequest(web3, "eth_sendRawTransaction", [tx.rawTransaction]);
+    const txHash = await customRequest(web3, "eth_sendRawTransaction", [
+      tx.rawTransaction,
+    ]);
     await sleep(3000);
-    contractAddess = (await web3.eth.getTransactionReceipt(txHash.result)).contractAddress;
+    contractAddess = (await web3.eth.getTransactionReceipt(txHash.result))
+      .contractAddress;
     expect(contractAddess).to.not.null;
 
     let estimate = await web3.eth.estimateGas({
-			from: GENESIS_ACCOUNTS[0],
-			to: contractAddess,
-			data: "0x28b5e32b", // selector for the contract's `call` method
-		});
-		expect(estimate).to.equal(85699);
+      from: GENESIS_ACCOUNTS[0],
+      to: contractAddess,
+      data: "0x28b5e32b", // selector for the contract's `call` method
+    });
+    expect(estimate).to.equal(85699);
   });
-
 });

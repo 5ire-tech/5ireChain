@@ -1,7 +1,12 @@
 import { expect } from "chai";
 import { step } from "mocha-steps";
 import Web3 from "web3";
-import { ALITH_PRIVATE_KEY, BLOCK_TIME, SECONDS, alith } from "../utils/constants";
+import {
+  ALITH_PRIVATE_KEY,
+  BLOCK_TIME,
+  SECONDS,
+  alith,
+} from "../utils/constants";
 import {
   customRequest,
   killNodeForTestEVM,
@@ -13,8 +18,6 @@ let web3: Web3;
 
 const ERC20_ABI = require("./contracts/MyToken.json").abi;
 const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
-
-
 
 async function sendTransaction(web3: Web3) {
   const erc20Contract = new web3.eth.Contract(ERC20_ABI);
@@ -35,7 +38,7 @@ async function sendTransaction(web3: Web3) {
       gasPrice,
       gas,
     },
-    ALITH_PRIVATE_KEY
+    ALITH_PRIVATE_KEY,
   );
   await customRequest(web3, "eth_sendRawTransaction", [tx.rawTransaction]);
   return tx;
@@ -57,7 +60,7 @@ describe("EVM related Subscription using web3js/ethersjs", function () {
           maxAttempts: 5,
           onTimeout: false,
         },
-      })
+      }),
     );
     await sleep(40 * SECONDS);
   });
@@ -74,7 +77,7 @@ describe("EVM related Subscription using web3js/ethersjs", function () {
   step("should subscribe", async function () {
     subscription = web3.eth.subscribe(
       "newBlockHeaders",
-      function (error, result) {}
+      function (error, result) {},
     );
 
     let connected = false;
@@ -95,7 +98,7 @@ describe("EVM related Subscription using web3js/ethersjs", function () {
   step("should get newHeads stream", async function (done) {
     subscription = web3.eth.subscribe(
       "newBlockHeaders",
-      function (error, result) {}
+      function (error, result) {},
     );
     let data = null;
     let dataResolve: any = null;
@@ -114,7 +117,7 @@ describe("EVM related Subscription using web3js/ethersjs", function () {
   step("should get newPendingTransactions stream", async function (done) {
     subscription = web3.eth.subscribe(
       "pendingTransactions",
-      function (error, result) {}
+      function (error, result) {},
     );
 
     await new Promise<void>((resolve) => {

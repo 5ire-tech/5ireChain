@@ -1,17 +1,17 @@
-import { expect } from 'chai';
-import { BLOCK_TIME } from '../utils/constants';
-import {killNodes, polkadotApi, spawnNodes} from "../utils/util";
+import { expect } from "chai";
+import { BLOCK_TIME } from "../utils/constants";
+import { killNodes, polkadotApi, spawnNodes } from "../utils/util";
 
-describe('Setup for test', function () {
+describe("Setup for test", function () {
   this.timeout(300 * BLOCK_TIME);
 
   before(async () => {
-    await spawnNodes()
+    await spawnNodes();
   });
 
   // This test checks if 5irechain node starts up properly
   // and
-  it('should startup node', async () => {
+  it("should startup node", async () => {
     console.log("Beginning first test");
 
     // Gets the current ethereum block
@@ -22,12 +22,12 @@ describe('Setup for test', function () {
   });
 
   // This test is for block production
-  it('tests block production', async () => {
+  it("tests block production", async () => {
     await testBlockProduction();
   });
 
   // This test is for block finalization
-  it('tests block finalization', async () => {
+  it("tests block finalization", async () => {
     await testBlockFinalization();
   });
 
@@ -35,7 +35,6 @@ describe('Setup for test', function () {
     await killNodes();
   });
 });
-
 
 async function testBlockProduction() {
   let previousBlockHash: `0x${string}` | null = null;
@@ -45,7 +44,9 @@ async function testBlockProduction() {
       const blockNumber = header.number.toNumber();
       const blockHash = header.hash.toHex();
 
-      console.log(`New block produced - Block Number: ${blockNumber}, Block Hash: ${blockHash}`);
+      console.log(
+        `New block produced - Block Number: ${blockNumber}, Block Hash: ${blockHash}`,
+      );
 
       expect(blockHash).not.null;
       expect(blockHash).not.undefined;
@@ -57,7 +58,7 @@ async function testBlockProduction() {
 
     await new Promise((resolve) => setTimeout(resolve, 60000));
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Error:", error);
   }
 }
 
@@ -74,7 +75,9 @@ async function testBlockFinalization() {
       const blockNumber = header.number.toNumber();
       const blockHash = header.hash.toHex();
 
-      console.log(`Block finalized - Block Number: ${blockNumber}, Block Hash: ${blockHash}`);
+      console.log(
+        `Block finalized - Block Number: ${blockNumber}, Block Hash: ${blockHash}`,
+      );
 
       expect(blockHash).not.null;
       expect(blockHash).not.undefined;
@@ -86,6 +89,6 @@ async function testBlockFinalization() {
 
     await new Promise((resolve) => setTimeout(resolve, 60000));
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Error:", error);
   }
 }

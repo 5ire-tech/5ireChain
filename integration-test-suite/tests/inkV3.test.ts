@@ -60,7 +60,7 @@ const deployContract = async () => {
     tokenSupply,
     tokenName,
     tokenSymbol,
-    tokenDecimal
+    tokenDecimal,
   );
   let address: string;
 
@@ -80,7 +80,7 @@ const deployContract = async () => {
           console.log(`error occurred ${dispatchError}`);
           reject(dispatchError);
         }
-      }
+      },
     );
   });
 
@@ -96,11 +96,11 @@ const deployContract = async () => {
 const executeContract = async () => {
   const refTime = polkadotApi.registry.createType(
     "Compact<u64>",
-    BigInt(10000000000)
+    BigInt(10000000000),
   );
   const proofSize = polkadotApi.registry.createType(
     "Compact<u64>",
-    BigInt(10000000000)
+    BigInt(10000000000),
   );
 
   const gasLimitForCallAndQuery = polkadotApi.registry.createType(
@@ -108,14 +108,14 @@ const executeContract = async () => {
     {
       refTime: refTime,
       proofSize: proofSize,
-    }
+    },
   );
   const storageDepositLimitForCallAndQuery = null;
 
   const contract = new ContractPromise(
     polkadotApi,
     contractAbi,
-    contractAddress
+    contractAddress,
   );
   const res1 = await contract.query["psp22::balanceOf"](
     alith.publicKey,
@@ -124,7 +124,7 @@ const executeContract = async () => {
       gasLimit: gasLimitForCallAndQuery,
       storageDepositLimit: storageDepositLimitForCallAndQuery,
     },
-    baltathar.publicKey
+    baltathar.publicKey,
   );
   expect(res1.output?.eq(0)).true;
 
@@ -138,7 +138,7 @@ const executeContract = async () => {
     },
     baltathar.publicKey,
     400,
-    []
+    [],
   );
 
   console.log(`trying to execute transaction`);
@@ -149,24 +149,24 @@ const executeContract = async () => {
       console.log(`execute contract transfer transaction is ${result.status}`);
       if (result.status.isInBlock) {
         console.log(
-          `execute contract transfer transaction included at blockHash ${result.status.asInBlock}`
+          `execute contract transfer transaction included at blockHash ${result.status.asInBlock}`,
         );
         console.log(
-          `execute contract transfer transaction waiting for finalization... (can take a minute)`
+          `execute contract transfer transaction waiting for finalization... (can take a minute)`,
         );
       } else if (result.status.isFinalized) {
         console.log(
-          `execute contract transfer transaction events are ${result.events.length}`
+          `execute contract transfer transaction events are ${result.events.length}`,
         );
         console.log(
-          `execute contract transfer transaction finalized at blockHash ${result.status.asFinalized}`
+          `execute contract transfer transaction finalized at blockHash ${result.status.asFinalized}`,
         );
         result.events.forEach(({ event: { data, method, section }, phase }) => {
           console.log("\t", phase.toString(), `: ${section}.${method}`);
         });
         unsub();
       }
-    }
+    },
   );
   // await waitForEvent(polkadotApi, "contracts", "ExtrinsicSuccess");
   await waitNfinalizedBlocks(polkadotApi, 4, 60000);
@@ -178,7 +178,7 @@ const executeContract = async () => {
       gasLimit: gasLimitForCallAndQuery,
       storageDepositLimit: storageDepositLimitForCallAndQuery,
     },
-    baltathar.publicKey
+    baltathar.publicKey,
   );
 
   // Expect Bobs balance to have increased

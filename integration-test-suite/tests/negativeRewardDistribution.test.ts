@@ -10,7 +10,6 @@ import { Keyring } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { waitForEvent, waitNfinalizedBlocks } from "../utils/setup";
 
-
 // We should test within 5 eras  ( 200 blocks)
 
 describe("Negative Reward Distribution tests", function () {
@@ -21,15 +20,13 @@ describe("Negative Reward Distribution tests", function () {
   });
 
   it("Negative test Reward Distribution with NoSuchValidator  ", async () => {
-
     // wait to new era
     await waitNfinalizedBlocks(polkadotApi, 45, 1000);
 
-    // Payout fail with invalid validator 
+    // Payout fail with invalid validator
     await payoutInValidValidator(baltathar);
-    
-    await waitNfinalizedBlocks(polkadotApi, 2, 1000);
 
+    await waitNfinalizedBlocks(polkadotApi, 2, 1000);
   });
 
   it("Negative test Reward Distribution with Already Claimed ", async () => {
@@ -51,7 +48,6 @@ describe("Negative Reward Distribution tests", function () {
   });
 });
 
-
 // Payout Transaction
 // alice : stash account
 // alice_stash : controller account
@@ -68,19 +64,19 @@ async function payoutSuccess(alith: KeyringPair) {
         console.log(`Payout transaction is ${result.status}`);
         if (result.status.isInBlock) {
           console.log(
-            `Payout Transaction included at blockHash ${result.status.asInBlock}`
+            `Payout Transaction included at blockHash ${result.status.asInBlock}`,
           );
           console.log(`Waiting for finalization... (can take a minute)`);
         } else if (result.status.isFinalized) {
           unsub();
           resolve({});
         }
-      }
+      },
     );
   });
 }
 
-// Alice is is not validator 
+// Alice is is not validator
 async function payoutInValidValidator(baltathar: KeyringPair) {
   console.log(`\n Payout InValid Validator`);
   const payout = await api.tx.reward.getRewards(baltathar.address);
@@ -93,7 +89,7 @@ async function payoutInValidValidator(baltathar: KeyringPair) {
         console.log(`Payout transaction is ${result.status}`);
         if (result.status.isInBlock) {
           console.log(
-            `Payout Transaction included at blockHash ${result.status.asInBlock}`
+            `Payout Transaction included at blockHash ${result.status.asInBlock}`,
           );
           console.log(`Waiting for finalization... (can take a minute)`);
         } else if (result.status.isFinalized) {
@@ -101,24 +97,22 @@ async function payoutInValidValidator(baltathar: KeyringPair) {
           const dataStr = JSON.parse(data);
           if (result.dispatchError) {
             const filteredData = dataStr.filter(
-              (item: any) => item.event.index === "0x0001"
+              (item: any) => item.event.index === "0x0001",
             );
             expect(filteredData[0].event.data[0].module.error).to.equal(
-              "0x00000000"
+              "0x00000000",
             ); // NoSuchValidator
           }
 
           unsub();
           resolve({});
         }
-      }
+      },
     );
   });
 }
 
-async function payoutAlreadyClaimed(
-  alith: KeyringPair,
-) {
+async function payoutAlreadyClaimed(alith: KeyringPair) {
   console.log(`\n Payout fail due to AlreadyClaimed`);
   const payout = await api.tx.reward.getRewards(alith.address);
 
@@ -130,7 +124,7 @@ async function payoutAlreadyClaimed(
         console.log(`Payout transaction is ${result.status}`);
         if (result.status.isInBlock) {
           console.log(
-            `Payout Transaction included at blockHash ${result.status.asInBlock}`
+            `Payout Transaction included at blockHash ${result.status.asInBlock}`,
           );
           console.log(`Waiting for finalization... (can take a minute)`);
         } else if (result.status.isFinalized) {
@@ -138,18 +132,18 @@ async function payoutAlreadyClaimed(
           const dataStr = JSON.parse(data);
           if (result.dispatchError) {
             const filteredData = dataStr.filter(
-              (item: any) => item.event.index === "0x0001"
+              (item: any) => item.event.index === "0x0001",
             );
 
             expect(filteredData[0].event.data[0].module.error).to.equal(
-              "0x00000000"
+              "0x00000000",
             ); // AlreadyClaimed
           }
 
           unsub();
           resolve({});
         }
-      }
+      },
     );
   });
 }

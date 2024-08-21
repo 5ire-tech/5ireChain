@@ -23,7 +23,6 @@ const TEST_ACCOUNT_PRIVATE_KEY =
 const TRANFER_VALUE = "1"; // 1 5IRE must be higher than ExistentialDeposit
 //const GAS_PRICE = "0x3B9ACA00"; // 1000000000
 
-
 describe("EVM related Nonce using web3js/ethersjs", function () {
   this.timeout(100 * BLOCK_TIME);
   before(async () => {
@@ -37,7 +36,7 @@ describe("EVM related Nonce using web3js/ethersjs", function () {
           maxAttempts: 5,
           onTimeout: false,
         },
-      })
+      }),
     );
     await sleep(3 * SECONDS);
   });
@@ -48,9 +47,9 @@ describe("EVM related Nonce using web3js/ethersjs", function () {
   step("get nonce", async function () {
     this.timeout(20000);
 
-    expect(
-      await web3.eth.getTransactionCount(alith.address, "latest")
-    ).to.eq(0);
+    expect(await web3.eth.getTransactionCount(alith.address, "latest")).to.eq(
+      0,
+    );
     const gasPrice = await web3.eth.getGasPrice();
     const tx = await web3.eth.accounts.signTransaction(
       {
@@ -60,15 +59,15 @@ describe("EVM related Nonce using web3js/ethersjs", function () {
         gasPrice: web3.utils.toHex(gasPrice),
         gas: "0x100000",
       },
-      ALITH_PRIVATE_KEY
+      ALITH_PRIVATE_KEY,
     );
     const rep = await customRequest(web3, "eth_sendRawTransaction", [
       tx.rawTransaction,
     ]);
     await sleep(3 * SECONDS);
-    expect(
-      await web3.eth.getTransactionCount(alith.address, "latest")
-    ).to.eq(1);
+    expect(await web3.eth.getTransactionCount(alith.address, "latest")).to.eq(
+      1,
+    );
   });
 
   step("stalled nonce", async function () {
@@ -82,7 +81,7 @@ describe("EVM related Nonce using web3js/ethersjs", function () {
         gas: "0x100000",
         nonce: 0,
       },
-      ALITH_PRIVATE_KEY
+      ALITH_PRIVATE_KEY,
     );
     let result = await customRequest(web3, "eth_sendRawTransaction", [
       tx.rawTransaction,

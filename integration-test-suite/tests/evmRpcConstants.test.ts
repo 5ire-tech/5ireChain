@@ -1,9 +1,6 @@
 import Web3 from "web3";
 import { BLOCK_TIME, CHAIN_ID, SECONDS } from "../utils/constants";
-import {
-  killNodeForTestEVM,
-  spawnNodeForTestEVM,
-} from "../utils/util";
+import { killNodeForTestEVM, spawnNodeForTestEVM } from "../utils/util";
 import { sleep } from "../utils/setup";
 
 import { expect } from "chai";
@@ -23,7 +20,7 @@ describe("EVM related RPC Constants using web3js/ethersjs", function () {
           maxAttempts: 5,
           onTimeout: false,
         },
-      })
+      }),
     );
     await sleep(40 * SECONDS);
   });
@@ -42,5 +39,4 @@ describe("EVM related RPC Constants using web3js/ethersjs", function () {
   it("should have no account", async function () {
     expect(await web3.eth.getAccounts()).to.eql([]);
   });
-
 });
