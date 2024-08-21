@@ -69,7 +69,7 @@ parameter_types! {
 	pub const MaxNumOfNonSudoOracles: u32 = 100;
 }
 
-impl pallet_esg::Config for Runtime {
+impl pallet_esg::Config for Test {
 	type RuntimeEvent = RuntimeEvent;
 	type MaxFileSize = MaxFileSize;
 	type MaxNumOfSudoOracles = MaxNumOfSudoOracles;

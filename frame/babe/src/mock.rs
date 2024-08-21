@@ -275,6 +275,8 @@ impl pallet_esg::Config for Test {
 	type RuntimeEvent = RuntimeEvent;
 	type MaxFileSize = ConstU32<1024000>;
 	type WeightInfo = ();
+	type MaxNumOfSudoOracles =  ConstU32<5>;
+	type MaxNumOfNonSudoOracles = ConstU32<5>;
 }
 
 impl pallet_offences::Config for Test {
