@@ -62,8 +62,8 @@ impl system::Config for Test {
 
 parameter_types! {
 	pub const MaxFileSize: u32 = 1024000;
-	pub const MaxNumOfSudoOracles: u32 = 5;
-	pub const MaxNumOfNonSudoOracles: u32 = 100;
+	pub const MaxNumOfSudoOracles: u32 = 3;
+	pub const MaxNumOfNonSudoOracles: u32 = 2;
 }
 
 impl pallet_esg::Config for Test {
