@@ -1,8 +1,5 @@
-import {
-  spawnNodeForTestEVM,
-  killNodeForTestEVM,
-} from "../utils/util";
-import { BLOCK_TIME, ETH_BLOCK_GAS_LIMIT, SECONDS } from "../utils/constants";
+import { spawnNodeForTestEVM, killNodeForTestEVM } from "../utils/util";
+import { BLOCK_TIME, ETH_BLOCK_GAS_LIMIT } from "../utils/constants";
 import { expect } from "chai";
 import { step } from "mocha-steps";
 import Web3 from "web3";
@@ -12,7 +9,7 @@ describe("EVM related Block using web3js/ethersjs", function () {
 
   before(async () => {
     await spawnNodeForTestEVM();
-    // Create instance web3 
+    // Create instance web3
     web3 = new Web3(
       new Web3.providers.WebsocketProvider("ws://127.0.0.1:9944", {
         reconnect: {
@@ -21,9 +18,8 @@ describe("EVM related Block using web3js/ethersjs", function () {
           maxAttempts: 5,
           onTimeout: false,
         },
-      })
+      }),
     );
-
   });
 
   after(async () => {
@@ -57,7 +53,7 @@ describe("EVM related Block using web3js/ethersjs", function () {
     const block = await web3.eth.getBlock(0);
     expect(block.uncles).to.be.a("array").empty;
     expect(block.sha3Uncles).to.equal(
-      "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347"
+      "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
     );
   });
 
@@ -70,7 +66,7 @@ describe("EVM related Block using web3js/ethersjs", function () {
         transactionsRoot:
           "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
       });
-    }
+    },
   );
   step("get block by hash", async function () {
     const latest_block = await web3.eth.getBlock("latest");

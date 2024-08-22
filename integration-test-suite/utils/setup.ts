@@ -1,14 +1,12 @@
-import type { Codec } from '@polkadot/types-codec/types';
-import { ApiPromise, Keyring } from '@polkadot/api';
-import { SubmittableExtrinsic } from '@polkadot/api/types';
-import child from 'child_process';
-import {mnemonicGenerate} from "@polkadot/util-crypto";
-import {WeightV2} from "@polkadot/types/interfaces";
-import {DetectCodec} from "@polkadot/types/types/detect";
-import { alith } from './constants';
+import { ApiPromise, Keyring } from "@polkadot/api";
+import { SubmittableExtrinsic } from "@polkadot/api/types";
+import child from "child_process";
 
-export const endpoint = 'ws://127.0.0.1:9944';
-export const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
+import { DetectCodec } from "@polkadot/types/types/detect";
+import { alith } from "./constants";
+
+export const endpoint = "ws://127.0.0.1:9944";
+export const ALICE = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
 
 export async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -40,7 +38,7 @@ export const listenOneBlock = async function (api: ApiPromise) {
 export const waitNfinalizedBlocks = async function (
   api: ApiPromise,
   n: number,
-  timeout: number
+  timeout: number,
 ) {
   return new Promise<void>(async (resolve, _reject) => {
     let count = 0;
@@ -66,7 +64,7 @@ export async function fastForward(
   n: number,
   { delayBetweenBlocks }: { delayBetweenBlocks?: number } = {
     delayBetweenBlocks: 5,
-  }
+  },
 ): Promise<void> {
   for (let i = 0; i < n; i++) {
     const createEmpty = true;
@@ -85,7 +83,7 @@ export async function fastForwardTo(
   blockNumber: number,
   { delayBetweenBlocks }: { delayBetweenBlocks?: number } = {
     delayBetweenBlocks: 0,
-  }
+  },
 ): Promise<void> {
   const currentBlockNumber = await api.rpc.chain.getHeader();
   const diff = blockNumber - currentBlockNumber.number.toNumber();
@@ -99,9 +97,15 @@ export async function fastForwardTo(
  */
 export const printValidators = async function (api: ApiPromise) {
   const [accountNonce, now, validators] = await Promise.all([
-    api.query.system.account(ALICE).then((account) => api.registry.createType(`number`, account.toU8a())),
+    api.query.system
+      .account(ALICE)
+      .then((account) => api.registry.createType(`number`, account.toU8a())),
     api.query.timestamp.now(),
-    api.query.session.validators().then((account) => api.registry.createType(`Vec<Address>`, account.toU8a())),
+    api.query.session
+      .validators()
+      .then((account) =>
+        api.registry.createType(`Vec<Address>`, account.toU8a()),
+      ),
   ]);
 
   console.log(`accountNonce(${ALICE}) ${accountNonce}`);
@@ -109,19 +113,19 @@ export const printValidators = async function (api: ApiPromise) {
 
   if (validators && validators.length > 0) {
     const validatorBalances = await Promise.all(
-      validators.map((authorityId) => api.query.system.account(authorityId))
+      validators.map((authorityId) => api.query.system.account(authorityId)),
     );
 
     console.log(
-      'validators',
+      "validators",
       validators.map((authorityId, index) => {
         const balance = validatorBalances[index].toJSON();
         ({
           address: authorityId.toString(),
-          balance: balance?["data"]?["free"]:0:0,
-          nonce: balance?["nonce"]:0,
-        })
-      })
+          balance: balance ? (["data"] ? ["free"] : 0) : 0,
+          nonce: balance ? ["nonce"] : 0,
+        });
+      }),
     );
   }
 };
@@ -145,29 +149,29 @@ const __NODE_STATE: {
 type StartOption = {
   tmp: boolean;
   printLogs: boolean;
-  chain?: 'dev' | 'local';
+  chain?: "dev" | "local";
 };
 
 const defaultOptions: StartOption = {
   tmp: true,
   printLogs: false,
-  chain: 'local',
+  chain: "local",
 };
 
 /**
  * Start 5ire chain node with different authorities and ports
  */
 export function start5ireChainNode(
-  authority: 'alice' | 'bob' | 'charlie' | 'dave' | 'eve' | 'ferdie',
-  options: StartOption = defaultOptions
+  authority: "alice" | "bob" | "charlie" | "dave" | "eve" | "ferdie",
+  options: StartOption = defaultOptions,
 ): child.ChildProcess {
-  options.chain ??= 'local';
+  options.chain ??= "local";
 
   if (__NODE_STATE[authority].isRunning) {
     return __NODE_STATE[authority].process!;
   }
   const gitRoot = child
-    .execSync('git rev-parse --show-toplevel')
+    .execSync("git rev-parse --show-toplevel")
     .toString()
     .trim();
   const nodePath = `${gitRoot}/target/release/firechain-node`;
@@ -183,51 +187,51 @@ export function start5ireChainNode(
     nodePath,
     [
       `--${authority}`,
-      options.printLogs ? '-linfo' : '-lerror',
+      options.printLogs ? "-linfo" : "-lerror",
       `--chain`,
       `qa-dev`,
       `--base-path`,
       `${gitRoot}/tmp/fire/${authority}`,
       `--rpc-port=${ports[authority].ws}`,
       `--port=${ports[authority].p2p}`,
-      ...(authority == 'alice'
+      ...(authority == "alice"
         ? [
-          '--node-key',
-          '0000000000000000000000000000000000000000000000000000000000000001',
-        ]
+            "--node-key",
+            "0000000000000000000000000000000000000000000000000000000000000001",
+          ]
         : [
-          '--bootnodes',
-          `/ip4/127.0.0.1/tcp/${ports['alice'].p2p}/p2p/12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp`,
-        ]),
+            "--bootnodes",
+            `/ip4/127.0.0.1/tcp/${ports["alice"].p2p}/p2p/12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp`,
+          ]),
       // only print logs from the alice node
-      ...(authority === 'alice'
+      ...(authority === "alice"
         ? [
-          '-lruntime::offchain=debug',
-          '--rpc-cors',
-          'all',
-          '--rpc-methods=unsafe',
-          '--unsafe-rpc-external',
-        ]
+            "-lruntime::offchain=debug",
+            "--rpc-cors",
+            "all",
+            "--rpc-methods=unsafe",
+            "--unsafe-rpc-external",
+          ]
         : []),
     ],
     {
       cwd: gitRoot,
-    }
+    },
   );
 
   __NODE_STATE[authority].isRunning = true;
   __NODE_STATE[authority].process = proc;
 
   if (options.printLogs) {
-    proc.stdout.on('data', (data) => {
+    proc.stdout.on("data", (data) => {
       console.log(`${authority}: ${data}`);
     });
-    proc.stderr.on('data', (data) => {
+    proc.stderr.on("data", (data) => {
       console.error(`${authority}: ${data}`);
     });
   }
 
-  proc.on('close', (code) => {
+  proc.on("close", (code) => {
     __NODE_STATE[authority].isRunning = false;
     __NODE_STATE[authority].process = null;
     console.log(`${authority} node exited with code ${code}`);
@@ -239,7 +243,7 @@ export function start5ireChainNode(
  * Waits until a new session is started.
  */
 export async function waitForTheNextSession(api: ApiPromise): Promise<void> {
-  return waitForEvent(api, 'session', 'NewSession');
+  return waitForEvent(api, "session", "NewSession");
 }
 
 /**
@@ -249,14 +253,17 @@ export async function waitForEvent(
   api: ApiPromise,
   pallet: string,
   eventVariant: string,
-  dataQuery?: { key: string }
+  dataQuery?: { key: string },
 ): Promise<void> {
   return new Promise(async (resolve, _rej) => {
     while (true) {
       // Subscribe to system events via storage
       const events = await api.query.system.events();
       const eventsJson = events.toJSON();
-      const eventsValue = api.registry.createType("Vec<EventRecord>", events.toU8a());
+      const eventsValue = api.registry.createType(
+        "Vec<EventRecord>",
+        events.toU8a(),
+      );
       // Loop through the Vec<EventRecord>
       for (var event of eventsValue) {
         //console.log("Checking event: ", event);
@@ -297,41 +304,41 @@ export async function waitForEvent(
 
 export async function sudoTx(
   api: ApiPromise,
-  call: SubmittableExtrinsic<'promise'>
+  call: SubmittableExtrinsic<"promise">,
 ): Promise<void> {
   const unsub = await api.tx.sudo
-      .sudo(call.method.toHex())
-      .signAndSend(alith, {tip: 2000, nonce: -1}, (result ) => {
-        if (result.status.isInBlock) {
-          console.log(`Sudo transaction included at blockHash ${result.status.asInBlock}`);
-          console.log(`Waiting for finalization... (can take a minute)`);
-        } else if (result.status.isFinalized) {
-          // @ts-ignore
-          const data = JSON.stringify(result.events);
-          console.log(data);
-          unsub();
-        }
-      });
+    .sudo(call.method.toHex())
+    .signAndSend(alith, { tip: 2000, nonce: -1 }, (result) => {
+      if (result.status.isInBlock) {
+        console.log(
+          `Sudo transaction included at blockHash ${result.status.asInBlock}`,
+        );
+        console.log(`Waiting for finalization... (can take a minute)`);
+      } else if (result.status.isFinalized) {
+        // @ts-ignore
+        const data = JSON.stringify(result.events);
+        console.log(data);
+        unsub();
+      }
+    });
 }
 
 export async function uncheckedSudoTx(
   weight: DetectCodec<any, any>,
   api: ApiPromise,
-  call: SubmittableExtrinsic<'promise'>
+  call: SubmittableExtrinsic<"promise">,
 ): Promise<void> {
-  const keyring = new Keyring({ type: 'sr25519' });
-  const alice = keyring.addFromUri('//Alice');
+  const keyring = new Keyring({ type: "sr25519" });
+  const alice = keyring.addFromUri("//Alice");
 
   return new Promise(async (resolve, _reject) => {
     const unsub = await api.tx.sudo
       .sudoUncheckedWeight(call, weight)
-      .signAndSend(alice, {tip: 2000, nonce: -1}, ({ status }) => {
+      .signAndSend(alice, { tip: 2000, nonce: -1 }, ({ status }) => {
         if (status.isFinalized) {
           unsub();
           resolve();
         }
-
       });
   });
 }
-

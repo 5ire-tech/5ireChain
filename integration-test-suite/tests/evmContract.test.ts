@@ -10,7 +10,7 @@ import {
   killNodeForTestEVM,
   spawnNodeForTestEVM,
 } from "../utils/util";
-import { sleep, waitForEvent } from "../utils/setup";
+import { sleep } from "../utils/setup";
 
 import { expect } from "chai";
 import { step } from "mocha-steps";
@@ -34,7 +34,7 @@ describe("EVM related Contract using web3js/ethersjs", function () {
           maxAttempts: 5,
           onTimeout: false,
         },
-      })
+      }),
     );
     await sleep(20 * SECONDS);
   });
@@ -62,7 +62,7 @@ describe("EVM related Contract using web3js/ethersjs", function () {
         gasPrice,
         gas,
       },
-      ALITH_PRIVATE_KEY
+      ALITH_PRIVATE_KEY,
     );
 
     let receipt = await customRequest(web3, "eth_sendRawTransaction", [
@@ -82,7 +82,7 @@ describe("EVM related Contract using web3js/ethersjs", function () {
 
   step("call sign transaction the method", async function () {
     const contract = new web3.eth.Contract(ERC20_ABI, contractAddress, {
-      from: alith.address
+      from: alith.address,
     });
     let amountTransfer = web3.utils.toWei("1", "ether");
     const data = contract.methods
@@ -93,10 +93,9 @@ describe("EVM related Contract using web3js/ethersjs", function () {
       {
         to: contractAddress,
         data,
-        gas:1000000,
-  
+        gas: 1000000,
       },
-      ALITH_PRIVATE_KEY
+      ALITH_PRIVATE_KEY,
     );
     await customRequest(web3, "eth_sendRawTransaction", [
       signedTx.rawTransaction,
@@ -104,19 +103,18 @@ describe("EVM related Contract using web3js/ethersjs", function () {
     await sleep(4 * SECONDS);
 
     expect(await contract.methods.balanceOf(TEST_ACCOUNT).call()).to.eq(
-      amountTransfer
+      amountTransfer,
     );
-
   });
 
   step("call query the method", async function () {
     const contract = new web3.eth.Contract(ERC20_ABI, contractAddress, {
-      from: alith.address
+      from: alith.address,
     });
     let expectedTotalSupply = BigInt(2 ** 256) - BigInt(1);
 
     expect(await contract.methods.totalSupply().call()).to.eq(
-      expectedTotalSupply.toString()
+      expectedTotalSupply.toString(),
     );
   });
 });

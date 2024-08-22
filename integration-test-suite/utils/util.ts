@@ -38,14 +38,13 @@ export async function killNodes() {
   await sleep(2 * SECONDS);
 }
 
-
 export const spawnNodeForTestEVM = async () => {
   await removeTmp();
   aliceNode = start5ireChainNode("alice", { tmp: true, printLogs: false });
 
   console.log("started alice node");
   polkadotApi = await ApiPromise.create();
-  
+
   return true;
 };
 
@@ -54,7 +53,6 @@ export async function killNodeForTestEVM() {
   aliceNode?.kill("SIGINT");
   await sleep(2 * SECONDS);
 }
-
 
 export async function removeTmp() {
   // delete the tmp directory if it exists.
@@ -74,34 +72,30 @@ export async function removeTmp() {
   } else {
     console.log(`tmp directory doesn't exists anymore ${tmpDir}`);
   }
-
 }
 
 export async function customRequest(web3: Web3, method: string, params: any[]) {
-	return new Promise<JsonRpcResponse>((resolve, reject) => {
-		(web3.currentProvider as any).send(
-			{
-				jsonrpc: "2.0",
-				id: 1,
-				method,
-				params,
-			},
-			(error: Error | null, result?: JsonRpcResponse) => {
-				if (error) {
-					reject(
-						`Failed to send custom request (${method} (${params.join(",")})): ${
-							error.message || error.toString()
-						}`
-					);
-				}
-        else if (result === undefined) {
+  return new Promise<JsonRpcResponse>((resolve, reject) => {
+    (web3.currentProvider as any).send(
+      {
+        jsonrpc: "2.0",
+        id: 1,
+        method,
+        params,
+      },
+      (error: Error | null, result?: JsonRpcResponse) => {
+        if (error) {
+          reject(
+            `Failed to send custom request (${method} (${params.join(",")})): ${
+              error.message || error.toString()
+            }`,
+          );
+        } else if (result === undefined) {
           reject(new Error("Result is undefined"));
-        }
-        else {
+        } else {
           resolve(result);
         }
-				
-			}
-		);
-	});
+      },
+    );
+  });
 }
