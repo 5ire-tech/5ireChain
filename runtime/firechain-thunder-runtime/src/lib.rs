@@ -606,11 +606,9 @@ parameter_types! {
 }
 
 impl pallet_reward::Config for Runtime{
-	//type TreasuryAccount = Treasury;
 	type RewardCurrency = Balances;
 	type Balance = Balance;
 	type RuntimeEvent = RuntimeEvent;
-	type DataProvider = <Runtime as pallet_election_provider_multi_phase::Config>::DataProvider;
 	type ValidatorSet = Historical;
 	type Validators = Historical;
 	type ValidatorId = pallet_staking::StashOf<Self>;

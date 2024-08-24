@@ -5,25 +5,20 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 use frame_support::pallet_prelude::DispatchResult;
 pub use pallet::*;
-use pallet_staking::{ CurrentEra, Validators, ErasRewardPoints, ErasStakers, IndividualExposure };
+use pallet_staking::{Rewards, CurrentEra, Validators, ErasRewardPoints, ErasStakers, IndividualExposure };
 use parity_scale_codec::Codec;
 use scale_info::prelude::{ vec::Vec, fmt::Debug };
 use sp_runtime::{ traits::{ AtLeast32BitUnsigned, Convert }, FixedPointOperand };
-use frame_support::PalletId;
-use pallet_staking::Rewards;
-use frame_support::traits::{
+use frame_support::{PalletId,traits::{
 	Currency,
 	LockableCurrency,
 	ValidatorSet,
 	Get,
-	//reward::Rewards,
 	ExistenceRequirement,
 	ExistenceRequirement::KeepAlive,
-};
-use frame_election_provider_support::ElectionDataProvider;
+}};
 use sp_runtime::traits::AccountIdConversion;
 use sp_runtime::traits::Zero;
-
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
 #[cfg(test)]
@@ -45,10 +40,6 @@ pub mod pallet {
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 		type ValidatorSet: frame_support::traits::ValidatorSetWithIdentification<Self::AccountId>;
 		type Validators: frame_support::traits::ValidatorSet<Self::AccountId>;
-		type DataProvider: ElectionDataProvider<
-			AccountId = <Self::ValidatorSet as ValidatorSet<Self::AccountId>>::ValidatorId,
-			BlockNumber = BlockNumberFor<Self>
-		>;
 		type ValidatorId: Convert<
 			<<Self as Config>::Validators as ValidatorSet<<Self as frame_system::Config>::AccountId>>::ValidatorId,
 			Option<Self::AccountId>
@@ -216,13 +207,13 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 	/// Distributing rewards to validators and nominators.
 	fn claim_rewards(validator: T::AccountId) -> DispatchResult {
 		let nominators = EraReward::<T>::get(validator.clone());
-		let _ = Self::distribute_validator_reward(validator.clone());
+		let _ = Self::distribute_reward(validator.clone(), None);
 		Self::update_rewarded_validators(validator.clone())?;
 		if nominators.is_empty() {
 			return Ok(());
 		}
 		nominators.iter().for_each(|nominator| {
-			let _ = Self::distribute_nominator_reward(validator.clone(), nominator.clone());
+			let _ = Self::distribute_reward(validator.clone(), Some(nominator.clone()));
 		});
 		EraReward::<T>::remove(validator.clone());
 		return Ok(());
@@ -273,7 +264,6 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 					current_nominators.push(nominator.who.clone());
 					EraReward::<T>::insert(validator.clone(), current_nominators);
 				}
-
 				let nominator_stake = nominator.value;
 				let nominator_reward = Self::calculate_reward_share(
 					nominator_stake.into(),
@@ -307,11 +297,7 @@ impl<T: Config> Pallet<T> {
 	/// Validation of an account to determine its reward.
 	fn verify_validator(validator: T::AccountId) -> DispatchResult {
 		let validator = ValidatorRewardAccounts::<T>::get(validator);
-		if validator.is_zero() {
-			return Err(Error::<T>::NoReward.into());
-		} else {
-			return Ok(());
-		}
+		Self::check_reward(validator)
 	}
 
 	/// Calculates the commission for the validator.
@@ -385,34 +371,33 @@ impl<T: Config> Pallet<T> {
 		*validator_points
 	}
 
-	/// Distributes rewards to the specified validator.
-	fn distribute_validator_reward(validator: T::AccountId) -> DispatchResult {
-		let reward = ValidatorRewardAccounts::<T>::get(validator.clone());
-		Self::check_reward(reward)?;
-		Self::transfer(Self::account_id(), validator.clone(), reward, KeepAlive)?;
-		ValidatorRewardAccounts::<T>::remove(validator.clone());
-		Self::store_reward_received(validator, reward);
-		Ok(())
-	}
-
-	/// Distributes rewards to the specified nominator.
-	fn distribute_nominator_reward(
+	/// Distributes rewards to the validator and nominators.
+	fn distribute_reward(
 		validator: T::AccountId,
-		nominator: T::AccountId
+		nominator: Option<T::AccountId>
 	) -> DispatchResult {
-		let reward = NominatorRewardAccounts::<T>::get(validator.clone(), nominator.clone());
-		Self::check_reward(reward)?;
-		Self::transfer(Self::account_id(), nominator.clone(), reward, KeepAlive)?;
-		let mut nominators = EraReward::<T>::get(validator.clone());
-		if
-			let Some(index) = nominators
-				.iter()
-				.position(|nominator_account| nominator_account == &nominator.clone())
-		{
-			nominators.remove(index);
-		}
-		NominatorRewardAccounts::<T>::remove(validator.clone(), nominator.clone());
-		Self::store_reward_received(nominator, reward);
+		let (reward, recipient) = if let Some(nominator) = nominator {
+			let reward = NominatorRewardAccounts::<T>::get(validator.clone(), nominator.clone());
+			Self::check_reward(reward)?;
+			Self::transfer(Self::account_id(), nominator.clone(), reward, KeepAlive)?;
+			let mut nominators = EraReward::<T>::get(validator.clone());
+			if
+				let Some(index) = nominators
+					.iter()
+					.position(|nominator_account| nominator_account == &nominator.clone())
+			{
+				nominators.remove(index);
+			}
+			NominatorRewardAccounts::<T>::remove(validator.clone(), nominator.clone());
+			(reward, nominator)
+		} else {
+			let reward = ValidatorRewardAccounts::<T>::get(validator.clone());
+			Self::check_reward(reward)?;
+			Self::transfer(Self::account_id(), validator.clone(), reward, KeepAlive)?;
+			ValidatorRewardAccounts::<T>::remove(validator.clone());
+			(reward, validator)
+		};
+		Self::store_reward_received(recipient, reward);
 		Ok(())
 	}
 
@@ -434,7 +419,7 @@ impl<T: Config> Pallet<T> {
 			*earlier_reward += reward;
 		});
 	}
-	
+
 	/// Check if the reward exist
 	fn check_reward(reward: T::Balance) -> DispatchResult {
 		if reward.is_zero() {
