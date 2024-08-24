@@ -257,6 +257,8 @@ where
 
 parameter_types! {
 	pub MaxOnChainElectableTargets: u16 = 1250;
+	pub const MaxNumOfSudoOracles: u32 = 5;
+	pub const MaxNumOfNonSudoOracles: u32 = 100;
 }
 
 impl pallet_im_online::Config for Test {
@@ -277,6 +279,8 @@ impl pallet_esg::Config for Test {
 	type WeightInfo = ();
 	type RuntimeEvent = RuntimeEvent;
 	type MaxFileSize = ConstU32<1024000>;
+	type MaxNumOfNonSudoOracles = MaxNumOfNonSudoOracles;
+	type MaxNumOfSudoOracles = MaxNumOfSudoOracles;
 }
 
 impl pallet_offences::Config for Test {
