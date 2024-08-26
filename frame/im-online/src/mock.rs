@@ -243,6 +243,8 @@ impl pallet_esg::Config for Test {
 	type WeightInfo = ();
 	type MaxFileSize = ConstU32<102400>;
 	type RuntimeEvent = RuntimeEvent;
+	type MaxNumOfSudoOracles =  ConstU32<5>;
+	type MaxNumOfNonSudoOracles = ConstU32<5>;
 }
 
 type VoterBagsListInstance = pallet_bags_list::Instance1;

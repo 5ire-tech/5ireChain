@@ -132,8 +132,11 @@ use frame_support::{
 					if max_num_of_sudo_oracles > num_of_sudo_oracles_stored {
 						<SudoOraclesStore<T>>::mutate(fn_mutate);
 						return Ok(());
+					}
+					else {
+						return Err(Error::<T>::MaxNumOfSudoOraclesReached.into());
 					} 
-					Err(Error::<T>::MaxNumOfSudoOraclesReached.into())
+
 				},
 
 				false => {
@@ -144,7 +147,10 @@ use frame_support::{
 						<NonSudoOraclesStore<T>>::mutate(fn_mutate);
 						return Ok(());
 					} 
-					Err(Error::<T>::MaxNumOfNonSudoOraclesReached.into())
+					else {
+						return Err(Error::<T>::MaxNumOfNonSudoOraclesReached.into());
+					}
+
 				},
 			}
 		}
@@ -263,7 +269,7 @@ use frame_support::{
 			}
 
 			if is_root || Self::is_sudo_oracle(&acc_id) {
-				let _ = Self::store_oracle(&oracle, is_sudo_oracle);
+				let _ = Self::store_oracle(&oracle, is_sudo_oracle)?;
 			} else {
 				return Err(Error::<T>::CallerNotRootOrSudoOracle.into())
 			}
