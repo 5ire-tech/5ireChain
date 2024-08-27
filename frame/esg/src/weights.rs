@@ -31,7 +31,6 @@
 
 use frame_support::{traits::Get, weights::{constants::RocksDbWeight, Weight}};
 use core::marker::PhantomData;
-use frame_support::weights::constants::RocksDbWeight;
 pub trait WeightInfo {
 	fn register_an_oracle() -> Weight;
 	fn deregister_an_oracle() -> Weight;
