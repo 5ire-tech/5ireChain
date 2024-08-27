@@ -207,7 +207,7 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 	/// Distributing rewards to validators and nominators.
 	fn claim_rewards(validator: T::AccountId) -> DispatchResult {
 		let nominators = EraReward::<T>::get(validator.clone());
-		let _ = Self::distribute_reward(validator.clone(), None);
+		Self::distribute_reward(validator.clone(), None)?;
 		Self::update_rewarded_validators(validator.clone())?;
 		if nominators.is_empty() {
 			return Ok(());
