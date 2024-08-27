@@ -409,7 +409,3 @@ pub(crate) fn run_to_block(n: BlockNumber) {
 pub(crate) fn active_era() -> EraIndex {
 	Staking::active_era().unwrap().index
 }
-
-pub fn new_test_ext() -> sp_io::TestExternalities {
-	frame_system::GenesisConfig::<Test>::default().build_storage().unwrap().into()
-}
