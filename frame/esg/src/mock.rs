@@ -27,10 +27,7 @@ type Block = frame_system::mocking::MockBlock<Test>;
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 
 frame_support::construct_runtime!(
-	pub enum Test where
-		Block = Block,
-		NodeBlock = Block,
-		UncheckedExtrinsic = UncheckedExtrinsic,
+	pub enum Test
 	{
 		System: frame_system,
 		Esg: pallet_esg,
@@ -65,11 +62,11 @@ impl system::Config for Test {
 
 parameter_types! {
 	pub const MaxFileSize: u32 = 1024000;
-	pub const MaxNumOfSudoOracles: u32 = 5;
-	pub const MaxNumOfNonSudoOracles: u32 = 100;
+	pub const MaxNumOfSudoOracles: u32 = 3;
+	pub const MaxNumOfNonSudoOracles: u32 = 2;
 }
 
-impl pallet_esg::Config for Runtime {
+impl pallet_esg::Config for Test {
 	type RuntimeEvent = RuntimeEvent;
 	type MaxFileSize = MaxFileSize;
 	type MaxNumOfSudoOracles = MaxNumOfSudoOracles;

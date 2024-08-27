@@ -29,7 +29,7 @@
 #![allow(unused_imports)]
 #![allow(missing_docs)]
 
-use frame_support::{traits::Get, weights::Weight};
+use frame_support::{traits::Get, weights::{constants::RocksDbWeight, Weight}};
 use core::marker::PhantomData;
 use frame_support::weights::constants::RocksDbWeight;
 pub trait WeightInfo {
@@ -82,6 +82,7 @@ impl<T: frame_system::Config> WeightInfo for SubstrateWeightInfo<T> {
 			.saturating_add(T::DbWeight::get().writes(2))
 	}
 }
+
 
 
 impl WeightInfo for () {
