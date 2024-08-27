@@ -233,7 +233,6 @@ impl pallet_reward::Config for Test {
 	type RewardCurrency = Balances;
 	type Balance = u128;
 	type RuntimeEvent = RuntimeEvent;
-	type DataProvider = Staking;
 	type ValidatorSet = Historical;
 	type Validators = Historical;
 	type ValidatorId = pallet_staking::StashOf<Test>;
