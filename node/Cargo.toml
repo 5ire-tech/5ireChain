@@ -16,7 +16,6 @@ name = "firechain-node"
 [dependencies]
 array-bytes = "6.1"
 clap = { version = "4.2.5", features = ["derive"], optional = true }
-
 hex-literal = "0.3.4"
 codec = { package = "parity-scale-codec", version = "3.6.12" }
 rand = "0.8"
@@ -25,9 +24,6 @@ hex = { version = "0.4", default-features = false }
 serde_json = { workspace = true }
 serde = { version = "1.0.163", features = ["derive"] }
 log = { workspace = true }
-
-
-
 futures = { workspace = true }
 sc-cli = { workspace = true }
 sp-core = { workspace = true }

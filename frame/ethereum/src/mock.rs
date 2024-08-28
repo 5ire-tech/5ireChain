@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: Apache-2.0
 // This file is part of Frontier.
-//
-// Copyright (c) 2020-2022 Parity Technologies (UK) Ltd.
-//
+
+// Copyright (C) Parity Technologies (UK) Ltd.
+// SPDX-License-Identifier: Apache-2.0
+
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,19 +18,19 @@
 //! Test utilities
 
 use ethereum::{TransactionAction, TransactionSignature};
+use rlp::RlpStream;
+// Substrate
 use frame_support::{
-	parameter_types,
+	derive_impl, parameter_types,
 	traits::{ConstU32, FindAuthor},
 	weights::Weight,
 	ConsensusEngineId, PalletId,
 };
-use rlp::RlpStream;
 use sp_core::{hashing::keccak_256, H160, H256, U256};
 use sp_runtime::{
-	traits::{BlakeTwo256, IdentityLookup},
+	traits::{BlakeTwo256, Dispatchable, IdentityLookup},
 	AccountId32, BuildStorage,
 };
-
 // Frontier
 use pallet_evm::{AddressMapping, EnsureAddressTruncated, FeeCalculator};
 
@@ -46,7 +46,6 @@ frame_support::construct_runtime! {
 		Timestamp: pallet_timestamp::{Pallet, Call, Storage},
 		EVM: pallet_evm::{Pallet, Call, Storage, Config<T>, Event<T>},
 		Ethereum: crate::{Pallet, Call, Storage, Event, Origin},
-		Authorship: pallet_authorship
 	}
 }
 
@@ -54,6 +53,7 @@ parameter_types! {
 	pub const BlockHashCount: u64 = 250;
 }
 
+#[derive_impl(frame_system::config_preludes::TestDefaultConfig as frame_system::DefaultConfig)]
 impl frame_system::Config for Test {
 	type RuntimeEvent = RuntimeEvent;
 	type BaseCallFilter = frame_support::traits::Everything;
@@ -61,6 +61,7 @@ impl frame_system::Config for Test {
 	type BlockLength = ();
 	type RuntimeOrigin = RuntimeOrigin;
 	type RuntimeCall = RuntimeCall;
+	type RuntimeTask = RuntimeTask;
 	type Nonce = u64;
 	type Hash = H256;
 	type Hashing = BlakeTwo256;
@@ -81,26 +82,27 @@ impl frame_system::Config for Test {
 }
 
 parameter_types! {
+	pub const ExistentialDeposit: u64 = 0;
 	// For weight estimation, we assume that the most locks on an individual account will be 50.
 	// This number may need to be adjusted in the future if this assumption no longer holds true.
 	pub const MaxLocks: u32 = 50;
-	pub const ExistentialDeposit: u64 = 500;
+	pub const MaxReserves: u32 = 50;
 }
 
 impl pallet_balances::Config for Test {
 	type RuntimeEvent = RuntimeEvent;
+	type RuntimeHoldReason = RuntimeHoldReason;
+	type RuntimeFreezeReason = RuntimeFreezeReason;
 	type WeightInfo = ();
 	type Balance = u64;
 	type DustRemoval = ();
 	type ExistentialDeposit = ExistentialDeposit;
 	type AccountStore = System;
-	type ReserveIdentifier = ();
-	type RuntimeHoldReason = ();
-	type FreezeIdentifier = ();
+	type ReserveIdentifier = [u8; 8];
+	type FreezeIdentifier = RuntimeFreezeReason;
 	type MaxLocks = MaxLocks;
-	type MaxReserves = ();
-	type MaxHolds = ();
-	type MaxFreezes = ();
+	type MaxReserves = MaxReserves;
+	type MaxFreezes = ConstU32<1>;
 }
 
 parameter_types! {
@@ -152,6 +154,10 @@ impl AddressMapping<AccountId32> for HashedAddressMapping {
 	}
 }
 
+parameter_types! {
+	pub SuicideQuickClearLimit: u32 = 0;
+}
+
 impl pallet_evm::Config for Test {
 	type FeeCalculator = FixedGasPrice;
 	type GasWeightMapping = pallet_evm::FixedGasWeightMapping<Self>;
@@ -169,8 +175,9 @@ impl pallet_evm::Config for Test {
 	type Runner = pallet_evm::runner::stack::Runner<Self>;
 	type OnChargeTransaction = ();
 	type OnCreate = ();
-	type Author = FindAuthorTruncated;
+	type FindAuthor = FindAuthorTruncated;
 	type GasLimitPovSizeRatio = GasLimitPovSizeRatio;
+	type SuicideQuickClearLimit = SuicideQuickClearLimit;
 	type Timestamp = Timestamp;
 	type WeightInfo = ();
 }
@@ -185,25 +192,6 @@ impl Config for Test {
 	type PostLogContent = PostBlockAndTxnHashes;
 	type ExtraDataLength = ConstU32<30>;
 }
-
-
-// For pallet authorship
-pub struct TestAuthor;
-impl FindAuthor<AccountId32> for TestAuthor {
-	fn find_author<'a, I>(_digests: I) -> Option<AccountId32>
-	where
-		I: 'a + IntoIterator<Item = (ConsensusEngineId, &'a [u8])>,
-	{
-		Some(address_build(0).account_id)
-	}
-}
-
-
-impl pallet_authorship::Config for Test {
-	type FindAuthor = TestAuthor;
-	type EventHandler = ();
-}
-
 
 impl fp_self_contained::SelfContainedCall for RuntimeCall {
 	type SignedInfo = H160;
@@ -241,8 +229,9 @@ impl fp_self_contained::SelfContainedCall for RuntimeCall {
 		len: usize,
 	) -> Option<Result<(), TransactionValidityError>> {
 		match self {
-			RuntimeCall::Ethereum(call) =>
-				call.pre_dispatch_self_contained(info, dispatch_info, len),
+			RuntimeCall::Ethereum(call) => {
+				call.pre_dispatch_self_contained(info, dispatch_info, len)
+			}
 			_ => None,
 		}
 	}
@@ -252,8 +241,9 @@ impl fp_self_contained::SelfContainedCall for RuntimeCall {
 		info: Self::SignedInfo,
 	) -> Option<sp_runtime::DispatchResultWithInfo<sp_runtime::traits::PostDispatchInfoOf<Self>>> {
 		match self {
-			call @ RuntimeCall::Ethereum(crate::Call::transact { .. }) =>
-				Some(call.dispatch(RuntimeOrigin::from(RawOrigin::EthereumTransaction(info)))),
+			call @ RuntimeCall::Ethereum(crate::Call::transact { .. }) => {
+				Some(call.dispatch(RuntimeOrigin::from(RawOrigin::EthereumTransaction(info))))
+			}
 			_ => None,
 		}
 	}
@@ -266,7 +256,7 @@ pub struct AccountInfo {
 }
 
 fn address_build(seed: u8) -> AccountInfo {
-	let private_key = H256::from_slice(&[(seed + 1) as u8; 32]); //H256::from_low_u64_be((i + 1) as u64);
+	let private_key = H256::from_slice(&[(seed + 1); 32]); //H256::from_low_u64_be((i + 1) as u64);
 	let secret_key = libsecp256k1::SecretKey::parse_slice(&private_key[..]).unwrap();
 	let public_key = &libsecp256k1::PublicKey::from_secret_key(&secret_key).serialize()[1..65];
 	let address = H160::from(H256::from(keccak_256(public_key)));
@@ -285,12 +275,17 @@ fn address_build(seed: u8) -> AccountInfo {
 // our desired mockup.
 pub fn new_test_ext(accounts_len: usize) -> (Vec<AccountInfo>, sp_io::TestExternalities) {
 	// sc_cli::init_logger("");
-	let mut ext = frame_system::GenesisConfig::<Test>::default().build_storage().unwrap();
+	let mut ext = frame_system::GenesisConfig::<Test>::default()
+		.build_storage()
+		.unwrap();
 
-	let pairs = (0..accounts_len).map(|i| address_build(i as u8)).collect::<Vec<_>>();
+	let pairs = (0..accounts_len)
+		.map(|i| address_build(i as u8))
+		.collect::<Vec<_>>();
 
-	let balances: Vec<_> =
-		(0..accounts_len).map(|i| (pairs[i].account_id.clone(), 10_000_000)).collect();
+	let balances: Vec<_> = (0..accounts_len)
+		.map(|i| (pairs[i].account_id.clone(), 10_000_000))
+		.collect();
 
 	pallet_balances::GenesisConfig::<Test> { balances }
 		.assimilate_storage(&mut ext)
@@ -306,9 +301,13 @@ pub fn new_test_ext_with_initial_balance(
 	initial_balance: u64,
 ) -> (Vec<AccountInfo>, sp_io::TestExternalities) {
 	// sc_cli::init_logger("");
-	let mut ext = frame_system::GenesisConfig::<Test>::default().build_storage().unwrap();
+	let mut ext = frame_system::GenesisConfig::<Test>::default()
+		.build_storage()
+		.unwrap();
 
-	let pairs = (0..accounts_len).map(|i| address_build(i as u8)).collect::<Vec<_>>();
+	let pairs = (0..accounts_len)
+		.map(|i| address_build(i as u8))
+		.collect::<Vec<_>>();
 
 	let balances: Vec<_> = (0..accounts_len)
 		.map(|i| (pairs[i].account_id.clone(), initial_balance))
@@ -330,7 +329,9 @@ pub fn contract_address(sender: H160, nonce: u64) -> H160 {
 }
 
 pub fn storage_address(sender: H160, slot: H256) -> H256 {
-	H256::from(keccak_256([&H256::from(sender)[..], &slot[..]].concat().as_slice()))
+	H256::from(keccak_256(
+		[&H256::from(sender)[..], &slot[..]].concat().as_slice(),
+	))
 }
 
 pub struct LegacyUnsignedTransaction {
@@ -369,7 +370,10 @@ impl LegacyUnsignedTransaction {
 	pub fn sign_with_chain_id(&self, key: &H256, chain_id: u64) -> Transaction {
 		let hash = self.signing_hash();
 		let msg = libsecp256k1::Message::parse(hash.as_fixed_bytes());
-		let s = libsecp256k1::sign(&msg, &libsecp256k1::SecretKey::parse_slice(&key[..]).unwrap());
+		let s = libsecp256k1::sign(
+			&msg,
+			&libsecp256k1::SecretKey::parse_slice(&key[..]).unwrap(),
+		);
 		let sig = s.0.serialize();
 
 		let sig = TransactionSignature::new(

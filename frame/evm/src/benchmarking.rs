@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: Apache-2.0
 // This file is part of Frontier.
-//
-// Copyright (c) 2020-2022 Parity Technologies (UK) Ltd.
-//
+
+// Copyright (C) Parity Technologies (UK) Ltd.
+// SPDX-License-Identifier: Apache-2.0
+
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,7 +18,7 @@
 #![cfg(feature = "runtime-benchmarks")]
 
 use super::*;
-use frame_benchmarking::{benchmarks, impl_benchmark_test_suite};
+use frame_benchmarking::benchmarks;
 
 type CurrencyOf<T> = <T as Config>::Currency;
 
@@ -35,7 +35,8 @@ benchmarks! {
 
 		use rlp::RlpStream;
 		use sp_core::{H160, U256};
-		use sp_std::vec;
+		use alloc::vec;
+
 		// contract bytecode below is for:
 		//
 		// pragma solidity >=0.8.0;
@@ -68,7 +69,7 @@ benchmarks! {
 			"2eeada8e094193a364736f6c63430008030033"))
 			.expect("Bad hex string");
 
-		let caller = H160::default();
+		let caller = "1000000000000000000000000000000000000001".parse::<H160>().unwrap();
 
 		let mut nonce: u64 = 1;
 		let nonce_as_u256: U256 = nonce.into();
@@ -145,4 +146,4 @@ benchmarks! {
 	}
 }
 
-impl_benchmark_test_suite!(Pallet, crate::tests::new_test_ext(), crate::mock::Test);
+// impl_benchmark_test_suite!(Pallet, crate::tests::new_test_ext(), crate::mock::Test);

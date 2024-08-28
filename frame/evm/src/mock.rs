@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: Apache-2.0
 // This file is part of Frontier.
-//
-// Copyright (c) 2020-2022 Parity Technologies (UK) Ltd.
-//
+
+// Copyright (C) Parity Technologies (UK) Ltd.
+// SPDX-License-Identifier: Apache-2.0
+
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -17,8 +17,10 @@
 
 //! Test mock for unit tests and benchmarking
 
+use alloc::boxed::Box;
+use core::str::FromStr;
 use frame_support::{
-	parameter_types,
+	derive_impl, parameter_types,
 	traits::{ConstU32, FindAuthor},
 	weights::Weight,
 };
@@ -27,19 +29,18 @@ use sp_runtime::{
 	traits::{BlakeTwo256, IdentityLookup},
 	ConsensusEngineId,
 };
-use sp_std::{boxed::Box, prelude::*, str::FromStr};
 
 use crate::{
 	EnsureAddressNever, EnsureAddressRoot, FeeCalculator, IdentityAddressMapping,
 	IsPrecompileResult, Precompile, PrecompileHandle, PrecompileResult, PrecompileSet,
 };
+
 frame_support::construct_runtime! {
 	pub enum Test {
 		System: frame_system::{Pallet, Call, Config<T>, Storage, Event<T>},
 		Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
 		Timestamp: pallet_timestamp::{Pallet, Call, Storage},
 		EVM: crate::{Pallet, Call, Storage, Config<T>, Event<T>},
-		Authorship: pallet_authorship
 	}
 }
 
@@ -48,6 +49,8 @@ parameter_types! {
 	pub BlockWeights: frame_system::limits::BlockWeights =
 		frame_system::limits::BlockWeights::simple_max(Weight::from_parts(1024, 0));
 }
+
+#[derive_impl(frame_system::config_preludes::TestDefaultConfig as frame_system::DefaultConfig)]
 impl frame_system::Config for Test {
 	type RuntimeEvent = RuntimeEvent;
 	type BaseCallFilter = frame_support::traits::Everything;
@@ -55,6 +58,7 @@ impl frame_system::Config for Test {
 	type BlockLength = ();
 	type RuntimeOrigin = RuntimeOrigin;
 	type RuntimeCall = RuntimeCall;
+	type RuntimeTask = RuntimeTask;
 	type Nonce = u64;
 	type Hash = H256;
 	type Hashing = BlakeTwo256;
@@ -79,17 +83,17 @@ parameter_types! {
 }
 impl pallet_balances::Config for Test {
 	type RuntimeEvent = RuntimeEvent;
+	type RuntimeHoldReason = RuntimeHoldReason;
+	type RuntimeFreezeReason = RuntimeFreezeReason;
 	type WeightInfo = ();
 	type Balance = u64;
 	type DustRemoval = ();
 	type ExistentialDeposit = ExistentialDeposit;
 	type AccountStore = System;
-	type ReserveIdentifier = ();
-	type RuntimeHoldReason = ();
-	type FreezeIdentifier = ();
+	type ReserveIdentifier = [u8; 8];
+	type FreezeIdentifier = RuntimeFreezeReason;
 	type MaxLocks = ();
 	type MaxReserves = ();
-	type MaxHolds = ();
 	type MaxFreezes = ();
 }
 
@@ -128,6 +132,7 @@ parameter_types! {
 	pub const GasLimitPovSizeRatio: u64 = BLOCK_GAS_LIMIT.saturating_div(MAX_POV_SIZE);
 	pub WeightPerGas: Weight = Weight::from_parts(20_000, 0);
 	pub MockPrecompiles: MockPrecompileSet = MockPrecompileSet;
+	pub SuicideQuickClearLimit: u32 = 0;
 }
 impl crate::Config for Test {
 	type FeeCalculator = FixedGasPrice;
@@ -149,8 +154,9 @@ impl crate::Config for Test {
 	type Runner = crate::runner::stack::Runner<Self>;
 	type OnChargeTransaction = ();
 	type OnCreate = ();
-	type Author = FindAuthorTruncated;
+	type FindAuthor = FindAuthorTruncated;
 	type GasLimitPovSizeRatio = GasLimitPovSizeRatio;
+	type SuicideQuickClearLimit = SuicideQuickClearLimit;
 	type Timestamp = Timestamp;
 	type WeightInfo = ();
 }
@@ -165,7 +171,7 @@ impl PrecompileSet for MockPrecompileSet {
 		let address = handle.code_address();
 
 		if address == H160::from_low_u64_be(1) {
-			return Some(pallet_evm_precompile_simple::Identity::execute(handle))
+			return Some(pallet_evm_precompile_simple::Identity::execute(handle));
 		}
 
 		None
@@ -180,10 +186,4 @@ impl PrecompileSet for MockPrecompileSet {
 			extra_cost: 0,
 		}
 	}
-}
-
-
-impl pallet_authorship::Config for Test {
-	type FindAuthor = FindAuthorTruncated;
-	type EventHandler = ();
 }

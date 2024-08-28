@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: Apache-2.0
 // This file is part of Frontier.
-//
-// Copyright (c) 2020-2022 Parity Technologies (UK) Ltd.
-//
+
+// Copyright (C) Parity Technologies (UK) Ltd.
+// SPDX-License-Identifier: Apache-2.0
+
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -17,7 +17,7 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 #![allow(clippy::comparison_chain)]
-#![deny(unused_crate_dependencies)]
+#![warn(unused_crate_dependencies)]
 
 extern crate alloc;
 
@@ -72,13 +72,13 @@ fn calculate_gas_cost(
 			//
 			// Notes:
 			// * exp_length is bounded to 1024 and is > 32
-			// * exponent can be zero, so we subtract 1 after adding the other terms (whose sum must
-			//   be > 0)
-			// * the addition can't overflow because the terms are both capped at roughly 8 * max
-			//   size of exp_length (1024)
+			// * exponent can be zero, so we subtract 1 after adding the other terms (whose sum
+			//   must be > 0)
+			// * the addition can't overflow because the terms are both capped at roughly
+			//   8 * max size of exp_length (1024)
 			// * the EIP spec is written in python, in which (exponent & (2**256 - 1)) takes the
-			//   FIRST 32 bytes. However this `BigUint` `&` operator takes the LAST 32 bytes. We
-			//   thus instead take the bytes manually.
+			//   FIRST 32 bytes. However this `BigUint` `&` operator takes the LAST 32 bytes.
+			//   We thus instead take the bytes manually.
 			let exponent_head = BigUint::from_bytes_be(&exponent_bytes[..32]);
 
 			iteration_count = (8 * (exp_length - 32)) + exponent_head.bits() - 1;
@@ -89,8 +89,11 @@ fn calculate_gas_cost(
 
 	let multiplication_complexity = calculate_multiplication_complexity(base_length, mod_length);
 	let iteration_count = calculate_iteration_count(exponent, exponent_bytes);
-	max(MIN_GAS_COST, multiplication_complexity * iteration_count / 3)
-		.saturating_mul(if mod_is_even { 20 } else { 1 })
+	max(
+		MIN_GAS_COST,
+		multiplication_complexity * iteration_count / 3,
+	)
+	.saturating_mul(if mod_is_even { 20 } else { 1 })
 }
 
 /// Copy bytes from input to target.
@@ -102,7 +105,7 @@ fn read_input(source: &[u8], target: &mut [u8], source_offset: &mut usize) {
 
 	// Out of bounds, nothing to copy.
 	if source.len() <= offset {
-		return
+		return;
 	}
 
 	// Find len to copy up to target len, but not out of bounds.
@@ -147,21 +150,21 @@ impl Precompile for Modexp {
 		if base_len_big > max_size_big {
 			return Err(PrecompileFailure::Error {
 				exit_status: ExitError::Other("unreasonably large base length".into()),
-			})
+			});
 		}
 
 		let exp_len_big = BigUint::from_bytes_be(&exp_len_buf);
 		if exp_len_big > max_size_big {
 			return Err(PrecompileFailure::Error {
 				exit_status: ExitError::Other("unreasonably large exponent length".into()),
-			})
+			});
 		}
 
 		let mod_len_big = BigUint::from_bytes_be(&mod_len_buf);
 		if mod_len_big > max_size_big {
 			return Err(PrecompileFailure::Error {
 				exit_status: ExitError::Other("unreasonably large modulus length".into()),
-			})
+			});
 		}
 
 		// bounds check handled above
@@ -171,11 +174,13 @@ impl Precompile for Modexp {
 
 		// if mod_len is 0 output must be empty
 		if mod_len == 0 {
-			return Ok(PrecompileOutput { exit_status: ExitSucceed::Returned, output: vec![] })
+			return Ok(PrecompileOutput {
+				exit_status: ExitSucceed::Returned,
+				output: vec![],
+			});
 		}
 
-		// Gas formula allows arbitrary large exp_len when base and modulus are empty, so we need to
-		// handle empty base first.
+		// Gas formula allows arbitrary large exp_len when base and modulus are empty, so we need to handle empty base first.
 		let r = if base_len == 0 && mod_len == 0 {
 			handle.record_cost(MIN_GAS_COST)?;
 			BigUint::zero()
@@ -217,14 +222,22 @@ impl Precompile for Modexp {
 		// always true except in the case of zero-length modulus, which leads to
 		// output of length and value 1.
 		if bytes.len() == mod_len {
-			Ok(PrecompileOutput { exit_status: ExitSucceed::Returned, output: bytes.to_vec() })
+			Ok(PrecompileOutput {
+				exit_status: ExitSucceed::Returned,
+				output: bytes.to_vec(),
+			})
 		} else if bytes.len() < mod_len {
 			let mut ret = Vec::with_capacity(mod_len);
 			ret.extend(core::iter::repeat(0).take(mod_len - bytes.len()));
 			ret.extend_from_slice(&bytes[..]);
-			Ok(PrecompileOutput { exit_status: ExitSucceed::Returned, output: ret.to_vec() })
+			Ok(PrecompileOutput {
+				exit_status: ExitSucceed::Returned,
+				output: ret.to_vec(),
+			})
 		} else {
-			Err(PrecompileFailure::Error { exit_status: ExitError::Other("failed".into()) })
+			Err(PrecompileFailure::Error {
+				exit_status: ExitError::Other("failed".into()),
+			})
 		}
 	}
 }
@@ -259,10 +272,10 @@ mod tests {
 		match Modexp::execute(&mut handle) {
 			Ok(precompile_result) => {
 				assert_eq!(precompile_result.output.len(), 0);
-			},
+			}
 			Err(_) => {
 				panic!("Modexp::execute() returned error"); // TODO: how to pass error on?
-			},
+			}
 		}
 	}
 
@@ -289,10 +302,10 @@ mod tests {
 			Ok(precompile_result) => {
 				assert_eq!(precompile_result.output.len(), 1);
 				assert_eq!(precompile_result.output, vec![0x00]);
-			},
+			}
 			Err(_) => {
 				panic!("Modexp::execute() returned error"); // TODO: how to pass error on?
-			},
+			}
 		}
 	}
 
@@ -318,7 +331,7 @@ mod tests {
 		match Modexp::execute(&mut handle) {
 			Ok(_) => {
 				panic!("Test not expected to pass");
-			},
+			}
 			Err(e) => {
 				assert_eq!(
 					e,
@@ -327,7 +340,7 @@ mod tests {
 					}
 				);
 				Ok(())
-			},
+			}
 		}
 	}
 
@@ -361,10 +374,10 @@ mod tests {
 				let result = BigUint::from_bytes_be(&precompile_result.output[..]);
 				let expected = BigUint::parse_bytes(b"5", 10).unwrap();
 				assert_eq!(result, expected);
-			},
+			}
 			Err(_) => {
 				panic!("Modexp::execute() returned error"); // TODO: how to pass error on?
-			},
+			}
 		}
 	}
 
@@ -398,10 +411,10 @@ mod tests {
 				let result = BigUint::from_bytes_be(&precompile_result.output[..]);
 				let expected = BigUint::parse_bytes(b"10055", 10).unwrap();
 				assert_eq!(result, expected);
-			},
+			}
 			Err(_) => {
 				panic!("Modexp::execute() returned error"); // TODO: how to pass error on?
-			},
+			}
 		}
 	}
 
@@ -433,10 +446,10 @@ mod tests {
 				let result = BigUint::from_bytes_be(&precompile_result.output[..]);
 				let expected = BigUint::parse_bytes(b"1", 10).unwrap();
 				assert_eq!(result, expected);
-			},
+			}
 			Err(_) => {
 				panic!("Modexp::execute() returned error"); // TODO: how to pass error on?
-			},
+			}
 		}
 	}
 

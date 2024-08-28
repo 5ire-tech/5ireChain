@@ -19,13 +19,19 @@
 
 use frame_support::{
 	pallet_prelude::*,
-	traits::{Currency, OnUnbalanced},
+	traits::{
+		fungibles::{Balanced, Credit},
+		Currency, OnUnbalanced,
+	},
 };
 use pallet_alliance::{IdentityVerifier, ProposalIndex, ProposalProvider};
+use pallet_asset_tx_payment::HandleCredit;
+use pallet_identity::legacy::IdentityField;
 use sp_std::prelude::*;
 
 use crate::{
-	AccountId, AllianceMotion, Authorship, Balances, Hash, NegativeImbalance, RuntimeCall,
+	AccountId, AllianceCollective, AllianceMotion, Assets, Authorship, Balances, Hash,
+	NegativeImbalance, Runtime, RuntimeCall,
 };
 
 pub struct Author;
@@ -37,16 +43,28 @@ impl OnUnbalanced<NegativeImbalance> for Author {
 	}
 }
 
+/// A `HandleCredit` implementation that naively transfers the fees to the block author.
+/// Will drop and burn the assets in case the transfer fails.
+pub struct CreditToBlockAuthor;
+impl HandleCredit<AccountId, Assets> for CreditToBlockAuthor {
+	fn handle_credit(credit: Credit<AccountId, Assets>) {
+		if let Some(author) = pallet_authorship::Pallet::<Runtime>::author() {
+			// Drop the result which will trigger the `OnDrop` of the imbalance in case of error.
+			let _ = Assets::resolve(&author, credit);
+		}
+	}
+}
+
 pub struct AllianceIdentityVerifier;
 impl IdentityVerifier<AccountId> for AllianceIdentityVerifier {
-	fn has_identity(who: &AccountId, fields: u64) -> bool {
-		crate::Identity::has_identity(who, fields)
+	fn has_required_identities(who: &AccountId) -> bool {
+		crate::Identity::has_identity(who, (IdentityField::Display | IdentityField::Web).bits())
 	}
 
 	fn has_good_judgement(who: &AccountId) -> bool {
 		use pallet_identity::Judgement;
 		crate::Identity::identity(who)
-			.map(|registration| registration.judgements)
+			.map(|(registration, _)| registration.judgements)
 			.map_or(false, |judgements| {
 				judgements
 					.iter()
@@ -89,7 +107,7 @@ impl ProposalProvider<AccountId, Hash, RuntimeCall> for AllianceProposalProvider
 	}
 
 	fn proposal_of(proposal_hash: Hash) -> Option<RuntimeCall> {
-		AllianceMotion::proposal_of(proposal_hash)
+		pallet_collective::ProposalOf::<Runtime, AllianceCollective>::get(proposal_hash)
 	}
 }
 
@@ -258,7 +276,7 @@ mod multiplier_tests {
 				let next = runtime_multiplier_update(fm);
 				fm = next;
 				if fm == min_multiplier() {
-					break
+					break;
 				}
 				iterations += 1;
 			}
