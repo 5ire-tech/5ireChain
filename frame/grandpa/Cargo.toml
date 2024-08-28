@@ -13,7 +13,7 @@ readme = "README.md"
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
-codec = { package = "parity-scale-codec", version = "3.6.1", default-features = false, features = ["derive"] }
+codec = { package = "parity-scale-codec", version = "3.6.9", default-features = false, features = ["derive"] }
 log = { version = "0.4.17", default-features = false }
 scale-info = { version = "2.5.0", default-features = false, features = ["derive", "serde"] }
 frame-benchmarking = { workspace = true, optional = true}
@@ -39,7 +39,6 @@ pallet-offences = { workspace = true }
 pallet-staking = { workspace = true }
 pallet-timestamp = { workspace = true }
 sp-keyring = { workspace = true }
-pallet-esg = { workspace = true }
 
 [features]
 default = [ "std" ]
@@ -65,7 +64,6 @@ std = [
 	"sp-session/std",
 	"sp-staking/std",
 	"sp-std/std",
-	"pallet-esg/std",
 ]
 runtime-benchmarks = [
 	"frame-benchmarking/runtime-benchmarks",
@@ -78,7 +76,6 @@ runtime-benchmarks = [
 	"pallet-timestamp/runtime-benchmarks",
 	"sp-runtime/runtime-benchmarks",
 	"sp-staking/runtime-benchmarks",
-	"pallet-esg/runtime-benchmarks"
 ]
 try-runtime = [
 	"frame-election-provider-support/try-runtime",
@@ -91,5 +88,4 @@ try-runtime = [
 	"pallet-staking/try-runtime",
 	"pallet-timestamp/try-runtime",
 	"sp-runtime/try-runtime",
-	"pallet-esg/try-runtime"
 ]

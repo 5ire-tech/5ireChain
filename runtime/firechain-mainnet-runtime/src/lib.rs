@@ -132,8 +132,6 @@ mod voter_bags;
 /// Runtime API definition for assets.
 pub mod assets_api;
 
-pub use pallet_esg;
-
 // Make the WASM binary available.
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
@@ -592,8 +590,6 @@ impl pallet_staking::Config for Runtime {
 	type EventListeners = NominationPools;
 	type WeightInfo = pallet_staking::weights::SubstrateWeight<Runtime>;
 	type BenchmarkingConfig = StakingBenchmarkingConfig;
-	type ESG = EsgScore;
-	type Reliability = ImOnline;
 }
 
 parameter_types! {
@@ -1603,13 +1599,7 @@ parameter_types! {
 	pub const MaxNumOfNonSudoOracles: u32 = 100;
 }
 
-impl pallet_esg::Config for Runtime {
-	type RuntimeEvent = RuntimeEvent;
-	type MaxFileSize = MaxFileSize;
-	type MaxNumOfSudoOracles = MaxNumOfSudoOracles;
-	type MaxNumOfNonSudoOracles = MaxNumOfNonSudoOracles;
-	type WeightInfo = pallet_esg::weights::SubstrateWeightInfo<Runtime>;
-}
+
 pub struct FindAuthorTruncated<F>(PhantomData<F>);
 impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 	fn find_author<'a, I>(digests: I) -> Option<H160>
@@ -1767,7 +1757,6 @@ construct_runtime!(
 		RankedCollective: pallet_ranked_collective,
 		FastUnstake: pallet_fast_unstake,
 		Pov: frame_benchmarking_pallet_pov,
-		EsgScore: pallet_esg,
 		Reward:pallet_reward,
 		Ethereum: pallet_ethereum,
 		EVM: pallet_evm,
@@ -1838,7 +1827,6 @@ mod benches {
 		[pallet_utility, Utility]
 		[pallet_vesting, Vesting]
 		[pallet_evm, EVM]
-		[pallet_esg, EsgScore]
 		[pallet_reward, Reward]
 	);
 }

@@ -100,7 +100,6 @@ use frame_system::{
 	pallet_prelude::*,
 };
 pub use pallet::*;
-use pallet_esg::traits::ERScoresTrait;
 use pallet_session::validation::OneSessionHandlerAll;
 use scale_info::TypeInfo;
 use sp_application_crypto::RuntimeAppPublic;
@@ -1073,40 +1072,6 @@ impl<Offender: Clone> Offence<Offender> for UnresponsivenessOffence<Offender> {
 			x.saturating_mul(Perbill::from_percent(7))
 		} else {
 			Perbill::default()
-		}
-	}
-}
-
-impl<T: Config> ERScoresTrait<ValidatorId<T>> for Pallet<T> {
-	fn get_score_of(org: ValidatorId<T>) -> u16 {
-		ReliabilityScoresMap::<T>::get(&org)
-	}
-
-	fn chilled_validator_status(company: ValidatorId<T>) {
-		let active_validators = Self::prepare_all_lists().0;
-		if active_validators.contains(&company) {
-			ChilledValidatorsMap::<T>::mutate(company, |v| *v = true);
-		}
-	}
-
-	fn reset_chilled_validator_status(company: ValidatorId<T>) {
-		ChilledValidatorsMap::<T>::mutate(company, |v| *v = false);
-	}
-
-	fn reset_score_after_era_for_chilled_active_validator() {
-		let active_validators = Self::prepare_all_lists().0;
-		active_validators.iter().for_each(|vid| {
-			if ChilledValidatorsMap::<T>::get(vid) == true {
-				ReliabilityScoresMap::<T>::mutate(vid, |v| *v = 0);
-				ChilledValidatorsMap::<T>::mutate(vid, |v| *v = false)
-			}
-		});
-	}
-
-	fn reset_score_of_chilled_waiting_validator(company: ValidatorId<T>) {
-		let active_validators = Self::prepare_all_lists().0;
-		if !active_validators.contains(&company) {
-			ReliabilityScoresMap::<T>::mutate(company.clone(), |v| *v = 0);
 		}
 	}
 }

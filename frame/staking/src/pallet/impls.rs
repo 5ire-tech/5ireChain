@@ -31,7 +31,6 @@ use frame_support::{
 	},
 	weights::Weight,
 };
-use pallet_esg::traits::ERScoresTrait;
 use crate::{Rewards};
 
 use frame_system::{pallet_prelude::BlockNumberFor, RawOrigin};
@@ -155,8 +154,6 @@ impl<T: Config> Pallet<T> {
 		let chilled_as_nominator = Self::do_remove_nominator(stash);
 		if chilled_as_validator || chilled_as_nominator {
 			Self::deposit_event(Event::<T>::Chilled { stash: stash.clone() });
-			T::Reliability::chilled_validator_status(stash.clone());
-			T::Reliability::reset_score_of_chilled_waiting_validator(stash.clone());
 		}
 	}
 
@@ -308,9 +305,6 @@ impl<T: Config> Pallet<T> {
 			// Set ending era reward.
 			<ErasValidatorReward<T>>::insert(&active_era.index, validator_payout);
 			T::RewardRemainder::on_unbalanced(T::Currency::issue(remainder));
-
-			//Reset active validators reliability score to zero
-			T::Reliability::reset_score_after_era_for_chilled_active_validator();
 
 			// Clear offending validators.
 			<OffendingValidators<T>>::kill();
@@ -1142,10 +1136,7 @@ where
 	T: Config + pallet_authorship::Config + pallet_session::Config,
 {
 	fn note_author(author: T::AccountId) {
-		let esg_score = T::ESG::get_score_of(author.clone());
-		let reliability_score = T::Reliability::get_score_of(author.clone());
-		let esg_reliability_score = esg_score.saturating_add(reliability_score);
-		Self::reward_by_ids(vec![(author.clone(), 20.saturating_add(esg_reliability_score).into())])
+		Self::reward_by_ids(vec![(author, 20)])
 	}
 }
 

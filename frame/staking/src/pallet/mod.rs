@@ -32,7 +32,6 @@ use frame_support::{
 	BoundedVec,
 };
 use frame_system::{ensure_root, ensure_signed, pallet_prelude::*};
-use pallet_esg::traits::ERScoresTrait;
 use sp_runtime::{
 	traits::{CheckedSub, SaturatedConversion, StaticLookup, Zero},
 	ArithmeticError, Perbill, Percent,
@@ -281,10 +280,6 @@ pub mod pallet {
 
 		/// Weight information for extrinsics in this pallet.
 		type WeightInfo: WeightInfo;
-
-		/// Esg & Reliability Score
-		type ESG: ERScoresTrait<Self::AccountId>;
-		type Reliability: ERScoresTrait<Self::AccountId>;
 	}
 
 	/// The ideal number of active validators.

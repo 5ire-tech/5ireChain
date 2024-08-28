@@ -56,7 +56,6 @@ fn nominator_receiving_reward() {
         let nominator: u64 = 21;
         let nominator_reward :u128 = 500;
 		let validator_reward: u128 = 1000; 
-
         let earlier_nominator_balance =RewardBalance::free_balance(21);
         let earlier_validator_balance =RewardBalance::free_balance(11);
 
@@ -71,7 +70,7 @@ fn nominator_receiving_reward() {
         let _=  Reward::claim_rewards(validator);
 
 		// Validator balance check
-        let validator_balance =RewardBalance::free_balance(21);
+        let validator_balance =RewardBalance::free_balance(11);
         assert_eq!(validator_balance, earlier_validator_balance + validator_reward); 
 
 		// Nominator balance check 
@@ -81,6 +80,44 @@ fn nominator_receiving_reward() {
 		// Reward balance check 
 		let reward_account_balance_after =RewardBalance::free_balance(Reward::account_id());
 		assert_eq!(reward_account_balance_after , 15000000 - validator_reward - nominator_reward); 
+
+    }); 
+}
+
+#[test]
+fn low_balance_for_nominator() {
+    ExtBuilder::default().build_and_execute(|| {
+        start_session(1);
+        assert_eq!(active_era(), 0);
+
+        let validator: u64 = 11;
+        let nominator: u64 = 21;
+        let nominator_reward :u128 = 500;
+		let validator_reward: u128 = 1000; 
+        let earlier_nominator_balance =RewardBalance::free_balance(21);
+        let earlier_validator_balance =RewardBalance::free_balance(11);
+
+        ValidatorRewardAccounts::<Test>::insert(validator, validator_reward);
+        NominatorRewardAccounts::<Test>::insert(validator, nominator, nominator_reward);
+        EraReward::<Test>::insert(validator,vec![nominator]);
+
+        let _ = Balances::deposit_creating(&Reward::account_id(), 1000);
+		let reward_account_balance_before =RewardBalance::free_balance(Reward::account_id());
+		assert_eq!(reward_account_balance_before , 1000); 
+        assert_ok!(Reward::get_rewards(who(1), validator));
+        let _=  Reward::claim_rewards(validator);
+
+		// Validator balance check
+        let validator_balance =RewardBalance::free_balance(11);
+        assert_eq!(validator_balance, earlier_validator_balance + validator_reward); 
+
+		// Nominator balance check 
+        let nominator_balance =RewardBalance::free_balance(21);
+        assert_eq!(nominator_balance,earlier_nominator_balance + nominator_reward); 
+
+		// Reward balance check 
+		let reward_account_balance_after =RewardBalance::free_balance(Reward::account_id());
+		assert_eq!(reward_account_balance_after , 10000 - validator_reward - nominator_reward); 
 
     }); 
 }

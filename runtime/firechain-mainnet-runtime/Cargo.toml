@@ -16,7 +16,7 @@ targets = ["x86_64-unknown-linux-gnu"]
 [dependencies]
 
 # third-party dependencies
-codec = { package = "parity-scale-codec", version = "3.6.1", default-features = false, features = [
+codec = { package = "parity-scale-codec", version = "3.6.9", default-features = false, features = [
 	"derive",
 	"max-encoded-len",
 ] }
@@ -111,7 +111,6 @@ pallet-transaction-payment = { workspace = true }
 pallet-transaction-payment-rpc-runtime-api = { workspace = true }
 pallet-transaction-storage = { workspace = true }
 pallet-vesting = { workspace = true }
-pallet-esg = { workspace = true }
 pallet-reward={ workspace = true }
 # Frontier
 fp-account = { workspace = true, features = ["serde"] }
@@ -217,7 +216,6 @@ std = [
 	"pallet-child-bounties/std",
 	"pallet-alliance/std",
 	"substrate-wasm-builder",
-	"pallet-esg/std",
 	"pallet-reward/std",
 	#frontier
 	'fp-rpc/std',
@@ -278,7 +276,6 @@ runtime-benchmarks = [
 	"pallet-utility/runtime-benchmarks",
 	"pallet-vesting/runtime-benchmarks",
 	"frame-system-benchmarking/runtime-benchmarks",
-	"pallet-esg/runtime-benchmarks",
 	"pallet-ethereum/runtime-benchmarks",
 	"pallet-reward/runtime-benchmarks",
 ]
@@ -333,7 +330,6 @@ try-runtime = [
 	"pallet-transaction-payment/try-runtime",
 	"pallet-transaction-storage/try-runtime",
 	"pallet-vesting/try-runtime",
-	"pallet-esg/try-runtime",
 	"fp-self-contained/try-runtime",
 	"sp-runtime/try-runtime",
 	"pallet-ethereum/try-runtime",

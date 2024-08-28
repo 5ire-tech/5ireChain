@@ -18,7 +18,7 @@ array-bytes = "6.1"
 clap = { version = "4.2.5", features = ["derive"], optional = true }
 
 hex-literal = "0.3.4"
-codec = { package = "parity-scale-codec", version = "3.6.1" }
+codec = { package = "parity-scale-codec", version = "3.6.12" }
 rand = "0.8"
 jsonrpsee = { version = "0.16.2", features = ["server"] }
 hex = { version = "0.4", default-features = false }
@@ -98,7 +98,6 @@ mmr-rpc = { workspace = true }
 frame-benchmarking = { optional = true, workspace = true }
 frame-benchmarking-cli = { optional = true, workspace = true }
 # Cli for try runtime
-try-runtime-cli = { optional = true, workspace = true }
 # frame dependencies
 frame-system = { workspace = true }
 pallet-transaction-payment = { workspace = true }
@@ -123,9 +122,7 @@ fc-storage = { workspace = true }
 
 
 # Local Dependencies
-firechain-qa-runtime = {  workspace = true }
 firechain-mainnet-runtime = {  workspace = true }
-firechain-thunder-runtime = {  workspace = true }
 node-primitives = { workspace = true, default-features = false  }
 firechain-runtime-core-primitives = { workspace = true }
 
@@ -140,15 +137,13 @@ substrate-frame-cli = { optional = true, workspace = true }
 
 # CLI-specific dependencies
 
-try-runtime-cli = { optional = true, workspace = true }
-
 [dev-dependencies]
 sc-client-db = { workspace = true }
 pallet-timestamp = { workspace = true }
 
 [features]
 default = ["rpc-binary-search-estimate"]
-all = ["cli", "firechain-qa", "firechain-mainnet", "firechain-thunder"]
+all = ["cli", "firechain-mainnet", ]
 cli = [
 	"sc-cli",
 	"frame-benchmarking-cli",
@@ -157,17 +152,12 @@ cli = [
 	"clap",
 	"clap_complete",
 	"substrate-build-script-utils",
-	"try-runtime-cli",
 ]
-firechain-qa = ["cli", "firechain-qa-runtime/default"]
 firechain-mainnet = ["cli", "firechain-mainnet-runtime/default"]
-firechain-thunder = ["cli", "firechain-thunder-runtime/default"]
 
 # Dependencies that are only required if runtime benchmarking should be build.
 runtime-benchmarks = [
-	"firechain-qa-runtime/runtime-benchmarks",
 	"firechain-mainnet-runtime/runtime-benchmarks",
-	"firechain-thunder-runtime/runtime-benchmarks",
 	"frame-benchmarking/runtime-benchmarks",
 	"frame-benchmarking-cli/runtime-benchmarks",
 ]
@@ -175,10 +165,7 @@ runtime-benchmarks = [
 # in the near future.
 
 try-runtime = [
-	"firechain-qa-runtime/try-runtime",
 	"firechain-mainnet-runtime/try-runtime",
-	"firechain-thunder-runtime/try-runtime",
-	"try-runtime-cli/try-runtime",
 ]
 
 rpc-binary-search-estimate = ["fc-rpc/rpc-binary-search-estimate"]
