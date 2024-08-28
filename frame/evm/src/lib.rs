@@ -732,6 +732,23 @@ impl<T: From<H160>> AddressMapping<T> for IdentityAddressMapping {
 		address.into()
 	}
 }
+pub fn h160_to_account_id(address: H160) -> AccountId32 {
+    // Create a 32-byte array initialized with zeros.
+    let mut data = [0u8; 32];
+    // Copy the 20-byte H160 address into the lower 20 bytes of the 32-byte array.
+    data[0..20].copy_from_slice(&address[..]);
+    // Convert the 32-byte array to AccountId32.
+    AccountId32::new(data)
+}
+
+pub struct CustomAddressMapping;
+
+impl AddressMapping<AccountId32> for CustomAddressMapping {
+    fn into_account_id(address: H160) -> AccountId32 {
+        h160_to_account_id(address)
+    }
+}
+
 
 /// Hashed address mapping.
 pub struct HashedAddressMapping<H>(core::marker::PhantomData<H>);

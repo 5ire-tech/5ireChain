@@ -14,8 +14,6 @@ pub mod opaque {
 	/// Opaque block identifier type.
 	pub type BlockId = generic::BlockId<Block>;
 
-
-
 	use sp_runtime::{
 	
 		traits::{ IdentifyAccount, Verify},
@@ -42,8 +40,6 @@ pub mod opaque {
 	
 	/// Index of a transaction in the chain.
 	pub type Nonce = u32;
-	
-	
 	
 	/// A timestamp: milliseconds since the unix epoch.
 	/// `u64` is enough to represent a duration of half a billion years, when the
