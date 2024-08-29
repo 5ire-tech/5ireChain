@@ -38,7 +38,7 @@ mod cli;
 #[cfg(feature = "cli")]
 mod command;
 pub mod service;
-
+pub mod eth;
 #[cfg(feature = "cli")]
 pub use cli::*;
 #[cfg(feature = "cli")]

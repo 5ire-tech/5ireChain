@@ -151,8 +151,9 @@ pallet-hotfix-sufficients = { workspace = true }
 substrate-wasm-builder = { workspace = true, optional = true }
 
 [features]
-default = ["std"]
+default = ["std","with-rocksdb-weights"]
 runtime-wasm = []
+with-rocksdb-weights = []
 with-tracing = ["frame-executive/with-tracing"]
 std = [
 	"pallet-election-provider-support-benchmarking?/std",

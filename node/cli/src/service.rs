@@ -24,6 +24,7 @@ use crate::Cli;
 use codec::Encode;
 use frame_benchmarking_cli::SUBSTRATE_REFERENCE_HARDWARE;
 use frame_system_rpc_runtime_api::AccountNonceApi;
+use crate::eth::EthConfiguration;
 use futures::prelude::*;
 use firechain_mainnet_runtime::RuntimeApi;
 use node_primitives::Block;
@@ -32,6 +33,7 @@ use sc_consensus_babe::{self, SlotProportion};
 use sc_network::{
 	event::Event, service::traits::NetworkService, NetworkBackend, NetworkEventStream,
 };
+use crate::eth::BackendType;
 use sc_network_sync::{strategy::warp::WarpSyncParams, SyncingService};
 use sc_service::{config::Configuration, error::Error as ServiceError, RpcHandlers, TaskManager};
 use sc_statement_store::Store as StatementStore;
@@ -41,7 +43,10 @@ use sp_api::ProvideRuntimeApi;
 use sp_core::crypto::Pair;
 use sp_runtime::{generic, traits::Block as BlockT, SaturatedConversion};
 use std::{path::Path, sync::Arc};
-
+use sc_consensus_babe::BabeWorkerHandle;
+use crate::eth::FrontierBackend;
+use crate::eth::StorageOverrideHandler;
+use crate::eth::db_config_dir;
 /// Host functions required for kitchensink runtime and Substrate node.
 #[cfg(not(feature = "runtime-benchmarks"))]
 pub type HostFunctions =
@@ -156,6 +161,7 @@ pub fn create_extrinsic(
 pub fn new_partial(
 	config: &Configuration,
 	mixnet_config: Option<&sc_mixnet::Config>,
+	eth_config: EthConfiguration,
 ) -> Result<
 	sc_service::PartialComponents<
 		FullClient,
@@ -164,10 +170,10 @@ pub fn new_partial(
 		sc_consensus::DefaultImportQueue<Block>,
 		sc_transaction_pool::FullPool<Block, FullClient>,
 		(
-			impl Fn(
-				node_rpc::DenyUnsafe,
-				sc_rpc::SubscriptionTaskExecutor,
-			) -> Result<jsonrpsee::RpcModule<()>, sc_service::Error>,
+			// impl Fn(
+			// 	node_rpc::DenyUnsafe,
+			// 	sc_rpc::SubscriptionTaskExecutor,
+			// ) -> Result<jsonrpsee::RpcModule<()>, sc_service::Error>,
 			(
 				sc_consensus_babe::BabeBlockImport<
 					Block,
@@ -176,11 +182,14 @@ pub fn new_partial(
 				>,
 				grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
 				sc_consensus_babe::BabeLink<Block>,
-				beefy::BeefyVoterLinks<Block>,
+				// beefy::BeefyVoterLinks<Block>,
 			),
-			grandpa::SharedVoterState,
+			BabeWorkerHandle<Block>,
+			// grandpa::SharedVoterState,
 			Option<Telemetry>,
 			Arc<StatementStore>,
+			FrontierBackend<FullClient>,
+			Option<sc_mixnet::Api>,
 			Option<sc_mixnet::ApiBackend>,
 		),
 	>,
@@ -270,7 +279,7 @@ pub fn new_partial(
 			offchain_tx_pool_factory: OffchainTransactionPoolFactory::new(transaction_pool.clone()),
 		})?;
 
-	let import_setup = (block_import, grandpa_link, babe_link, beefy_voter_links);
+	let import_setup = (block_import, grandpa_link, babe_link);
 
 	let statement_store = sc_statement_store::Store::new_shared(
 		&config.data_path,
@@ -283,66 +292,95 @@ pub fn new_partial(
 	.map_err(|e| ServiceError::Other(format!("Statement store error: {:?}", e)))?;
 
 	let (mixnet_api, mixnet_api_backend) = mixnet_config.map(sc_mixnet::Api::new).unzip();
-
-	let (rpc_extensions_builder, rpc_setup) = {
-		let (_, grandpa_link, _, _) = &import_setup;
-
-		let justification_stream = grandpa_link.justification_stream();
-		let shared_authority_set = grandpa_link.shared_authority_set().clone();
-		let shared_voter_state = grandpa::SharedVoterState::empty();
-		let shared_voter_state2 = shared_voter_state.clone();
-
-		let finality_proof_provider = grandpa::FinalityProofProvider::new_for_service(
-			backend.clone(),
-			Some(shared_authority_set.clone()),
-		);
-
-		let client = client.clone();
-		let pool = transaction_pool.clone();
-		let select_chain = select_chain.clone();
-		let keystore = keystore_container.keystore();
-		let chain_spec = config.chain_spec.cloned_box();
-
-		let rpc_backend = backend.clone();
-		let rpc_statement_store = statement_store.clone();
-		let rpc_extensions_builder =
-			move |deny_unsafe, subscription_executor: node_rpc::SubscriptionTaskExecutor| {
-				let deps = node_rpc::FullDeps {
-					client: client.clone(),
-					pool: pool.clone(),
-					select_chain: select_chain.clone(),
-					chain_spec: chain_spec.cloned_box(),
-					deny_unsafe,
-					babe: node_rpc::BabeDeps {
-						keystore: keystore.clone(),
-						babe_worker_handle: babe_worker_handle.clone(),
-					},
-					grandpa: node_rpc::GrandpaDeps {
-						shared_voter_state: shared_voter_state.clone(),
-						shared_authority_set: shared_authority_set.clone(),
-						justification_stream: justification_stream.clone(),
-						subscription_executor: subscription_executor.clone(),
-						finality_provider: finality_proof_provider.clone(),
-					},
-					beefy: node_rpc::BeefyDeps {
-						beefy_finality_proof_stream: beefy_rpc_links
-							.from_voter_justif_stream
-							.clone(),
-						beefy_best_block_stream: beefy_rpc_links
-							.from_voter_best_beefy_stream
-							.clone(),
-						subscription_executor,
-					},
-					statement_store: rpc_statement_store.clone(),
-					backend: rpc_backend.clone(),
-					mixnet_api: mixnet_api.as_ref().cloned(),
-				};
-
-				node_rpc::create_full(deps).map_err(Into::into)
-			};
-
-		(rpc_extensions_builder, shared_voter_state2)
+	let storage_override = Arc::new(StorageOverrideHandler::new(client.clone()));
+	let frontier_backend = match eth_config.frontier_backend_type {
+		BackendType::KeyValue => FrontierBackend::KeyValue(Arc::new(fc_db::kv::Backend::open(
+			Arc::clone(&client),
+			&config.database,
+			&db_config_dir(config),
+		)?)),
+		BackendType::Sql => {
+			let db_path = db_config_dir(config).join("sql");
+			std::fs::create_dir_all(&db_path).expect("failed creating sql db directory");
+			let backend = futures::executor::block_on(fc_db::sql::Backend::new(
+				fc_db::sql::BackendConfig::Sqlite(fc_db::sql::SqliteBackendConfig {
+					path: Path::new("sqlite:///")
+						.join(db_path)
+						.join("frontier.db3")
+						.to_str()
+						.unwrap(),
+					create_if_missing: true,
+					thread_count: eth_config.frontier_sql_backend_thread_count,
+					cache_size: eth_config.frontier_sql_backend_cache_size,
+				}),
+				eth_config.frontier_sql_backend_pool_size,
+				std::num::NonZeroU32::new(eth_config.frontier_sql_backend_num_ops_timeout),
+				storage_override.clone(),
+			))
+			.unwrap_or_else(|err| panic!("failed creating sql backend: {:?}", err));
+			FrontierBackend::Sql(Arc::new(backend))
+		}
 	};
+
+	// let (rpc_extensions_builder, rpc_setup) = {
+	// 	let (_, grandpa_link, _, _) = &import_setup;
+
+	// 	let justification_stream = grandpa_link.justification_stream();
+	// 	let shared_authority_set = grandpa_link.shared_authority_set().clone();
+	// 	let shared_voter_state = grandpa::SharedVoterState::empty();
+	// 	let shared_voter_state2 = shared_voter_state.clone();
+
+	// 	let finality_proof_provider = grandpa::FinalityProofProvider::new_for_service(
+	// 		backend.clone(),
+	// 		Some(shared_authority_set.clone()),
+	// 	);
+
+	// 	let client = client.clone();
+	// 	let pool = transaction_pool.clone();
+	// 	let select_chain = select_chain.clone();
+	// 	let keystore = keystore_container.keystore();
+	// 	let chain_spec = config.chain_spec.cloned_box();
+
+	// 	let rpc_backend = backend.clone();
+	// 	let rpc_statement_store = statement_store.clone();
+	// 	let rpc_extensions_builder =
+	// 		move |deny_unsafe, subscription_executor: node_rpc::SubscriptionTaskExecutor| {
+	// 			let deps = node_rpc::FullDeps {
+	// 				client: client.clone(),
+	// 				pool: pool.clone(),
+	// 				select_chain: select_chain.clone(),
+	// 				chain_spec: chain_spec.cloned_box(),
+	// 				deny_unsafe,
+	// 				babe: node_rpc::BabeDeps {
+	// 					keystore: keystore.clone(),
+	// 					babe_worker_handle: babe_worker_handle.clone(),
+	// 				},
+	// 				grandpa: node_rpc::GrandpaDeps {
+	// 					shared_voter_state: shared_voter_state.clone(),
+	// 					shared_authority_set: shared_authority_set.clone(),
+	// 					justification_stream: justification_stream.clone(),
+	// 					subscription_executor: subscription_executor.clone(),
+	// 					finality_provider: finality_proof_provider.clone(),
+	// 				},
+	// 				beefy: node_rpc::BeefyDeps {
+	// 					beefy_finality_proof_stream: beefy_rpc_links
+	// 						.from_voter_justif_stream
+	// 						.clone(),
+	// 					beefy_best_block_stream: beefy_rpc_links
+	// 						.from_voter_best_beefy_stream
+	// 						.clone(),
+	// 					subscription_executor,
+	// 				},
+	// 				statement_store: rpc_statement_store.clone(),
+	// 				backend: rpc_backend.clone(),
+	// 				mixnet_api: mixnet_api.as_ref().cloned(),
+	// 			};
+
+	// 			node_rpc::create_full(deps).map_err(Into::into)
+	// 		};
+
+	// 	(rpc_extensions_builder, shared_voter_state2)
+	// };
 
 	Ok(sc_service::PartialComponents {
 		client,
@@ -353,12 +391,7 @@ pub fn new_partial(
 		import_queue,
 		transaction_pool,
 		other: (
-			rpc_extensions_builder,
-			import_setup,
-			rpc_setup,
-			telemetry,
-			statement_store,
-			mixnet_api_backend,
+			import_setup, babe_worker_handle, telemetry, statement_store,frontier_backend,mixnet_api,mixnet_api_backend,
 		),
 	})
 }
@@ -392,6 +425,7 @@ pub fn new_full_base<N: NetworkBackend<Block, <Block as BlockT>::Hash>>(
 		>,
 		&sc_consensus_babe::BabeLink<Block>,
 	),
+	eth_config: EthConfiguration,
 ) -> Result<NewFullBase, ServiceError> {
 	let is_offchain_indexing_enabled = config.offchain_worker.indexing_enabled;
 	let role = config.role.clone();
@@ -418,14 +452,12 @@ pub fn new_full_base<N: NetworkBackend<Block, <Block as BlockT>::Hash>>(
 		keystore_container,
 		select_chain,
 		transaction_pool,
-		other:
-			(rpc_builder, import_setup, rpc_setup, mut telemetry, statement_store, mixnet_api_backend),
-	} = new_partial(&config, mixnet_config.as_ref())?;
+		other: (import_setup,babe_worker_handle,mut telemetry, frontier_backend,statement_store,mixnet_api, mixnet_api_backend),
+	} = new_partial(&config, mixnet_config.as_ref(),eth_config.clone())?;
 
 	let metrics = N::register_notification_metrics(
 		config.prometheus_config.as_ref().map(|cfg| &cfg.registry),
 	);
-	let shared_voter_state = rpc_setup;
 	let auth_disc_publish_non_global_ips = config.network.allow_non_globals_in_dht;
 	let auth_disc_public_addresses = config.network.public_addresses.clone();
 
@@ -523,6 +555,72 @@ pub fn new_full_base<N: NetworkBackend<Block, <Block as BlockT>::Hash>>(
 		);
 		task_manager.spawn_handle().spawn("mixnet", None, mixnet);
 	}
+
+	let (rpc_extensions_builder, rpc_setup) = {
+		let (_, grandpa_link, _, _) = &import_setup;
+
+		let justification_stream = grandpa_link.justification_stream();
+		let shared_authority_set = grandpa_link.shared_authority_set().clone();
+		let shared_voter_state = grandpa::SharedVoterState::empty();
+		let shared_voter_state2 = shared_voter_state.clone();
+
+		let finality_proof_provider = grandpa::FinalityProofProvider::new_for_service(
+			backend.clone(),
+			Some(shared_authority_set.clone()),
+		);
+
+		let client = client.clone();
+		let pool = transaction_pool.clone();
+		let select_chain = select_chain.clone();
+		let keystore = keystore_container.keystore();
+		let chain_spec = config.chain_spec.cloned_box();
+
+		let rpc_backend = backend.clone();
+		let rpc_statement_store = statement_store.clone();
+		let rpc_extensions_builder =
+			move |deny_unsafe, subscription_executor: node_rpc::SubscriptionTaskExecutor| {
+				let deps = node_rpc::FullDeps {
+					client: client.clone(),
+					pool: pool.clone(),
+					select_chain: select_chain.clone(),
+					chain_spec: chain_spec.cloned_box(),
+					deny_unsafe,
+					babe: node_rpc::BabeDeps {
+						keystore: keystore.clone(),
+						babe_worker_handle: babe_worker_handle.clone(),
+					},
+					grandpa: node_rpc::GrandpaDeps {
+						shared_voter_state: shared_voter_state.clone(),
+						shared_authority_set: shared_authority_set.clone(),
+						justification_stream: justification_stream.clone(),
+						subscription_executor: subscription_executor.clone(),
+						finality_provider: finality_proof_provider.clone(),
+					},
+					// beefy: node_rpc::BeefyDeps {
+					// 	beefy_finality_proof_stream: beefy_rpc_links
+					// 		.from_voter_justif_stream
+					// 		.clone(),
+					// 	beefy_best_block_stream: beefy_rpc_links
+					// 		.from_voter_best_beefy_stream
+					// 		.clone(),
+					// 	subscription_executor,
+					// },
+					statement_store: rpc_statement_store.clone(),
+					backend: rpc_backend.clone(),
+					mixnet_api: mixnet_api.as_ref().cloned(),
+				};
+
+				node_rpc::create_full(deps).map_err(Into::into)
+			};
+
+		(rpc_extensions_builder, shared_voter_state2)
+	};
+	let shared_voter_state = rpc_setup;
+
+
+
+
+
 
 	let rpc_handlers = sc_service::spawn_tasks(sc_service::SpawnTasksParams {
 		config,
