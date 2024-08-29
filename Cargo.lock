@@ -2565,6 +2565,7 @@ dependencies = [
  "frame-benchmarking-pallet-pov",
  "frame-election-provider-support",
  "frame-executive",
+ "frame-metadata-hash-extension",
  "frame-support",
  "frame-system",
  "frame-system-benchmarking",

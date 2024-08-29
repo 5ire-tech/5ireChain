@@ -20,7 +20,7 @@
 
 use beefy_primitives::ecdsa_crypto::AuthorityId as BeefyId;
 use grandpa_primitives::AuthorityId as GrandpaId;
-use kitchensink_runtime::{
+use firechain_mainnet_runtime::{
 	constants::currency::*, wasm_binary_unwrap, Block, MaxNominations, SessionKeys, StakerStatus,
 };
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
@@ -37,7 +37,7 @@ use sp_runtime::{
 	Perbill,
 };
 
-pub use kitchensink_runtime::RuntimeGenesisConfig;
+pub use firechain_mainnet_runtime::RuntimeGenesisConfig;
 pub use node_primitives::{AccountId, Balance, Signature};
 
 type AccountPublic = <Signature as Verify>::Signer;
@@ -422,9 +422,9 @@ pub fn testnet_genesis(
 		},
 		"sudo": { "key": Some(root_key.clone()) },
 		"babe": {
-			"epochConfig": Some(kitchensink_runtime::BABE_GENESIS_EPOCH_CONFIG),
+			"epochConfig": Some(firechain_mainnet_runtime::BABE_GENESIS_EPOCH_CONFIG),
 		},
-		"society": { "pot": 0 },
+		// "society": { "pot": 0 },
 		"assets": {
 			// This asset is used by the NIS pallet as counterpart currency.
 			"assets": vec![(9, get_account_id_from_seed::<sr25519::Public>("Alice"), true, 1)],

@@ -25,7 +25,7 @@ use codec::Encode;
 use frame_benchmarking_cli::SUBSTRATE_REFERENCE_HARDWARE;
 use frame_system_rpc_runtime_api::AccountNonceApi;
 use futures::prelude::*;
-use kitchensink_runtime::RuntimeApi;
+use firechain_mainnet_runtime::RuntimeApi;
 use node_primitives::Block;
 use sc_client_api::{Backend, BlockBackend};
 use sc_consensus_babe::{self, SlotProportion};
@@ -95,61 +95,59 @@ pub fn fetch_nonce(client: &FullClient, account: sp_core::sr25519::Pair) -> u32 
 pub fn create_extrinsic(
 	client: &FullClient,
 	sender: sp_core::sr25519::Pair,
-	function: impl Into<kitchensink_runtime::RuntimeCall>,
+	function: impl Into<firechain_mainnet_runtime::RuntimeCall>,
 	nonce: Option<u32>,
-) -> kitchensink_runtime::UncheckedExtrinsic {
+) -> firechain_mainnet_runtime::UncheckedExtrinsic {
 	let function = function.into();
 	let genesis_hash = client.block_hash(0).ok().flatten().expect("Genesis block exists; qed");
 	let best_hash = client.chain_info().best_hash;
 	let best_block = client.chain_info().best_number;
 	let nonce = nonce.unwrap_or_else(|| fetch_nonce(client, sender.clone()));
 
-	let period = kitchensink_runtime::BlockHashCount::get()
+	let period = firechain_mainnet_runtime::BlockHashCount::get()
 		.checked_next_power_of_two()
 		.map(|c| c / 2)
 		.unwrap_or(2) as u64;
 	let tip = 0;
-	let extra: kitchensink_runtime::SignedExtra =
+	let extra: firechain_mainnet_runtime::SignedExtra =
 		(
-			frame_system::CheckNonZeroSender::<kitchensink_runtime::Runtime>::new(),
-			frame_system::CheckSpecVersion::<kitchensink_runtime::Runtime>::new(),
-			frame_system::CheckTxVersion::<kitchensink_runtime::Runtime>::new(),
-			frame_system::CheckGenesis::<kitchensink_runtime::Runtime>::new(),
-			frame_system::CheckEra::<kitchensink_runtime::Runtime>::from(generic::Era::mortal(
+			frame_system::CheckNonZeroSender::<firechain_mainnet_runtime::Runtime>::new(),
+			frame_system::CheckSpecVersion::<firechain_mainnet_runtime::Runtime>::new(),
+			frame_system::CheckTxVersion::<firechain_mainnet_runtime::Runtime>::new(),
+			frame_system::CheckGenesis::<firechain_mainnet_runtime::Runtime>::new(),
+			frame_system::CheckEra::<firechain_mainnet_runtime::Runtime>::from(generic::Era::mortal(
 				period,
 				best_block.saturated_into(),
 			)),
-			frame_system::CheckNonce::<kitchensink_runtime::Runtime>::from(nonce),
-			frame_system::CheckWeight::<kitchensink_runtime::Runtime>::new(),
+			frame_system::CheckNonce::<firechain_mainnet_runtime::Runtime>::from(nonce),
+			frame_system::CheckWeight::<firechain_mainnet_runtime::Runtime>::new(),
 			pallet_skip_feeless_payment::SkipCheckIfFeeless::from(
 				pallet_asset_conversion_tx_payment::ChargeAssetTxPayment::<
-					kitchensink_runtime::Runtime,
+					firechain_mainnet_runtime::Runtime,
 				>::from(tip, None),
 			),
-			frame_metadata_hash_extension::CheckMetadataHash::new(false),
 		);
 
-	let raw_payload = kitchensink_runtime::SignedPayload::from_raw(
+	let raw_payload = firechain_mainnet_runtime::SignedPayload::from_raw(
 		function.clone(),
 		extra.clone(),
 		(
 			(),
-			kitchensink_runtime::VERSION.spec_version,
-			kitchensink_runtime::VERSION.transaction_version,
+			firechain_mainnet_runtime::VERSION.spec_version,
+			firechain_mainnet_runtime::VERSION.transaction_version,
 			genesis_hash,
 			best_hash,
 			(),
 			(),
 			(),
-			None,
 		),
 	);
 	let signature = raw_payload.using_encoded(|e| sender.sign(e));
 
-	kitchensink_runtime::UncheckedExtrinsic::new_signed(
+	firechain_mainnet_runtime::UncheckedExtrinsic::new_signed(
 		function,
 		sp_runtime::AccountId32::from(sender.public()).into(),
-		kitchensink_runtime::Signature::Sr25519(signature),
+		firechain_mainnet_runtime::Signature::Sr25519(signature),
 		extra,
 	)
 }
@@ -839,7 +837,7 @@ pub fn new_full(config: Configuration, cli: Cli) -> Result<TaskManager, ServiceE
 mod tests {
 	use crate::service::{new_full_base, NewFullBase};
 	use codec::Encode;
-	use kitchensink_runtime::{
+	use firechain_mainnet_runtime::{
 		constants::{currency::CENTS, time::SLOT_DURATION},
 		Address, BalancesCall, RuntimeCall, UncheckedExtrinsic,
 	};

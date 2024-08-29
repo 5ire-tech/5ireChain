@@ -60,6 +60,7 @@ frame-benchmarking = { workspace = true }
 frame-benchmarking-pallet-pov = { workspace = true }
 frame-support = { workspace = true, eatures = ["experimental", "tuples-96"] }
 frame-system = { workspace = true }
+frame-metadata-hash-extension = { workspace = true }
 frame-system-benchmarking = { workspace = true, optional = true }
 frame-election-provider-support = { workspace = true }
 frame-system-rpc-runtime-api = { workspace = true }
@@ -204,6 +205,7 @@ std = [
 	"sp-runtime/std",
 	"sp-staking/std",
 	"pallet-staking/std",
+	"frame-metadata-hash-extension/std",
 	"pallet-staking-runtime-api/std",
 	"pallet-state-trie-migration/std",
 	"pallet-asset-tx-payment/std",

@@ -33,7 +33,7 @@ pub type Client = client::Client<
 	Backend,
 	client::LocalCallExecutor<node_primitives::Block, Backend, RuntimeExecutor>,
 	node_primitives::Block,
-	kitchensink_runtime::RuntimeApi,
+	firechain_mainnet_runtime::RuntimeApi,
 >;
 
 /// Genesis configuration parameters for `TestClient`.
@@ -45,7 +45,7 @@ impl substrate_test_client::GenesisInit for GenesisParameters {
 		let mut storage = crate::genesis::config().build_storage().unwrap();
 		storage.top.insert(
 			sp_core::storage::well_known_keys::CODE.to_vec(),
-			kitchensink_runtime::wasm_binary_unwrap().into(),
+			firechain_mainnet_runtime::wasm_binary_unwrap().into(),
 		);
 		storage
 	}

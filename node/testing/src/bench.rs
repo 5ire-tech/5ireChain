@@ -34,7 +34,7 @@ use crate::{
 };
 use codec::{Decode, Encode};
 use futures::executor;
-use kitchensink_runtime::{
+use firechain_mainnet_runtime::{
 	constants::currency::DOLLARS, AccountId, BalancesCall, CheckedExtrinsic, MinimumPeriod,
 	RuntimeCall, Signature, SystemCall, UncheckedExtrinsic,
 };
@@ -297,13 +297,13 @@ impl<'a> Iterator for BlockContentIterator<'a> {
 			CheckedExtrinsic {
 				signed: Some((
 					sender,
-					signed_extra(0, kitchensink_runtime::ExistentialDeposit::get() + 1),
+					signed_extra(0, firechain_mainnet_runtime::ExistentialDeposit::get() + 1),
 				)),
 				function: match self.content.block_type {
 					BlockType::RandomTransfersKeepAlive =>
 						RuntimeCall::Balances(BalancesCall::transfer_keep_alive {
 							dest: sp_runtime::MultiAddress::Id(receiver),
-							value: kitchensink_runtime::ExistentialDeposit::get() + 1,
+							value: firechain_mainnet_runtime::ExistentialDeposit::get() + 1,
 						}),
 					BlockType::RandomTransfersReaping => {
 						RuntimeCall::Balances(BalancesCall::transfer_allow_death {
@@ -311,7 +311,7 @@ impl<'a> Iterator for BlockContentIterator<'a> {
 							// Transfer so that ending balance would be 1 less than existential
 							// deposit so that we kill the sender account.
 							value: 100 * DOLLARS -
-								(kitchensink_runtime::ExistentialDeposit::get() - 1),
+								(firechain_mainnet_runtime::ExistentialDeposit::get() - 1),
 						})
 					},
 					BlockType::Noop =>
@@ -592,7 +592,7 @@ impl BenchKeyring {
 	}
 
 	/// Generate genesis with accounts from this keyring endowed with some balance and
-	/// kitchensink_runtime code blob.
+	/// firechain_mainnet_runtime code blob.
 	pub fn as_storage_builder(&self) -> &dyn sp_runtime::BuildStorage {
 		self
 	}
@@ -602,7 +602,7 @@ impl sp_runtime::BuildStorage for BenchKeyring {
 	fn assimilate_storage(&self, storage: &mut sp_core::storage::Storage) -> Result<(), String> {
 		storage.top.insert(
 			sp_core::storage::well_known_keys::CODE.to_vec(),
-			kitchensink_runtime::wasm_binary_unwrap().into(),
+			firechain_mainnet_runtime::wasm_binary_unwrap().into(),
 		);
 		crate::genesis::config_endowed(self.collect_account_ids()).assimilate_storage(storage)
 	}

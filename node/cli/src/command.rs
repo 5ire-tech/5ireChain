@@ -23,7 +23,7 @@ use crate::{
 	Cli, Subcommand,
 };
 use frame_benchmarking_cli::*;
-use kitchensink_runtime::{ExistentialDeposit, RuntimeApi};
+use firechain_mainnet_runtime::{ExistentialDeposit, RuntimeApi};
 use node_primitives::Block;
 use sc_cli::{Result, SubstrateCli};
 use sc_service::PartialComponents;
