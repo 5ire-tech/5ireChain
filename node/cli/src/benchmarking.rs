@@ -21,26 +21,41 @@
 //! Should only be used for benchmarking as it may break in other contexts.
 
 use crate::service::{create_extrinsic, FullClient};
-
+use sc_executor::NativeExecutionDispatch;
 use firechain_mainnet_runtime::{BalancesCall, SystemCall};
 use node_primitives::{AccountId, Balance};
 use sc_cli::Result;
 use sp_inherents::{InherentData, InherentDataProvider};
 use sp_keyring::Sr25519Keyring;
 use sp_runtime::OpaqueExtrinsic;
+use sc_executor::NativeVersion;
+
+pub type HostFunctions = ();
+pub struct TemplateRuntimeExecutor;
+impl NativeExecutionDispatch for TemplateRuntimeExecutor {
+	type ExtendHostFunctions = HostFunctions;
+
+	fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
+		firechain_mainnet_runtime::api::dispatch(method, data)
+	}
+
+	fn native_version() -> NativeVersion {
+		firechain_mainnet_runtime::native_version()
+	}
+}
 
 use std::{sync::Arc, time::Duration};
-
+pub type Client = FullClient;
 /// Generates `System::Remark` extrinsics for the benchmarks.
 ///
 /// Note: Should only be used for benchmarking.
 pub struct RemarkBuilder {
-	client: Arc<FullClient>,
+	client: Arc<Client>,
 }
 
 impl RemarkBuilder {
 	/// Creates a new [`Self`] from the given client.
-	pub fn new(client: Arc<FullClient>) -> Self {
+	pub fn new(client: Arc<Client>) -> Self {
 		Self { client }
 	}
 }
@@ -72,14 +87,14 @@ impl frame_benchmarking_cli::ExtrinsicBuilder for RemarkBuilder {
 ///
 /// Note: Should only be used for benchmarking.
 pub struct TransferKeepAliveBuilder {
-	client: Arc<FullClient>,
+	client: Arc<Client>,
 	dest: AccountId,
 	value: Balance,
 }
 
 impl TransferKeepAliveBuilder {
 	/// Creates a new [`Self`] from the given client.
-	pub fn new(client: Arc<FullClient>, dest: AccountId, value: Balance) -> Self {
+	pub fn new(client: Arc<Client>, dest: AccountId, value: Balance) -> Self {
 		Self { client, dest, value }
 	}
 }

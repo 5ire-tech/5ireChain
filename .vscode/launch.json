@@ -1,0 +1,861 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'node-bench'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=node-bench",
+                    "--package=node-bench"
+                ],
+                "filter": {
+                    "name": "node-bench",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'node-bench'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=node-bench",
+                    "--package=node-bench"
+                ],
+                "filter": {
+                    "name": "node-bench",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'firechain-mainnet-runtime'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=firechain-mainnet-runtime"
+                ],
+                "filter": {
+                    "name": "firechain-mainnet-runtime",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'firechain-runtime-core-primitives'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=firechain-runtime-core-primitives"
+                ],
+                "filter": {
+                    "name": "firechain-runtime-core-primitives",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'pallet-ethereum'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=pallet-ethereum"
+                ],
+                "filter": {
+                    "name": "pallet-ethereum",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'pallet-evm'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=pallet-evm"
+                ],
+                "filter": {
+                    "name": "pallet-evm",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'pallet-evm-precompile-simple'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=pallet-evm-precompile-simple"
+                ],
+                "filter": {
+                    "name": "pallet-evm-precompile-simple",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'pallet-evm-test-vector-support'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=pallet-evm-test-vector-support"
+                ],
+                "filter": {
+                    "name": "pallet-evm-test-vector-support",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'pallet-evm-precompile-modexp'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=pallet-evm-precompile-modexp"
+                ],
+                "filter": {
+                    "name": "pallet-evm-precompile-modexp",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'pallet-evm-precompile-sha3fips'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=pallet-evm-precompile-sha3fips"
+                ],
+                "filter": {
+                    "name": "pallet-evm-precompile-sha3fips",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'pallet-hotfix-sufficients'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=pallet-hotfix-sufficients"
+                ],
+                "filter": {
+                    "name": "pallet-hotfix-sufficients",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'pallet-reward'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=pallet-reward"
+                ],
+                "filter": {
+                    "name": "pallet-reward",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'pallet-staking'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=pallet-staking"
+                ],
+                "filter": {
+                    "name": "pallet-staking",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'pallet-staking-runtime-api'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=pallet-staking-runtime-api"
+                ],
+                "filter": {
+                    "name": "pallet-staking-runtime-api",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'node-primitives'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=node-primitives"
+                ],
+                "filter": {
+                    "name": "node-primitives",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'node-testing'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=node-testing"
+                ],
+                "filter": {
+                    "name": "node-testing",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'staging-node-cli'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "staging-node-cli",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'substrate-node'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=substrate-node",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "substrate-node",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'substrate-node'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=substrate-node",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "substrate-node",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'telemetry'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=telemetry",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "telemetry",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'websocket_server'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=websocket_server",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "websocket_server",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'export_import_flow'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=export_import_flow",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "export_import_flow",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'benchmark_overhead_works'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=benchmark_overhead_works",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "benchmark_overhead_works",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'benchmark_pallet_works'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=benchmark_pallet_works",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "benchmark_pallet_works",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'benchmark_machine_works'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=benchmark_machine_works",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "benchmark_machine_works",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'check_block_works'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=check_block_works",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "check_block_works",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'remember_state_pruning_works'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=remember_state_pruning_works",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "remember_state_pruning_works",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'build_spec_works'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=build_spec_works",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "build_spec_works",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'benchmark_storage_works'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=benchmark_storage_works",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "benchmark_storage_works",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'version'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=version",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "version",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'running_the_node_and_interrupt'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=running_the_node_and_interrupt",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "running_the_node_and_interrupt",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'purge_chain_works'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=purge_chain_works",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "purge_chain_works",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'fees'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=fees",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "fees",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'benchmark_block_works'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=benchmark_block_works",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "benchmark_block_works",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'benchmark_extrinsic_works'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=benchmark_extrinsic_works",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "benchmark_extrinsic_works",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'inspect_works'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=inspect_works",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "inspect_works",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'submit_transaction'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=submit_transaction",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "submit_transaction",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'temp_base_path_works'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=temp_base_path_works",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "temp_base_path_works",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'basic'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=basic",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "basic",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'common'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=common",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "common",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug benchmark 'transaction_pool'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bench=transaction_pool",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "transaction_pool",
+                    "kind": "bench"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug benchmark 'block_production'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bench=block_production",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "block_production",
+                    "kind": "bench"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug benchmark 'executor'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bench=executor",
+                    "--package=staging-node-cli"
+                ],
+                "filter": {
+                    "name": "executor",
+                    "kind": "bench"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'staging-node-inspect'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=staging-node-inspect"
+                ],
+                "filter": {
+                    "name": "staging-node-inspect",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'node-rpc'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=node-rpc"
+                ],
+                "filter": {
+                    "name": "node-rpc",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

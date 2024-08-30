@@ -17,6 +17,9 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 /// An overarching CLI command definition.
+/// 
+/// 
+// pub use crate::eth::EthConfiguration;
 #[derive(Debug, clap::Parser)]
 pub struct Cli {
 	/// Possible subcommand with parameters.
@@ -44,6 +47,9 @@ pub struct Cli {
 	#[allow(missing_docs)]
 	#[clap(flatten)]
 	pub storage_monitor: sc_storage_monitor::StorageMonitorParams,
+
+	// #[command(flatten)]
+	// pub eth: EthConfiguration,
 }
 
 /// Possible subcommands of the main binary.

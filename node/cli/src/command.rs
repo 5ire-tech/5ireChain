@@ -22,6 +22,7 @@ use crate::{
 	service::{new_partial, FullClient},
 	Cli, Subcommand,
 };
+use crate::service::FirechainRuntimeExecutor;
 use frame_benchmarking_cli::*;
 use firechain_mainnet_runtime::{ExistentialDeposit, RuntimeApi};
 use node_primitives::Block;

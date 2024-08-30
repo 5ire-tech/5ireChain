@@ -34,7 +34,7 @@ mod eth;
 use sp_inherents::CreateInherentDataProviders;
 use sc_client_api::backend::Backend;
 use std::sync::Arc;
-use crate::eth::EthDeps;
+pub use crate::eth::EthDeps;
 use jsonrpsee::RpcModule;
 use node_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Nonce};
 use sc_client_api::AuxStore;
@@ -109,8 +109,6 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi,CT,CIDP> {
 	pub babe: BabeDeps,
 	/// GRANDPA specific dependencies.
 	pub grandpa: GrandpaDeps<B>,
-	/// BEEFY specific dependencies.
-	// pub beefy: BeefyDeps,
 	/// Shared statement store reference.
 	pub statement_store: Arc<dyn sp_statement_store::StatementStore>,
 	/// The backend used by the node.
@@ -162,6 +160,9 @@ where
 	C::Api: BabeApi<Block>,
 	C::Api: BlockBuilder<Block>,
 	P: TransactionPool + 'static,
+	C: HeaderBackend<Block>
+		+ HeaderMetadata<Block, Error = BlockChainError>
+		+ StorageProvider<Block, BE>,
 	SC: SelectChain<Block> + 'static,
 	B: sc_client_api::Backend<Block> + Send + Sync + 'static,
 	B::State: sc_client_api::backend::StateBackend<sp_runtime::traits::HashingFor<Block>>,
@@ -194,7 +195,6 @@ where
 		deny_unsafe,
 		babe,
 		grandpa,
-		beefy,
 		statement_store,
 		backend,
 		mixnet_api,
@@ -262,14 +262,14 @@ where
 		io.merge(mixnet)?;
 	}
 
-	io.merge(
-		Beefy::<Block>::new(
-			beefy.beefy_finality_proof_stream,
-			beefy.beefy_best_block_stream,
-			beefy.subscription_executor,
-		)?
-		.into_rpc(),
-	)?;
+	// io.merge(
+	// 	Beefy::<Block>::new(
+	// 		beefy.beefy_finality_proof_stream,
+	// 		beefy.beefy_best_block_stream,
+	// 		beefy.subscription_executor,
+	// 	)?
+	// 	.into_rpc(),
+	// )?;
 
 	// Ethereum compatibility RPCs
 	let io = create_eth::<_, _, _, _, _, _, _, DefaultEthConfig<C, BE>>(

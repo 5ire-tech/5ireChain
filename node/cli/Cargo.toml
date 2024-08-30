@@ -64,10 +64,19 @@ sp-keyring = { workspace = true }
 sp-keystore = { workspace = true }
 sp-consensus ={ workspace = true }
 sp-transaction-storage-proof = { workspace = true }
+sp-transaction-pool = { workspace = true }
 sp-io = { workspace = true }
 sp-mixnet = { workspace = true }
 sp-mmr-primitives = { workspace = true }
 sp-statement-store = { workspace = true }
+sp-session = { workspace = true, features = ["default"] }
+sp-block-builder = { workspace = true }
+sp-blockchain = {workspace = true}
+sc-block-builder = { workspace = true }
+sp-offchain = { workspace = true }
+pallet-transaction-payment-rpc-runtime-api= { workspace = true }
+mmr-rpc = { workspace = true }
+substrate-frame-rpc-system = { workspace = true }
 
 # client dependencies
 sc-client-api = { workspace = true }
@@ -112,6 +121,7 @@ fc-api = { workspace = true }
 fc-cli = { workspace = true }
 fc-consensus = { workspace = true }
 fc-db = { workspace = true }
+firechain-runtime-core-primitives = { workspace = true }
 fc-mapping-sync = { workspace = true }
 fc-rpc = { workspace = true }
 fc-rpc-core = { workspace = true }
@@ -141,6 +151,7 @@ sc-consensus-epochs = { workspace = true }
 sc-service-test ={ workspace = true }
 sc-block-builder = { workspace = true }
 sp-tracing = { workspace = true }
+sp-transaction-pool = { workspace = true }
 sp-blockchain ={ workspace = true }
 sp-crypto-hashing = { workspace = true }
 futures = "0.3.30"
@@ -160,7 +171,7 @@ substrate-cli-test-utils ={ workspace = true }
 
 wat = "1.0"
 frame-support = { workspace = true }
-node-testing = {path="../testing" }
+# node-testing = {path="../testing" }
 pallet-balances = { workspace = true }
 pallet-contracts = { workspace = true }
 pallet-glutton = { workspace = true }

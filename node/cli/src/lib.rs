@@ -29,7 +29,8 @@
 //! hasn't been tested.
 
 #![warn(missing_docs)]
-
+pub mod eth;
+pub use eth::*;
 #[cfg(feature = "cli")]
 mod benchmarking;
 pub mod chain_spec;
@@ -38,8 +39,9 @@ mod cli;
 #[cfg(feature = "cli")]
 mod command;
 pub mod service;
-pub mod eth;
 #[cfg(feature = "cli")]
 pub use cli::*;
 #[cfg(feature = "cli")]
 pub use command::*;
+pub mod client;
+pub use eth::*;

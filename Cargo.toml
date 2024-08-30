@@ -1,11 +1,11 @@
 [workspace]
 members = [
-	"node/bench",
+	# "node/bench",
 	"node/cli",
 	"node/inspect",
 	"node/primitives",
 	"node/rpc",
-	"node/testing",
+	# "node/testing",
 	"runtime/core-primitives",
 	"runtime/firechain-mainnet-runtime",
 ]
