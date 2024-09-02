@@ -110,7 +110,7 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi,CT,CIDP> {
 	/// GRANDPA specific dependencies.
 	pub grandpa: GrandpaDeps<B>,
 	/// Shared statement store reference.
-	pub statement_store: Arc<dyn sp_statement_store::StatementStore>,
+	// pub statement_store: Arc<dyn sp_statement_store::StatementStore>,
 	/// The backend used by the node.
 	pub backend: Arc<B>,
 	/// Mixnet API.
@@ -195,7 +195,7 @@ where
 		deny_unsafe,
 		babe,
 		grandpa,
-		statement_store,
+		// statement_store,
 		backend,
 		mixnet_api,
 		eth,
@@ -253,23 +253,14 @@ where
 
 	io.merge(StateMigration::new(client.clone(), backend, deny_unsafe).into_rpc())?;
 	io.merge(Dev::new(client, deny_unsafe).into_rpc())?;
-	let statement_store =
-		sc_rpc::statement::StatementStore::new(statement_store, deny_unsafe).into_rpc();
-	io.merge(statement_store)?;
+	// let statement_store =
+	// 	sc_rpc::statement::StatementStore::new(statement_store, deny_unsafe).into_rpc();
+	// io.merge(statement_store)?;
 
 	if let Some(mixnet_api) = mixnet_api {
 		let mixnet = sc_rpc::mixnet::Mixnet::new(mixnet_api).into_rpc();
 		io.merge(mixnet)?;
 	}
-
-	// io.merge(
-	// 	Beefy::<Block>::new(
-	// 		beefy.beefy_finality_proof_stream,
-	// 		beefy.beefy_best_block_stream,
-	// 		beefy.subscription_executor,
-	// 	)?
-	// 	.into_rpc(),
-	// )?;
 
 	// Ethereum compatibility RPCs
 	let io = create_eth::<_, _, _, _, _, _, _, DefaultEthConfig<C, BE>>(

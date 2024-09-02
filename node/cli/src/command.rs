@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use super::benchmarking::{inherent_benchmark_data, RemarkBuilder, TransferKeepAliveBuilder};
+// use super::benchmarking::{inherent_benchmark_data, RemarkBuilder, TransferKeepAliveBuilder};
 use crate::{
 	chain_spec, service,
 	service::{new_partial, FullClient},
@@ -129,41 +129,9 @@ pub fn run() -> Result<()> {
 
 						cmd.run(config, partial.client, db, storage)
 					},
-					BenchmarkCmd::Overhead(cmd) => {
-						// ensure that we keep the task manager alive
-						let partial = new_partial(&config, None)?;
-						let ext_builder = RemarkBuilder::new(partial.client.clone());
-
-						cmd.run(
-							config,
-							partial.client,
-							inherent_benchmark_data()?,
-							Vec::new(),
-							&ext_builder,
-						)
-					},
-					BenchmarkCmd::Extrinsic(cmd) => {
-						// ensure that we keep the task manager alive
-						let partial = service::new_partial(&config, None)?;
-						// Register the *Remark* and *TKA* builders.
-						let ext_factory = ExtrinsicFactory(vec![
-							Box::new(RemarkBuilder::new(partial.client.clone())),
-							Box::new(TransferKeepAliveBuilder::new(
-								partial.client.clone(),
-								Sr25519Keyring::Alice.to_account_id(),
-								ExistentialDeposit::get(),
-							)),
-						]);
-
-						cmd.run(
-							partial.client,
-							inherent_benchmark_data()?,
-							Vec::new(),
-							&ext_factory,
-						)
-					},
-					BenchmarkCmd::Machine(cmd) =>
-						cmd.run(&config, SUBSTRATE_REFERENCE_HARDWARE.clone()),
+					BenchmarkCmd::Overhead(_) |
+					BenchmarkCmd::Extrinsic(_) |
+					BenchmarkCmd::Machine(_) => Err("Unsupported benchmarking command".into()),
 				}
 			})
 		},
@@ -214,7 +182,7 @@ pub fn run() -> Result<()> {
 			runner.async_run(|config| {
 				let PartialComponents { client, task_manager, backend, .. } =
 					new_partial(&config, None)?;
-				let aux_revert = Box::new(|client: Arc<FullClient>, backend, blocks| {
+				let aux_revert = Box::new(|client: Arc<FullClient<firechain_mainnet_runtime::RuntimeApi>>, backend, blocks| {
 					sc_consensus_babe::revert(client.clone(), backend, blocks)?;
 					grandpa::revert(client, blocks)?;
 					Ok(())

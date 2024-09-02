@@ -33,8 +33,8 @@ pub trait RuntimeApiCollection:
     + sp_mixnet::runtime_api::MixnetApi<Block>
     + sp_statement_store::runtime_api::ValidateStatement<Block>
 	+ grandpa_primitives::GrandpaApi<Block>
-    // + substrate_frame_rpc_system::AccountNonceApi<Block,AccountId, Nonce>
-	+ frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Nonce>
+    + substrate_frame_rpc_system::AccountNonceApi<Block,AccountId, Nonce>
+	 + frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Nonce>
 	+ pallet_transaction_payment_rpc_runtime_api::TransactionPaymentApi<Block, Balance>
 {
 }
@@ -46,7 +46,8 @@ impl<Api> RuntimeApiCollection for Api where
         + sp_statement_store::runtime_api::ValidateStatement<Block>
         + sp_mixnet::runtime_api::MixnetApi<Block>
 		+ grandpa_primitives::GrandpaApi<Block>
-        // + substrate_frame_rpc_system::AccountNonceApi<Block,AccountId, Nonce>
+        + substrate_frame_rpc_system::AccountNonceApi<Block,AccountId, Nonce>
 		+ frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Nonce>
 		+ pallet_transaction_payment_rpc_runtime_api::TransactionPaymentApi<Block, Balance>
-{}
+{
+}

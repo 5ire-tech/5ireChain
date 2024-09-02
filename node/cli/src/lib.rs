@@ -32,7 +32,7 @@
 pub mod eth;
 pub use eth::*;
 #[cfg(feature = "cli")]
-mod benchmarking;
+// mod benchmarking;
 pub mod chain_spec;
 #[cfg(feature = "cli")]
 mod cli;

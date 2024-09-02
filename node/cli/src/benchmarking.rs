@@ -28,6 +28,7 @@ use sc_cli::Result;
 use sp_inherents::{InherentData, InherentDataProvider};
 use sp_keyring::Sr25519Keyring;
 use sp_runtime::OpaqueExtrinsic;
+use firechain_mainnet_runtime::RuntimeApi;
 use sc_executor::NativeVersion;
 
 pub type HostFunctions = ();
@@ -45,22 +46,22 @@ impl NativeExecutionDispatch for TemplateRuntimeExecutor {
 }
 
 use std::{sync::Arc, time::Duration};
-pub type Client = FullClient;
+pub type Client<RuntimeApi> = FullClient<RuntimeApi>;
 /// Generates `System::Remark` extrinsics for the benchmarks.
 ///
 /// Note: Should only be used for benchmarking.
-pub struct RemarkBuilder {
-	client: Arc<Client>,
+pub struct RemarkBuilder<RuntimeApi> {
+	client: Arc<Client<RuntimeApi>>,
 }
 
-impl RemarkBuilder {
+impl RemarkBuilder<RuntimeApi> {
 	/// Creates a new [`Self`] from the given client.
-	pub fn new(client: Arc<Client>) -> Self {
+	pub fn new(client: Arc<Client<RuntimeApi>>) -> Self {
 		Self { client }
 	}
 }
 
-impl frame_benchmarking_cli::ExtrinsicBuilder for RemarkBuilder {
+impl frame_benchmarking_cli::ExtrinsicBuilder for RemarkBuilder<RuntimeApi> {
 	fn pallet(&self) -> &str {
 		"system"
 	}
@@ -86,20 +87,20 @@ impl frame_benchmarking_cli::ExtrinsicBuilder for RemarkBuilder {
 /// Generates `Balances::TransferKeepAlive` extrinsics for the benchmarks.
 ///
 /// Note: Should only be used for benchmarking.
-pub struct TransferKeepAliveBuilder {
-	client: Arc<Client>,
+pub struct TransferKeepAliveBuilder<RuntimeApi> {
+	client: Arc<Client<RuntimeApi>>,
 	dest: AccountId,
 	value: Balance,
 }
 
-impl TransferKeepAliveBuilder {
+impl TransferKeepAliveBuilder<RuntimeApi> {
 	/// Creates a new [`Self`] from the given client.
-	pub fn new(client: Arc<Client>, dest: AccountId, value: Balance) -> Self {
+	pub fn new(client: Arc<Client<RuntimeApi>>, dest: AccountId, value: Balance) -> Self {
 		Self { client, dest, value }
 	}
 }
 
-impl frame_benchmarking_cli::ExtrinsicBuilder for TransferKeepAliveBuilder {
+impl frame_benchmarking_cli::ExtrinsicBuilder for TransferKeepAliveBuilder<RuntimeApi> {
 	fn pallet(&self) -> &str {
 		"balances"
 	}

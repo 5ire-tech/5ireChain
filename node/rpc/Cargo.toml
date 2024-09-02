@@ -69,5 +69,6 @@ fc-storage = { workspace = true }
 
 
 [features]
-default = ["rpc-binary-search-estimate"]
+txpool = ["fc-rpc/txpool"]
+default = ["txpool","rpc-binary-search-estimate"]
 rpc-binary-search-estimate = ["fc-rpc/rpc-binary-search-estimate"]

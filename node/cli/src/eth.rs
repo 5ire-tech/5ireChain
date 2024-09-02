@@ -196,7 +196,7 @@ pub fn spawn_essential_tasks<B, C, BE>(
 					b.clone(),
 					3,
 					0,
-					SyncStrategy::Parachain,
+					fc_mapping_sync::SyncStrategy::Normal,
 					sync.clone(),
 					pubsub_notification_sinks.clone(),
 				)
@@ -216,7 +216,7 @@ pub fn spawn_essential_tasks<B, C, BE>(
 						read_notification_timeout: Duration::from_secs(10),
 						check_indexed_blocks_interval: Duration::from_secs(60),
 					},
-					fc_mapping_sync::SyncStrategy::Parachain,
+					fc_mapping_sync::SyncStrategy::Normal,
 					sync.clone(),
 					pubsub_notification_sinks.clone(),
 				),

@@ -30,13 +30,15 @@ use sc_telemetry::TelemetryEndpoints;
 use serde::{Deserialize, Serialize};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
-use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
+use sp_core::{crypto::UncheckedInto, Pair, Public};
 use sp_mixnet::types::AuthorityId as MixnetId;
 use sp_runtime::{
 	traits::{IdentifyAccount, Verify},
 	Perbill,
 };
+use hex_literal::hex;
 use std::str::FromStr;
+use sp_core::ecdsa;
 use std::collections::BTreeMap;
 use sp_core::H160;
 use sp_core::U256;
@@ -121,9 +123,9 @@ fn configure_accounts_for_staging_testnet() -> (
 	)> = vec![
 		(
 			// 5Fbsd6WXDGiLTxunqeK5BATNiocfCqu9bS1yArVjCgeBLkVy
-			array_bytes::hex_n_into_unchecked("9c7a2ee14e565db0c69f78c7b4cd839fbf52b607d867e9e9c5a79042898a0d12"),
+			hex!("187f1aebdce344c33e9902ccb2b801a0b0930cdcb444d68b53be3d08aba2ed05").into(),
 			// 5EnCiV7wSHeNhjW3FSUwiJNkcc2SBkPLn5Nj93FmbLtBjQUq
-			array_bytes::hex_n_into_unchecked("781ead1e2fa9ccb74b44c19d29cb2a7a4b5be3972927ae98cd3877523976a276"),
+			hex!("a295aced06b13f5adde2833e669eaa57d6581e2e99bb90fd66982c017319ca09").into(),
 			// 5Fb9ayurnxnaXj56CjmyQLBiadfRCqUbL2VWNbbe1nZU6wiC
 			array_bytes::hex2array_unchecked("9becad03e6dcac03cee07edebca5475314861492cdfc96a2144a67bbe9699332")
 				.unchecked_into(),
@@ -145,9 +147,10 @@ fn configure_accounts_for_staging_testnet() -> (
 		),
 		(
 			// 5ERawXCzCWkjVq3xz1W5KGNtVx2VdefvZ62Bw1FEuZW4Vny2
-			array_bytes::hex_n_into_unchecked("68655684472b743e456907b398d3a44c113f189e56d1bbfd55e889e295dfde78"),
+			hex!("fe585216f9755ce330efcdc8de70eaaea87b2591fb10683e66dd88bb30d04626").into(),
+			// Controller account
 			// 5Gc4vr42hH1uDZc93Nayk5G7i687bAQdHHc9unLuyeawHipF
-			array_bytes::hex_n_into_unchecked("c8dc79e36b29395413399edaec3e20fcca7205fb19776ed8ddb25d6f427ec40e"),
+			hex!("94314b1c08e0eca215ce16618f71d7d0eb8eaed714e6127a8c4eb36be4762732").into(),
 			// 5EockCXN6YkiNCDjpqqnbcqd4ad35nU4RmA1ikM4YeRN4WcE
 			array_bytes::hex2array_unchecked("7932cff431e748892fa48e10c63c17d30f80ca42e4de3921e641249cd7fa3c2f")
 				.unchecked_into(),
@@ -169,9 +172,9 @@ fn configure_accounts_for_staging_testnet() -> (
 		),
 		(
 			// 5DyVtKWPidondEu8iHZgi6Ffv9yrJJ1NDNLom3X9cTDi98qp
-			array_bytes::hex_n_into_unchecked("547ff0ab649283a7ae01dbc2eb73932eba2fb09075e9485ff369082a2ff38d65"),
+			hex!("226e4778aa989697711bed0e28597e5df391e3cc0e942708bad95d6d25877e41").into(),
 			// 5FeD54vGVNpFX3PndHPXJ2MDakc462vBCD5mgtWRnWYCpZU9
-			array_bytes::hex_n_into_unchecked("9e42241d7cd91d001773b0b616d523dd80e13c6c2cab860b1234ef1b9ffc1526"),
+			hex!("7295ecf96ed1b0a3de524565c5fcada5ec9bb677d2f659577ff0d4f1169afb46").into(),
 			// 5E1jLYfLdUQKrFrtqoKgFrRvxM3oQPMbf6DfcsrugZZ5Bn8d
 			array_bytes::hex2array_unchecked("5633b70b80a6c8bb16270f82cca6d56b27ed7b76c8fd5af2986a25a4788ce440")
 				.unchecked_into(),
@@ -193,9 +196,9 @@ fn configure_accounts_for_staging_testnet() -> (
 		),
 		(
 			// 5HYZnKWe5FVZQ33ZRJK1rG3WaLMztxWrrNDb1JRwaHHVWyP9
-			array_bytes::hex_n_into_unchecked("f26cdb14b5aec7b2789fd5ca80f979cef3761897ae1f37ffb3e154cbcc1c2663"),
+			hex!("b6dc5c3901edccf7db83e6c2af0bf6d63eceb077b62480ed3f932c7fe90ccf5a").into(),
 			// 5EPQdAQ39WQNLCRjWsCk5jErsCitHiY5ZmjfWzzbXDoAoYbn
-			array_bytes::hex_n_into_unchecked("66bc1e5d275da50b72b15de072a2468a5ad414919ca9054d2695767cf650012f"),
+			hex!("4cdd06344118f2df0cdbfc646d54d94d77fc46ad86c806deb0dd3cf044776d67").into(),
 			// 5DMa31Hd5u1dwoRKgC4uvqyrdK45RHv3CpwvpUC1EzuwDit4
 			array_bytes::hex2array_unchecked("3919132b851ef0fd2dae42a7e734fe547af5a6b809006100f48944d7fae8e8ef")
 				.unchecked_into(),
@@ -218,10 +221,10 @@ fn configure_accounts_for_staging_testnet() -> (
 	];
 
 	// generated with secret: subkey inspect "$secret"/fir
-	let root_key: AccountId = array_bytes::hex_n_into_unchecked(
-		// 5Ff3iXP75ruzroPWRP2FYBHWnmGGBSb63857BgnzCoXNxfPo
-		"9ee5e5bdc0ec239eb164f865ecc345ce4c88e76ee002e0f7e318097347471809",
-	);
+	let root_key: AccountId = hex!(
+		// 5CVFxLsc3xvQJ1LZAThu21xdtEnGRVqpuLv2pWxKdWYnYXE3
+		"12b9f0cf6185531102242efed7478dcd53e174bc8764172c371d7cf87d55fa22"
+	).into();
 
 	let endowed_accounts: Vec<AccountId> = vec![root_key.clone()];
 	(initial_authorities, root_key, endowed_accounts)
@@ -268,8 +271,8 @@ pub fn authority_keys_from_seed(
 ) -> (AccountId, AccountId, GrandpaId, BabeId, ImOnlineId, AuthorityDiscoveryId, MixnetId, BeefyId)
 {
 	(
-		get_account_id_from_seed::<sr25519::Public>(&format!("{}//stash", seed)),
-		get_account_id_from_seed::<sr25519::Public>(seed),
+		get_account_id_from_seed::<ecdsa::Public>(&format!("{}//stash", seed)),
+		get_account_id_from_seed::<ecdsa::Public>(seed),
 		get_from_seed::<GrandpaId>(seed),
 		get_from_seed::<BabeId>(seed),
 		get_from_seed::<ImOnlineId>(seed),
@@ -310,18 +313,18 @@ fn configure_accounts(
 ) {
 	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
 		vec![
-			get_account_id_from_seed::<sr25519::Public>("Alice"),
-			get_account_id_from_seed::<sr25519::Public>("Bob"),
-			get_account_id_from_seed::<sr25519::Public>("Charlie"),
-			get_account_id_from_seed::<sr25519::Public>("Dave"),
-			get_account_id_from_seed::<sr25519::Public>("Eve"),
-			get_account_id_from_seed::<sr25519::Public>("Ferdie"),
-			get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Charlie//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Dave//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
+			get_account_id_from_seed::<ecdsa::Public>("Alice"),
+			get_account_id_from_seed::<ecdsa::Public>("Bob"),
+			get_account_id_from_seed::<ecdsa::Public>("Charlie"),
+			get_account_id_from_seed::<ecdsa::Public>("Dave"),
+			get_account_id_from_seed::<ecdsa::Public>("Eve"),
+			get_account_id_from_seed::<ecdsa::Public>("Ferdie"),
+			get_account_id_from_seed::<ecdsa::Public>("Alice//stash"),
+			get_account_id_from_seed::<ecdsa::Public>("Bob//stash"),
+			get_account_id_from_seed::<ecdsa::Public>("Charlie//stash"),
+			get_account_id_from_seed::<ecdsa::Public>("Dave//stash"),
+			get_account_id_from_seed::<ecdsa::Public>("Eve//stash"),
+			get_account_id_from_seed::<ecdsa::Public>("Ferdie//stash"),
 		]
 	});
 	// endow all authorities and nominators.
@@ -474,7 +477,7 @@ pub fn testnet_genesis(
 		// "society": { "pot": 0 },
 		"assets": {
 			// This asset is used by the NIS pallet as counterpart currency.
-			"assets": vec![(9, get_account_id_from_seed::<sr25519::Public>("Alice"), true, 1)],
+			"assets": vec![(9, get_account_id_from_seed::<ecdsa::Public>("Alice"), true, 1)],
 		},
 		"nominationPools": {
 			"minCreateBond": 10 * DOLLARS,
@@ -488,7 +491,7 @@ fn development_config_genesis_json() -> serde_json::Value {
 	testnet_genesis(
 		vec![authority_keys_from_seed("Alice")],
 		vec![],
-		get_account_id_from_seed::<sr25519::Public>("Alice"),
+		get_account_id_from_seed::<ecdsa::Public>("Alice"),
 		None,
 	)
 }
@@ -507,7 +510,7 @@ fn local_testnet_genesis() -> serde_json::Value {
 	testnet_genesis(
 		vec![authority_keys_from_seed("Alice"), authority_keys_from_seed("Bob")],
 		vec![],
-		get_account_id_from_seed::<sr25519::Public>("Alice"),
+		get_account_id_from_seed::<ecdsa::Public>("Alice"),
 		None,
 	)
 }
@@ -538,7 +541,7 @@ pub(crate) mod tests {
 			.with_genesis_config_patch(testnet_genesis(
 				vec![authority_keys_from_seed("Alice")],
 				vec![],
-				get_account_id_from_seed::<sr25519::Public>("Alice"),
+				get_account_id_from_seed::<ecdsa::Public>("Alice"),
 				None,
 			))
 			.build()

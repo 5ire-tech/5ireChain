@@ -89,16 +89,16 @@ impl sc_executor::NativeExecutionDispatch for FirechainRuntimeExecutor {
 }
 
 /// The full client type definition.
-pub type FullClient = sc_service::TFullClient<Block, RuntimeApi, RuntimeExecutor>;
+pub type FullClient<RuntimeApi> = sc_service::TFullClient<Block, RuntimeApi, RuntimeExecutor>;
 type FullBackend = sc_service::TFullBackend<Block>;
 type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
-type FullGrandpaBlockImport =
-	grandpa::GrandpaBlockImport<FullBackend, Block, FullClient, FullSelectChain>;
+type FullGrandpaBlockImport<RuntimeApi> =
+	grandpa::GrandpaBlockImport<FullBackend, Block, FullClient<RuntimeApi>, FullSelectChain>;
 // type FullBeefyBlockImport<InnerBlockImport> =
 // 	beefy::import::BeefyBlockImport<Block, FullBackend, FullClient<RuntimeApi, Executor>, InnerBlockImport>;
 
 /// The transaction pool type definition.
-pub type TransactionPool = sc_transaction_pool::FullPool<Block, FullClient>;
+pub type TransactionPool<RuntimeApi> = sc_transaction_pool::FullPool<Block, FullClient<RuntimeApi>>;
 
 /// The minimum period of blocks on which justifications will be
 /// imported and generated.
@@ -107,7 +107,7 @@ const GRANDPA_JUSTIFICATION_PERIOD: u32 = 512;
 /// Fetch the nonce of the given `account` from the chain state.
 ///
 /// Note: Should only be used for tests.
-pub fn fetch_nonce(client: &FullClient, account: sp_core::sr25519::Pair) -> u32
+pub fn fetch_nonce(client: &FullClient<RuntimeApi>, account: sp_core::sr25519::Pair) -> u32
 // where 
 // Executor: sc_executor::NativeExecutionDispatch + 'static,
 // 	RuntimeApi: ConstructRuntimeApi<Block, FullClient> + Send + Sync + 'static,
@@ -127,7 +127,7 @@ pub fn fetch_nonce(client: &FullClient, account: sp_core::sr25519::Pair) -> u32
 ///
 /// Note: Should only be used for tests.
 pub fn create_extrinsic(
-	client: &FullClient,
+	client: &FullClient<RuntimeApi>,
 	sender: sp_core::sr25519::Pair,
 	function: impl Into<firechain_mainnet_runtime::RuntimeCall>,
 	nonce: Option<u32>,
@@ -192,31 +192,31 @@ pub fn create_extrinsic(
 }
 
 /// Creates a new partial node.
-pub fn new_partial(
+pub fn new_partial<RuntimeApi>(
 	config: &Configuration,
 	mixnet_config: Option<&sc_mixnet::Config>,
 ) -> Result<
 	sc_service::PartialComponents<
-		FullClient,
+		FullClient<RuntimeApi>,
 		FullBackend,
 		FullSelectChain,
 		sc_consensus::DefaultImportQueue<Block>,
-		sc_transaction_pool::FullPool<Block, FullClient>,
+		sc_transaction_pool::FullPool<Block, FullClient<RuntimeApi>>,
 		(
 			(
 				sc_consensus_babe::BabeBlockImport<
 					Block,
-					FullClient,
-					FullGrandpaBlockImport,
+					FullClient<RuntimeApi>,
+					FullGrandpaBlockImport<RuntimeApi>,
 				>,
-				grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
+				grandpa::LinkHalf<Block, FullClient<RuntimeApi>, FullSelectChain>,
 				sc_consensus_babe::BabeLink<Block>,
 			),
 			BabeWorkerHandle<Block>,
 			// grandpa::SharedVoterState,
 			Option<Telemetry>,
 			// Arc<StatementStore>,
-			FrontierBackend<FullClient>,
+			FrontierBackend<FullClient<RuntimeApi>>,
 			Option<sc_mixnet::Api>,
 			Option<sc_mixnet::ApiBackend>,
 			Arc<dyn StorageOverride<Block>>,
@@ -224,11 +224,11 @@ pub fn new_partial(
 	>,
 	ServiceError,
 > 
-// where 
-// 	Executor: sc_executor::NativeExecutionDispatch + 'static,
-// 	RuntimeApi: ConstructRuntimeApi<Block, FullClient> + Send + Sync + 'static,
-// 	RuntimeApi::RuntimeApi: RuntimeApiCollection,
-// 	RuntimeApi::RuntimeApi: sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>,
+where 
+	// Executor: sc_executor::NativeExecutionDispatch + 'static,
+	RuntimeApi: ConstructRuntimeApi<Block, FullClient<RuntimeApi>> + Send + Sync + 'static,
+	RuntimeApi::RuntimeApi: RuntimeApiCollection,
+	RuntimeApi::RuntimeApi: sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>,
 	{
 	let telemetry = config
 		.telemetry_endpoints
@@ -349,47 +349,48 @@ pub fn new_partial(
 }
 
 /// Result of [`new_full_base`].
-pub struct NewFullBase
-// where
-// RuntimeApi: std::marker::Send + ConstructRuntimeApi<Block, FullClient> + Send + Sync + 'static,
+pub struct NewFullBase<RuntimeApi>
+ where
+RuntimeApi: std::marker::Send + ConstructRuntimeApi<Block, FullClient<RuntimeApi>> + Send + Sync + 'static,
 // Executor: sc_executor::NativeExecutionDispatch + 'static,
-// RuntimeApi::RuntimeApi: sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>, 
+RuntimeApi::RuntimeApi: sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>, 
  {
 	/// The task manager of the node.
 	pub task_manager: TaskManager,
 	/// The client instance of the node.
-	pub client: Arc<FullClient>,
+	pub client: Arc<FullClient<RuntimeApi>>,
 	/// The networking service of the node.
 	pub network: Arc<dyn NetworkService>,
 	/// The syncing service of the node.
 	pub sync: Arc<SyncingService<Block>>,
 	/// The transaction pool of the node.
-	pub transaction_pool: Arc<TransactionPool>,
+	pub transaction_pool: Arc<TransactionPool<RuntimeApi>>,
 	/// The rpc handlers of the node.
 	pub rpc_handlers: RpcHandlers,
 }
 
 /// Creates a full service from the configuration.
-pub fn new_full_base<N: NetworkBackend<Block,<Block as BlockT>::Hash>>(
+pub fn new_full_base<N: NetworkBackend<Block,<Block as BlockT>::Hash>,RuntimeApi>(
 	config: Configuration,
 	mixnet_config: Option<sc_mixnet::Config>,
 	disable_hardware_benchmarks: bool,
 	with_startup_data: impl FnOnce(
 		&sc_consensus_babe::BabeBlockImport<
 			Block,
-			FullClient,
-			FullGrandpaBlockImport,
+			FullClient<RuntimeApi>,
+			FullGrandpaBlockImport<RuntimeApi>,
 		>,
 		&sc_consensus_babe::BabeLink<Block>,
 	),
-) -> Result<NewFullBase, ServiceError> 
-// where 
-// 	Executor: sc_executor::NativeExecutionDispatch + 'static,
-// 	RuntimeApi:ConstructRuntimeApi<Block, FullClient> + Send + Sync + 'static,
-// 	RuntimeApi::RuntimeApi: RuntimeApiCollection,
-// 	RuntimeApi::RuntimeApi: sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>,
-// 	RuntimeApi::RuntimeApi: sp_authority_discovery::AuthorityDiscoveryApi<Block>,
-// 	RuntimeApi::RuntimeApi: mmr_rpc::MmrRuntimeApi<Block, Hash, BlockNumber>,
+) -> Result<NewFullBase<RuntimeApi>, ServiceError> 
+where 
+	// Executor: sc_executor::NativeExecutionDispatch + 'static,
+	RuntimeApi:ConstructRuntimeApi<Block, FullClient<RuntimeApi>> + Send + Sync + 'static,
+	RuntimeApi::RuntimeApi: RuntimeApiCollection,
+	RuntimeApi::RuntimeApi: sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>,
+	RuntimeApi::RuntimeApi: sp_authority_discovery::AuthorityDiscoveryApi<Block>,
+	RuntimeApi::RuntimeApi: mmr_rpc::MmrRuntimeApi<Block, Hash, BlockNumber>,
+	
 {
 	let is_offchain_indexing_enabled = config.offchain_worker.indexing_enabled;
 	let role = config.role.clone();
@@ -633,7 +634,7 @@ pub fn new_full_base<N: NetworkBackend<Block,<Block as BlockT>::Hash>>(
 						subscription_executor: subscription_executor.clone(),
 						finality_provider: finality_proof_provider.clone(),
 					},
-					statement_store: rpc_statement_store.clone(),
+					// statement_store: rpc_statement_store.clone(),
 					backend: rpc_backend.clone(),
 					mixnet_api: mixnet_api.as_ref().cloned(),
 					eth: eth_deps,
@@ -898,22 +899,22 @@ pub fn new_full_base<N: NetworkBackend<Block,<Block as BlockT>::Hash>>(
 }
 
 /// Builds a new service for a full client.
-pub fn new_full(config: Configuration, cli: Cli) -> Result<TaskManager, ServiceError> 
-// where 
+pub fn new_full<RuntimeApi>(config: Configuration, cli: Cli) -> Result<TaskManager, ServiceError> 
+where 
 // Executor: sc_executor::NativeExecutionDispatch + 'static,
-// RuntimeApi: Send + Sync + 'static,
-// RuntimeApi::RuntimeApi: RuntimeApiCollection,
-// RuntimeApi:ConstructRuntimeApi<Block, FullClient> + Send + Sync + 'static,
-// RuntimeApi::RuntimeApi: sp_authority_discovery::AuthorityDiscoveryApi<Block>,
-// RuntimeApi::RuntimeApi: mmr_rpc::MmrRuntimeApi<Block, Hash, BlockNumber>,
-// RuntimeApi::RuntimeApi: sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>,
+RuntimeApi: Send + Sync + 'static,
+RuntimeApi::RuntimeApi: RuntimeApiCollection,
+RuntimeApi:ConstructRuntimeApi<Block, FullClient<RuntimeApi>> + Send + Sync + 'static,
+RuntimeApi::RuntimeApi: sp_authority_discovery::AuthorityDiscoveryApi<Block>,
+RuntimeApi::RuntimeApi: mmr_rpc::MmrRuntimeApi<Block, Hash, BlockNumber>,
+RuntimeApi::RuntimeApi: sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>,
 {
 	let mixnet_config = cli.mixnet_params.config(config.role.is_authority());
 	let database_path = config.database.path().map(Path::to_path_buf);
 
 	let task_manager = match config.network.network_backend {
 		sc_network::config::NetworkBackendType::Libp2p => {
-			let task_manager = new_full_base::<sc_network::NetworkWorker<_, _>>(
+			let task_manager = new_full_base::<sc_network::NetworkWorker<_, _>,RuntimeApi>(
 				config,
 				mixnet_config,
 				cli.no_hardware_benchmarks,
@@ -923,7 +924,7 @@ pub fn new_full(config: Configuration, cli: Cli) -> Result<TaskManager, ServiceE
 			task_manager
 		},
 		sc_network::config::NetworkBackendType::Litep2p => {
-			let task_manager = new_full_base::<sc_network::Litep2pNetworkBackend>(
+			let task_manager = new_full_base::<sc_network::Litep2pNetworkBackend,RuntimeApi>(
 				config,
 				mixnet_config,
 				cli.no_hardware_benchmarks,
