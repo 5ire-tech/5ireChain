@@ -10,12 +10,16 @@ pub const NOMINATOR: u64 = 22;
 pub const USER: u64 = 1;
 pub const USER_2: u64 = 2;
 
+pub fn add_reward_balance() {
+	Balances::deposit_creating(&Reward::account_id(), 15000000);
+}
 
 #[test]
 fn get_rewards_should_work() {
 	ExtBuilder::default().build_and_execute(|| {
 		start_session(1);
 		ValidatorRewardAccounts::<Test>::insert(VALIDATOR, 1000);
+        add_reward_balance();
 		assert_eq!(active_era(), 0);
 		assert_eq!(RewardBalance::free_balance(VALIDATOR), 1000);
 		assert_ok!(Reward::get_rewards(who(VALIDATOR), VALIDATOR));
@@ -27,6 +31,7 @@ fn anyone_can_call_rewards_should_work() {
 	ExtBuilder::default().build_and_execute(|| {
 		start_session(1);
 		assert_eq!(active_era(), 0);
+        add_reward_balance();
 		ValidatorRewardAccounts::<Test>::insert(VALIDATOR, 1000);
 		assert_ok!(Reward::get_rewards(who(USER), VALIDATOR));
 	});
@@ -47,6 +52,7 @@ fn get_multiple_rewards_in_the_same_era_should_not_work() {
 	ExtBuilder::default().build_and_execute(|| {
 		start_session(1);
 		assert_eq!(active_era(), 0);
+        add_reward_balance();
 		ValidatorRewardAccounts::<Test>::insert(VALIDATOR, 1000);
         assert_ok!(Reward::get_rewards(who(USER), VALIDATOR));
 		assert_noop!(Reward::get_rewards(who(USER), VALIDATOR), Error::<Test>::WaitTheEraToComplete);
@@ -94,6 +100,7 @@ fn accumulated_rewards_over_multiple_eras() {
     ExtBuilder::default().build_and_execute(|| {
         start_session(1);
         assert_eq!(active_era(), 0);
+        add_reward_balance();
 
         let mut total_validator_reward = 0;
 		let earlier_validator_balance =RewardBalance::free_balance(VALIDATOR);
@@ -116,8 +123,6 @@ fn accumulated_rewards_over_multiple_eras() {
         }
 
 		assert_ok!(Reward::get_rewards(who(USER), VALIDATOR));
-		let _ = Balances::deposit_creating(&Reward::account_id(), 15000000000);
-		let reward_account_balance_before =RewardBalance::free_balance(Reward::account_id());
         let _ = Reward::claim_rewards(VALIDATOR);
 
         assert_eq!(RewardBalance::free_balance(VALIDATOR), earlier_validator_balance + total_validator_reward);
@@ -130,6 +135,7 @@ fn reward_distribution_with_zero_commission() {
     ExtBuilder::default().build_and_execute(|| {
         start_session(1);
         assert_eq!(active_era(), 0);
+        add_reward_balance();
 
         let validator_reward: u128 = 1000;
 		let earlier_validator_balance =RewardBalance::free_balance(VALIDATOR);
@@ -141,10 +147,6 @@ fn reward_distribution_with_zero_commission() {
         EraReward::<Test>::insert(VALIDATOR, vec![NOMINATOR]);
 
         Staking::set_min_commission(who(VALIDATOR),commission );
-
-        assert_ok!(Reward::get_rewards(who(USER), VALIDATOR));
-		let _ = Balances::deposit_creating(&Reward::account_id(), 15000000);
-		let reward_account_balance_before =RewardBalance::free_balance(Reward::account_id());
         let _ = Reward::claim_rewards(VALIDATOR);
 
         // Check the balances
