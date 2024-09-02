@@ -3,7 +3,7 @@
 // This pallet facilitates the allocation of rewards to validators and nominators for their involvement in staking activities.
 
 #![cfg_attr(not(feature = "std"), no_std)]
-use frame_support::pallet_prelude::DispatchResult;
+use frame_support::{ensure, pallet_prelude::DispatchResult};
 pub use pallet::*;
 use pallet_staking::{Rewards, CurrentEra, Validators, ErasRewardPoints, ErasStakers, IndividualExposure };
 use parity_scale_codec::Codec;
@@ -157,6 +157,8 @@ pub mod pallet {
 		NoReward,
 		/// Wait for the era to complete
 		WaitTheEraToComplete,
+		/// Insufficient Reward Balance
+		InsufficientRewardBalance,
 	}
 
 	#[pallet::genesis_config]
@@ -187,6 +189,7 @@ pub mod pallet {
 		pub fn get_rewards(origin: OriginFor<T>, validator: T::AccountId) -> DispatchResult {
 			ensure_signed(origin)?;
 			Self::verify_validator(validator.clone())?;
+			Self::verify_balance(validator.clone())?;
 			let mut era_reward_accounts = EraRewardsVault::<T>::get().unwrap_or_else(Vec::new);
 			ensure!(!era_reward_accounts.contains(&validator), Error::<T>::WaitTheEraToComplete);
 			era_reward_accounts.push(validator.clone());
@@ -298,6 +301,24 @@ impl<T: Config> Pallet<T> {
 	fn verify_validator(validator: T::AccountId) -> DispatchResult {
 		let validator = ValidatorRewardAccounts::<T>::get(validator);
 		Self::check_reward(validator)
+	}
+
+	/// Verify the balance of reward 
+	fn verify_balance(validator: T::AccountId) -> DispatchResult {
+		let validator_reward = ValidatorRewardAccounts::<T>::get(validator.clone());
+		let free_balance =T::RewardCurrency::free_balance(&Self::account_id());
+		let nominators = EraReward::<T>::get(validator.clone());
+		if nominators.is_empty(){
+			ensure!(free_balance >= validator_reward,Error::<T>::InsufficientRewardBalance);
+			return Ok(());
+		}
+		let mut total_nominator_reward:T::Balance = 0u128.into();
+		nominators.iter().for_each(|nominator| {
+			let nominator_reward = NominatorRewardAccounts::<T>::get(validator.clone(),nominator);
+			total_nominator_reward += nominator_reward;
+		});
+		ensure!(free_balance >= total_nominator_reward + validator_reward,Error::<T>::InsufficientRewardBalance);
+		return Ok(());
 	}
 
 	/// Calculates the commission for the validator.

@@ -3,6 +3,7 @@ use crate::Error;
 use crate::{Rewards,ValidatorRewardAccounts,NominatorRewardAccounts,EraReward};
 use frame_support::{assert_ok, assert_noop};
 use frame_support::traits::Currency;
+use sp_runtime::Perbill;
 
 pub const VALIDATOR: u64 = 11;
 pub const NOMINATOR: u64 = 22; 
@@ -86,4 +87,68 @@ fn nominator_receiving_reward() {
 		assert_eq!(reward_account_balance_after , 15000000 - validator_reward - nominator_reward); 
 
     }); 
+}
+
+#[test]
+fn accumulated_rewards_over_multiple_eras() {
+    ExtBuilder::default().build_and_execute(|| {
+        start_session(1);
+        assert_eq!(active_era(), 0);
+
+        let mut total_validator_reward = 0;
+		let earlier_validator_balance =RewardBalance::free_balance(VALIDATOR);
+        let mut total_nominator_reward = 0;
+
+        for era in 0..3 {
+            let validator_reward: u128 = 1000 * (era + 1);
+            let nominator_reward: u128 = 500 * (era + 1);
+
+			ValidatorRewardAccounts::<Test>::mutate(VALIDATOR.clone(), |earlier_reward| {
+				*earlier_reward += validator_reward;
+			});
+			NominatorRewardAccounts::<Test>::mutate(VALIDATOR.clone(), NOMINATOR,|earlier_reward| {
+				*earlier_reward += nominator_reward;
+			});
+            EraReward::<Test>::insert(VALIDATOR, vec![NOMINATOR]);
+
+            total_validator_reward += validator_reward;
+            total_nominator_reward += nominator_reward;
+        }
+
+		assert_ok!(Reward::get_rewards(who(USER), VALIDATOR));
+		let _ = Balances::deposit_creating(&Reward::account_id(), 15000000000);
+		let reward_account_balance_before =RewardBalance::free_balance(Reward::account_id());
+        let _ = Reward::claim_rewards(VALIDATOR);
+
+        assert_eq!(RewardBalance::free_balance(VALIDATOR), earlier_validator_balance + total_validator_reward);
+        assert_eq!(RewardBalance::free_balance(NOMINATOR), total_nominator_reward);
+    });
+}
+
+#[test]
+fn reward_distribution_with_zero_commission() {
+    ExtBuilder::default().build_and_execute(|| {
+        start_session(1);
+        assert_eq!(active_era(), 0);
+
+        let validator_reward: u128 = 1000;
+		let earlier_validator_balance =RewardBalance::free_balance(VALIDATOR);
+        let nominator_reward: u128 = 500;
+        let commission = Perbill::from_percent(0);
+
+        ValidatorRewardAccounts::<Test>::insert(VALIDATOR, validator_reward);
+        NominatorRewardAccounts::<Test>::insert(VALIDATOR, NOMINATOR, nominator_reward);
+        EraReward::<Test>::insert(VALIDATOR, vec![NOMINATOR]);
+
+        Staking::set_min_commission(who(VALIDATOR),commission );
+
+        assert_ok!(Reward::get_rewards(who(USER), VALIDATOR));
+		let _ = Balances::deposit_creating(&Reward::account_id(), 15000000);
+		let reward_account_balance_before =RewardBalance::free_balance(Reward::account_id());
+        let _ = Reward::claim_rewards(VALIDATOR);
+
+        // Check the balances
+        assert_eq!(RewardBalance::free_balance(VALIDATOR), earlier_validator_balance + validator_reward);
+        assert_eq!(RewardBalance::free_balance(NOMINATOR), nominator_reward);
+    });
 }
