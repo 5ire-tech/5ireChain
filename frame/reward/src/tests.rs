@@ -3,6 +3,7 @@ use crate::Error;
 use crate::{Rewards,ValidatorRewardAccounts,NominatorRewardAccounts,EraReward};
 use frame_support::{assert_ok, assert_noop};
 use frame_support::traits::Currency;
+use frame_system::Event;
 use sp_runtime::Perbill;
 
 pub const VALIDATOR: u64 = 11;
@@ -42,7 +43,6 @@ fn get_rewards_by_not_validator_should_not_work() {
 	ExtBuilder::default().build_and_execute(|| {
 		start_session(1);
 		assert_eq!(active_era(), 0);
-
 		assert_noop!(Reward::get_rewards(who(USER), USER_2), Error::<Test>::NoReward);
 	});
 }
@@ -146,7 +146,7 @@ fn reward_distribution_with_zero_commission() {
         NominatorRewardAccounts::<Test>::insert(VALIDATOR, NOMINATOR, nominator_reward);
         EraReward::<Test>::insert(VALIDATOR, vec![NOMINATOR]);
 
-        Staking::set_min_commission(who(VALIDATOR),commission );
+        let _ = Staking::set_min_commission(who(VALIDATOR),commission);
         let _ = Reward::claim_rewards(VALIDATOR);
 
         // Check the balances

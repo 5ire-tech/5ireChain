@@ -149,6 +149,8 @@ pub mod pallet {
 		Rewarded {
 			who: T::AccountId,
 		},
+		/// Insufficient Reward Balance
+		InsufficientRewardBalance
 	}
 
 	#[pallet::error]
@@ -189,7 +191,6 @@ pub mod pallet {
 		pub fn get_rewards(origin: OriginFor<T>, validator: T::AccountId) -> DispatchResult {
 			ensure_signed(origin)?;
 			Self::verify_validator(validator.clone())?;
-			Self::verify_balance(validator.clone())?;
 			let mut era_reward_accounts = EraRewardsVault::<T>::get().unwrap_or_else(Vec::new);
 			ensure!(!era_reward_accounts.contains(&validator), Error::<T>::WaitTheEraToComplete);
 			era_reward_accounts.push(validator.clone());
@@ -210,6 +211,11 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 	/// Distributing rewards to validators and nominators.
 	fn claim_rewards(validator: T::AccountId) -> DispatchResult {
 		let nominators = EraReward::<T>::get(validator.clone());
+		let reward_balance = Self::verify_balance(validator.clone());
+		if let Err(e) = reward_balance {
+			Self::deposit_event(Event::InsufficientRewardBalance);
+			return Err(e);
+		}
 		Self::distribute_reward(validator.clone(), None)?;
 		Self::update_rewarded_validators(validator.clone())?;
 		if nominators.is_empty() {
@@ -318,8 +324,8 @@ impl<T: Config> Pallet<T> {
 			total_nominator_reward += nominator_reward;
 		});
 		ensure!(free_balance >= total_nominator_reward + validator_reward,Error::<T>::InsufficientRewardBalance);
-		return Ok(());
-	}
+	    return Ok(());
+}
 
 	/// Calculates the commission for the validator.
 	fn validator_commission(validator: T::AccountId) -> u32 {
@@ -409,6 +415,7 @@ impl<T: Config> Pallet<T> {
 			{
 				nominators.remove(index);
 			}
+			EraReward::<T>::insert(validator.clone(),nominators.clone());
 			NominatorRewardAccounts::<T>::remove(validator.clone(), nominator.clone());
 			(reward, nominator)
 		} else {
