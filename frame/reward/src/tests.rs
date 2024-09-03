@@ -15,6 +15,13 @@ pub fn add_reward_balance() {
 	Balances::deposit_creating(&Reward::account_id(), 15000000);
 }
 
+pub fn assert_last_event(generic_event: RuntimeEvent) {
+	let events = frame_system::Pallet::<Test>::events();
+	let system_event: RuntimeEvent = generic_event.into();
+	let frame_system::EventRecord { event, .. } = &events[events.len() - 1];
+	assert_eq!(event, &system_event);
+}
+
 #[test]
 fn get_rewards_should_work() {
 	ExtBuilder::default().build_and_execute(|| {
@@ -152,5 +159,28 @@ fn reward_distribution_with_zero_commission() {
         // Check the balances
         assert_eq!(RewardBalance::free_balance(VALIDATOR), earlier_validator_balance + validator_reward);
         assert_eq!(RewardBalance::free_balance(NOMINATOR), nominator_reward);
+    });
+}
+
+#[test]
+fn balance_low_before_distributing() {
+    ExtBuilder::default().build_and_execute(|| {
+        start_session(1);
+        assert_eq!(active_era(), 0);
+
+        let validator_reward: u128 = 1000;
+        let nominator_reward1: u128 = 500;
+        let nominator_reward2: u128 = 300;
+        let nominator_reward3: u128 = 200;
+
+        ValidatorRewardAccounts::<Test>::insert(VALIDATOR, validator_reward);
+        NominatorRewardAccounts::<Test>::insert(VALIDATOR, NOMINATOR, nominator_reward1);
+        NominatorRewardAccounts::<Test>::insert(VALIDATOR, NOMINATOR + 1, nominator_reward2);
+        NominatorRewardAccounts::<Test>::insert(VALIDATOR, NOMINATOR + 2, nominator_reward3);
+        EraReward::<Test>::insert(VALIDATOR, vec![NOMINATOR, NOMINATOR + 1, NOMINATOR + 2]);
+
+        let _ = Balances::deposit_creating(&Reward::account_id(), 1000);
+        let _ = Reward::claim_rewards(VALIDATOR);
+         assert_last_event(RuntimeEvent::Reward(crate::Event::InsufficientRewardBalance) );
     });
 }
