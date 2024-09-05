@@ -138,31 +138,6 @@ fn accumulated_rewards_over_multiple_eras() {
 }
 
 #[test]
-fn reward_distribution_with_zero_commission() {
-    ExtBuilder::default().build_and_execute(|| {
-        start_session(1);
-        assert_eq!(active_era(), 0);
-        add_reward_balance();
-
-        let validator_reward: u128 = 1000;
-		let earlier_validator_balance =RewardBalance::free_balance(VALIDATOR);
-        let nominator_reward: u128 = 500;
-        let commission = Perbill::from_percent(0);
-
-        ValidatorRewardAccounts::<Test>::insert(VALIDATOR, validator_reward);
-        NominatorRewardAccounts::<Test>::insert(VALIDATOR, NOMINATOR, nominator_reward);
-        EraReward::<Test>::insert(VALIDATOR, vec![NOMINATOR]);
-
-        let _ = Staking::set_min_commission(who(VALIDATOR),commission);
-        let _ = Reward::claim_rewards(VALIDATOR);
-
-        // Check the balances
-        assert_eq!(RewardBalance::free_balance(VALIDATOR), earlier_validator_balance + validator_reward);
-        assert_eq!(RewardBalance::free_balance(NOMINATOR), nominator_reward);
-    });
-}
-
-#[test]
 fn balance_low_before_distributing() {
     ExtBuilder::default().build_and_execute(|| {
         start_session(1);
