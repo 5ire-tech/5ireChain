@@ -7,6 +7,8 @@ use frame_support::{ensure, pallet_prelude::DispatchResult};
 pub use pallet::*;
 use pallet_staking::{Rewards, CurrentEra, Validators, ErasRewardPoints, ErasStakers, IndividualExposure };
 use parity_scale_codec::Codec;
+use crate::migration::migrate_to_v1;
+use frame_support::pallet_prelude::StorageVersion;
 use scale_info::prelude::{ vec::Vec, fmt::Debug };
 use sp_runtime::{ traits::{ AtLeast32BitUnsigned, Convert }, FixedPointOperand };
 use frame_support::{PalletId,traits::{
@@ -21,20 +23,26 @@ use sp_runtime::traits::AccountIdConversion;
 use sp_runtime::traits::Zero;
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
+
+mod migration;
 #[cfg(test)]
 mod mock;
 #[cfg(test)]
 mod tests;
 pub mod weights;
 pub use weights::WeightInfo;
+const STORAGE_VERSION: StorageVersion = StorageVersion::new(2);
 #[frame_support::pallet]
 pub mod pallet {
 	use super::*;
 	use frame_support::pallet_prelude::{ ValueQuery, * };
 	use frame_system::pallet_prelude::*;
+	
 	#[pallet::pallet]
+	#[pallet::storage_version(STORAGE_VERSION)]
 	#[pallet::without_storage_info]
 	pub struct Pallet<T>(_);
+	
 	#[pallet::config]
 	pub trait Config: frame_system::Config + pallet_staking::Config {
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
@@ -81,6 +89,15 @@ pub mod pallet {
 		type WeightInfo: WeightInfo;
 	}
 
+
+	#[pallet::hooks]
+	impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
+		fn on_runtime_upgrade() -> frame_support::weights::Weight {
+			migrate_to_v1::<T>()
+		}
+
+	}
+
 	/// The era reward which are distributed among the validator and nominator
 	#[pallet::storage]
 	#[pallet::getter(fn total_rewards)]
@@ -117,7 +134,18 @@ pub mod pallet {
 	/// Specifics regarding the rewards distributed within the designated era of the nominator
 	#[pallet::storage]
 	#[pallet::getter(fn nominator_reward_accounts)]
-	pub type NominatorRewardAccounts<T: Config> = StorageDoubleMap<
+	pub type NominatorRewardAccounts<T: Config> = StorageMap<
+		_,
+		Blake2_128Concat,
+		T::AccountId,
+		T::Balance,
+		ValueQuery
+	>;
+	
+	/// Storage that tracks the rewards earned by nominators for each validator
+	#[pallet::storage]
+	#[pallet::getter(fn nominator_earning_accounts)]
+	pub type NominatorEarningsAccount<T: Config> = StorageDoubleMap<
 		_,
 		Blake2_128Concat,
 		T::AccountId,
@@ -320,7 +348,7 @@ impl<T: Config> Pallet<T> {
 		}
 		let mut total_nominator_reward:T::Balance = 0u128.into();
 		nominators.iter().for_each(|nominator| {
-			let nominator_reward = NominatorRewardAccounts::<T>::get(validator.clone(),nominator);
+			let nominator_reward = NominatorEarningsAccount::<T>::get(validator.clone(),nominator);
 			total_nominator_reward += nominator_reward;
 		});
 		ensure!(free_balance >= total_nominator_reward + validator_reward,Error::<T>::InsufficientRewardBalance);
@@ -381,7 +409,7 @@ impl<T: Config> Pallet<T> {
 		reward: T::Balance
 	) {
 		if let Some(nominator) = nominator {
-			NominatorRewardAccounts::<T>::mutate(validator, nominator.clone(), |earlier_reward| {
+			NominatorEarningsAccount::<T>::mutate(validator, nominator.clone(), |earlier_reward| {
 				*earlier_reward += reward;
 			})
 		} else {
@@ -404,7 +432,7 @@ impl<T: Config> Pallet<T> {
 		nominator: Option<T::AccountId>
 	) -> DispatchResult {
 		let (reward, recipient) = if let Some(nominator) = nominator {
-			let reward = NominatorRewardAccounts::<T>::get(validator.clone(), nominator.clone());
+			let reward = NominatorEarningsAccount::<T>::get(validator.clone(), nominator.clone());
 			Self::check_reward(reward)?;
 			Self::transfer(Self::account_id(), nominator.clone(), reward, KeepAlive)?;
 			let mut nominators = EraReward::<T>::get(validator.clone());
@@ -416,7 +444,7 @@ impl<T: Config> Pallet<T> {
 				nominators.remove(index);
 			}
 			EraReward::<T>::insert(validator.clone(),nominators.clone());
-			NominatorRewardAccounts::<T>::remove(validator.clone(), nominator.clone());
+			NominatorEarningsAccount::<T>::remove(validator.clone(), nominator.clone());
 			(reward, nominator)
 		} else {
 			let reward = ValidatorRewardAccounts::<T>::get(validator.clone());
