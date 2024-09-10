@@ -20,7 +20,7 @@ pub fn migrate_to_v1<T: Config>() -> frame_support::weights::Weight {
 			}
 			count += 1;
 		}
-		StorageVersion::new(2).put::<Pallet<T>>();
+		StorageVersion::new(1).put::<Pallet<T>>();
 		T::DbWeight::get().reads_writes((count as u64) + 1, (count as u64) + 1)
 	} else {
 		T::DbWeight::get().reads(1)

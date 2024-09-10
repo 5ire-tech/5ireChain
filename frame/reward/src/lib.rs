@@ -31,7 +31,7 @@ mod mock;
 mod tests;
 pub mod weights;
 pub use weights::WeightInfo;
-const STORAGE_VERSION: StorageVersion = StorageVersion::new(2);
+const STORAGE_VERSION: StorageVersion = StorageVersion::new(1);
 #[frame_support::pallet]
 pub mod pallet {
 	use super::*;
