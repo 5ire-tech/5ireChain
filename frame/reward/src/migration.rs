@@ -1,11 +1,14 @@
 use super::*;
 use frame_support::traits::{ Get, GetStorageVersion, StorageVersion };
 
+use log::{log, Level};
+
 /// Migrate the pallet storage to v1.
 pub fn migrate_to_v1<T: Config>() -> frame_support::weights::Weight {
 	let onchain_version = Pallet::<T>::on_chain_storage_version();
+	
 
-	if onchain_version < 2 {
+	if onchain_version == 0 {
 		let mut count = 0;
 		for (nominator_id, balance) in NominatorRewardAccounts::<T>::iter() {
 			if let Some(nominations) = pallet_staking::Nominators::<T>::get(nominator_id.clone()) {
@@ -21,8 +24,10 @@ pub fn migrate_to_v1<T: Config>() -> frame_support::weights::Weight {
 			count += 1;
 		}
 		StorageVersion::new(1).put::<Pallet<T>>();
+		log!(Level::Info, "reward v1 applied successfully");
 		T::DbWeight::get().reads_writes((count as u64) + 1, (count as u64) + 1)
 	} else {
+		log!(Level::Warn, "Skipping reward v1, should be removed");
 		T::DbWeight::get().reads(1)
 	}
 }
