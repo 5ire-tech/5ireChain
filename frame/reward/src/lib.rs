@@ -7,7 +7,7 @@ use frame_support::{ensure, pallet_prelude::DispatchResult};
 pub use pallet::*;
 use pallet_staking::{Rewards, CurrentEra, Validators, ErasRewardPoints, ErasStakers, IndividualExposure };
 use parity_scale_codec::Codec;
-use crate::migration::migrate_to_v1;
+// use crate::migration::migrate_to_v1;
 use frame_support::pallet_prelude::StorageVersion;
 use scale_info::prelude::{ vec::Vec, fmt::Debug };
 use sp_runtime::{ traits::{ AtLeast32BitUnsigned, Convert }, FixedPointOperand };
@@ -24,7 +24,7 @@ use sp_runtime::traits::Zero;
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
 
-mod migration;
+pub mod migration;
 #[cfg(test)]
 mod mock;
 #[cfg(test)]
@@ -90,13 +90,13 @@ pub mod pallet {
 	}
 
 
-	#[pallet::hooks]
-	impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
-		fn on_runtime_upgrade() -> frame_support::weights::Weight {
-			migrate_to_v1::<T>()
-		}
+	// #[pallet::hooks]
+	// impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
+	// 	fn on_runtime_upgrade() -> frame_support::weights::Weight {
+	// 		migrate_to_v1::<T>()
+	// 	}
 
-	}
+	// }
 
 	/// The era reward which are distributed among the validator and nominator
 	#[pallet::storage]
