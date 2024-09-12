@@ -1,6 +1,6 @@
 use crate::mock::*;
 use crate::Error;
-use crate::{Rewards,ValidatorRewardAccounts,NominatorRewardAccounts,EraReward};
+use crate::{Rewards,ValidatorRewardAccounts,NominatorEarningsAccount,EraReward};
 use frame_support::{assert_ok, assert_noop};
 use frame_support::traits::Currency;
 use frame_system::Event;
@@ -78,7 +78,7 @@ fn nominator_receiving_reward() {
         let earlier_validator_balance =RewardBalance::free_balance(VALIDATOR);
 
         ValidatorRewardAccounts::<Test>::insert(VALIDATOR, validator_reward);
-        NominatorRewardAccounts::<Test>::insert(VALIDATOR, NOMINATOR, nominator_reward);
+        NominatorEarningsAccount::<Test>::insert(VALIDATOR, NOMINATOR, nominator_reward);
         EraReward::<Test>::insert(VALIDATOR,vec![NOMINATOR]);
 
         let _ = Balances::deposit_creating(&Reward::account_id(), 15000000);
@@ -120,7 +120,7 @@ fn accumulated_rewards_over_multiple_eras() {
 			ValidatorRewardAccounts::<Test>::mutate(VALIDATOR.clone(), |earlier_reward| {
 				*earlier_reward += validator_reward;
 			});
-			NominatorRewardAccounts::<Test>::mutate(VALIDATOR.clone(), NOMINATOR,|earlier_reward| {
+			NominatorEarningsAccount::<Test>::mutate(VALIDATOR.clone(), NOMINATOR,|earlier_reward| {
 				*earlier_reward += nominator_reward;
 			});
             EraReward::<Test>::insert(VALIDATOR, vec![NOMINATOR]);
@@ -149,9 +149,9 @@ fn balance_low_before_distributing() {
         let nominator_reward3: u128 = 200;
 
         ValidatorRewardAccounts::<Test>::insert(VALIDATOR, validator_reward);
-        NominatorRewardAccounts::<Test>::insert(VALIDATOR, NOMINATOR, nominator_reward1);
-        NominatorRewardAccounts::<Test>::insert(VALIDATOR, NOMINATOR + 1, nominator_reward2);
-        NominatorRewardAccounts::<Test>::insert(VALIDATOR, NOMINATOR + 2, nominator_reward3);
+        NominatorEarningsAccount::<Test>::insert(VALIDATOR, NOMINATOR, nominator_reward1);
+        NominatorEarningsAccount::<Test>::insert(VALIDATOR, NOMINATOR + 1, nominator_reward2);
+        NominatorEarningsAccount::<Test>::insert(VALIDATOR, NOMINATOR + 2, nominator_reward3);
         EraReward::<Test>::insert(VALIDATOR, vec![NOMINATOR, NOMINATOR + 1, NOMINATOR + 2]);
 
         let _ = Balances::deposit_creating(&Reward::account_id(), 1000);
