@@ -159,7 +159,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("firechain-node-thunder"),
 	impl_name: create_runtime_str!("5ire"),
 	authoring_version: 1,
-	spec_version: 106,
+	spec_version: 107,
 	impl_version: 0,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
@@ -606,11 +606,9 @@ parameter_types! {
 }
 
 impl pallet_reward::Config for Runtime{
-	//type TreasuryAccount = Treasury;
 	type RewardCurrency = Balances;
 	type Balance = Balance;
 	type RuntimeEvent = RuntimeEvent;
-	type DataProvider = <Runtime as pallet_election_provider_multi_phase::Config>::DataProvider;
 	type ValidatorSet = Historical;
 	type Validators = Historical;
 	type ValidatorId = pallet_staking::StashOf<Self>;
@@ -2542,6 +2540,23 @@ pub type CheckedExtrinsic =
 	fp_self_contained::CheckedExtrinsic<AccountId, RuntimeCall, SignedExtra, H160>;
 /// The payload being signed in transactions.
 pub type SignedPayload = generic::SignedPayload<RuntimeCall, SignedExtra>;
+
+/// All migrations that will run on the next runtime upgrade.
+///
+/// This contains the combined migrations of the last 10 releases. It allows to skip runtime
+/// upgrades in case governance decides to do so. THE ORDER IS IMPORTANT.
+pub type Migrations = migrations::Unreleased;
+
+/// The runtime migrations per release.
+#[allow(deprecated, missing_docs)]
+pub mod migrations {
+	use super::*;
+
+	/// Unreleased migrations. Add new ones here:
+	pub type Unreleased = pallet_reward::migration::v1::MigrateToV1<Runtime>;
+}
+
+
 /// Executive: handles dispatch to the various modules.
 pub type Executive = frame_executive::Executive<
 	Runtime,
@@ -2551,7 +2566,6 @@ pub type Executive = frame_executive::Executive<
 	AllPalletsWithSystem,
 	Migrations,
 >;
-type Migrations = ();
 
 impl fp_self_contained::SelfContainedCall for RuntimeCall {
 	type SignedInfo = H160;

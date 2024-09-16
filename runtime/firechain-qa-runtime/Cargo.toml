@@ -1,6 +1,6 @@
 [package]
 name = "firechain-qa-runtime"
-version = "1.0.9"
+version = "1.1.0"
 authors = ["5ire Team <support@5ire.org>"]
 description = "5ire chain qa runtime"
 edition = "2021"
@@ -343,4 +343,5 @@ try-runtime = [
 	"pallet-evm/try-runtime",
 	"pallet-base-fee/try-runtime",
 	"pallet-dynamic-fee/try-runtime",
+	"pallet-reward/try-runtime",
 ]
