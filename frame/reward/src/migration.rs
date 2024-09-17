@@ -29,11 +29,11 @@ pub mod v1 {
 						pallet_staking::Nominators::<T>::get(nominator_id.clone())
 					{
 						if let Some(validator) = nominations.targets.first() {
-							NominatorEarningsAccount::<T>::insert(
-								validator.clone(),
-								nominator_id.clone(),
-								balance,
-							);
+							NominatorEarningsAccount::<T>::mutate(
+								validator, 
+								nominator_id.clone(), 
+								|earlier_reward| { *earlier_reward += balance;
+							})
 						}
 						NominatorRewardAccounts::<T>::remove(nominator_id.clone());
 					}
