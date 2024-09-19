@@ -2406,7 +2406,7 @@ dependencies = [
 
 [[package]]
 name = "firechain-mainnet-runtime"
-version = "1.0.9"
+version = "1.1.1"
 dependencies = [
  "firechain-runtime-core-primitives",
  "fp-account",
@@ -2614,7 +2614,7 @@ dependencies = [
 
 [[package]]
 name = "firechain-qa-runtime"
-version = "1.0.9"
+version = "1.1.0"
 dependencies = [
  "firechain-runtime-core-primitives",
  "fp-account",
@@ -2727,7 +2727,7 @@ dependencies = [
 
 [[package]]
 name = "firechain-thunder-runtime"
-version = "1.0.6"
+version = "1.0.7"
 dependencies = [
  "firechain-runtime-core-primitives",
  "fp-account",

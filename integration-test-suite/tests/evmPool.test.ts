@@ -34,7 +34,7 @@ describe("EVM related Pool using web3js/ethersjs", function () {
           maxAttempts: 5,
           onTimeout: false,
         },
-      })
+      }),
     );
 
     const erc20Contract = new web3.eth.Contract(ERC20_ABI);
@@ -55,10 +55,10 @@ describe("EVM related Pool using web3js/ethersjs", function () {
         gasPrice,
         gas,
       },
-      GENESIS_ACCOUNT_0_PRIVATE_KEY
+      GENESIS_ACCOUNT_0_PRIVATE_KEY,
     );
     const receipt = await web3.eth.sendSignedTransaction(
-      txSign.rawTransaction as string
+      txSign.rawTransaction as string,
     );
     await sleep(1 * SECONDS);
     contractAddress = receipt.contractAddress || "";
@@ -88,8 +88,8 @@ describe("EVM related Pool using web3js/ethersjs", function () {
           // we intentionally set gas too low
           gas: 2000,
         },
-        GENESIS_ACCOUNT_0_PRIVATE_KEY
-      )
+        GENESIS_ACCOUNT_0_PRIVATE_KEY,
+      ),
     ).to.throw;
   });
 
@@ -103,7 +103,7 @@ describe("EVM related Pool using web3js/ethersjs", function () {
       21000,
       web3.utils.toHex(gasPrice),
       nonce,
-      GENESIS_ACCOUNT_0_PRIVATE_KEY
+      GENESIS_ACCOUNT_0_PRIVATE_KEY,
     );
     await web3.eth.sendSignedTransaction(tx.rawTransaction as string);
     let result = await customRequest(web3, "eth_sendRawTransaction", [
@@ -115,7 +115,7 @@ describe("EVM related Pool using web3js/ethersjs", function () {
   it("EVM RPC pool error - exceeds block gas limit", async function () {
     const nonce = await web3.eth.getTransactionCount(
       GENESIS_ACCOUNTS[0],
-      "latest"
+      "latest",
     );
     let gasPriceTx = web3.utils.toWei("15", "gwei");
     let tx = await createRawTransferLegacy(
@@ -125,7 +125,7 @@ describe("EVM related Pool using web3js/ethersjs", function () {
       10_000_000_000,
       web3.utils.toHex(gasPriceTx),
       nonce,
-      GENESIS_ACCOUNT_0_PRIVATE_KEY
+      GENESIS_ACCOUNT_0_PRIVATE_KEY,
     );
 
     let result = await customRequest(web3, "eth_sendRawTransaction", [
@@ -137,7 +137,7 @@ describe("EVM related Pool using web3js/ethersjs", function () {
   it("EVM RPC pool error - max priority fee per gas higher than max fee per gas", async function () {
     const nonce = await web3.eth.getTransactionCount(
       GENESIS_ACCOUNTS[0],
-      "latest"
+      "latest",
     );
 
     // Throw: maxFeePerGas cannot be less than maxPriorityFeePerGas
@@ -150,8 +150,8 @@ describe("EVM related Pool using web3js/ethersjs", function () {
         100_000_000_000,
         200_000_000_000,
         nonce,
-        GENESIS_ACCOUNT_0_PRIVATE_KEY
-      )
+        GENESIS_ACCOUNT_0_PRIVATE_KEY,
+      ),
     ).Throw;
   });
 });
@@ -163,7 +163,7 @@ async function createRawTransferLegacy(
   gas: number,
   gasPrice: string,
   nonce: number,
-  privateKey: string
+  privateKey: string,
 ): Promise<any> {
   return new Promise((resolve, reject) => {
     const transaction = {
@@ -190,7 +190,7 @@ async function createRawTransferEIP1559(
   maxFeePerGas: number,
   maxPriorityFeePerGas: number,
   nonce: number,
-  privateKey: string
+  privateKey: string,
 ): Promise<any> {
   return new Promise((resolve, reject) => {
     const transaction = {

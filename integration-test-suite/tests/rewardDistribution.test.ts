@@ -6,7 +6,6 @@ import {
   spawnNodes,
   polkadotApi,
 } from "../utils/util";
-import { Keyring } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { waitForEvent, waitNfinalizedBlocks } from "../utils/setup";
 
@@ -19,55 +18,81 @@ describe("Reward Distribution tests", function () {
     await spawnNodes();
     const rewardAccount = await getRewardAccount();
     rewardAddress = rewardAccount.toString();
-    await transfer(alith, rewardAddress )
-
+    await transfer(alith, rewardAddress);
   });
 
   it("Should test Reward Distribution with Reliability score ", async () => {
     const reliabilityZero = await getReliabilityScore(alith);
-    console.log("Reliability Score in Era 0 without Esg Score:", reliabilityZero);
+    console.log(
+      "Reliability Score in Era 0 without Esg Score:",
+      reliabilityZero,
+    );
     await waitNfinalizedBlocks(polkadotApi, 45, 1000);
     const eraZeroValidatorsReward = await getErasValidatorReward(alith.address);
-    console.log("Validator Reward in Era 0 without Esg Score:", eraZeroValidatorsReward.toHuman());
+    console.log(
+      "Validator Reward in Era 0 without Esg Score:",
+      eraZeroValidatorsReward.toHuman(),
+    );
 
     const reliabilityOne = await getReliabilityScore(alith);
-    console.log("Reliability Score in Era 1 without Esg Score:", reliabilityOne);
+    console.log(
+      "Reliability Score in Era 1 without Esg Score:",
+      reliabilityOne,
+    );
 
     await waitNfinalizedBlocks(polkadotApi, 45, 1000);
     const eraOneValidatorsReward = await getErasValidatorReward(alith.address);
 
-    console.log("Validator Reward in Era 1 without Esg Score:", eraOneValidatorsReward.toHuman());
+    console.log(
+      "Validator Reward in Era 1 without Esg Score:",
+      eraOneValidatorsReward.toHuman(),
+    );
 
     expect(
       BigInt(eraOneValidatorsReward?.toString()) >
-        BigInt(eraZeroValidatorsReward?.toString())
+        BigInt(eraZeroValidatorsReward?.toString()),
     ).true;
 
     const reliabilityTwo = await getReliabilityScore(alith);
-    console.log("Reliability Score in Era 2 without Esg Score:", reliabilityTwo);
+    console.log(
+      "Reliability Score in Era 2 without Esg Score:",
+      reliabilityTwo,
+    );
     await waitNfinalizedBlocks(polkadotApi, 45, 1000);
     const eraTwoValidatorsReward = await getErasValidatorReward(alith.address);
-    console.log("Validator Reward in Era 2 without Esg Score:{}", eraTwoValidatorsReward.toHuman());
+    console.log(
+      "Validator Reward in Era 2 without Esg Score:{}",
+      eraTwoValidatorsReward.toHuman(),
+    );
 
     expect(
       BigInt(eraTwoValidatorsReward?.toString()) >
-        BigInt(eraOneValidatorsReward?.toString())
+        BigInt(eraOneValidatorsReward?.toString()),
     ).true;
 
     await waitNfinalizedBlocks(polkadotApi, 2, 1000);
     // @ts-ignore
-    const {data: rewardBalanceBeforeClaimByValidator} =  await api.query.system.account(rewardAddress);
-    expect(rewardBalanceBeforeClaimByValidator.free.toBigInt()).to.equal(BigInt("1000000000000000000000"));
+    const { data: rewardBalanceBeforeClaimByValidator } =
+      await api.query.system.account(rewardAddress);
+    expect(rewardBalanceBeforeClaimByValidator.free.toBigInt()).to.equal(
+      BigInt("1000000000000000000000"),
+    );
 
     await getReward(alith, alith.address);
     await waitNfinalizedBlocks(polkadotApi, 45, 1000);
-    const eraThreeValidatorsReward = await getErasValidatorReward(alith.address);
-    console.log("Validator Reward in Era 3 without Esg Score:{}", eraThreeValidatorsReward.toHuman());
+    const eraThreeValidatorsReward = await getErasValidatorReward(
+      alith.address,
+    );
+    console.log(
+      "Validator Reward in Era 3 without Esg Score:{}",
+      eraThreeValidatorsReward.toHuman(),
+    );
     // @ts-ignore
-    const {data: rewardBalanceAfterClaimByValidator} =  await api.query.system.account(rewardAddress);
-    expect(rewardBalanceAfterClaimByValidator.free.toBigInt()).to.equal(BigInt("688000000000000000000"));
-
-
+    const { data: rewardBalanceAfterClaimByValidator } =
+      await api.query.system.account(rewardAddress);
+    expect(rewardBalanceAfterClaimByValidator.free.toBigInt()).to.equal(
+      BigInt("688000000000000000000"),
+    );
   });
 
   after(async () => {
@@ -83,7 +108,6 @@ describe("Reward Distribution tests with Reliability score and sustainability sc
   });
 
   it("Should test Reward Distribution with Reliability score and sustainability score ", async () => {
-
     const esgData = [
       {
         account: alith.address,
@@ -96,10 +120,16 @@ describe("Reward Distribution tests with Reliability score and sustainability sc
     await insertEsgScores(alith, jsonData);
 
     const reliabilityZero = await getReliabilityScore(alith);
-    console.log("Reliability Score in Era 0 within Esg Score:", reliabilityZero);
+    console.log(
+      "Reliability Score in Era 0 within Esg Score:",
+      reliabilityZero,
+    );
     await waitNfinalizedBlocks(polkadotApi, 45, 1000);
     const eraZeroValidatorsReward = await getErasValidatorReward(alith.address);
-    console.log("Validator Reward in Era 0 within Esg Score:", eraZeroValidatorsReward.toHuman());
+    console.log(
+      "Validator Reward in Era 0 within Esg Score:",
+      eraZeroValidatorsReward.toHuman(),
+    );
 
     const reliabilityOne = await getReliabilityScore(alith);
     console.log("Reliability Score in Era 1 within Esg Score:", reliabilityOne);
@@ -107,22 +137,28 @@ describe("Reward Distribution tests with Reliability score and sustainability sc
     await waitNfinalizedBlocks(polkadotApi, 45, 1000);
     const eraOneValidatorsReward = await getErasValidatorReward(alith.address);
 
-    console.log("Validator Reward in Era 1 within Esg Score:", eraOneValidatorsReward.toHuman());
+    console.log(
+      "Validator Reward in Era 1 within Esg Score:",
+      eraOneValidatorsReward.toHuman(),
+    );
 
     expect(
       BigInt(eraOneValidatorsReward?.toString()) >
-        BigInt(eraZeroValidatorsReward?.toString())
+        BigInt(eraZeroValidatorsReward?.toString()),
     ).true;
 
     const reliabilityTwo = await getReliabilityScore(alith);
     console.log("Reliability Score in Era 2 within Esg Score:", reliabilityTwo);
     await waitNfinalizedBlocks(polkadotApi, 45, 1000);
     const eraTwoValidatorsReward = await getErasValidatorReward(alith.address);
-    console.log("Validator Reward in Era 2 within Esg Score:", eraTwoValidatorsReward.toHuman());
+    console.log(
+      "Validator Reward in Era 2 within Esg Score:",
+      eraTwoValidatorsReward.toHuman(),
+    );
 
     expect(
       BigInt(eraTwoValidatorsReward?.toString()) >
-        BigInt(eraOneValidatorsReward?.toString())
+        BigInt(eraOneValidatorsReward?.toString()),
     ).true;
 
     await waitNfinalizedBlocks(polkadotApi, 2, 1000);
@@ -133,10 +169,9 @@ describe("Reward Distribution tests with Reliability score and sustainability sc
   });
 });
 
-
 async function getReliabilityScore(alith: KeyringPair) {
   const reliabilityScores = await api.query.imOnline.reliabilityScoresMap(
-    alith.address
+    alith.address,
   );
   return reliabilityScores;
 }
@@ -157,11 +192,7 @@ async function getCurrentEra() {
   return currentEra;
 }
 
-
-export async function insertEsgScores(
-  alith: KeyringPair,
-  jsonData: string
-) {
+export async function insertEsgScores(alith: KeyringPair, jsonData: string) {
   console.log(`\n Inserting ESG Score of the user.`);
 
   const transaction = await api.tx.esgScore.upsertEsgScores(jsonData);
@@ -174,7 +205,7 @@ export async function insertEsgScores(
       } else if (result.status.isFinalized) {
         const data = JSON.stringify(result.events);
       }
-    }
+    },
   );
 
   await waitForEvent(api, "esgScore", "ESGStored");
@@ -182,14 +213,12 @@ export async function insertEsgScores(
   console.log(`ESG Score verified in storage: ${score}`);
 }
 
-export async function registerOracle(
-  alith: KeyringPair
-) {
+export async function registerOracle(alith: KeyringPair) {
   console.log(`\n: Registering Oracle`);
 
   const transaction = await api.tx.esgScore.registerAnOracle(
     alith.address,
-    true
+    true,
   );
 
   const unsub = await api.tx.sudo
@@ -206,14 +235,13 @@ export async function registerOracle(
   console.log(`Account verified in the oracle storage: ${oracleAccounts}`);
 }
 
-
-export async function transfer(
-  alith: KeyringPair,
-  rewardAccount: string,
-) {
+export async function transfer(alith: KeyringPair, rewardAccount: string) {
   console.log(`\n Transfering coin to reward account.`);
   // Transfer 100 5ire to reward Account
-  const transaction = polkadotApi.tx.balances.transfer(rewardAccount, "1000000000000000000000");
+  const transaction = polkadotApi.tx.balances.transfer(
+    rewardAccount,
+    "1000000000000000000000",
+  );
 
   const unsub = await transaction.signAndSend(
     alith,
@@ -223,17 +251,13 @@ export async function transfer(
       } else if (result.status.isFinalized) {
         const data = JSON.stringify(result.events);
       }
-    }
+    },
   );
 
   await waitForEvent(api, "balances", "Transfer");
-
 }
 
-export async function getReward(
-  alith: KeyringPair,
-  validator: string,
-) {
+export async function getReward(alith: KeyringPair, validator: string) {
   console.log(`\n Transfering coin to reward account.`);
   // Transfer 100 5ire to reward Account
   const transaction = polkadotApi.tx.reward.getRewards(validator);
@@ -246,10 +270,8 @@ export async function getReward(
       } else if (result.status.isFinalized) {
         const data = JSON.stringify(result.events);
       }
-    }
+    },
   );
 
   await waitForEvent(api, "reward", "Rewarded");
-
 }
-

@@ -17,7 +17,6 @@ describe("Wasm test with new ink! version 4", function () {
   it("Should deploy/interact/query a counter wasm contract to 5ire chain", async () => {
     console.log("Beginning deploying counter wasm contract");
 
-
     const gasLimit = polkadotApi.registry.createType("WeightV2", {
       refTime: 5908108255,
       proofSize: BigInt(131072),
@@ -35,7 +34,7 @@ describe("Wasm test with new ink! version 4", function () {
       contractFileString,
       wasm,
       gasLimit,
-      storageDepositLimit
+      storageDepositLimit,
     );
     console.log("Address:", contractAddress);
     await waitForEvent(polkadotApi, "contracts", "Instantiated");
@@ -47,7 +46,7 @@ describe("Wasm test with new ink! version 4", function () {
       contractFileString,
       contractAddress,
       gasLimit,
-      storageDepositLimit
+      storageDepositLimit,
     );
     // Before trigger inc function
     // count should be 0
@@ -64,7 +63,7 @@ describe("Wasm test with new ink! version 4", function () {
       contractFileString,
       contractAddress,
       gasLimit,
-      storageDepositLimit
+      storageDepositLimit,
     );
 
     // wait for contract called event
@@ -77,7 +76,7 @@ describe("Wasm test with new ink! version 4", function () {
       contractFileString,
       contractAddress,
       gasLimit,
-      storageDepositLimit
+      storageDepositLimit,
     );
     // After trigger inc function
     // count should be 1
@@ -97,7 +96,7 @@ const deployContract = async (
   contractFile: string,
   contractWasm: string,
   gasLimit: WeightV2,
-  storageDepositLimit: any
+  storageDepositLimit: any,
 ) => {
   // convert contract json file into usable contract ABI
   //let contractAbi = new Abi(contractFile, api?.registry?.getChainProperties());
@@ -108,7 +107,7 @@ const deployContract = async (
 
   const tx = code.tx.new(
     { gasLimit: gasLimit, storageDepositLimit: storageDepositLimit },
-    initValue
+    initValue,
   );
 
   let address: string;
@@ -129,7 +128,7 @@ const deployContract = async (
         }
 
         expect(address).not.null;
-      }
+      },
     );
   });
 
@@ -142,7 +141,7 @@ const incTransaction = async (
   contractFile: string,
   contractAddress: string,
   gasLimit: WeightV2,
-  storageDepositLimit: any
+  storageDepositLimit: any,
 ) => {
   console.log("Begin triggering inc transaction smart contract");
   // convert contract json file into usable contract ABI
@@ -162,7 +161,7 @@ const incTransaction = async (
       if (result.status.isInBlock || result.status.isFinalized) {
         console.log("Block finalized");
       }
-    }
+    },
   );
 };
 
@@ -172,7 +171,7 @@ const queryTransaction = async (
   contractFile: string,
   contractAddress: string,
   gasLimit: WeightV2,
-  storageDepositLimit: any
+  storageDepositLimit: any,
 ) => {
   console.log("Begin querying smart contract");
 

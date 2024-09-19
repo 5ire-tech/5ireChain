@@ -59,14 +59,17 @@ export const DOROTHY_ADDRESS: `0x${string}` =
 export const DOROTHY_PRIVATE_KEY: `0x${string}` =
   "0x39539ab1876910bbf3a223d84a29e28f1cb4e2e456503e7e91ed39b2e7223d68";
 
-// Default testing address , no balance 
+// Default testing address , no balance
 export const GERALD_ADDRESS: `0x${string}` =
   "0x6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b";
 export const GERALD_PRIVATE_KEY: `0x${string}` =
   "0x99b3c12287537e38c90a9219d4cb074a89a16e9cdb20bf85728ebd97c343e342";
 
 export const alith: KeyringPair = keyringEth.addFromUri(ALITH_PRIVATE_KEY);
-export const baltathar: KeyringPair = keyringEth.addFromUri(BALTATHAR_PRIVATE_KEY);
-export const charleth: KeyringPair = keyringEth.addFromUri(CHARLETH_PRIVATE_KEY);
+export const baltathar: KeyringPair = keyringEth.addFromUri(
+  BALTATHAR_PRIVATE_KEY,
+);
+export const charleth: KeyringPair =
+  keyringEth.addFromUri(CHARLETH_PRIVATE_KEY);
 export const dorothy: KeyringPair = keyringEth.addFromUri(DOROTHY_PRIVATE_KEY);
 export const gerald: KeyringPair = keyringEth.addFromUri(GERALD_PRIVATE_KEY);

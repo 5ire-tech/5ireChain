@@ -233,7 +233,6 @@ impl pallet_reward::Config for Test {
 	type RewardCurrency = Balances;
 	type Balance = u128;
 	type RuntimeEvent = RuntimeEvent;
-	type DataProvider = Staking;
 	type ValidatorSet = Historical;
 	type Validators = Historical;
 	type ValidatorId = pallet_staking::StashOf<Test>;
@@ -277,6 +276,8 @@ impl pallet_esg::Config for Test {
 	type WeightInfo = ();
 	type RuntimeEvent = RuntimeEvent;
 	type MaxFileSize = ConstU32<1024000>;
+	type MaxNumOfSudoOracles =  ConstU32<5>;
+	type MaxNumOfNonSudoOracles = ConstU32<5>;
 }
 
 impl pallet_offences::Config for Test {
@@ -407,8 +408,4 @@ pub(crate) fn run_to_block(n: BlockNumber) {
 
 pub(crate) fn active_era() -> EraIndex {
 	Staking::active_era().unwrap().index
-}
-
-pub fn new_test_ext() -> sp_io::TestExternalities {
-	frame_system::GenesisConfig::<Test>::default().build_storage().unwrap().into()
 }
