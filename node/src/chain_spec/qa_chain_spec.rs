@@ -237,10 +237,11 @@ where
 
 /// Helper function to generate stash, controller and session key from seed
 pub fn authority_keys_from_seed(
+	authority: &str,
 	seed: &str,
 ) -> (AccountId, AccountId, GrandpaId, BabeId, ImOnlineId, AuthorityDiscoveryId) {
 	(
-		array_bytes::hex_n_into_unchecked::<_, _, 20>(ALITH),
+		array_bytes::hex_n_into_unchecked::<_, _, 20>(authority),
 		get_account_id_from_seed::<ecdsa::Public>(seed),
 		get_from_seed::<GrandpaId>(seed),
 		get_from_seed::<BabeId>(seed),
@@ -532,7 +533,7 @@ pub fn development_genesis(
 
 fn development_config_genesis() -> RuntimeGenesisConfig {
 	development_genesis(
-		vec![authority_keys_from_seed("Alice")],
+		vec![authority_keys_from_seed(ALITH, "Alice")],
 		vec![],
 		array_bytes::hex_n_into_unchecked::<_, _, 20>(ALITH),
 		None,
@@ -561,7 +562,7 @@ pub fn development_config() -> ChainSpec {
 
 fn local_testnet_genesis() -> RuntimeGenesisConfig {
 	testnet_genesis(
-		vec![authority_keys_from_seed("Alice"), authority_keys_from_seed("Bob")],
+		vec![authority_keys_from_seed(ALITH, "Alice"), authority_keys_from_seed(BALTATHAR, "Bob")],
 		vec![],
 		get_account_id_from_seed::<ecdsa::Public>("Alice"),
 		None,

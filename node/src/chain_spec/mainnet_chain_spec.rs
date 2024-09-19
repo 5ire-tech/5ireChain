@@ -51,10 +51,11 @@ pub fn mainnet_config() -> Result<ChainSpec, String> {
 }
 
 const ALITH: &str = "0xf24FF3a9CF04c71Dbc94D0b566f7A27B94566cac";
-const CHARLETH: &str = "0x1B1Afe03Fc576fD6ca3eA57701Cf7c134Ca0256A";
-const DOROTHY: &str = "0xa6beEA3E3D0DD5EB2eE5961ba9BB14bCC1Aa0158";
-const ETHAN: &str = "0x10fe10ce77db20f9E23496CD11bCdeC7DE538be2";
-const FAITH: &str = "0x5Ad36E29de0706D8CF51d91306e2201bCc701E97";
+const BALTATHAR: &str = "0x3Cd0A705a2DC65e5b1E1205896BaA2be8A07c6e0";
+const CHARLETH: &str = "0x798d4Ba9baf0064Ec19eB4F0a1a45785ae9D6DFc";
+const DOROTHY: &str = "0x773539d4Ac0e786233D90A233654ccEE26a613D9";
+const ETHAN: &str = "0xFf64d3F6efE2317EE2807d223a0Bdc4c0c49dfDB";
+const FAITH: &str = "0xC0F0f4ab324C46e55D02D0033343B4Be8A55532d";
 
 
 type AccountPublic = <Signature as Verify>::Signer;
@@ -243,10 +244,11 @@ where
 
 /// Helper function to generate stash, controller and session key from seed
 pub fn authority_keys_from_seed(
+	authority: &str,
 	seed: &str,
 ) -> (AccountId, AccountId, GrandpaId, BabeId, ImOnlineId, AuthorityDiscoveryId) {
 	(
-		array_bytes::hex_n_into_unchecked::<_, _, 20>(ALITH),
+		array_bytes::hex_n_into_unchecked::<_, _, 20>(authority),
 		get_account_id_from_seed::<ecdsa::Public>(seed),
 		get_from_seed::<GrandpaId>(seed),
 		get_from_seed::<BabeId>(seed),
@@ -258,7 +260,7 @@ pub fn authority_keys_from_seed(
 fn testnet_accounts() -> Vec<AccountId> {
 	vec![
 		array_bytes::hex_n_into_unchecked::<_, _, 20>(ALITH),
-		// array_bytes::hex_n_into_unchecked::<_, _, 20>(BALTATHAR),
+		array_bytes::hex_n_into_unchecked::<_, _, 20>(BALTATHAR),
 		array_bytes::hex_n_into_unchecked::<_, _, 20>(CHARLETH),
 		array_bytes::hex_n_into_unchecked::<_, _, 20>(DOROTHY),
 		array_bytes::hex_n_into_unchecked::<_, _, 20>(ETHAN),
@@ -405,25 +407,8 @@ pub fn development_genesis(
 	)>,
 	initial_nominators: Vec<AccountId>,
 	root_key: AccountId,
-	endowed_accounts: Option<Vec<AccountId>>,
-	_chain_id: u64,
 ) -> RuntimeGenesisConfig {
-	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
-		vec![
-			get_account_id_from_seed::<ecdsa::Public>("Alice"),
-			get_account_id_from_seed::<ecdsa::Public>("Bob"),
-			get_account_id_from_seed::<ecdsa::Public>("Charlie"),
-			get_account_id_from_seed::<ecdsa::Public>("Dave"),
-			get_account_id_from_seed::<ecdsa::Public>("Eve"),
-			get_account_id_from_seed::<ecdsa::Public>("Ferdie"),
-			get_account_id_from_seed::<ecdsa::Public>("Alice//stash"),
-			get_account_id_from_seed::<ecdsa::Public>("Bob//stash"),
-			get_account_id_from_seed::<ecdsa::Public>("Charlie//stash"),
-			get_account_id_from_seed::<ecdsa::Public>("Dave//stash"),
-			get_account_id_from_seed::<ecdsa::Public>("Eve//stash"),
-			get_account_id_from_seed::<ecdsa::Public>("Ferdie//stash"),
-		]
-	});
+	let mut endowed_accounts: Vec<AccountId> = testnet_accounts();
 	// endow all authorities and nominators.
 	initial_authorities
 		.iter()
@@ -567,11 +552,9 @@ pub fn development_genesis(
 
 fn development_config_genesis() -> RuntimeGenesisConfig {
 	development_genesis(
-		vec![authority_keys_from_seed("Alice")],
+		vec![authority_keys_from_seed(ALITH, "Alice")],
 		vec![],
 		array_bytes::hex_n_into_unchecked::<_, _, 20>(ALITH),
-		None,
-		42, //passing chain_id = 42.  Need to change??
 	)
 }
 
@@ -597,9 +580,9 @@ pub fn development_config() -> ChainSpec {
 
 fn local_mainnet_genesis() -> RuntimeGenesisConfig {
 	testnet_genesis(
-		vec![authority_keys_from_seed("Alice"), authority_keys_from_seed("Bob")],
+		vec![authority_keys_from_seed(ALITH, "Alice"), authority_keys_from_seed(BALTATHAR, "Bob")],
 		vec![],
-		get_account_id_from_seed::<ecdsa::Public>("Alice"),
+		array_bytes::hex_n_into_unchecked::<_, _, 20>(ALITH),
 		None,
 	)
 }
