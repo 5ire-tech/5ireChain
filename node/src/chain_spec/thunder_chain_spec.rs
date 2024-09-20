@@ -105,19 +105,15 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 			// Controller account
 			AccountId::from(hex!("2400996D897289B494f6A722776eb20005B6fE82")),
 			// Grandpa Key
-			// 5DXUP46kzDACCrQq5MmuBVK8qJWn8RNWJPECss26YEPDQYeX
 			array_bytes::hex2array_unchecked("40a67ea6de9044df14a8d2f59cd92b49d269c98b879c2ee4d37bbafe7a5514cc")
 				.unchecked_into(),
 			// Babe Key
-			// 5ExiCarB3nKmGEqio4vKG4nXG7VdJxLygxGpArUUXc8S67Hk
 			array_bytes::hex2array_unchecked("80226242b1135fc43d532400fbc7058150549894fcbb3c65c862effe31ccc93b")
 				.unchecked_into(),
 			// Imonline Key
-			// 5EhL7MR8BnDoqz4gsvkko3wQkaEZ4pQ12ZLqqiK9Qz9BmRpE
 			array_bytes::hex2array_unchecked("7467572c8fb7db5e46314e909874ab179d47e81a558b6ea77dced7e400c99623")
 				.unchecked_into(),
 			// Authority Discovery Key
-			// 5FCBSDxxkreTxzzjt1rzKnKrbx4tm5tQYGs1VAEqMCi2giPw
 			array_bytes::hex2array_unchecked("8a68417f2d4883e2ec67087fd7ee873da9baf6d5d5fa2d54f51ccb8bc3842c5e")
 				.unchecked_into(),
 		),
@@ -127,19 +123,15 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 			// Controller account
 			AccountId::from(hex!("FE33A1b461aD8DAF3BA98b674Ea400F495c0c90E")),
 			// Grandpa Key
-			// 5ECE279NXB91SiEm9nUV8PRSMUYtH1rAinQ1fRFeBkg8r7eU
 			array_bytes::hex2array_unchecked("5e34b8b558953d248289383732c3ebd8910f01442f7dc71380011a5e3b0d5f3a")
 				.unchecked_into(),
 			// Babe Key
-			// 5CPqMXvjXwC8ypXaL6pqMd4odZQos84azGzEKMHEYwZ2midQ
 			array_bytes::hex2array_unchecked("0e96e6f0f6713682d35eec15b6ac7ac000988367887c48a7844aaf2e395d0a14")
 				.unchecked_into(),
 			// Imonline Key
-			// 5GC1dpcQxDtvsaa2EH8cz5N4cdLWT519JZXPSj4DBq5xDUc3
 			array_bytes::hex2array_unchecked("b6837fd8fc075fde1f9b6d5647ff6c6de8178f39f855bd75477085e596c84658")
 				.unchecked_into(),
 			// Authority Discovery Key
-			// 5CyGGGUJftV5cEctExKYAG4EaejMTVoK9qGDn94XMQTrq6X6
 			array_bytes::hex2array_unchecked("2815da300b5a36a5a87a1122b6ff1386cad6f99fa8614e2d99f0ade61e6dc36d")
 				.unchecked_into(),
 		),
@@ -149,19 +141,15 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 			// Controller account
 			AccountId::from(hex!("2e60222AdB99DF69d5d29E4C74bf54fd7F2C8712")),
 			// Grandpa Key
-			// 5FkXKQLW6wsXWJpwaavhUQnm76tkFGAPwFaacudJzm578U3T
 			array_bytes::hex2array_unchecked("a31309f49d6af5074fe80972bb9c9a3bb660b25255573b4be015e977ae0a5586")
 				.unchecked_into(),
 			// Babe key
-			// 5GNUTK7n743hEXxnhmS5APrZ2QTXhjQS9mwHWBJ1rz8gzP7E
 			array_bytes::hex2array_unchecked("be7e3bcfd2a82de9ee13e7d8723c1486bc1e256955551ee209f83a64ac159839")
 				.unchecked_into(),
 			// Imonline Key
-			// 5FHe833RVXwM7QF4XJbt8nBUBRuNvJXnecjazXke4ofJ4mqK
 			array_bytes::hex2array_unchecked("8e92513c4b95ce2caef7295ea32e27f0cd979a6b32919e3dab1125d1c4cd2b0a")
 				.unchecked_into(),
 			// Authority Discovery Key
-			// 5EF2CGSeaPdsMP5ViGpc9Je6GaC7v8PGKJZuPKY6uSpWwqEu
 			array_bytes::hex2array_unchecked("6056a6de5668ff351527d4185cb497e229061adaa37cefd4cec3c9a5a70a1f56")
 				.unchecked_into(),
 		),
@@ -171,19 +159,15 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 			// Controller account
 			AccountId::from(hex!("FF4551D31c501714b8787414208397A56149303b")),
 			// Grandpa Key
-			// 5Dr8NvyQ8ekb97wspJrz6G5oQqRo18M4njwxYKpMFnEQzaQM
 			array_bytes::hex2array_unchecked("4ee0d3043b7f828d737343852751bc002f42358ecad36e05777d735f0d849127")
 				.unchecked_into(),
 			// Babe Key
-			// 5H99AwHsiQfU6aa6E6eJmYz8GnDebRRT4mNNfGBwqHhf9zyM
 			array_bytes::hex2array_unchecked("e08f5ddd6397b9e0e9299a4a064533cf0a2350278d7972629a608f371466895b")
 				.unchecked_into(),
 			// Imonline Key
-			// 5CyXw9659xLCnrUn5vxuyuDHBtW5pByAp5ECm4QcSibfSoNF
 			array_bytes::hex2array_unchecked("284a9a5b41799d57c9fb8841eca4c08dc1c07c6a84432008b984552658bfe44b")
 				.unchecked_into(),
 			// Authority Discovery Key
-			// 5H758x1t5h4Ck6PYZdYGRJwQg35ssnrh5Q455cYusrJcrXij
 			array_bytes::hex2array_unchecked("defb4b9881252dc357300763cb4f394594e2fcfdad61d493685c6cef67707860")
 				.unchecked_into(),
 		),
@@ -193,19 +177,15 @@ fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
 			// Controller account
 			AccountId::from(hex!("d715fD1aa1998Bf6Ad5E46631B647Ef9AA8340a0")),
 			// Grandpa Key
-			// 5FnL1s6HnyhG73vNuvtJ7D9xM4c3hpfcbLhNPg8mv5Yu1tvb
 			array_bytes::hex2array_unchecked("a4737b823e65d323200d3fff98bef39e4af8a94c35b6ddbe4e6a821de05b96bb")
 				.unchecked_into(),
 			// Babe Key
-			// 5FqWtw2GM1s1hNMhHwQtWEkDz98MoqTfKv415ErZAeqtDNxi
 			array_bytes::hex2array_unchecked("a6e1d87aed5e2c4f379d5fe8abcc120e1b1df49c7c7cdc4b71b91b262aaadb0d")
 				.unchecked_into(),
 			// Imonline Key
-			// 5E5GdgP4QCapQveBMrHqKjGh1A6jAuHZGCcCFh2qkR5CgdJq
 			array_bytes::hex2array_unchecked("58e6cd09f9348d6200730aaedbf699db4514848569f593db902af969ca16ce4f")
 				.unchecked_into(),
 			// Authority Discovery Key
-			// 5FcQesnuDYL8RDXuDPfJqFxsqSAQkYSJoR9VQGTqjnnksVNE
 			array_bytes::hex2array_unchecked("9ce2a44bbe3f90234c7c7e597704c3d3fc6893055a76392337fe86c92a5fe535")
 				.unchecked_into(),
 		),
@@ -573,7 +553,6 @@ fn development_config_genesis() -> RuntimeGenesisConfig {
 }
 
 /// Development config (single validator Alice)
-/// Need to work on it..
 pub fn development_config() -> ChainSpec {
 	ChainSpec::from_genesis(
 		"Development",
