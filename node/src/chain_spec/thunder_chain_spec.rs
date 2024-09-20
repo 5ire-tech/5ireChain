@@ -33,7 +33,7 @@ use serde::{Deserialize, Serialize};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
 use sp_consensus_grandpa::AuthorityId as GrandpaId;
-use sp_core::{crypto::UncheckedInto, Pair, Public, H160, U256};
+use sp_core::{Pair, Public, H160, U256};
 use sp_runtime::{
 	traits::{IdentifyAccount, Verify},
 	Perbill,
@@ -45,7 +45,6 @@ pub use firechain_thunder_runtime::{EVMConfig, RuntimeGenesisConfig};
 use firechain_runtime_core_primitives::opaque::{
 	AccountId, Balance, Signature,
 };
-use hex_literal::hex;
 use sp_core::ecdsa;
 
 pub fn thunder_config() -> Result<ChainSpec, String> {
@@ -61,7 +60,6 @@ const FAITH: &str = "0xC0F0f4ab324C46e55D02D0033343B4Be8A55532d";
 
 type AccountPublic = <Signature as Verify>::Signer;
 
-const DEFAULT_PROTOCOL_ID: &str = "thunder-5ire";
 /// Node `ChainSpec` extensions.
 ///
 /// Additional parameters for some Substrate core modules,
@@ -87,135 +85,6 @@ fn session_keys(
 	authority_discovery: AuthorityDiscoveryId,
 ) -> SessionKeys {
 	SessionKeys { grandpa, babe, im_online, authority_discovery }
-}
-
-fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
-	#[rustfmt::skip]
-		let initial_authorities: Vec<(
-		AccountId,
-		AccountId,
-		GrandpaId,
-		BabeId,
-		ImOnlineId,
-		AuthorityDiscoveryId,
-	)> = vec![
-		(
-			// Stash Account
-			AccountId::from(hex!("bAAd68b1c64D2Cbd55Ff2Ea0c0b6E91564A5d1c3")),
-			// Controller account
-			AccountId::from(hex!("2400996D897289B494f6A722776eb20005B6fE82")),
-			// Grandpa Key
-			array_bytes::hex2array_unchecked("40a67ea6de9044df14a8d2f59cd92b49d269c98b879c2ee4d37bbafe7a5514cc")
-				.unchecked_into(),
-			// Babe Key
-			array_bytes::hex2array_unchecked("80226242b1135fc43d532400fbc7058150549894fcbb3c65c862effe31ccc93b")
-				.unchecked_into(),
-			// Imonline Key
-			array_bytes::hex2array_unchecked("7467572c8fb7db5e46314e909874ab179d47e81a558b6ea77dced7e400c99623")
-				.unchecked_into(),
-			// Authority Discovery Key
-			array_bytes::hex2array_unchecked("8a68417f2d4883e2ec67087fd7ee873da9baf6d5d5fa2d54f51ccb8bc3842c5e")
-				.unchecked_into(),
-		),
-		(
-			// Stash Account
-			AccountId::from(hex!("6065b716391d339c0C5b3ce63175369Ee821329b")),
-			// Controller account
-			AccountId::from(hex!("FE33A1b461aD8DAF3BA98b674Ea400F495c0c90E")),
-			// Grandpa Key
-			array_bytes::hex2array_unchecked("5e34b8b558953d248289383732c3ebd8910f01442f7dc71380011a5e3b0d5f3a")
-				.unchecked_into(),
-			// Babe Key
-			array_bytes::hex2array_unchecked("0e96e6f0f6713682d35eec15b6ac7ac000988367887c48a7844aaf2e395d0a14")
-				.unchecked_into(),
-			// Imonline Key
-			array_bytes::hex2array_unchecked("b6837fd8fc075fde1f9b6d5647ff6c6de8178f39f855bd75477085e596c84658")
-				.unchecked_into(),
-			// Authority Discovery Key
-			array_bytes::hex2array_unchecked("2815da300b5a36a5a87a1122b6ff1386cad6f99fa8614e2d99f0ade61e6dc36d")
-				.unchecked_into(),
-		),
-		(
-			// Stash Account
-			AccountId::from(hex!("083bE71145B70C230Bd2bBa7c2cDE9CaB2075ff6")),
-			// Controller account
-			AccountId::from(hex!("2e60222AdB99DF69d5d29E4C74bf54fd7F2C8712")),
-			// Grandpa Key
-			array_bytes::hex2array_unchecked("a31309f49d6af5074fe80972bb9c9a3bb660b25255573b4be015e977ae0a5586")
-				.unchecked_into(),
-			// Babe key
-			array_bytes::hex2array_unchecked("be7e3bcfd2a82de9ee13e7d8723c1486bc1e256955551ee209f83a64ac159839")
-				.unchecked_into(),
-			// Imonline Key
-			array_bytes::hex2array_unchecked("8e92513c4b95ce2caef7295ea32e27f0cd979a6b32919e3dab1125d1c4cd2b0a")
-				.unchecked_into(),
-			// Authority Discovery Key
-			array_bytes::hex2array_unchecked("6056a6de5668ff351527d4185cb497e229061adaa37cefd4cec3c9a5a70a1f56")
-				.unchecked_into(),
-		),
-		(
-			// Stash Account
-			AccountId::from(hex!("1304E9A7229eEB12600E06B0225e6d9bb79907c2")),
-			// Controller account
-			AccountId::from(hex!("FF4551D31c501714b8787414208397A56149303b")),
-			// Grandpa Key
-			array_bytes::hex2array_unchecked("4ee0d3043b7f828d737343852751bc002f42358ecad36e05777d735f0d849127")
-				.unchecked_into(),
-			// Babe Key
-			array_bytes::hex2array_unchecked("e08f5ddd6397b9e0e9299a4a064533cf0a2350278d7972629a608f371466895b")
-				.unchecked_into(),
-			// Imonline Key
-			array_bytes::hex2array_unchecked("284a9a5b41799d57c9fb8841eca4c08dc1c07c6a84432008b984552658bfe44b")
-				.unchecked_into(),
-			// Authority Discovery Key
-			array_bytes::hex2array_unchecked("defb4b9881252dc357300763cb4f394594e2fcfdad61d493685c6cef67707860")
-				.unchecked_into(),
-		),
-		(
-			// Stash Account
-			AccountId::from(hex!("fb55e345e150E39D31334D62B606d287a12da06F")),
-			// Controller account
-			AccountId::from(hex!("d715fD1aa1998Bf6Ad5E46631B647Ef9AA8340a0")),
-			// Grandpa Key
-			array_bytes::hex2array_unchecked("a4737b823e65d323200d3fff98bef39e4af8a94c35b6ddbe4e6a821de05b96bb")
-				.unchecked_into(),
-			// Babe Key
-			array_bytes::hex2array_unchecked("a6e1d87aed5e2c4f379d5fe8abcc120e1b1df49c7c7cdc4b71b91b262aaadb0d")
-				.unchecked_into(),
-			// Imonline Key
-			array_bytes::hex2array_unchecked("58e6cd09f9348d6200730aaedbf699db4514848569f593db902af969ca16ce4f")
-				.unchecked_into(),
-			// Authority Discovery Key
-			array_bytes::hex2array_unchecked("9ce2a44bbe3f90234c7c7e597704c3d3fc6893055a76392337fe86c92a5fe535")
-				.unchecked_into(),
-		),
-	];
-
-	let root_key: AccountId = AccountId::from(hex!("4b30eE3536684671a3f1A66e820E394CdbCd568E"));
-
-	let endowed_accounts: Vec<AccountId> = vec![root_key.clone()];
-
-	testnet_genesis(initial_authorities, vec![], root_key, Some(endowed_accounts))
-}
-
-///  Thunder config.
-pub fn staging_testnet_config() -> ChainSpec {
-	let boot_nodes = vec![];
-	ChainSpec::from_genesis(
-		"5ireChain Thunder",
-		"thunder_firechain_staging",
-		ChainType::Live,
-		staging_testnet_config_genesis,
-		boot_nodes,
-		None,
-		Some(DEFAULT_PROTOCOL_ID),
-		None,
-		Some(
-			serde_json::from_str("{\"tokenDecimals\": 18, \"tokenSymbol\": \"5IRE\"}")
-				.expect("Provided valid json map"),
-		),
-		Default::default(),
-	)
 }
 
 /// Helper function to generate a crypto pair from seed
