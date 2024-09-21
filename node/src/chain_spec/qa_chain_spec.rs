@@ -29,12 +29,11 @@ use fp_evm::GenesisAccount;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sc_chain_spec::ChainSpecExtension;
 use sc_service::ChainType;
-use sc_telemetry::TelemetryEndpoints;
 use serde::{Deserialize, Serialize};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
 use sp_consensus_grandpa::AuthorityId as GrandpaId;
-use sp_core::{crypto::UncheckedInto, ecdsa, Pair, Public, H160, U256};
+use sp_core::{ecdsa, Pair, Public, H160, U256};
 use sp_runtime::{
 	traits::{IdentifyAccount, Verify},
 	Perbill,
@@ -45,7 +44,6 @@ pub use firechain_qa_runtime::{EVMConfig, RuntimeGenesisConfig};
 use firechain_runtime_core_primitives::opaque::{
 	AccountId, Balance, Signature,
 };
-use hex_literal::hex;
 
 pub fn qa_config() -> Result<ChainSpec, String> {
 	ChainSpec::from_json_bytes(&include_bytes!("../../../specs/5ire-qa-specRaw.json")[..])
@@ -61,8 +59,6 @@ const FAITH: &str = "0xC0F0f4ab324C46e55D02D0033343B4Be8A55532d";
 
 type AccountPublic = <Signature as Verify>::Signer;
 
-const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
-const DEFAULT_PROTOCOL_ID: &str = "qa-5ire";
 /// Node `ChainSpec` extensions.
 ///
 /// Additional parameters for some Substrate core modules,
@@ -90,135 +86,6 @@ fn session_keys(
 	SessionKeys { grandpa, babe, im_online, authority_discovery }
 }
 
-fn staging_testnet_config_genesis() -> RuntimeGenesisConfig {
-	#[rustfmt::skip]
-		let initial_authorities: Vec<(
-		AccountId,
-		AccountId,
-		GrandpaId,
-		BabeId,
-		ImOnlineId,
-		AuthorityDiscoveryId,
-	)> = vec![
-		(
-			// Stash Account
-			AccountId::from(hex!("ABb9D37755e6C541Db36B6aa64556397Fd9e5D12")),
-			// Controller account
-			AccountId::from(hex!("eC301D49411591CB7BE56738B3FfC7Dba9D24b31")),
-			// Grandpa account
-			// 5FD7opppAeP2zDqKgxLj3xMHovd9r81Z8SXzRt3RavxWpQq8
-			array_bytes::hex2array_unchecked("8b1f4a2e2bc0953f80e9d6f6be8a41bf2c0d7f22648a7a9bb0876e13769a4477")
-				.unchecked_into(),
-			// Babe Account
-			// 5HbD32UJd8JrWDNmBP8zggy8P9HZNypH82LpEYYJ3m2SR5tX
-			array_bytes::hex2array_unchecked("f470c0d448a0851086f291ecd432e8e0e924a1d75823626f7b23bf45181a242d")
-				.unchecked_into(),
-			// imonline Account
-			// 5GQviwyEmDqCgrS98yGSKV7JAmcAAFWmsWZH6JnSz45EeJbC
-			array_bytes::hex2array_unchecked("c05d27dd7c4a81338d5f7d9bfdd513f4ead5c09abad10d81460f4ba5a754e12f")
-				.unchecked_into(),
-			// authority discovery account
-			// 5HjeF54rtdV9RHLh9BmHfPSfgW268GiqKU12s2cFYWHUYTof
-			array_bytes::hex2array_unchecked("fadf92b35dda22345023fcde913a2de2352445def1a8c436873ab96fe2b02468")
-				.unchecked_into(),
-		),
-		(
-			// Stash Account
-			AccountId::from(hex!("87f73ff6Cc311Daff46829Dd48941E0377DADC27")),
-			// Controller account
-			AccountId::from(hex!("E6A133D8eC1E6576b3E540e249fDd2d23228EF18")),
-			// Grandpa account
-			// 5CV4qVPtFRNG1WHHGo27WU6rjK8qgXRJMsxJhJYxoQjWQzMs
-			array_bytes::hex2array_unchecked("1294837c326104a861a447816a286e289786f396d2ded9d5374e40dc812ab91a")
-				.unchecked_into(),
-			// Babe Account
-			// 5F9jubJxrByyQHr2NtJoBUbUoz1BnPjhfT5AKV8rby5sG3Pm
-			array_bytes::hex2array_unchecked("888bd46502e5a1e10a51b3625b0e6ea76d3353dc1bcac6c9da25d586b6ca7e1c")
-				.unchecked_into(),
-			// imonline Account
-			// 5DfXEnW4veh4XzbhxxaC6YbVWQWUbDvu5q1SpQuEh3zwfk15
-			array_bytes::hex2array_unchecked("46ca13b2862bec637e76fbac53e7f73fb04ae8fbb36e9c4a408614c3b4f93525")
-				.unchecked_into(),
-			// authority discovery account
-			// 5Gdv4kU1T7VoX3AxZtNSdMeKAp6vd1JTDpvw7CJvdsy4UGRE
-			array_bytes::hex2array_unchecked("ca4521039b528329801bfe8e83f20414329c17859c1372bb149845f71ebee07c")
-				.unchecked_into(),
-		),
-		(
-			// Stash Account
-			AccountId::from(hex!("C45B35C79B173924c3db5596A7a266d0BddC7613")),
-			// Controller account
-			AccountId::from(hex!("bd4a0e32ee7C3e81e616A12ADffC5243B460DaDf")),
-			// Grandpa account
-			// 5DEsThhp3DH33H44tdbrpjQQvZiTrsd8xjRKwA3EHXjXyVvY
-			array_bytes::hex2array_unchecked("33fd047e281b273e0893d5362b5e62bc680b22e170cd377e96e0b3c75c9a3bcd")
-				.unchecked_into(),
-			// Babe Account
-			// 5CJi6NASBmh5469yN84kBPgrK89WKYrrDXQGbVTwPckiLuKi
-			array_bytes::hex2array_unchecked("0aae3b0a5957982321825e75ddc34aac99237e3a5b0ec1ebc18db3388d7f8a7e")
-				.unchecked_into(),
-			// imonline Account
-			// 5Eh8fVQRvXAxzXRUVirqS5vp6gQiiUmDeYJe2SNDoGbBaogd
-			array_bytes::hex2array_unchecked("7440cf684dc9100f927d089acd6f9b2543658f924abbfe2c02cd6a3ae03d7f1e")
-				.unchecked_into(),
-			// authority discovery account
-			// 5G3w495Ntwms8WYvNh7w5ZG3sAjUjUwCxgg591mPpMrAFQBE
-			array_bytes::hex2array_unchecked("b05a1db8a4bfcf011daf21e22e6b681e88a8084f7dcc420d7f569bfe8e903c68")
-				.unchecked_into(),
-		),
-		(
-			// Stash Account
-			AccountId::from(hex!("d9d828032174DfDbd1f2BE9B4cAC99F5023866AA")),
-			// Controller account
-			AccountId::from(hex!("f5BF4770e605ae834823Ef50dd7E82FDdE878497")),
-			// Grandpa account
-			// 5GnBjhSCabfLSzAXyL77MivXRs7bqN4HcCYxJwGQXY6wzXVR
-			array_bytes::hex2array_unchecked("d093d8e2cc4358f1714b246aa164b9dd8607bd897f8dee09944df37376a3ae81")
-				.unchecked_into(),
-			// Babe Account
-			// 5Gje3aohmTiXdXMSX8ghzFmqf5uciK3eAuvdUq1FebSQAYTb
-			array_bytes::hex2array_unchecked("cea2ac41d5baeba039de7bb80b41f0a3022b88f8aa005aab7797f192c0ee4303")
-				.unchecked_into(),
-			// imonline Account
-			// 5FW1voGghSqyBkLBjcNZZR5LHwJJwNnwt1yYP2L2yrWesb3N
-			array_bytes::hex2array_unchecked("9802ab26f6de56f9f3c24ed37d6f7c9db634537822a028fd23e1001c81ace515")
-				.unchecked_into(),
-			// authority discovery account
-			// 5HGmzrLGGsTPJPLh7v7mFuXV4otd7aN8LFS8iu8CzbCHtgAW
-			array_bytes::hex2array_unchecked("e6620d5f33df7b2b953c65dede20b47ecb571269c2b33ecdab2d7d6645912528")
-				.unchecked_into(),
-		),
-	];
-
-	let root_key: AccountId = AccountId::from(hex!("107867B564B10E3C963db8D66612E67E4B0508eC"));
-
-	let endowed_accounts: Vec<AccountId> = vec![root_key.clone()];
-
-	testnet_genesis(initial_authorities, vec![], root_key, Some(endowed_accounts))
-}
-
-///  QA config.
-pub fn staging_testnet_config() -> ChainSpec {
-	let boot_nodes = vec![];
-	ChainSpec::from_genesis(
-		"5ireChain QA",
-		"qa_5ireChain_staging",
-		ChainType::Live,
-		staging_testnet_config_genesis,
-		boot_nodes,
-		Some(
-			TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
-				.expect("Staging telemetry url is valid; qed"),
-		),
-		Some(DEFAULT_PROTOCOL_ID),
-		None,
-		Some(
-			serde_json::from_str("{\"tokenDecimals\": 18, \"tokenSymbol\": \"5IRE\"}")
-				.expect("Provided valid json map"),
-		),
-		Default::default(),
-	)
-}
 
 /// Helper function to generate a crypto pair from seed
 pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
@@ -237,10 +104,11 @@ where
 
 /// Helper function to generate stash, controller and session key from seed
 pub fn authority_keys_from_seed(
+	authority: &str,
 	seed: &str,
 ) -> (AccountId, AccountId, GrandpaId, BabeId, ImOnlineId, AuthorityDiscoveryId) {
 	(
-		array_bytes::hex_n_into_unchecked::<_, _, 20>(ALITH),
+		array_bytes::hex_n_into_unchecked::<_, _, 20>(authority),
 		get_account_id_from_seed::<ecdsa::Public>(seed),
 		get_from_seed::<GrandpaId>(seed),
 		get_from_seed::<BabeId>(seed),
@@ -532,7 +400,7 @@ pub fn development_genesis(
 
 fn development_config_genesis() -> RuntimeGenesisConfig {
 	development_genesis(
-		vec![authority_keys_from_seed("Alice")],
+		vec![authority_keys_from_seed(ALITH, "Alice")],
 		vec![],
 		array_bytes::hex_n_into_unchecked::<_, _, 20>(ALITH),
 		None,
@@ -540,7 +408,6 @@ fn development_config_genesis() -> RuntimeGenesisConfig {
 }
 
 /// Development config (single validator Alice)
-/// Need to work on it..
 pub fn development_config() -> ChainSpec {
 	ChainSpec::from_genesis(
 		"Development",
@@ -561,7 +428,7 @@ pub fn development_config() -> ChainSpec {
 
 fn local_testnet_genesis() -> RuntimeGenesisConfig {
 	testnet_genesis(
-		vec![authority_keys_from_seed("Alice"), authority_keys_from_seed("Bob")],
+		vec![authority_keys_from_seed(ALITH, "Alice"), authority_keys_from_seed(BALTATHAR, "Bob")],
 		vec![],
 		get_account_id_from_seed::<ecdsa::Public>("Alice"),
 		None,
