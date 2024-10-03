@@ -2547,7 +2547,7 @@ pub mod migrations {
 	use super::*;
 
 	/// Unreleased migrations. Add new ones here:
-	pub type Unreleased = pallet_reward::migration::v1::MigrateToV1<Runtime>;
+	pub type Unreleased = ();
 }
 
 
