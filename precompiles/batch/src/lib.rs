@@ -1,7 +1,3 @@
-// Copyright 2019-2022 PureStake Inc.
-// This file is part of Moonbeam.
-
-//! Batch precompile
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
