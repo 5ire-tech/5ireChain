@@ -106,6 +106,7 @@ pub mod pallet {
 			+ MaybeSerializeDeserialize
 			+ sp_std::fmt::Debug
 			+ Default
+			+ From<u32>
 			+ From<u64>
 			+ From<u128>
 			+ Into<u128>

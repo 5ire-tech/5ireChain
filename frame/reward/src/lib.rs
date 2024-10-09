@@ -5,7 +5,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 use frame_support::{ensure, pallet_prelude::DispatchResult};
 pub use pallet::*;
-use pallet_staking::{Rewards, CurrentEra, Validators, ErasRewardPoints, ErasStakers, IndividualExposure };
+use pallet_staking::{BalanceOf, CurrentEra, ErasRewardPoints, ErasStakers, Exposure, IndividualExposure, Rewards, Validators };
 use parity_scale_codec::Codec;
 // use crate::migration::migrate_to_v1;
 use frame_support::pallet_prelude::StorageVersion;
@@ -263,9 +263,11 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 		validators.iter().for_each(|validator_id| {
 			let validator = T::ValidatorId::convert(validator_id.clone()).unwrap();
 			let validator_points = Self::retrieve_validator_point(validator.clone());
+			let validator_exposure= ErasStakers::<T>::get(Self::current_era(), validator.clone());
 			let total_reward = Self::calculate_era_reward();
-			let reward = Self::calculate_validator_era_reward(
+			let validator_era_reward = Self::calculate_validator_era_reward(
 				validator_points.into(),
+				validator_exposure.total,
 				total_reward
 			);
 			let nominators = Self::check_nominators(validator.clone());
@@ -273,28 +275,17 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 				Self::allocate_rewards(
 					validator.clone(),
 					None,
-					Self::convert_float64_to_unsigned128(reward).into()
+					Self::convert_float64_to_unsigned128(validator_era_reward).into()
 				);
 				return;
 			}
-			let validator_commission = Self::validator_commission(validator.clone());
-			let validator_share = ((reward as f64) * (validator_commission as f64)) / 100.0;
-			let exposure = ErasStakers::<T>::get(Self::current_era(), validator.clone());
-			let total_stake = exposure.total;
-			let validator_stake = exposure.own;
-			let remaining_reward = reward - validator_share;
-			let validator_own_share_reward = Self::calculate_reward_share(
-				validator_stake.into(),
-				total_stake.into(),
-				remaining_reward
-			);
-			let total_validator_reward = validator_share + validator_own_share_reward;
+			let (total_validator_reward,remaining_reward_for_nominators) = Self::calculate_validator_commission_reward(validator.clone(),validator_era_reward,validator_exposure.clone());
 			Self::allocate_rewards(
 				validator.clone(),
 				None,
 				Self::convert_float64_to_unsigned128(total_validator_reward).into()
 			);
-			if remaining_reward.is_zero(){
+			if remaining_reward_for_nominators.is_zero(){
 				return;
 			}
 			nominators.iter().for_each(|nominator| {
@@ -306,8 +297,8 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 				let nominator_stake = nominator.value;
 				let nominator_reward = Self::calculate_reward_share(
 					nominator_stake.into(),
-					total_stake.into(),
-					remaining_reward.into()
+					validator_exposure.total.into(),
+					remaining_reward_for_nominators.into()
 				);
 				Self::allocate_rewards(
 					validator.clone(),
@@ -396,6 +387,22 @@ impl<T: Config> Pallet<T> {
 		total_reward
 	}
 
+	/// Calculates the total reward for a validator based on their commission and stake, as well as the remaining reward for nominators.
+	fn calculate_validator_commission_reward(validator: T::AccountId, validator_era_reward: f64, exposure : Exposure<<T as frame_system::Config>::AccountId, BalanceOf<T>>,) -> (f64,f64) {
+		let validator_commission = Self::validator_commission(validator.clone());
+		let validator_share = ((validator_era_reward as f64) * (validator_commission as f64)) / 100.0;
+		let total_stake = exposure.total;
+		let validator_stake = exposure.own;
+		let remaining_reward = validator_era_reward - validator_share;
+		let validator_own_share_reward = Self::calculate_reward_share(
+			validator_stake.into(),
+			total_stake.into(),
+			remaining_reward
+		);
+		let total_validator_reward = validator_share + validator_own_share_reward;
+		(total_validator_reward,remaining_reward)
+	}
+	
 	/// Converts a floating-point number to an unsigned 128-bit integer.
 	pub fn convert_float64_to_unsigned128(value: f64) -> u128 {
 		let precision = T::Precision::get();
@@ -488,10 +495,12 @@ impl<T: Config> Pallet<T> {
 	}
 
 	/// Compute the reward of the validator
-	fn calculate_validator_era_reward(validator_points: u32, era_reward: f64) -> f64 {
+	fn calculate_validator_era_reward(validator_points: u32,validator_stake:T::CurrencyBalance, era_reward: f64) -> f64 {
 		let era_reward_points = <ErasRewardPoints<T>>::get(Self::active_era());
-		let total_points = era_reward_points.total as u32;
-		let reward = ((validator_points as f64) / (total_points as f64)) * (era_reward as f64);
+		let validator_points_stake = validator_points as u128 + validator_stake.into();
+		let total_stake = pallet_staking::ErasTotalStake::<T>::get(Self::current_era());
+		let total_points = era_reward_points.total as u128 + total_stake.into();
+		let reward = ((validator_points_stake as f64) / (total_points as f64)) * (era_reward as f64);
 		reward
 	}
 
