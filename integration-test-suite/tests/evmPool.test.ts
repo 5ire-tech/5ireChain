@@ -14,11 +14,15 @@ import {
 import { sleep } from "../utils/setup";
 
 import { expect } from "chai";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 let web3: Web3;
 
-const ERC20_ABI = require("./contracts/MyToken.json").abi;
-const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
+const ERC20_ABI = require("./contracts/MyToken.json");
+
+const ERC20_BYTECODES = readFileSync(join(__dirname, './contracts/erc20_contract_bytecode.txt'), 'utf8').trim();
+
 let contractAddress: string;
 
 describe("EVM related Pool using web3js/ethersjs", function () {

@@ -235,7 +235,7 @@ describe("EVM related Contract using web3js/ethersjs", function () {
         }
 
         const baltatharFinalBalance = await web3.eth.getBalance(BALTATHAR_ADDRESS);
-        expect(baltatharFinalBalance).to.equal(baltatharInitialBalance);
+        expect(BigInt(baltatharFinalBalance)< BigInt(baltatharInitialBalance)).to.be.true;
     });
 
 

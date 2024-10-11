@@ -17,11 +17,14 @@ import {
 import { sleep } from "../utils/setup";
 
 import { expect } from "chai";
+import { readFileSync } from "fs";
+import { join } from "path";
 let web3: Web3;
 
 const TRANSFER_VALUE = "1";
-const ERC20_ABI = require("./contracts/MyToken.json").abi;
-const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
+const ERC20_ABI = require("./contracts/MyToken.json");
+
+const ERC20_BYTECODES = readFileSync(join(__dirname, './contracts/erc20_contract_bytecode.txt'), 'utf8').trim();
 
 describe("EVM related Gas using web3js/ethersjs", function () {
   this.timeout(100 * BLOCK_TIME);
@@ -51,7 +54,7 @@ describe("EVM related Gas using web3js/ethersjs", function () {
       from: GENESIS_ACCOUNTS[0],
       data: ERC20_BYTECODES,
     });
-    expect(gasEstimation).to.eq(935922);
+    expect(gasEstimation).to.eq(991120);
   });
 
   it("estimate gas for contract call", async function () {
@@ -73,12 +76,12 @@ describe("EVM related Gas using web3js/ethersjs", function () {
       data: ERC20_BYTECODES,
       gasPrice: "0x0",
     });
-    expect(result).to.equal(935922);
+    expect(result).to.equal(991120);
     result = await web3.eth.estimateGas({
       from: GENESIS_ACCOUNTS[0],
       data: ERC20_BYTECODES,
     });
-    expect(result).to.equal(935922);
+    expect(result).to.equal(991120);
   });
 
   it("tx gas limit below ETH_BLOCK_GAS_LIMIT", async function () {
