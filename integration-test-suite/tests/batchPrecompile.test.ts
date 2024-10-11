@@ -196,6 +196,48 @@ describe("EVM related Contract using web3js/ethersjs", function () {
         expect(charlethBalance).to.equal(transferAmount);
     });
 
+    step("batchAll: fail due to OutOfFund", async function () {
+        this.timeout(30000);
+
+        const baltatharInitialBalance = await web3.eth.getBalance(BALTATHAR_ADDRESS);
+        const transferAmount = web3.utils.toWei((parseFloat(web3.utils.fromWei(baltatharInitialBalance, 'ether')) + 1).toString(), 'ether');
+
+        const batchTx = batchContract.methods.batchAll(
+            [CHARLETH_ADDRESS, CHARLETH_ADDRESS],
+            [transferAmount, transferAmount],
+            ["0x", "0x"],
+            [21000, 21000]
+        );
+
+
+        try {
+            const txSign = await web3.eth.accounts.signTransaction(
+                {
+                    from: BALTATHAR_ADDRESS,
+                    to: BATCH_CONTRACT,
+                    data: batchTx.encodeABI(),
+                    gas: 300000,
+                    value: "0x",
+                },
+                BALTATHAR_PRIVATE_KEY,
+            );
+
+            await customRequest(web3, "eth_sendRawTransaction", [txSign.rawTransaction]);
+            await sleep(3 * SECONDS);
+            throw new Error("Transaction should have failed due to insufficient funds");
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                expect(error.message).to.include("insufficient funds");
+                console.log("Transaction failed as expected due to insufficient funds");
+            } else {
+                throw error; 
+            }
+        }
+
+        const baltatharFinalBalance = await web3.eth.getBalance(BALTATHAR_ADDRESS);
+        expect(baltatharFinalBalance).to.equal(baltatharInitialBalance);
+    });
+
 
 
 });
