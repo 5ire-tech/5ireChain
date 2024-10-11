@@ -2,6 +2,7 @@ import Web3 from "web3";
 import {
     ALITH_PRIVATE_KEY,
     BALTATHAR_ADDRESS,
+    BALTATHAR_PRIVATE_KEY,
     BLOCK_TIME,
     CHARLETH_ADDRESS,
     SECONDS,
@@ -16,14 +17,19 @@ import { sleep } from "../utils/setup";
 
 import { expect } from "chai";
 import { step } from "mocha-steps";
+
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
 let web3: Web3;
 
 const BATCH_CONTRACT = "0x0000000000000000000000000000000000001000";
 
 const BATCH_ABI = require("./contracts/batch/Batch.json");
 
-const ERC20_ABI = require("./contracts/MyToken.json").abi;
-const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
+const ERC20_ABI = require("./contracts/MyToken.json");
+
+const ERC20_BYTECODES = readFileSync(join(__dirname, './contracts/erc20_contract_bytecode.txt'), 'utf8').trim();
 
 
 describe("EVM related Contract using web3js/ethersjs", function () {
@@ -135,6 +141,60 @@ describe("EVM related Contract using web3js/ethersjs", function () {
 
     });
 
+    step("batchAll: approve and transferFrom ERC20 tokens", async function () {
+        this.timeout(60000);
+
+        const approveAmount = web3.utils.toWei("50", "ether");
+        const transferAmount = web3.utils.toWei("50", "ether");
+
+        const approveTx = erc20Contract.methods.approve(BALTATHAR_ADDRESS, approveAmount).encodeABI();
+        const transferFromTx = erc20Contract.methods.transferFrom(alith.address, CHARLETH_ADDRESS, transferAmount).encodeABI();
+
+        const signedTx = await web3.eth.accounts.signTransaction(
+            {
+                to: erc20Address,
+                data: approveTx,
+                gas: 1000000,
+            },
+            ALITH_PRIVATE_KEY,
+        );
+        await customRequest(web3, "eth_sendRawTransaction", [
+            signedTx.rawTransaction,
+        ]);
+        await sleep(4 * SECONDS);
+
+        const baltatharAllowance = await erc20Contract.methods.allowance(alith.address, BALTATHAR_ADDRESS).call();
+        expect(baltatharAllowance).to.equal(approveAmount);
+
+        const batchTx = batchContract.methods.batchAll(
+            [erc20Address],
+            [0],
+            [transferFromTx],
+            [300000]
+        );
+
+
+        const txSign = await web3.eth.accounts.signTransaction(
+            {
+                from: alith.address,
+                to: BATCH_CONTRACT,
+                data: batchTx.encodeABI(),
+                gas: 1000000,
+            },
+            BALTATHAR_PRIVATE_KEY,
+        );
+
+        let receipt = await customRequest(web3, "eth_sendRawTransaction", [
+            txSign.rawTransaction,
+        ]);
+
+        await sleep(3 * SECONDS);
+
+        //Check balances
+
+        const charlethBalance = await erc20Contract.methods.balanceOf(CHARLETH_ADDRESS).call();
+        expect(charlethBalance).to.equal(transferAmount);
+    });
 
 
 
