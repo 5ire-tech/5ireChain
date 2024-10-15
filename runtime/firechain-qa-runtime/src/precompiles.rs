@@ -8,6 +8,7 @@ use pallet_evm_precompile_modexp::Modexp;
 use pallet_evm_precompile_sha3fips::Sha3FIPS256;
 use pallet_evm_precompile_simple::{ECRecover, ECRecoverPublicKey, Identity, Ripemd160, Sha256};
 use pallet_evm_precompile_batch::BatchPrecompile;
+use pallet_evm_precompile_registry::RegistryPrecompile;
 pub struct FrontierPrecompiles<R>(PhantomData<R>);
 
 #[allow(clippy::new_without_default)]
@@ -18,8 +19,8 @@ where
 	pub fn new() -> Self {
 		Self(Default::default())
 	}
-	pub fn used_addresses() -> [H160; 8] {
-		[hash(1), hash(2), hash(3), hash(4), hash(5), hash(1024), hash(1025), hash(4096)]
+	pub fn used_addresses() -> [H160; 9] {
+		[hash(1), hash(2), hash(3), hash(4), hash(5), hash(1024), hash(1025), hash(4096), hash(4097)]
 	}
 }
 impl<R> PrecompileSet for FrontierPrecompiles<R>
@@ -35,6 +36,7 @@ where
 			a if a == hash(4) => Some(Identity::execute(handle)),
 			a if a == hash(5) => Some(Modexp::execute(handle)),
 			a if a == hash(4096) => Some(BatchPrecompile::<R>::execute(handle)),
+			a if a == hash(4097) => Some(RegistryPrecompile::<R>::execute(handle)),
 			// Non-Frontier specific nor Ethereum precompiles :
 			a if a == hash(1024) => Some(Sha3FIPS256::execute(handle)),
 			a if a == hash(1025) => Some(ECRecoverPublicKey::execute(handle)),

@@ -2658,6 +2658,7 @@ dependencies = [
  "pallet-evm-chain-id",
  "pallet-evm-precompile-batch",
  "pallet-evm-precompile-modexp",
+ "pallet-evm-precompile-registry",
  "pallet-evm-precompile-sha3fips",
  "pallet-evm-precompile-simple",
  "pallet-fast-unstake",
@@ -6181,6 +6182,30 @@ dependencies = [
  "hex",
  "num",
  "pallet-evm-test-vector-support",
+]
+
+[[package]]
+name = "pallet-evm-precompile-registry"
+version = "0.1.0"
+dependencies = [
+ "derive_more",
+ "fp-evm",
+ "frame-support",
+ "frame-system",
+ "hex-literal 0.4.1",
+ "log",
+ "pallet-balances",
+ "pallet-evm 6.0.0-dev",
+ "pallet-scheduler",
+ "pallet-timestamp",
+ "parity-scale-codec",
+ "precompile-utils",
+ "scale-info",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
