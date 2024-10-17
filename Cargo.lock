@@ -640,6 +640,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8c3c1a368f70d6cf7302d78f8f7093da241fb8e8807c05cc9e51a125895a6d5b"
 
 [[package]]
+name = "basic-toml"
+version = "0.1.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "823388e228f614e9558c6804262db37960ec8821856535f5c3f59913140558f8"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "beef"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5040,6 +5049,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "macrotest"
+version = "1.0.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4e2035deb453578ff1cd2da2761ac78abbffffd1d06a0f59261c082ea713fdad"
+dependencies = [
+ "basic-toml",
+ "diff",
+ "glob",
+ "prettyplease 0.2.17",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "syn 2.0.58",
+]
+
+[[package]]
 name = "maplit"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7267,7 +7292,6 @@ checksum = "5b40af805b3121feab8a3c29f04d8ad262fa8e0561883e7653e024ae4479e6de"
 [[package]]
 name = "precompile-utils"
 version = "0.1.0"
-source = "git+https://github.com/polkadot-evm/frontier.git?branch=polkadot-v1.1.0#7544791796a93e85716241b72ba68b7c7231376f"
 dependencies = [
  "derive_more",
  "environmental",
@@ -7279,8 +7303,8 @@ dependencies = [
  "hex-literal 0.4.1",
  "impl-trait-for-tuples",
  "log",
- "num_enum 0.7.2",
- "pallet-evm 6.0.0-dev (git+https://github.com/polkadot-evm/frontier.git?branch=polkadot-v1.1.0)",
+ "num_enum 0.5.11",
+ "pallet-evm 6.0.0-dev",
  "parity-scale-codec",
  "precompile-utils-macro",
  "scale-info",
@@ -7295,15 +7319,20 @@ dependencies = [
 [[package]]
 name = "precompile-utils-macro"
 version = "0.1.0"
-source = "git+https://github.com/polkadot-evm/frontier.git?branch=polkadot-v1.1.0#7544791796a93e85716241b72ba68b7c7231376f"
 dependencies = [
  "case",
- "num_enum 0.7.2",
+ "fp-evm",
+ "frame-support",
+ "macrotest",
+ "num_enum 0.5.11",
+ "precompile-utils",
  "prettyplease 0.2.17",
  "proc-macro2",
  "quote",
  "sp-core-hashing",
+ "sp-std",
  "syn 1.0.109",
+ "trybuild",
 ]
 
 [[package]]
@@ -11256,6 +11285,20 @@ dependencies = [
  "sp-weights",
  "substrate-rpc-client",
  "zstd 0.12.4",
+]
+
+[[package]]
+name = "trybuild"
+version = "1.0.100"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8923cde76a6329058a86f04d033f0945a2c6df8b94093512e4ab188b3e3a8950"
+dependencies = [
+ "glob",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "termcolor",
+ "toml 0.8.2",
 ]
 
 [[package]]
