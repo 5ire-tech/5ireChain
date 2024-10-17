@@ -44,6 +44,9 @@ paste = "1.0.6"
 slices = "0.2.0"
 derive_more = "0.99"
 sha3 = { version = "0.10", default-features = false }
+impl-trait-for-tuples = "0.2.1"
+scale-codec = { package = "parity-scale-codec", version = "3.6.4", default-features = false, features = ["derive"] }
+similar-asserts = "1.1.0"
 
 # Substrate Client
 sc-basic-authorship = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0" }
@@ -116,6 +119,8 @@ sp-npos-elections = { version = "4.0.0-dev", git = "https://github.com/paritytec
 substrate-test-utils = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
 sp-weights = { version = "20.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
 sp-rpc= { version = "6.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-core-hashing = { version = "9.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-core-hashing-proc-macro = { version = "9.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
 
 # Substrate FRAME
 frame-benchmarking = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.1.0", default-features = false }
@@ -234,7 +239,7 @@ pallet-evm-precompile-sha3fips = { version = "2.0.0-dev", path = "frame/evm/prec
 pallet-evm-precompile-simple = { version = "2.0.0-dev", path = "frame/evm/precompile/simple", default-features = false }
 pallet-evm-test-vector-support = { version = "1.0.0-dev", path = "frame/evm/test-vector-support" }
 pallet-evm-precompile-batch = { path = "precompiles/batch", default-features = false }
-precompile-utils = { git = "https://github.com/polkadot-evm/frontier.git", branch = "polkadot-v1.1.0", default-features = false }
+precompile-utils = { path = "precompiles/utils", default-features = false }
 
 # Firechain Runtine
 firechain-qa-runtime = { path = "runtime/firechain-qa-runtime", default-features = false }
