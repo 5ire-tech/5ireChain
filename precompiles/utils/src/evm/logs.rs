@@ -25,21 +25,13 @@ use sp_std::{vec, vec::Vec};
 /// Create a 0-topic log.
 #[must_use]
 pub fn log0(address: impl Into<H160>, data: impl Into<Vec<u8>>) -> Log {
-	Log {
-		address: address.into(),
-		topics: vec![],
-		data: data.into(),
-	}
+	Log { address: address.into(), topics: vec![], data: data.into() }
 }
 
 /// Create a 1-topic log.
 #[must_use]
 pub fn log1(address: impl Into<H160>, topic0: impl Into<H256>, data: impl Into<Vec<u8>>) -> Log {
-	Log {
-		address: address.into(),
-		topics: vec![topic0.into()],
-		data: data.into(),
-	}
+	Log { address: address.into(), topics: vec![topic0.into()], data: data.into() }
 }
 
 /// Create a 2-topics log.
@@ -50,11 +42,7 @@ pub fn log2(
 	topic1: impl Into<H256>,
 	data: impl Into<Vec<u8>>,
 ) -> Log {
-	Log {
-		address: address.into(),
-		topics: vec![topic0.into(), topic1.into()],
-		data: data.into(),
-	}
+	Log { address: address.into(), topics: vec![topic0.into(), topic1.into()], data: data.into() }
 }
 
 /// Create a 3-topics log.

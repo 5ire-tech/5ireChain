@@ -128,7 +128,8 @@ impl<'inner> Reader<'inner> {
 		Ok(Self::new(&input[4..]))
 	}
 
-	/// Check the input has at least the correct amount of arguments before the end (32 bytes values).
+	/// Check the input has at least the correct amount of arguments before the end (32 bytes
+	/// values).
 	pub fn expect_arguments(&self, args: usize) -> MayRevert {
 		if self.input.len() >= self.cursor + args * 32 {
 			Ok(())
@@ -168,10 +169,7 @@ impl<'inner> Reader<'inner> {
 			return Err(RevertReason::PointerToOutofBound.into());
 		}
 
-		Ok(Self {
-			input: &self.input[offset..],
-			cursor: 0,
-		})
+		Ok(Self { input: &self.input[offset..], cursor: 0 })
 	}
 
 	/// Read remaining bytes
@@ -191,10 +189,7 @@ impl<'inner> Reader<'inner> {
 	/// Checks cursor overflows.
 	fn move_cursor(&mut self, len: usize) -> MayRevert<Range<usize>> {
 		let start = self.cursor;
-		let end = self
-			.cursor
-			.checked_add(len)
-			.ok_or(RevertReason::CursorOverflow)?;
+		let end = self.cursor.checked_add(len).ok_or(RevertReason::CursorOverflow)?;
 
 		self.cursor = end;
 
@@ -221,8 +216,8 @@ struct OffsetChunk {
 	offset_position: usize,
 	// Data pointed by the offset that must be inserted at the end of container data.
 	data: Vec<u8>,
-	// Inside of arrays, the offset is not from the start of array data (length), but from the start
-	// of the item. This shift allow to correct this.
+	// Inside of arrays, the offset is not from the start of array data (length), but from the
+	// start of the item. This shift allow to correct this.
 	offset_shift: usize,
 }
 
@@ -236,11 +231,7 @@ impl Writer {
 	/// Selector will only be appended before the data when calling
 	/// `build` to not mess with the offsets.
 	pub fn new_with_selector(selector: impl Into<u32>) -> Self {
-		Self {
-			data: vec![],
-			offset_data: vec![],
-			selector: Some(selector.into()),
-		}
+		Self { data: vec![], offset_data: vec![], selector: Some(selector.into()) }
 	}
 
 	// Return the built data.
@@ -296,16 +287,13 @@ impl Writer {
 	/// Initially write a dummy value as offset in this writer's data, which will be replaced by
 	/// the correct offset once the pointed data is appended.
 	///
-	/// Takes `&mut self` since its goal is to be used inside `solidity::Codec` impl and not in chains.
+	/// Takes `&mut self` since its goal is to be used inside `solidity::Codec` impl and not in
+	/// chains.
 	pub fn write_pointer(&mut self, data: Vec<u8>) {
 		let offset_position = self.data.len();
 		H256::write(self, H256::repeat_byte(0xff));
 
-		self.offset_data.push(OffsetChunk {
-			offset_position,
-			data,
-			offset_shift: 0,
-		});
+		self.offset_data.push(OffsetChunk { offset_position, data, offset_shift: 0 });
 	}
 }
 
@@ -320,10 +308,7 @@ pub struct Convert<P, C> {
 
 impl<P, C> From<C> for Convert<P, C> {
 	fn from(value: C) -> Self {
-		Self {
-			inner: value,
-			_phantom: PhantomData,
-		}
+		Self { inner: value, _phantom: PhantomData }
 	}
 }
 
@@ -343,10 +328,7 @@ where
 			.try_into()
 			.map_err(|_| RevertReason::value_is_too_large(C::signature()))?;
 
-		Ok(Self {
-			inner: c,
-			_phantom: PhantomData,
-		})
+		Ok(Self { inner: c, _phantom: PhantomData })
 	}
 
 	fn write(writer: &mut Writer, value: Self) {

@@ -102,7 +102,7 @@ fn read_input(source: &[u8], target: &mut [u8], source_offset: &mut usize) {
 
 	// Out of bounds, nothing to copy.
 	if source.len() <= offset {
-		return
+		return;
 	}
 
 	// Find len to copy up to target len, but not out of bounds.
@@ -147,21 +147,21 @@ impl Precompile for Modexp {
 		if base_len_big > max_size_big {
 			return Err(PrecompileFailure::Error {
 				exit_status: ExitError::Other("unreasonably large base length".into()),
-			})
+			});
 		}
 
 		let exp_len_big = BigUint::from_bytes_be(&exp_len_buf);
 		if exp_len_big > max_size_big {
 			return Err(PrecompileFailure::Error {
 				exit_status: ExitError::Other("unreasonably large exponent length".into()),
-			})
+			});
 		}
 
 		let mod_len_big = BigUint::from_bytes_be(&mod_len_buf);
 		if mod_len_big > max_size_big {
 			return Err(PrecompileFailure::Error {
 				exit_status: ExitError::Other("unreasonably large modulus length".into()),
-			})
+			});
 		}
 
 		// bounds check handled above
@@ -171,7 +171,7 @@ impl Precompile for Modexp {
 
 		// if mod_len is 0 output must be empty
 		if mod_len == 0 {
-			return Ok(PrecompileOutput { exit_status: ExitSucceed::Returned, output: vec![] })
+			return Ok(PrecompileOutput { exit_status: ExitSucceed::Returned, output: vec![] });
 		}
 
 		// Gas formula allows arbitrary large exp_len when base and modulus are empty, so we need to

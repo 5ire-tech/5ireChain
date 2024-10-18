@@ -186,7 +186,6 @@ impl Config for Test {
 	type ExtraDataLength = ConstU32<30>;
 }
 
-
 // For pallet authorship
 pub struct TestAuthor;
 impl FindAuthor<AccountId32> for TestAuthor {
@@ -198,12 +197,10 @@ impl FindAuthor<AccountId32> for TestAuthor {
 	}
 }
 
-
 impl pallet_authorship::Config for Test {
 	type FindAuthor = TestAuthor;
 	type EventHandler = ();
 }
-
 
 impl fp_self_contained::SelfContainedCall for RuntimeCall {
 	type SignedInfo = H160;

@@ -207,8 +207,6 @@ impl pallet_timestamp::Config for Test {
 	type WeightInfo = ();
 }
 
-
-
 parameter_types! {
 	pub const SessionsPerEra: SessionIndex = 3;
 	pub const BondingDuration: EraIndex = 3;
@@ -220,7 +218,7 @@ impl pallet_esg::Config for Test {
 	type RuntimeEvent = RuntimeEvent;
 	type MaxFileSize = ConstU32<1024000>;
 	type WeightInfo = ();
-	type MaxNumOfSudoOracles =  ConstU32<5>;
+	type MaxNumOfSudoOracles = ConstU32<5>;
 	type MaxNumOfNonSudoOracles = ConstU32<5>;
 }
 
@@ -234,23 +232,18 @@ impl onchain::Config for OnChainSeqPhragmen {
 	type Bounds = ElectionsBoundsOnChain;
 }
 
-
 pub struct TestReward;
 impl pallet_staking::Rewards<AccountId> for TestReward {
 	fn payout_validators() -> Vec<AccountId> {
 		vec![]
 	}
-	fn claim_rewards(account:AccountId) -> Result<(), sp_runtime::DispatchError> {
+	fn claim_rewards(account: AccountId) -> Result<(), sp_runtime::DispatchError> {
 		Ok(())
-	
 	}
 	fn calculate_reward() -> sp_runtime::DispatchResult {
-	
 		Ok(())
 	}
-
 }
-
 
 impl pallet_staking::Config for Test {
 	type RewardRemainder = ();

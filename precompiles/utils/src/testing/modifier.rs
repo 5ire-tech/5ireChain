@@ -34,19 +34,12 @@ impl<P: PrecompileSet> PrecompilesModifierTester<P> {
 		let to = to.into();
 		let mut handle = MockHandle::new(
 			to,
-			Context {
-				address: to,
-				caller: from.into(),
-				apparent_value: U256::zero(),
-			},
+			Context { address: to, caller: from.into(), apparent_value: U256::zero() },
 		);
 
 		handle.gas_limit = u64::MAX;
 
-		Self {
-			precompiles,
-			handle,
-		}
+		Self { precompiles, handle }
 	}
 
 	fn is_view(&mut self, selector: u32) -> bool {
@@ -63,7 +56,7 @@ impl<P: PrecompileSet> PrecompilesModifierTester<P> {
 				let decoded = decode_revert_message(&output);
 
 				dbg!(decoded) != b"Can't call non-static function in static context"
-			}
+			},
 			Some(_) => true,
 			None => panic!("tried to check view modifier on unknown precompile"),
 		}
@@ -83,7 +76,7 @@ impl<P: PrecompileSet> PrecompilesModifierTester<P> {
 				let decoded = decode_revert_message(&output);
 
 				decoded != b"Function is not payable"
-			}
+			},
 			Some(_) => true,
 			None => panic!("tried to check payable modifier on unknown precompile"),
 		}
@@ -91,40 +84,22 @@ impl<P: PrecompileSet> PrecompilesModifierTester<P> {
 
 	pub fn test_view_modifier(&mut self, selectors: &[u32]) {
 		for &s in selectors {
-			assert!(
-				self.is_view(s),
-				"Function doesn't behave like a view function."
-			);
-			assert!(
-				!self.is_payable(s),
-				"Function doesn't behave like a non-payable function."
-			)
+			assert!(self.is_view(s), "Function doesn't behave like a view function.");
+			assert!(!self.is_payable(s), "Function doesn't behave like a non-payable function.")
 		}
 	}
 
 	pub fn test_payable_modifier(&mut self, selectors: &[u32]) {
 		for &s in selectors {
-			assert!(
-				!self.is_view(s),
-				"Function doesn't behave like a non-view function."
-			);
-			assert!(
-				self.is_payable(s),
-				"Function doesn't behave like a payable function."
-			);
+			assert!(!self.is_view(s), "Function doesn't behave like a non-view function.");
+			assert!(self.is_payable(s), "Function doesn't behave like a payable function.");
 		}
 	}
 
 	pub fn test_default_modifier(&mut self, selectors: &[u32]) {
 		for &s in selectors {
-			assert!(
-				!self.is_view(s),
-				"Function doesn't behave like a non-view function."
-			);
-			assert!(
-				!self.is_payable(s),
-				"Function doesn't behave like a non-payable function."
-			);
+			assert!(!self.is_view(s), "Function doesn't behave like a non-view function.");
+			assert!(!self.is_payable(s), "Function doesn't behave like a non-payable function.");
 		}
 	}
 }

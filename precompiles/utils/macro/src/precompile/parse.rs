@@ -51,8 +51,8 @@ impl Precompile {
 		}
 
 		// Check constraint of PrecompileSet.
-		if precompile.tagged_as_precompile_set
-			&& precompile.precompile_set_discriminant_fn.is_none()
+		if precompile.tagged_as_precompile_set &&
+			precompile.precompile_set_discriminant_fn.is_none()
 		{
 			let msg = "A PrecompileSet must have exactly one function tagged with \
 			`#[precompile::discriminant]`";
@@ -71,7 +71,7 @@ impl Precompile {
 			match attr {
 				attr::ImplAttr::PrecompileSet(_) => {
 					self.tagged_as_precompile_set = true;
-				}
+				},
 				attr::ImplAttr::TestConcreteTypes(span, types) => {
 					if types.len() != self.generics.params.len() {
 						let msg = "The amount of types should match the amount of type parameters \
@@ -85,7 +85,7 @@ impl Precompile {
 					}
 
 					self.test_concrete_types = Some(types);
-				}
+				},
 			}
 		}
 
@@ -102,7 +102,7 @@ impl Precompile {
 				let msg = "The type in the impl block must be a path, like `Precompile` or
 				`example::Precompile`";
 				return Err(syn::Error::new(impl_.self_ty.span(), msg));
-			}
+			},
 		};
 
 		let final_path = type_path.path.segments.last().ok_or_else(|| {
@@ -166,12 +166,12 @@ impl Precompile {
 					let msg = "The discriminant attribute must be the only precompile \
 					attribute of the function";
 					return Err(syn::Error::new(span, msg));
-				}
+				},
 				attr::MethodAttr::PreCheck(span) => {
 					let msg = "The pre_check attribute must be the only precompile \
 					attribute of the function";
 					return Err(syn::Error::new(span, msg));
-				}
+				},
 				attr::MethodAttr::Fallback(span) => {
 					if self.fallback_to_variant.is_some() {
 						let msg = "A precompile can only have 1 fallback function";
@@ -181,7 +181,7 @@ impl Precompile {
 					self.fallback_to_variant = Some(method_name.clone());
 					used = true;
 					is_fallback = true;
-				}
+				},
 				attr::MethodAttr::Payable(span) => {
 					if modifier != Modifier::NonPayable {
 						let msg =
@@ -190,7 +190,7 @@ impl Precompile {
 					}
 
 					modifier = Modifier::Payable;
-				}
+				},
 				attr::MethodAttr::View(span) => {
 					if modifier != Modifier::NonPayable {
 						let msg =
@@ -199,7 +199,7 @@ impl Precompile {
 					}
 
 					modifier = Modifier::View;
-				}
+				},
 				attr::MethodAttr::Public(_, signature_lit) => {
 					used = true;
 
@@ -209,7 +209,7 @@ impl Precompile {
 						&mut solidity_arguments_type,
 					)?;
 					selectors.push(selector);
-				}
+				},
 			}
 		}
 
@@ -261,7 +261,7 @@ impl Precompile {
 					// `check_initial_parameters`.
 					let msg = "Exposed precompile methods cannot have a `self` parameter";
 					return Err(syn::Error::new(input.span(), msg));
-				}
+				},
 			};
 
 			let msg = "Parameter must be of the form `name: Type`, optionally prefixed by `mut`";
@@ -272,10 +272,10 @@ impl Precompile {
 					}
 
 					pat.ident.clone()
-				}
+				},
 				_ => {
 					return Err(syn::Error::new(input.pat.span(), msg));
-				}
+				},
 			};
 			let ty = input.ty.as_ref().clone();
 			self.check_type_parameter_usage(&ty)?;
@@ -290,7 +290,7 @@ impl Precompile {
 				let msg = "A precompile method must have a return type of `EvmResult<_>` (exposed \
 				by `precompile_utils`)";
 				return Err(syn::Error::new(method.sig.span(), msg));
-			}
+			},
 		};
 
 		// We insert the collected data in self.
@@ -329,7 +329,7 @@ impl Precompile {
 					let msg = "PrecompileSet methods must have at least 2 parameters (the \
 					precompile instance discriminant and the PrecompileHandle)";
 					return Err(syn::Error::new(method_span, msg));
-				}
+				},
 			};
 
 			let input = match input {
@@ -337,7 +337,7 @@ impl Precompile {
 				_ => {
 					let msg = "self is not allowed in precompile methods";
 					return Err(syn::Error::new(input.span(), msg));
-				}
+				},
 			};
 
 			let input_type = input.ty.as_ref();
@@ -358,7 +358,7 @@ impl Precompile {
 					};
 
 					return Err(syn::Error::new(method_span, msg));
-				}
+				},
 			};
 
 			let input = match input {
@@ -366,7 +366,7 @@ impl Precompile {
 				_ => {
 					let msg = "self is not allowed in precompile methods";
 					return Err(syn::Error::new(input.span(), msg));
-				}
+				},
 			};
 
 			let input_type = input.ty.as_ref();
@@ -534,10 +534,7 @@ impl Precompile {
 		let digest = keccak_256(signature.as_bytes());
 		let selector = u32::from_be_bytes([digest[0], digest[1], digest[2], digest[3]]);
 
-		if let Some(previous) = self
-			.selector_to_variant
-			.insert(selector, method_name.clone())
-		{
+		if let Some(previous) = self.selector_to_variant.insert(selector, method_name.clone()) {
 			let msg = format!("Selector collision with method {previous}");
 			return Err(syn::Error::new(signature_lit.span(), msg));
 		}
@@ -562,17 +559,14 @@ block to provide concrete types that will be used to run the automatically gener
 ensuring the Solidity function signatures are correct.";
 
 		match ty {
-			syn::Type::Array(syn::TypeArray { elem, .. })
-			| syn::Type::Group(syn::TypeGroup { elem, .. })
-			| syn::Type::Paren(syn::TypeParen { elem, .. })
-			| syn::Type::Reference(syn::TypeReference { elem, .. })
-			| syn::Type::Ptr(syn::TypePtr { elem, .. })
-			| syn::Type::Slice(syn::TypeSlice { elem, .. }) => self.check_type_parameter_usage(elem)?,
+			syn::Type::Array(syn::TypeArray { elem, .. }) |
+			syn::Type::Group(syn::TypeGroup { elem, .. }) |
+			syn::Type::Paren(syn::TypeParen { elem, .. }) |
+			syn::Type::Reference(syn::TypeReference { elem, .. }) |
+			syn::Type::Ptr(syn::TypePtr { elem, .. }) |
+			syn::Type::Slice(syn::TypeSlice { elem, .. }) => self.check_type_parameter_usage(elem)?,
 
-			syn::Type::Path(syn::TypePath {
-				path: syn::Path { segments, .. },
-				..
-			}) => {
+			syn::Type::Path(syn::TypePath { path: syn::Path { segments, .. }, .. }) => {
 				let impl_params: Vec<_> = self
 					.generics
 					.params
@@ -590,8 +584,8 @@ ensuring the Solidity function signatures are correct.";
 
 					if let syn::PathArguments::AngleBracketed(args) = &segment.arguments {
 						let types = args.args.iter().filter_map(|arg| match arg {
-							syn::GenericArgument::Type(ty)
-							| syn::GenericArgument::Binding(syn::Binding { ty, .. }) => Some(ty),
+							syn::GenericArgument::Type(ty) |
+							syn::GenericArgument::Binding(syn::Binding { ty, .. }) => Some(ty),
 							_ => None,
 						});
 
@@ -600,12 +594,11 @@ ensuring the Solidity function signatures are correct.";
 						}
 					}
 				}
-			}
-			syn::Type::Tuple(tuple) => {
+			},
+			syn::Type::Tuple(tuple) =>
 				for ty in tuple.elems.iter() {
 					self.check_type_parameter_usage(ty)?;
-				}
-			}
+				},
 			// BareFn => very unlikely this appear as parameter
 			// ImplTrait => will cause other errors, it must be a concrete type
 			// TypeInfer => it must be explicit concrete types since it ends up in enum fields

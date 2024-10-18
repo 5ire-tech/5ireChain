@@ -49,10 +49,9 @@ use fp_evm::{
 
 use crate::{
 	runner::Runner as RunnerT, AccountCodes, AccountCodesMetadata, AccountStorages, AddressMapping,
-	BalanceOf, BlockHashMapping, Config, Error, Event, FeeCalculator, OnChargeEVMTransaction,
-	OnCreate, Pallet, RunnerError,
+	BalanceOf, BlockHashMapping, Config, ContractDeployer, Error, Event, FeeCalculator,
+	OnChargeEVMTransaction, OnCreate, Pallet, RunnerError,
 };
-use crate::ContractDeployer;
 #[cfg(feature = "forbid-evm-reentrancy")]
 environmental::thread_local_impl!(static IN_EVM: environmental::RefCell<bool> = environmental::RefCell::new(false));
 
@@ -71,7 +70,7 @@ where
 		source: H160,
 		value: U256,
 		gas_limit: u64,
-		target:Option<H160>,
+		target: Option<H160>,
 		max_fee_per_gas: Option<U256>,
 		max_priority_fee_per_gas: Option<U256>,
 		config: &'config evm::Config,
@@ -96,7 +95,7 @@ where
 
 		#[cfg(feature = "forbid-evm-reentrancy")]
 		if IN_EVM.with(|in_evm| in_evm.replace(true)) {
-			return Err(RunnerError { error: Error::<T>::Reentrancy, weight })
+			return Err(RunnerError { error: Error::<T>::Reentrancy, weight });
 		}
 
 		let res = Self::execute_inner(
@@ -129,7 +128,7 @@ where
 		source: H160,
 		value: U256,
 		mut gas_limit: u64,
-		target:Option<H160>,
+		target: Option<H160>,
 		max_fee_per_gas: Option<U256>,
 		max_priority_fee_per_gas: Option<U256>,
 		config: &'config evm::Config,
@@ -182,7 +181,7 @@ where
 		// EIP-3607: https://eips.ethereum.org/EIPS/eip-3607
 		// Do not allow transactions for which `tx.sender` has any code deployed.
 		if is_transactional && !<AccountCodes<T>>::get(source).is_empty() {
-			return Err(RunnerError { error: Error::<T>::TransactionMustComeFromEOA, weight })
+			return Err(RunnerError { error: Error::<T>::TransactionMustComeFromEOA, weight });
 		}
 
 		let (total_fee_per_gas, _actual_priority_fee_per_gas) =
@@ -286,7 +285,7 @@ where
 			// Fee initially withdrawn.
 			fee,
 			// Contract Address
-			target
+			target,
 		);
 		T::OnChargeTransaction::pay_priority_fee(actual_priority_fee);
 
@@ -490,13 +489,16 @@ where
 		);
 		// Unwrap the `execute` result to get a reference to the underlying value
 		let execute_result = execute.as_ref();
-		// Retrieve the `value` from the unwrapped `execute_result which represents the contract address
+		// Retrieve the `value` from the unwrapped `execute_result which represents the contract
+		// address
 		let value = execute_result.unwrap().value;
-		// Fetch the contract deployer associated with the contract address `value` from `ContractDeployer` mapping
+		// Fetch the contract deployer associated with the contract address `value` from
+		// `ContractDeployer` mapping
 		let deployer = ContractDeployer::<T>::get(value);
-		if deployer.is_none(){
-			// If no deployer is found for the contract address, insert the `source` as the contract deployer
-			ContractDeployer::<T>::insert(value,source);
+		if deployer.is_none() {
+			// If no deployer is found for the contract address, insert the `source` as the contract
+			// deployer
+			ContractDeployer::<T>::insert(value, source);
 		}
 		execute
 	}
@@ -562,13 +564,16 @@ where
 		);
 		// Unwrap the `execute` result to get a reference to the underlying value
 		let execute_result = execute.as_ref();
-		// Retrieve the `value` from the unwrapped `execute_result which represents the contract address
+		// Retrieve the `value` from the unwrapped `execute_result which represents the contract
+		// address
 		let value = execute_result.unwrap().value;
-		// Fetch the contract deployer associated with the contract address `value` from `ContractDeployer` mapping
+		// Fetch the contract deployer associated with the contract address `value` from
+		// `ContractDeployer` mapping
 		let deployer = ContractDeployer::<T>::get(value);
-		if deployer.is_none(){
-			// If no deployer is found for the contract address, insert the `source` as the contract deployer
-			ContractDeployer::<T>::insert(value,source);
+		if deployer.is_none() {
+			// If no deployer is found for the contract address, insert the `source` as the contract
+			// deployer
+			ContractDeployer::<T>::insert(value, source);
 		}
 		execute
 	}
@@ -636,11 +641,11 @@ impl<'config> SubstrateStackSubstate<'config> {
 
 	pub fn deleted(&self, address: H160) -> bool {
 		if self.deletes.contains(&address) {
-			return true
+			return true;
 		}
 
 		if let Some(parent) = self.parent.as_ref() {
-			return parent.deleted(address)
+			return parent.deleted(address);
 		}
 
 		false
@@ -961,7 +966,7 @@ where
 						weight_info.try_record_proof_size_or_fail(IS_EMPTY_CHECK_PROOF_SIZE)?;
 
 						if <AccountCodes<T>>::decode_len(address).unwrap_or(0) == 0 {
-							return Ok(())
+							return Ok(());
 						}
 						// Try to record fixed sized `AccountCodesMetadata` read
 						// Tentatively 16 + 20 + 40
@@ -1000,13 +1005,13 @@ where
 		let mut accessed_storage: Option<AccessedStorage> = match target {
 			StorageTarget::Address(address) =>
 				if self.recorded().account_codes.contains(&address) {
-					return Ok(())
+					return Ok(());
 				} else {
 					Some(AccessedStorage::AccountCodes(address))
 				},
 			StorageTarget::Slot(address, index) => {
 				if self.recorded().account_storages.contains_key(&(address, index)) {
-					return Ok(())
+					return Ok(());
 				} else {
 					Some(AccessedStorage::AccountStorages((address, index)))
 				}
@@ -1022,7 +1027,7 @@ where
 			if let Some(weight_info) = weight_info {
 				(weight_info, recorded)
 			} else {
-				return Ok(())
+				return Ok(());
 			}
 		};
 
@@ -1035,7 +1040,7 @@ where
 		let proof_size_limit = if let Some(proof_size_limit) = weight_info.proof_size_limit {
 			proof_size_limit
 		} else {
-			return Ok(())
+			return Ok(());
 		};
 
 		let mut maybe_record_and_refund = |with_empty_check: bool| -> Result<(), ExitError> {
@@ -1044,7 +1049,7 @@ where
 			} else {
 				// This must be unreachable, a valid target must be set.
 				// TODO decide how do we want to gracefully handle.
-				return Err(ExitError::OutOfGas)
+				return Err(ExitError::OutOfGas);
 			};
 			// First try to record fixed sized `AccountCodesMetadata` read
 			// Tentatively 20 + 8 + 32
@@ -1098,7 +1103,7 @@ where
 					} else {
 						// This must be unreachable, a valid target must be set.
 						// TODO decide how do we want to gracefully handle.
-						return Err(ExitError::OutOfGas)
+						return Err(ExitError::OutOfGas);
 					};
 				let mut cost = WRITE_PROOF_SIZE;
 				let maybe_record = !recorded.account_storages.contains_key(&(address, index));
@@ -1126,7 +1131,7 @@ where
 
 		if opcode_proof_size > U256::from(u64::MAX) {
 			weight_info.try_record_proof_size_or_fail(proof_size_limit)?;
-			return Err(ExitError::OutOfGas)
+			return Err(ExitError::OutOfGas);
 		}
 
 		// Cache the storage access

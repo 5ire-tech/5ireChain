@@ -39,10 +39,9 @@ use sp_runtime::{
 	impl_opaque_keys,
 	testing::{Digest, DigestItem, Header, TestXt, UintAuthorityId},
 	traits::{Header as _, IdentityLookup, OpaqueKeys},
-	BuildStorage, Perbill,
+	BuildStorage, DispatchError, Perbill,
 };
 use sp_staking::{EraIndex, SessionIndex};
-use sp_runtime::DispatchError;
 type DummyValidatorId = u64;
 
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -202,7 +201,6 @@ impl pallet_balances::Config for Test {
 	type MaxHolds = ();
 }
 
-
 parameter_types! {
 	pub const SessionsPerEra: SessionIndex = 3;
 	pub const BondingDuration: EraIndex = 3;
@@ -226,17 +224,13 @@ impl Rewards<AccountId> for TestReward {
 	fn payout_validators() -> Vec<AccountId> {
 		vec![]
 	}
-	fn claim_rewards(account:AccountId) -> Result<(), DispatchError> {
+	fn claim_rewards(account: AccountId) -> Result<(), DispatchError> {
 		Ok(())
-	
 	}
 	fn calculate_reward() -> sp_runtime::DispatchResult {
-	
 		Ok(())
 	}
-
 }
-
 
 impl pallet_staking::Config for Test {
 	type RewardRemainder = ();
@@ -275,7 +269,7 @@ impl pallet_esg::Config for Test {
 	type RuntimeEvent = RuntimeEvent;
 	type MaxFileSize = ConstU32<1024000>;
 	type WeightInfo = ();
-	type MaxNumOfSudoOracles =  ConstU32<5>;
+	type MaxNumOfSudoOracles = ConstU32<5>;
 	type MaxNumOfNonSudoOracles = ConstU32<5>;
 }
 

@@ -41,14 +41,11 @@ use sp_runtime::{
 use std::{collections::BTreeMap, str::FromStr};
 
 pub use firechain_qa_runtime::{EVMConfig, RuntimeGenesisConfig};
-use firechain_runtime_core_primitives::opaque::{
-	AccountId, Balance, Signature,
-};
+use firechain_runtime_core_primitives::opaque::{AccountId, Balance, Signature};
 
 pub fn qa_config() -> Result<ChainSpec, String> {
 	ChainSpec::from_json_bytes(&include_bytes!("../../../specs/5ire-qa-specRaw.json")[..])
 }
-
 
 const ALITH: &str = "0xf24FF3a9CF04c71Dbc94D0b566f7A27B94566cac";
 const BALTATHAR: &str = "0x3Cd0A705a2DC65e5b1E1205896BaA2be8A07c6e0";
@@ -85,7 +82,6 @@ fn session_keys(
 ) -> SessionKeys {
 	SessionKeys { grandpa, babe, im_online, authority_discovery }
 }
-
 
 /// Helper function to generate a crypto pair from seed
 pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
@@ -143,9 +139,7 @@ pub fn testnet_genesis(
 	endowed_accounts: Option<Vec<AccountId>>,
 ) -> RuntimeGenesisConfig {
 	let testnet_accounts = testnet_accounts();
-	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
-		testnet_accounts
-	});
+	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| testnet_accounts);
 	// endow all authorities and nominators.
 	initial_authorities
 		.iter()
@@ -173,7 +167,6 @@ pub fn testnet_genesis(
 			(x.clone(), x.clone(), STASH, StakerStatus::Nominator(nominations))
 		}))
 		.collect::<Vec<_>>();
-
 
 	const ENDOWMENT: Balance = 10_000_000 * DOLLARS;
 	const STASH: Balance = ENDOWMENT / 1000;
@@ -208,7 +201,7 @@ pub fn testnet_genesis(
 		elections: ElectionsConfig::default(),
 		council: CouncilConfig::default(),
 		technical_committee: TechnicalCommitteeConfig::default(),
-		sudo: SudoConfig {key: Some(root_key) },
+		sudo: SudoConfig { key: Some(root_key) },
 		babe: BabeConfig {
 			epoch_config: Some(firechain_qa_runtime::BABE_GENESIS_EPOCH_CONFIG),
 			..Default::default()
@@ -235,7 +228,7 @@ pub fn testnet_genesis(
 		ethereum: Default::default(),
 		dynamic_fee: Default::default(),
 		base_fee: Default::default(),
-		reward:Default::default(),
+		reward: Default::default(),
 	}
 }
 
@@ -254,9 +247,7 @@ pub fn development_genesis(
 	endowed_accounts: Option<Vec<AccountId>>,
 ) -> RuntimeGenesisConfig {
 	let dev_accounts = testnet_accounts();
-	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
-		dev_accounts
-	});
+	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| dev_accounts);
 	// endow all authorities and nominators.
 	initial_authorities
 		.iter()
@@ -285,7 +276,6 @@ pub fn development_genesis(
 			(x.clone(), x.clone(), STASH, StakerStatus::Nominator(nominations))
 		}))
 		.collect::<Vec<_>>();
-
 
 	const ENDOWMENT: Balance = 5_000_000_000 * DOLLARS;
 	const STASH: Balance = ENDOWMENT / 1000;
@@ -394,7 +384,7 @@ pub fn development_genesis(
 		ethereum: EthereumConfig { _marker: Default::default() },
 		dynamic_fee: Default::default(),
 		base_fee: Default::default(),
-		reward:Default::default(),
+		reward: Default::default(),
 	}
 }
 

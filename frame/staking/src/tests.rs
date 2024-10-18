@@ -1169,7 +1169,8 @@ fn validator_payment_prefs_work() {
 		// let reward_of_10 = shared_cut * exposure_1.own / exposure_1.total + taken_cut;
 		// let reward_of_100 = shared_cut * exposure_1.others[0].value / exposure_1.total;
 		// assert_eq_error_rate!(Balances::total_balance(&11), balance_era_1_11 + reward_of_10, 2);
-		// assert_eq_error_rate!(Balances::total_balance(&101), balance_era_1_101 + reward_of_100, 2);
+		// assert_eq_error_rate!(Balances::total_balance(&101), balance_era_1_101 + reward_of_100,
+		// 2);
 	});
 }
 
@@ -3992,8 +3993,8 @@ fn payout_stakers_handles_weight_refund() {
 		start_active_era(2);
 
 		// Collect payouts when there are no nominators
-		// let call = TestCall::Staking(StakingCall::payout_stakers { validator_stash: 11, era: 1 });
-		// let info = call.get_dispatch_info();
+		// let call = TestCall::Staking(StakingCall::payout_stakers { validator_stash: 11, era: 1
+		// }); let info = call.get_dispatch_info();
 		// let result = call.dispatch(RuntimeOrigin::signed(20));
 		// assert_ok!(result);
 		// assert_eq!(extract_actual_weight(&result, &info), zero_nom_payouts_weight);
@@ -4005,8 +4006,8 @@ fn payout_stakers_handles_weight_refund() {
 		start_active_era(3);
 
 		// Collect payouts for an era where the validator did not receive any points.
-		// let call = TestCall::Staking(StakingCall::payout_stakers { validator_stash: 11, era: 2 });
-		// let info = call.get_dispatch_info();
+		// let call = TestCall::Staking(StakingCall::payout_stakers { validator_stash: 11, era: 2
+		// }); let info = call.get_dispatch_info();
 		// let result = call.dispatch(RuntimeOrigin::signed(20));
 		// assert_ok!(result);
 		// assert_eq!(extract_actual_weight(&result, &info), zero_nom_payouts_weight);
@@ -4018,8 +4019,8 @@ fn payout_stakers_handles_weight_refund() {
 		start_active_era(4);
 
 		// Collect payouts when the validator has `half_max_nom_rewarded` nominators.
-		// let call = TestCall::Staking(StakingCall::payout_stakers { validator_stash: 11, era: 3 });
-		// let info = call.get_dispatch_info();
+		// let call = TestCall::Staking(StakingCall::payout_stakers { validator_stash: 11, era: 3
+		// }); let info = call.get_dispatch_info();
 		// let result = call.dispatch(RuntimeOrigin::signed(20));
 		// assert_ok!(result);
 		// assert_eq!(extract_actual_weight(&result, &info), half_max_nom_rewarded_weight);
@@ -4041,19 +4042,19 @@ fn payout_stakers_handles_weight_refund() {
 		start_active_era(6);
 
 		// Collect payouts when the validator had `half_max_nom_rewarded` nominators.
-		// let call = TestCall::Staking(StakingCall::payout_stakers { validator_stash: 11, era: 5 });
-		// let info = call.get_dispatch_info();
+		// let call = TestCall::Staking(StakingCall::payout_stakers { validator_stash: 11, era: 5
+		// }); let info = call.get_dispatch_info();
 		// let result = call.dispatch(RuntimeOrigin::signed(20));
 		// assert_ok!(result);
 		// assert_eq!(extract_actual_weight(&result, &info), max_nom_rewarded_weight);
 
 		// Try and collect payouts for an era that has already been collected.
-		// let call = TestCall::Staking(StakingCall::payout_stakers { validator_stash: 11, era: 5 });
-		// let info = call.get_dispatch_info();
+		// let call = TestCall::Staking(StakingCall::payout_stakers { validator_stash: 11, era: 5
+		// }); let info = call.get_dispatch_info();
 		// let result = call.dispatch(RuntimeOrigin::signed(20));
 		// assert!(result.is_err());
-		// // When there is an error the consumed weight == weight when there are 0 nominator payouts.
-		// assert_eq!(extract_actual_weight(&result, &info), zero_nom_payouts_weight);
+		// // When there is an error the consumed weight == weight when there are 0 nominator
+		// payouts. assert_eq!(extract_actual_weight(&result, &info), zero_nom_payouts_weight);
 	});
 }
 
@@ -4885,7 +4886,7 @@ mod election_data_provider {
 			// election
 			run_to_block(45);
 			assert_eq!(Staking::next_election_prediction(System::block_number()), 70);
-			// remove 1 event 
+			// remove 1 event
 			// assert_eq!(staking_events().len(), 3);
 			assert_eq!(*staking_events().last().unwrap(), Event::StakersElected);
 

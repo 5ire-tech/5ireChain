@@ -21,18 +21,9 @@ use sp_core_hashing::keccak_256;
 
 #[test]
 fn test_keccak256() {
-	assert_eq!(
-		&precompile_utils_macro::keccak256!(""),
-		keccak_256(b"").as_slice(),
-	);
-	assert_eq!(
-		&precompile_utils_macro::keccak256!("toto()"),
-		keccak_256(b"toto()").as_slice(),
-	);
-	assert_ne!(
-		&precompile_utils_macro::keccak256!("toto()"),
-		keccak_256(b"tata()").as_slice(),
-	);
+	assert_eq!(&precompile_utils_macro::keccak256!(""), keccak_256(b"").as_slice(),);
+	assert_eq!(&precompile_utils_macro::keccak256!("toto()"), keccak_256(b"toto()").as_slice(),);
+	assert_ne!(&precompile_utils_macro::keccak256!("toto()"), keccak_256(b"tata()").as_slice(),);
 }
 
 #[test]

@@ -43,7 +43,7 @@ use sp_std::prelude::*;
 mod impls;
 //use pallet_treasury::TreasuryAccountId;
 
-use crate::{Rewards};
+use crate::Rewards;
 
 pub use impls::*;
 
@@ -96,7 +96,7 @@ pub mod pallet {
 		>;
 		/// The reward distribution for validator and nominator
 
-		type RewardDistribution :Rewards<Self::AccountId>;
+		type RewardDistribution: Rewards<Self::AccountId>;
 
 		/// Just the `Currency::Balance` type; we have this item to allow us to constrain it to
 		/// `From<u64>`.
@@ -718,8 +718,7 @@ pub mod pallet {
 		/// A new force era mode was set.
 		ForceEra { mode: Forcing },
 		/// renominate   event
-		NominatorPrefsSet{ stash: T::AccountId, nominations: Nominations<T>},
-
+		NominatorPrefsSet { stash: T::AccountId, nominations: Nominations<T> },
 	}
 
 	#[pallet::error]
@@ -858,16 +857,16 @@ pub mod pallet {
 			let controller_to_be_deprecated = stash.clone();
 
 			if <Bonded<T>>::contains_key(&stash) {
-				return Err(Error::<T>::AlreadyBonded.into())
+				return Err(Error::<T>::AlreadyBonded.into());
 			}
 
 			if <Ledger<T>>::contains_key(&controller_to_be_deprecated) {
-				return Err(Error::<T>::AlreadyPaired.into())
+				return Err(Error::<T>::AlreadyPaired.into());
 			}
 
 			// Reject a bond which is considered to be _dust_.
 			if value < T::Currency::minimum_balance() {
-				return Err(Error::<T>::InsufficientBond.into())
+				return Err(Error::<T>::InsufficientBond.into());
 			}
 
 			frame_system::Pallet::<T>::inc_consumers(&stash).map_err(|_| Error::<T>::BadState)?;
@@ -1199,7 +1198,7 @@ pub mod pallet {
 
 			Self::do_remove_validator(stash);
 			Self::do_add_nominator(stash, nominations.clone());
-			Self::deposit_event(Event::<T>::NominatorPrefsSet{ stash: ledger.stash, nominations: nominations });
+			Self::deposit_event(Event::<T>::NominatorPrefsSet { stash: ledger.stash, nominations });
 			Ok(())
 		}
 
@@ -1268,7 +1267,7 @@ pub mod pallet {
 			let old_controller = Self::bonded(&stash).ok_or(Error::<T>::NotStash)?;
 
 			if <Ledger<T>>::contains_key(&stash) {
-				return Err(Error::<T>::AlreadyPaired.into())
+				return Err(Error::<T>::AlreadyPaired.into());
 			}
 			if old_controller != stash {
 				<Bonded<T>>::insert(&stash, &stash);
@@ -1478,8 +1477,6 @@ pub mod pallet {
 			Ok(())
 		}
 
-	
-
 		/// Rebond a portion of the stash scheduled to be unlocked.
 		///
 		/// The dispatch origin must be signed by the controller.
@@ -1550,7 +1547,8 @@ pub mod pallet {
 			let reapable = T::Currency::total_balance(&stash) < ed ||
 				Self::ledger(Self::bonded(stash.clone()).ok_or(Error::<T>::NotStash)?)
 					.map(|l| l.total)
-					.unwrap_or_default() < ed;
+					.unwrap_or_default() <
+					ed;
 			ensure!(reapable, Error::<T>::FundedTarget);
 
 			Self::kill_stash(&stash, num_slashing_spans)?;
@@ -1704,7 +1702,7 @@ pub mod pallet {
 
 			if Nominators::<T>::contains_key(&stash) && Nominators::<T>::get(&stash).is_none() {
 				Self::chill_stash(&stash);
-				return Ok(())
+				return Ok(());
 			}
 
 			if caller != controller {
