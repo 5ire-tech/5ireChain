@@ -48,4 +48,3 @@ where
 	let maximum = portion * (yearly_inflation.maximum * total_tokens);
 	(payout, maximum)
 }
-

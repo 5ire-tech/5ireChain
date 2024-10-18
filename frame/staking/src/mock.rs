@@ -28,7 +28,8 @@ use frame_support::{
 		ConstU32, ConstU64, Currency, EitherOfDiverse, FindAuthor, Get, Hooks, Imbalance,
 		OnUnbalanced, OneSessionHandler,
 	},
-	weights::constants::RocksDbWeight, PalletId
+	weights::constants::RocksDbWeight,
+	PalletId,
 };
 use frame_system::{EnsureRoot, EnsureSignedBy};
 pub use pallet_esg;
@@ -177,7 +178,7 @@ impl pallet_esg::Config for Test {
 	type WeightInfo = ();
 	type RuntimeEvent = RuntimeEvent;
 	type MaxFileSize = ConstU32<1024000>;
-	type MaxNumOfSudoOracles =  ConstU32<5>;
+	type MaxNumOfSudoOracles = ConstU32<5>;
 	type MaxNumOfNonSudoOracles = ConstU32<5>;
 }
 
@@ -361,18 +362,13 @@ impl Rewards<AccountId> for TestReward {
 		validators.append(&mut nominators);
 		validators
 	}
-	fn claim_rewards(account:AccountId) -> Result<(), DispatchError> {
+	fn claim_rewards(account: AccountId) -> Result<(), DispatchError> {
 		Ok(())
-	
 	}
 	fn calculate_reward() -> sp_runtime::DispatchResult {
-	
 		Ok(())
 	}
-
-
 }
-
 
 pub struct WeightedNominationsQuota<const MAX: u32>;
 impl<Balance, const MAX: u32> NominationsQuota<Balance> for WeightedNominationsQuota<MAX>
@@ -612,8 +608,6 @@ impl ExtBuilder {
 		}
 		.assimilate_storage(&mut storage);
 
-
-
 		let mut ext = sp_io::TestExternalities::from(storage);
 
 		if self.initialize_first_session {
@@ -787,9 +781,9 @@ pub(crate) fn on_offence_in_era(
 	for &(bonded_era, start_session) in bonded_eras.iter() {
 		if bonded_era == era {
 			let _ = Staking::on_offence(offenders, slash_fraction, start_session, disable_strategy);
-			return
+			return;
 		} else if bonded_era > era {
-			break
+			break;
 		}
 	}
 

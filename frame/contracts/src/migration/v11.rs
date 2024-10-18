@@ -81,7 +81,7 @@ impl<T: Config> MigrationStep for Migration<T> {
 
 	fn step(&mut self) -> (IsFinished, Weight) {
 		let Some(old_queue) = old::DeletionQueue::<T>::take() else {
-			return (IsFinished::Yes, Weight::zero())
+			return (IsFinished::Yes, Weight::zero());
 		};
 		let len = old_queue.len();
 
@@ -115,7 +115,7 @@ impl<T: Config> MigrationStep for Migration<T> {
 				"Injecting {len} entries to deletion queue to test migration"
 			);
 			fill_old_queue::<T>(len as usize);
-			return Ok(len.encode())
+			return Ok(len.encode());
 		}
 
 		Ok((old_queue.len() as u32).encode())

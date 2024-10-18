@@ -1,7 +1,7 @@
-use fp_account::AccountId20;
-use sp_runtime::DispatchError;
 pub use crate::{mock::*, Error};
+use fp_account::AccountId20;
 use frame_support::{assert_err, assert_noop, assert_ok, WeakBoundedVec};
+use sp_runtime::DispatchError;
 
 const MAX_ESG_SCORE: u16 = 100;
 
@@ -43,7 +43,7 @@ impl Default for Addr {
 fn it_must_register_oracles_new() {
 	new_test_ext().execute_with(|| {
 		let addr = Addr::default();
-		
+
 		assert_ok!(Esg::register_an_oracle(RuntimeOrigin::root(), addr.SUDO_ORACLE, true));
 		assert_ok!(Esg::register_an_oracle(
 			RuntimeOrigin::signed(addr.SUDO_ORACLE),
@@ -56,8 +56,6 @@ fn it_must_register_oracles_new() {
 			false
 		));
 		assert_ok!(Esg::deregister_an_oracle(RuntimeOrigin::root(), addr.NON_SUDO_ORACLE_7, false));
-
-
 	});
 }
 
@@ -205,13 +203,21 @@ fn it_must_not_register_oracles_with_non_sudo_oracle_non_root_or_unsigned_origin
 
 		// expect `CallerNotRootOrSudoOracle` error
 		assert_noop!(
-			Esg::register_an_oracle(RuntimeOrigin::signed(addr.ALICE), addr.DUMMY_SUDO_ORACLE, true),
+			Esg::register_an_oracle(
+				RuntimeOrigin::signed(addr.ALICE),
+				addr.DUMMY_SUDO_ORACLE,
+				true
+			),
 			Error::<Test>::CallerNotRootOrSudoOracle
 		);
 
 		// expect `CallerNotRootOrSudoOracle` error
 		assert_noop!(
-			Esg::register_an_oracle(RuntimeOrigin::signed(addr.ALICE), addr.DUMMY_SUDO_ORACLE, false),
+			Esg::register_an_oracle(
+				RuntimeOrigin::signed(addr.ALICE),
+				addr.DUMMY_SUDO_ORACLE,
+				false
+			),
 			Error::<Test>::CallerNotRootOrSudoOracle
 		);
 	});
@@ -648,14 +654,12 @@ fn it_must_handle_scores_exceeding_set_maximum() {
 	});
 }
 
-
 #[test]
-fn it_must_fail_to_register_oracle_non_oracle_exceeding_maximum(){
+fn it_must_fail_to_register_oracle_non_oracle_exceeding_maximum() {
 	let addr = Addr::default();
 
 	new_test_ext().execute_with(|| {
 		System::set_block_number(1);
-
 
 		// register sudo as an oracle
 		assert_ok!(Esg::register_an_oracle(RuntimeOrigin::root(), addr.SUDO_ORACLE, true));
@@ -669,21 +673,25 @@ fn it_must_fail_to_register_oracle_non_oracle_exceeding_maximum(){
 		let three_sudoes = Esg::get_oracle_sudo();
 		assert_eq!(three_sudoes, vec![addr.SUDO_ORACLE, addr.SUDO_ORACLE_2, addr.SUDO_ORACLE_3]);
 
-		// Return Error due to maximum oracle sudo 
-		assert_noop!(Esg::register_an_oracle(RuntimeOrigin::root(), addr.SUDO_ORACLE_4, true), Error::<Test>::MaxNumOfSudoOraclesReached);
+		// Return Error due to maximum oracle sudo
+		assert_noop!(
+			Esg::register_an_oracle(RuntimeOrigin::root(), addr.SUDO_ORACLE_4, true),
+			Error::<Test>::MaxNumOfSudoOraclesReached
+		);
 
 		// Deregister oracle sudo
 		assert_ok!(Esg::deregister_an_oracle(RuntimeOrigin::root(), addr.SUDO_ORACLE_3, true));
 		let sudoes_after_deregister = Esg::get_oracle_sudo();
-		assert_eq!(sudoes_after_deregister, vec![addr.SUDO_ORACLE, addr.SUDO_ORACLE_2]);	
-		// Add oracle sudo again 
-		assert_ok!(Esg::register_an_oracle(RuntimeOrigin::root(), addr.SUDO_ORACLE_4, true));	
+		assert_eq!(sudoes_after_deregister, vec![addr.SUDO_ORACLE, addr.SUDO_ORACLE_2]);
+		// Add oracle sudo again
+		assert_ok!(Esg::register_an_oracle(RuntimeOrigin::root(), addr.SUDO_ORACLE_4, true));
 		let three_sudoes_after_registering = Esg::get_oracle_sudo();
-		assert_eq!(three_sudoes_after_registering, vec![addr.SUDO_ORACLE, addr.SUDO_ORACLE_2, addr.SUDO_ORACLE_4]);
+		assert_eq!(
+			three_sudoes_after_registering,
+			vec![addr.SUDO_ORACLE, addr.SUDO_ORACLE_2, addr.SUDO_ORACLE_4]
+		);
 
-
-
-		// Register sudo as an non-sudo oracle 
+		// Register sudo as an non-sudo oracle
 		assert_ok!(Esg::register_an_oracle(RuntimeOrigin::root(), addr.NON_SUDO_ORACLE, false));
 		let one_non_sudo = Esg::get_oracle_nsudo();
 		assert_eq!(one_non_sudo, vec![addr.NON_SUDO_ORACLE]);
@@ -691,8 +699,10 @@ fn it_must_fail_to_register_oracle_non_oracle_exceeding_maximum(){
 		let two_non_sudoes = Esg::get_oracle_nsudo();
 		assert_eq!(two_non_sudoes, vec![addr.NON_SUDO_ORACLE, addr.NON_SUDO_ORACLE_2]);
 
-		// Return Error due to maximum non oracle sudo 
-		assert_noop!(Esg::register_an_oracle(RuntimeOrigin::root(), addr.NON_SUDO_ORACLE_6, false), Error::<Test>::MaxNumOfNonSudoOraclesReached);
-
+		// Return Error due to maximum non oracle sudo
+		assert_noop!(
+			Esg::register_an_oracle(RuntimeOrigin::root(), addr.NON_SUDO_ORACLE_6, false),
+			Error::<Test>::MaxNumOfNonSudoOraclesReached
+		);
 	});
 }

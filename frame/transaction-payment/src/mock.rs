@@ -17,32 +17,23 @@
 
 use super::*;
 use crate as pallet_transaction_payment;
-use pallet_contracts::{
-	Frame,
-	Schedule,
-	chain_extension::{
-		Result as ExtensionResult,
-		ChainExtension,
-		Environment,
-		RetVal,
-		InitState,
-		Ext,
-		RegisteredChainExtension,
-		ReturnFlags,
-	},
-	DefaultAddressGenerator,
-};
-use sp_core::H256;
-use frame_support::traits::Contains;
-use sp_runtime::traits::{ BlakeTwo256, IdentityLookup };
 use frame_support::{
 	dispatch::DispatchClass,
 	parameter_types,
-	traits::{ ConstU32, ConstU64, Imbalance, OnUnbalanced },
-	weights::{ Weight, WeightToFee as WeightToFeeT },
+	traits::{ConstU32, ConstU64, Contains, Imbalance, OnUnbalanced},
+	weights::{Weight, WeightToFee as WeightToFeeT},
 };
 use frame_system as system;
 use pallet_balances::Call as BalancesCall;
+use pallet_contracts::{
+	chain_extension::{
+		ChainExtension, Environment, Ext, InitState, RegisteredChainExtension,
+		Result as ExtensionResult, RetVal, ReturnFlags,
+	},
+	DefaultAddressGenerator, Frame, Schedule,
+};
+use sp_core::H256;
+use sp_runtime::traits::{BlakeTwo256, IdentityLookup};
 
 type Block = frame_system::mocking::MockBlock<Runtime>;
 
@@ -58,9 +49,8 @@ frame_support::construct_runtime!(
 	}
 );
 
-pub(crate) const CALL: &<Runtime as frame_system::Config>::RuntimeCall = &RuntimeCall::Balances(
-	BalancesCall::transfer_allow_death { dest: 2, value: 69 }
-);
+pub(crate) const CALL: &<Runtime as frame_system::Config>::RuntimeCall =
+	&RuntimeCall::Balances(BalancesCall::transfer_allow_death { dest: 2, value: 69 });
 
 parameter_types! {
 	pub(crate) static ExtrinsicBaseWeight: Weight = Weight::zero();
@@ -69,8 +59,7 @@ parameter_types! {
 pub struct BlockWeights;
 impl Get<frame_system::limits::BlockWeights> for BlockWeights {
 	fn get() -> frame_system::limits::BlockWeights {
-		frame_system::limits::BlockWeights
-			::builder()
+		frame_system::limits::BlockWeights::builder()
 			.base_block(Weight::zero())
 			.for_class(DispatchClass::all(), |weights| {
 				weights.base_extrinsic = ExtrinsicBaseWeight::get().into();
@@ -134,9 +123,8 @@ impl WeightToFeeT for WeightToFee {
 	type Balance = u64;
 
 	fn weight_to_fee(weight: &Weight) -> Self::Balance {
-		Self::Balance::saturated_from(weight.ref_time()).saturating_mul(
-			WEIGHT_TO_FEE.with(|v| *v.borrow())
-		)
+		Self::Balance::saturated_from(weight.ref_time())
+			.saturating_mul(WEIGHT_TO_FEE.with(|v| *v.borrow()))
 	}
 }
 
@@ -144,9 +132,8 @@ impl WeightToFeeT for TransactionByteFee {
 	type Balance = u64;
 
 	fn weight_to_fee(weight: &Weight) -> Self::Balance {
-		Self::Balance::saturated_from(weight.ref_time()).saturating_mul(
-			TRANSACTION_BYTE_FEE.with(|v| *v.borrow())
-		)
+		Self::Balance::saturated_from(weight.ref_time())
+			.saturating_mul(TRANSACTION_BYTE_FEE.with(|v| *v.borrow()))
 	}
 }
 
@@ -180,7 +167,8 @@ impl Default for TestExtension {
 
 impl ChainExtension<Runtime> for TestExtension {
 	fn call<E>(&mut self, env: Environment<E, InitState>) -> ExtensionResult<RetVal>
-		where E: Ext<T = Runtime>
+	where
+		E: Ext<T = Runtime>,
 	{
 		let func_id = env.func_id();
 		let id = (env.ext_id() as u32) | (func_id as u32);
@@ -193,24 +181,24 @@ impl ChainExtension<Runtime> for TestExtension {
 					e.last_seen_buffer = input;
 				});
 				Ok(RetVal::Converging(id))
-			}
+			},
 			1 => {
 				let env = env.only_in();
 				TestExtensionTestValue::mutate(|e| {
 					e.last_seen_inputs = (env.val0(), env.val1(), env.val2(), env.val3());
 				});
 				Ok(RetVal::Converging(id))
-			}
+			},
 			2 => {
 				let mut env = env.buf_in_buf_out();
 				let weight = Weight::from_parts(0, 0);
 				env.charge_weight(weight)?;
 				Ok(RetVal::Converging(id))
-			}
+			},
 			3 => Ok(RetVal::Diverging { flags: ReturnFlags::REVERT, data: vec![42, 99] }),
 			_ => {
 				panic!("Passed unknown id to test chain extension: {}", func_id);
-			}
+			},
 		}
 	}
 
@@ -221,7 +209,8 @@ impl ChainExtension<Runtime> for TestExtension {
 
 impl ChainExtension<Runtime> for RevertingExtension {
 	fn call<E>(&mut self, _env: Environment<E, InitState>) -> ExtensionResult<RetVal>
-		where E: Ext<T = Runtime>
+	where
+		E: Ext<T = Runtime>,
 	{
 		Ok(RetVal::Diverging { flags: ReturnFlags::REVERT, data: vec![0x4b, 0x1d] })
 	}
@@ -243,7 +232,7 @@ parameter_types! {
 pub struct DealWithFees;
 impl OnUnbalanced<pallet_balances::NegativeImbalance<Runtime>> for DealWithFees {
 	fn on_unbalanceds<B>(
-		mut fees_then_tips: impl Iterator<Item = pallet_balances::NegativeImbalance<Runtime>>
+		mut fees_then_tips: impl Iterator<Item = pallet_balances::NegativeImbalance<Runtime>>,
 	) {
 		if let Some(fees) = fees_then_tips.next() {
 			FeeUnbalancedAmount::mutate(|a| {
@@ -309,22 +298,23 @@ impl RegisteredChainExtension<Runtime> for TempStorageExtension {
 
 impl ChainExtension<Runtime> for TempStorageExtension {
 	fn call<E>(&mut self, env: Environment<E, InitState>) -> ExtensionResult<RetVal>
-		where E: Ext<T = Runtime>
+	where
+		E: Ext<T = Runtime>,
 	{
 		let func_id = env.func_id();
 		match func_id {
 			0 => {
 				self.storage = 42;
-			}
+			},
 			1 => assert_eq!(self.storage, 42, "Storage is preserved inside the same call."),
 			2 => {
 				assert_eq!(self.storage, 0, "Storage is different for different calls.");
 				self.storage = 99;
-			}
+			},
 			3 => assert_eq!(self.storage, 99, "Storage is preserved inside the same call."),
 			_ => {
 				panic!("Passed unknown id to test chain extension: {}", func_id);
-			}
+			},
 		}
 		Ok(RetVal::Converging(0))
 	}
@@ -344,7 +334,8 @@ impl RegisteredChainExtension<Runtime> for DisabledExtension {
 
 impl ChainExtension<Runtime> for DisabledExtension {
 	fn call<E>(&mut self, _env: Environment<E, InitState>) -> ExtensionResult<RetVal>
-		where E: Ext<T = Runtime>
+	where
+		E: Ext<T = Runtime>,
 	{
 		panic!("Disabled chain extensions are never called")
 	}
@@ -378,7 +369,8 @@ impl pallet_contracts::Config for Runtime {
 	type CallStack = [Frame<Self>; 5];
 	type WeightPrice = Self;
 	type WeightInfo = ();
-	type ChainExtension = (TestExtension,DisabledExtension,RevertingExtension,TempStorageExtension);
+	type ChainExtension =
+		(TestExtension, DisabledExtension, RevertingExtension, TempStorageExtension);
 	type Schedule = MySchedule;
 	type DepositPerByte = DepositPerByte;
 	type DepositPerItem = DepositPerItem;

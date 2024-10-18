@@ -3,24 +3,17 @@
 
 use core::str::FromStr;
 
-use fp_account::AccountId20;
-use sp_core::Decode;
 use crate as pallet_esg;
-use frame_system as system;
-use sp_runtime::{
-	BuildStorage,
-	traits::{
-		BlakeTwo256, 
-		IdentityLookup
-	},
-};
+use fp_account::AccountId20;
 use frame_support::{
-	parameter_types, 
-	traits::{ConstU16, ConstU32, ConstU64}
+	parameter_types,
+	traits::{ConstU16, ConstU32, ConstU64},
 };
-use sp_core::{
-	H160, 
-	H256
+use frame_system as system;
+use sp_core::{Decode, H160, H256};
+use sp_runtime::{
+	traits::{BlakeTwo256, IdentityLookup},
+	BuildStorage,
 };
 
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -71,7 +64,7 @@ impl pallet_esg::Config for Test {
 	type MaxFileSize = MaxFileSize;
 	type MaxNumOfSudoOracles = MaxNumOfSudoOracles;
 	type MaxNumOfNonSudoOracles = MaxNumOfNonSudoOracles;
-	type WeightInfo =();
+	type WeightInfo = ();
 }
 
 pub fn new_test_ext() -> sp_io::TestExternalities {

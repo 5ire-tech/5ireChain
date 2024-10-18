@@ -320,8 +320,8 @@ use sp_staking::{
 use sp_std::{collections::btree_map::BTreeMap, prelude::*};
 pub use weights::WeightInfo;
 
-pub use pallet::{pallet::*, UseNominatorsAndValidatorsMap, UseValidatorsMap};
 use frame_support::pallet_prelude::DispatchError;
+pub use pallet::{pallet::*, UseNominatorsAndValidatorsMap, UseValidatorsMap};
 
 pub(crate) const LOG_TARGET: &str = "runtime::staking";
 
@@ -527,7 +527,7 @@ impl<T: Config> StakingLedger<T> {
 			}
 
 			if unlocking_balance >= value {
-				break
+				break;
 			}
 		}
 
@@ -564,7 +564,7 @@ impl<T: Config> StakingLedger<T> {
 		slash_era: EraIndex,
 	) -> BalanceOf<T> {
 		if slash_amount.is_zero() {
-			return Zero::zero()
+			return Zero::zero();
 		}
 
 		use sp_runtime::PerThing as _;
@@ -657,7 +657,7 @@ impl<T: Config> StakingLedger<T> {
 		let mut slashed_unlocking = BTreeMap::<_, _>::new();
 		for i in slash_chunks_priority {
 			if remaining_slash.is_zero() {
-				break
+				break;
 			}
 
 			if let Some(chunk) = self.unlocking.get_mut(i).defensive() {
@@ -665,7 +665,7 @@ impl<T: Config> StakingLedger<T> {
 				// write the new slashed value of this chunk to the map.
 				slashed_unlocking.insert(chunk.era, chunk.value);
 			} else {
-				break
+				break;
 			}
 		}
 
@@ -777,12 +777,11 @@ pub trait NominationsQuota<Balance> {
 
 ///rewars trait
 
-pub trait Rewards<AccountId>{
+pub trait Rewards<AccountId> {
 	fn payout_validators() -> Vec<AccountId>;
-	fn claim_rewards(account:AccountId) -> Result<(), DispatchError>;
+	fn claim_rewards(account: AccountId) -> Result<(), DispatchError>;
 	fn calculate_reward() -> sp_runtime::DispatchResult;
 }
-
 
 /// A nomination quota that allows up to MAX nominations for all validators.
 pub struct FixedNominationsQuota<const MAX: u32>;

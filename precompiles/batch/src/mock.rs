@@ -1,20 +1,20 @@
-
 use super::*;
 
-use frame_support::traits::Everything;
 use frame_support::{
-	construct_runtime, parameter_types, traits::FindAuthor, weights::Weight, ConsensusEngineId,
+	construct_runtime, parameter_types,
+	traits::{Everything, FindAuthor},
+	weights::Weight,
+	ConsensusEngineId,
 };
 use pallet_evm::{
-	EnsureAddressNever, EnsureAddressRoot, IsPrecompileResult, Precompile, PrecompileHandle,
-	PrecompileResult, PrecompileSet, IdentityAddressMapping
+	EnsureAddressNever, EnsureAddressRoot, IdentityAddressMapping, IsPrecompileResult, Precompile,
+	PrecompileHandle, PrecompileResult, PrecompileSet,
 };
 use precompile_utils::{mock_account, testing::MockAccount};
 use sp_core::H256;
-use sp_runtime::BuildStorage;
 use sp_runtime::{
 	traits::{BlakeTwo256, IdentityLookup},
-	Perbill,
+	BuildStorage, Perbill,
 };
 
 pub type AccountId = MockAccount;
@@ -108,7 +108,6 @@ impl<R: pallet_evm::Config> PrecompileSet for MockPrecompileSet<R> {
 }
 
 pub type PCall = BatchPrecompileCall<Runtime>;
-
 
 mock_account!(Batch, |_| MockAccount::from_u64(1));
 mock_account!(Revert, |_| MockAccount::from_u64(2));

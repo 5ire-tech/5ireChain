@@ -26,18 +26,9 @@ use syn::{
 };
 
 pub fn main(input: TokenStream) -> TokenStream {
-	let DeriveInput {
-		ident,
-		mut generics,
-		data,
-		..
-	} = parse_macro_input!(input as DeriveInput);
+	let DeriveInput { ident, mut generics, data, .. } = parse_macro_input!(input as DeriveInput);
 
-	let syn::Data::Struct(syn::DataStruct {
-		fields: syn::Fields::Named(fields),
-		..
-	}) = data
-	else {
+	let syn::Data::Struct(syn::DataStruct { fields: syn::Fields::Named(fields), .. }) = data else {
 		return quote_spanned! { ident.span() =>
 			compile_error!("Codec can only be derived for structs with named fields");
 		}
@@ -64,20 +55,15 @@ pub fn main(input: TokenStream) -> TokenStream {
 		.iter()
 		.map(|f| f.ident.as_ref().expect("None case checked above"))
 		.collect();
-	let fields_name_lit: Vec<_> = fields_ident
-		.iter()
-		.map(|i| LitStr::new(&i.to_string(), i.span()))
-		.collect();
+	let fields_name_lit: Vec<_> =
+		fields_ident.iter().map(|i| LitStr::new(&i.to_string(), i.span())).collect();
 
 	let evm_data_trait_path = {
 		let mut segments = Punctuated::<PathSegment, _>::new();
 		segments.push(Ident::new("precompile_utils", Span::call_site()).into());
 		segments.push(Ident::new("solidity", Span::call_site()).into());
 		segments.push(Ident::new("Codec", Span::call_site()).into());
-		Path {
-			leading_colon: Some(Default::default()),
-			segments,
-		}
+		Path { leading_colon: Some(Default::default()), segments }
 	};
 	let where_clause = generics.make_where_clause();
 

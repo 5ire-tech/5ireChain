@@ -78,15 +78,12 @@ use pallet_ethereum::{
 	Call::transact, PostLogContent, Transaction as EthereumTransaction, TransactionAction,
 	TransactionData,
 };
-use pallet_evm::{
-	Account as EVMAccount,  FeeCalculator, Runner,
-};
+use pallet_evm::{Account as EVMAccount, FeeCalculator, Runner};
 mod precompiles;
 use precompiles::FrontierPrecompiles;
 
 use sp_runtime::{
-	create_runtime_str,
-	generic, impl_opaque_keys,
+	create_runtime_str, generic, impl_opaque_keys,
 	traits::{
 		self, AccountIdConversion, BlakeTwo256, Block as BlockT, Bounded, ConvertInto,
 		DispatchInfoOf, Dispatchable, NumberFor, OpaqueKeys, PostDispatchInfoOf,
@@ -450,7 +447,7 @@ impl pallet_indices::Config for Runtime {
 }
 
 parameter_types! {
-	pub const ExistentialDeposit: Balance = 1; 
+	pub const ExistentialDeposit: Balance = 1;
 	// For weight estimation, we assume that the most locks on an individual account will be 50.
 	// This number may need to be adjusted in the future if this assumption no longer holds true.
 	pub const MaxLocks: u32 = 50;
@@ -542,7 +539,6 @@ impl pallet_session::historical::Config for Runtime {
 	type FullIdentificationOf = pallet_staking::ExposureOf<Runtime>;
 }
 
-
 parameter_types! {
 	pub const SessionsPerEra: sp_staking::SessionIndex = 6;
 	pub const BondingDuration: sp_staking::EraIndex = 28; // 14 days
@@ -601,11 +597,11 @@ impl pallet_staking::Config for Runtime {
 parameter_types! {
 	pub const EraMinutes:u32 = 720;
 	pub const DecimalPrecision:u32 = 18;
-	pub const TotalMinutesPerYear:u32 = 525600; 
+	pub const TotalMinutesPerYear:u32 = 525600;
 	pub const TotalReward :u32 = 20564830;
 }
 
-impl pallet_reward::Config for Runtime{
+impl pallet_reward::Config for Runtime {
 	type RewardCurrency = Balances;
 	type Balance = Balance;
 	type RuntimeEvent = RuntimeEvent;
@@ -616,7 +612,7 @@ impl pallet_reward::Config for Runtime{
 	type TotalMinutesPerYear = TotalMinutesPerYear;
 	type EraMinutes = EraMinutes;
 	type TotalReward = TotalReward;
-	type PalletId =RewardPalletId;
+	type PalletId = RewardPalletId;
 	type WeightInfo = pallet_reward::weights::SubstrateWeightInfo<Runtime>;
 }
 
@@ -1128,7 +1124,7 @@ parameter_types! {
 	pub const DataDepositPerByte: Balance = CENTS;
 	pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
 	pub const RewardPalletId: PalletId = PalletId(*b"py/rewrd");
-    pub const MaximumReasonLength: u32 = 300;
+	pub const MaximumReasonLength: u32 = 300;
 	pub const MaxApprovals: u32 = 100;
 	pub const MaxBalance: Balance = Balance::max_value();
 }
@@ -2555,7 +2551,6 @@ pub mod migrations {
 	/// Unreleased migrations. Add new ones here:
 	pub type Unreleased = ();
 }
-
 
 /// Executive: handles dispatch to the various modules.
 pub type Executive = frame_executive::Executive<

@@ -17,6 +17,7 @@
 
 //! Implementations for the Staking FRAME Pallet.
 
+use crate::Rewards;
 use frame_election_provider_support::{
 	bounds::{CountBound, SizeBound},
 	data_provider, BoundedSupportsOf, DataProviderBounds, ElectionDataProvider, ElectionProvider,
@@ -26,13 +27,12 @@ use frame_support::{
 	defensive,
 	pallet_prelude::*,
 	traits::{
-		Currency, Defensive,EstimateNextNewSession, Get,
-		LockableCurrency, OnUnbalanced, TryCollect, UnixTime, WithdrawReasons,
+		Currency, Defensive, EstimateNextNewSession, Get, LockableCurrency, OnUnbalanced,
+		TryCollect, UnixTime, WithdrawReasons,
 	},
 	weights::Weight,
 };
 use pallet_esg::traits::ERScoresTrait;
-use crate::{Rewards};
 
 use frame_system::{pallet_prelude::BlockNumberFor, RawOrigin};
 use pallet_session::historical;
@@ -50,8 +50,8 @@ use sp_std::prelude::*;
 use crate::{
 	election_size_tracker::StaticTracker, log, slashing, weights::WeightInfo, ActiveEraInfo,
 	BalanceOf, EraPayout, Exposure, ExposureOf, Forcing, IndividualExposure, MaxNominationsOf,
-	MaxWinnersOf, Nominations, NominationsQuota, RewardDestination,
-	SessionInterface, StakingLedger, ValidatorPrefs,
+	MaxWinnersOf, Nominations, NominationsQuota, RewardDestination, SessionInterface,
+	StakingLedger, ValidatorPrefs,
 };
 
 use super::{pallet::*, STAKING_ID};
@@ -141,7 +141,7 @@ impl<T: Config> Pallet<T> {
 
 		Ok(used_weight)
 	}
-    /// Update the ledger for a controller.
+	/// Update the ledger for a controller.
 	///
 	/// This will also update the stash lock.
 	pub(crate) fn update_ledger(controller: &T::AccountId, ledger: &StakingLedger<T>) {
@@ -185,7 +185,7 @@ impl<T: Config> Pallet<T> {
 				_ => {
 					// Either `Forcing::ForceNone`,
 					// or `Forcing::NotForcing if era_length >= T::SessionsPerEra::get()`.
-					return None
+					return None;
 				},
 			}
 
@@ -402,7 +402,7 @@ impl<T: Config> Pallet<T> {
 			}
 
 			Self::deposit_event(Event::StakingElectionFailed);
-			return None
+			return None;
 		}
 
 		Self::deposit_event(Event::StakersElected);
@@ -565,7 +565,7 @@ impl<T: Config> Pallet<T> {
 	///
 	/// COMPLEXITY: Complexity is `number_of_validator_to_reward x current_elected_len`.
 	pub fn reward_by_ids(validators_points: impl IntoIterator<Item = (T::AccountId, u32)>) {
-	let reward =	if let Some(active_era) = Self::active_era() {
+		let reward = if let Some(active_era) = Self::active_era() {
 			<ErasRewardPoints<T>>::mutate(active_era.index, |era_rewards| {
 				for (validator, points) in validators_points.into_iter() {
 					*era_rewards.individual.entry(validator).or_default() += points;
@@ -647,7 +647,7 @@ impl<T: Config> Pallet<T> {
 			// if voter weight is zero, do not consider this voter for the snapshot.
 			if voter_weight.is_zero() {
 				log!(debug, "voter's active balance is 0. skip this voter.");
-				continue
+				continue;
 			}
 
 			if let Some(Nominations { targets, .. }) = <Nominators<T>>::get(&voter) {
@@ -662,7 +662,7 @@ impl<T: Config> Pallet<T> {
 						Self::deposit_event(Event::<T>::SnapshotVotersSizeExceeded {
 							size: voters_size_tracker.size as u32,
 						});
-						break
+						break;
 					}
 
 					all_voters.push(voter);
@@ -687,7 +687,7 @@ impl<T: Config> Pallet<T> {
 					Self::deposit_event(Event::<T>::SnapshotVotersSizeExceeded {
 						size: voters_size_tracker.size as u32,
 					});
-					break
+					break;
 				}
 				all_voters.push(self_vote);
 				validators_taken.saturating_inc();
@@ -756,7 +756,7 @@ impl<T: Config> Pallet<T> {
 				Self::deposit_event(Event::<T>::SnapshotTargetsSizeExceeded {
 					size: targets_size_tracker.size as u32,
 				});
-				break
+				break;
 			}
 
 			if Validators::<T>::contains_key(&target) {
@@ -910,7 +910,7 @@ impl<T: Config> ElectionDataProvider for Pallet<T> {
 		// We can't handle this case yet -- return an error. WIP to improve handling this case in
 		// <https://github.com/paritytech/substrate/pull/13195>.
 		if bounds.exhausted(None, CountBound(T::TargetList::count() as u32).into()) {
-			return Err("Target snapshot too big")
+			return Err("Target snapshot too big");
 		}
 
 		debug_assert!(!bounds.exhausted(
@@ -1186,7 +1186,7 @@ where
 			add_db_reads_writes(1, 0);
 			if active_era.is_none() {
 				// This offence need not be re-submitted.
-				return consumed_weight
+				return consumed_weight;
 			}
 			active_era.expect("value checked not to be `None`; qed").index
 		};
@@ -1227,7 +1227,7 @@ where
 
 			// Skip if the validator is invulnerable.
 			if invulnerables.contains(stash) {
-				continue
+				continue;
 			}
 
 			let unapplied = slashing::compute_slash::<T>(slashing::SlashParams {
@@ -1575,7 +1575,7 @@ impl<T: Config> StakingInterface for Pallet<T> {
 	) -> Result<sp_staking::StakerStatus<Self::AccountId>, DispatchError> {
 		let is_bonded = Self::bonded(who).is_some();
 		if !is_bonded {
-			return Err(Error::<T>::NotStash.into())
+			return Err(Error::<T>::NotStash.into());
 		}
 
 		let is_validator = Validators::<T>::contains_key(&who);

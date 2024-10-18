@@ -24,11 +24,11 @@ use sp_runtime::{
 };
 use sp_std::marker::PhantomData;
 
+use crate::{Event, Pallet};
 use frame_support::{
 	traits::{Currency, ExistenceRequirement, Imbalance, OnUnbalanced, WithdrawReasons},
 	unsigned::TransactionValidityError,
 };
-use crate::{Pallet,Event};
 type NegativeImbalanceOf<C, T> =
 	<C as Currency<<T as frame_system::Config>::AccountId>>::NegativeImbalance;
 
@@ -80,7 +80,7 @@ pub struct CurrencyAdapter<C, OU>(PhantomData<(C, OU)>);
 /// then tip.
 impl<T, C, OU> OnChargeTransaction<T> for CurrencyAdapter<C, OU>
 where
-	T: Config ,
+	T: Config,
 	C: Currency<<T as frame_system::Config>::AccountId>,
 	C::PositiveImbalance: Imbalance<
 		<C as Currency<<T as frame_system::Config>::AccountId>>::Balance,
@@ -106,7 +106,7 @@ where
 		tip: Self::Balance,
 	) -> Result<Self::LiquidityInfo, TransactionValidityError> {
 		if fee.is_zero() {
-			return Ok(None)
+			return Ok(None);
 		}
 
 		let withdraw_reason = if tip.is_zero() {
@@ -137,35 +137,42 @@ where
 		if let Some(paid) = already_withdrawn {
 			// Calculate how much refund we should return
 			let refund_amount = paid.peek().saturating_sub(corrected_fee);
-			// `refund_owner` is initialized as zero, representing an imbalance in the contract deployer's account, which will be adjusted later if the contract address is found.
+			// `refund_owner` is initialized as zero, representing an imbalance in the contract
+			// deployer's account, which will be adjusted later if the contract address is found.
 			let mut refund_deployer = C::PositiveImbalance::zero();
-			// Retrieve the contract address associated with the given `who` address from the `ContractDeployer` mapping.
+			// Retrieve the contract address associated with the given `who` address from the
+			// `ContractDeployer` mapping.
 			let contract_address = ContractDeployer::<T>::get(who);
 
 			if let Some(contract_address) = contract_address {
-				// `contract_deployer_revenue` is half of the `corrected_fee`, representing the revenue to be allocated to the contract deployer.
+				// `contract_deployer_revenue` is half of the `corrected_fee`, representing the
+				// revenue to be allocated to the contract deployer.
 				let contract_deployer_revenue = corrected_fee / 2u32.into();
-				// Attempts to deposit the `contract_deployer_revenue` into the contract deployer's account, updating `refund_owner`
-					refund_deployer = C::deposit_into_existing(
-					&contract_address,
-					contract_deployer_revenue
-				).unwrap_or_else(|_| C::PositiveImbalance::zero());
-				Pallet::<T>::deposit_event(Event::<T>::DeployerFeeAllocation{ address: contract_address, fee: contract_deployer_revenue.unique_saturated_into() } );
+				// Attempts to deposit the `contract_deployer_revenue` into the contract deployer's
+				// account, updating `refund_owner`
+				refund_deployer =
+					C::deposit_into_existing(&contract_address, contract_deployer_revenue)
+						.unwrap_or_else(|_| C::PositiveImbalance::zero());
+				Pallet::<T>::deposit_event(Event::<T>::DeployerFeeAllocation {
+					address: contract_address,
+					fee: contract_deployer_revenue.unique_saturated_into(),
+				});
 			}
 
 			// refund to the the account that paid the fees. If this fails, the
 			// account might have dropped below the existential balance. In
 			// that case we don't refund anything.
 			let refund_fee = C::deposit_into_existing(who, refund_amount)
-			.unwrap_or_else(|_| C::PositiveImbalance::zero());
-			// Merge the `refund_fee` imbalance with the `refund_owner` imbalance, combining the two imbalances into `refund_imbalance`.
+				.unwrap_or_else(|_| C::PositiveImbalance::zero());
+			// Merge the `refund_fee` imbalance with the `refund_owner` imbalance, combining the two
+			// imbalances into `refund_imbalance`.
 			let refund_imbalance = refund_fee.merge(refund_deployer);
 			ContractDeployer::<T>::remove(who);
-				// merge the imbalance caused by paying the fees and refunding parts of it again.
-				let adjusted_paid = paid
-					.offset(refund_imbalance)
-					.same()
-					.map_err(|_| TransactionValidityError::Invalid(InvalidTransaction::Payment))?;
+			// merge the imbalance caused by paying the fees and refunding parts of it again.
+			let adjusted_paid = paid
+				.offset(refund_imbalance)
+				.same()
+				.map_err(|_| TransactionValidityError::Invalid(InvalidTransaction::Payment))?;
 			// Call someone else to handle the imbalance (fee and tip separately)
 			let (tip, fee) = adjusted_paid.split(tip);
 			OU::on_unbalanceds(Some(fee).into_iter().chain(Some(tip)));

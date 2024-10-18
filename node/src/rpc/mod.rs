@@ -32,12 +32,12 @@
 
 use std::sync::Arc;
 
+use firechain_runtime_core_primitives::opaque::AccountId;
 use grandpa::{
 	FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState,
 };
 use jsonrpsee::RpcModule;
 use node_primitives::{Balance, Block, BlockNumber, Hash, Nonce};
-use firechain_runtime_core_primitives::opaque::AccountId;
 // use firechain_runtime_core_primitives::opaque::{
 // 	AccountId, AccountIndex, Balance, BlockNumber, Hash, Header, Moment, Nonce, Signature,
 // };
