@@ -29,3 +29,11 @@ Then:
 ```sh
 ./scripts/generate-session-keys.sh
 ```
+
+### Run integration tests  local 
+
+
+Execute the `run-integration-tests` script:
+```sh
+./scripts/run-integration-tests.sh
+```
