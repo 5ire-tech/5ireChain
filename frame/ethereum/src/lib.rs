@@ -133,7 +133,7 @@ where
 	) -> Option<Result<(), TransactionValidityError>> {
 		if let Call::transact { transaction } = self {
 			if let Err(e) = CheckWeight::<T>::do_pre_dispatch(dispatch_info, len) {
-				return Some(Err(e))
+				return Some(Err(e));
 			}
 
 			Some(Pallet::<T>::validate_transaction_in_block(*origin, transaction))
@@ -150,7 +150,7 @@ where
 	) -> Option<TransactionValidity> {
 		if let Call::transact { transaction } = self {
 			if let Err(e) = CheckWeight::<T>::do_validate(dispatch_info, len) {
-				return Some(Err(e))
+				return Some(Err(e));
 			}
 
 			Some(Pallet::<T>::validate_transaction_in_pool(*origin, transaction))
@@ -509,7 +509,7 @@ impl<T: Config> Pallet<T> {
 		// on trnasaction execution, otherwise a contract tx will be included in
 		// the mempool and pollute the mempool forever.
 		if !pallet_evm::AccountCodes::<T>::get(origin).is_empty() {
-			return Err(InvalidTransaction::BadSigner.into())
+			return Err(InvalidTransaction::BadSigner.into());
 		}
 
 		let priority = match (

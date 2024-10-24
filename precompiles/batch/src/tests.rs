@@ -1,18 +1,19 @@
-use crate::mock::{
-	balance, Batch, ExtBuilder, MockPrecompileSet, PCall, PrecompilesValue, Revert, Runtime,
-	RuntimeCall, RuntimeOrigin,
-};
 use crate::{
-	log_subcall_failed, log_subcall_succeeded, Mode, LOG_SUBCALL_FAILED, LOG_SUBCALL_SUCCEEDED,
+	log_subcall_failed, log_subcall_succeeded,
+	mock::{
+		balance, Batch, ExtBuilder, MockPrecompileSet, PCall, PrecompilesValue, Revert, Runtime,
+		RuntimeCall, RuntimeOrigin,
+	},
+	Mode, LOG_SUBCALL_FAILED, LOG_SUBCALL_SUCCEEDED,
 };
 use fp_evm::ExitError;
 use frame_support::assert_ok;
 use pallet_evm::Call as EvmCall;
-use precompile_utils::solidity::revert::revert_as_bytes;
-use precompile_utils::{evm::costs::call_cost, prelude::*, testing::*};
+use precompile_utils::{
+	evm::costs::call_cost, prelude::*, solidity::revert::revert_as_bytes, testing::*,
+};
 use sp_core::{H160, H256, U256};
-use sp_runtime::DispatchError;
-use sp_runtime::{traits::Dispatchable, DispatchErrorWithPostInfo, ModuleError};
+use sp_runtime::{traits::Dispatchable, DispatchError, DispatchErrorWithPostInfo, ModuleError};
 
 fn evm_call(from: impl Into<H160>, input: Vec<u8>) -> EvmCall<Runtime> {
 	EvmCall::call {
@@ -864,7 +865,6 @@ fn evm_batch_recursion_under_limit() {
 			assert_eq!(balance(Bob), 1_000);
 		})
 }
-
 
 #[test]
 fn batch_not_callable_by_smart_contract() {

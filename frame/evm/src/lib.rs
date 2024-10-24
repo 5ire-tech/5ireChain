@@ -473,7 +473,7 @@ pub mod pallet {
 		/// applied.
 		ExecutedFailed { address: H160 },
 		/// 50% of caller fees are allocated to the contract deployer
-		DeployerFeeAllocation { address: H160, fee:U256 },
+		DeployerFeeAllocation { address: H160, fee: U256 },
 	}
 
 	#[pallet::error]
@@ -805,7 +805,7 @@ impl<T: Config> Pallet<T> {
 	/// Create an account.
 	pub fn create_account(address: H160, code: Vec<u8>) {
 		if code.is_empty() {
-			return
+			return;
 		}
 
 		if !<AccountCodes<T>>::contains_key(address) {
@@ -824,7 +824,7 @@ impl<T: Config> Pallet<T> {
 	/// or compute it from code and store it if it doesn't exist.
 	pub fn account_code_metadata(address: H160) -> CodeMetadata {
 		if let Some(meta) = <AccountCodesMetadata<T>>::get(address) {
-			return meta
+			return meta;
 		}
 
 		let code = <AccountCodes<T>>::get(address);
@@ -835,7 +835,7 @@ impl<T: Config> Pallet<T> {
 			const EMPTY_CODE_HASH: [u8; 32] = hex_literal::hex!(
 				"c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
 			);
-			return CodeMetadata { size: 0, hash: EMPTY_CODE_HASH.into() }
+			return CodeMetadata { size: 0, hash: EMPTY_CODE_HASH.into() };
 		}
 
 		let meta = CodeMetadata::from_code(&code);
@@ -872,8 +872,6 @@ impl<T: Config> Pallet<T> {
 		let pre_runtime_digests = digest.logs.iter().filter_map(|d| d.as_pre_runtime());
 
 		T::Author::find_author(pre_runtime_digests).unwrap_or_default()
-
-	
 	}
 }
 
@@ -929,7 +927,7 @@ where
 
 	fn withdraw_fee(who: &H160, fee: U256) -> Result<Self::LiquidityInfo, Error<T>> {
 		if fee.is_zero() {
-			return Ok(None)
+			return Ok(None);
 		}
 		let account_id = T::AddressMapping::into_account_id(*who);
 		let imbalance = C::withdraw(
@@ -947,39 +945,45 @@ where
 		corrected_fee: U256,
 		base_fee: U256,
 		already_withdrawn: Self::LiquidityInfo,
-		target: Option<H160>
+		target: Option<H160>,
 	) -> Self::LiquidityInfo {
 		if let Some(paid) = already_withdrawn {
 			let account_id = T::AddressMapping::into_account_id(*who);
 
 			// Calculate how much refund we should return
 			let refund_amount = paid.peek().saturating_sub(corrected_fee.unique_saturated_into());
-			// `contract_deployer_revenue` is half of the `corrected_fee`, representing the revenue to be allocated to the contract deployer.
+			// `contract_deployer_revenue` is half of the `corrected_fee`, representing the revenue
+			// to be allocated to the contract deployer.
 			let contract_deployer_revenue = corrected_fee / 2;
-			// deployer_imbalance` is initialized as zero, representing an imbalance in the contract deployer's 
-			// account, which will be adjusted later if the contract owner is found.
+			// deployer_imbalance` is initialized as zero, representing an imbalance in the contract
+			// deployer's account, which will be adjusted later if the contract owner is found.
 			let mut deployer_imbalance = C::PositiveImbalance::zero();
-				if let Some(target_address) = target {
-					  // If target_address` exists in the `ContractDeployer` mapping, retrieve the contract owner.
-					if let Some(contract_owner) = ContractDeployer::<T>::get(target_address) {
-						// Converts the `contract_owner` address into an account ID format.
-						let owner = T::AddressMapping::into_account_id(contract_owner);
-						  // Attempts to deposit the `contract_deployer_revenue` into the owner's account, updating 
-       					 // `deployer_imbalance`
-						deployer_imbalance = C::deposit_into_existing(
-							&owner,
-							contract_deployer_revenue.unique_saturated_into()
-						).unwrap_or_else(|_| C::PositiveImbalance::zero());
-						Pallet::<T>::deposit_event(Event::<T>::DeployerFeeAllocation { address: contract_owner, fee: contract_deployer_revenue });
-					} else {
-						deployer_imbalance = C::PositiveImbalance::zero();
-					}
+			if let Some(target_address) = target {
+				// If target_address` exists in the `ContractDeployer` mapping, retrieve the
+				// contract owner.
+				if let Some(contract_owner) = ContractDeployer::<T>::get(target_address) {
+					// Converts the `contract_owner` address into an account ID format.
+					let owner = T::AddressMapping::into_account_id(contract_owner);
+					// Attempts to deposit the `contract_deployer_revenue` into the owner's account,
+					// updating `deployer_imbalance`
+					deployer_imbalance = C::deposit_into_existing(
+						&owner,
+						contract_deployer_revenue.unique_saturated_into(),
+					)
+					.unwrap_or_else(|_| C::PositiveImbalance::zero());
+					Pallet::<T>::deposit_event(Event::<T>::DeployerFeeAllocation {
+						address: contract_owner,
+						fee: contract_deployer_revenue,
+					});
+				} else {
+					deployer_imbalance = C::PositiveImbalance::zero();
 				}
+			}
 			// refund to the account that paid the fees. If this fails, the
 			// account might have dropped below the existential balance. In
 			// that case we don't refund anything.
 			let refund_fee = C::deposit_into_existing(&account_id, refund_amount)
-			.unwrap_or_else(|_| C::PositiveImbalance::zero());
+				.unwrap_or_else(|_| C::PositiveImbalance::zero());
 
 			let refund_imbalance = refund_fee.merge(deployer_imbalance);
 
@@ -1010,7 +1014,7 @@ where
 			let (base_fee, tip) = adjusted_paid.split(base_fee.unique_saturated_into());
 			// Handle base fee. Can be either burned, rationed, etc ...
 			OU::on_unbalanced(base_fee);
-			return Some(tip)
+			return Some(tip);
 		}
 		None
 	}
@@ -1020,7 +1024,7 @@ where
 		if let Some(tip) = tip {
 			let author = pallet_authorship::Pallet::<T>::author().unwrap();
 
-		   let _=C::resolve_creating(&author, tip);
+			let _ = C::resolve_creating(&author, tip);
 		}
 	}
 }

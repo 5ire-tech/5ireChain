@@ -31,7 +31,6 @@ alice_start=(
 	--rpc-port 9934
 	--validator
 	--rpc-cors=all
-	--execution native
 )
 
 bob_start=(
@@ -42,7 +41,6 @@ bob_start=(
 	--port 30335
 	--rpc-port 9935
 	--validator
-	--execution native
 	--bootnodes "/ip4/127.0.0.1/tcp/30334/p2p/12D3KooWBBUaVWE5SYj3UvnoXojfS8fvPorw5biRDaDQV7XXwCXm"
 )
 

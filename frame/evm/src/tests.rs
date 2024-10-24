@@ -241,7 +241,8 @@ mod proof_size_test {
 			let expected_proof_size = ((read_account_metadata * 2) +
 				reading_contract_len +
 				reading_main_contract_len +
-				is_empty_check + increase_nonce) as u64;
+				is_empty_check +
+				increase_nonce) as u64;
 
 			let actual_proof_size = result
 				.weight_info
@@ -298,7 +299,8 @@ mod proof_size_test {
 			let expected_proof_size = (basic_account_size +
 				read_account_metadata +
 				reading_main_contract_len +
-				is_empty_check + increase_nonce) as u64;
+				is_empty_check +
+				increase_nonce) as u64;
 
 			let actual_proof_size = result
 				.weight_info
@@ -393,7 +395,8 @@ mod proof_size_test {
 			let reading_main_contract_len =
 				AccountCodes::<Test>::get(call_contract_address).len() as u64;
 			let expected_proof_size = reading_main_contract_len +
-				WRITE_PROOF_SIZE + ACCOUNT_CODES_METADATA_PROOF_SIZE +
+				WRITE_PROOF_SIZE +
+				ACCOUNT_CODES_METADATA_PROOF_SIZE +
 				ACCOUNT_STORAGE_PROOF_SIZE +
 				IS_EMPTY_CHECK_PROOF_SIZE +
 				(ACCOUNT_BASIC_PROOF_SIZE * 2);
@@ -523,7 +526,8 @@ mod proof_size_test {
 			let expected_proof_size = ((read_account_metadata * 2) +
 				reading_callee_contract_len +
 				reading_main_contract_len +
-				is_empty_check + increase_nonce) as u64;
+				is_empty_check +
+				increase_nonce) as u64;
 
 			let actual_proof_size = result
 				.weight_info

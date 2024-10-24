@@ -6,7 +6,6 @@ pub use pallet::*;
 mod mock;
 
 #[cfg(test)]
-
 pub mod tests;
 
 pub mod traits;
@@ -22,19 +21,18 @@ pub trait Sustainability<AccountId> {
 
 #[frame_support::pallet]
 pub mod pallet {
+	use crate::{traits::ERScoresTrait, weights::WeightInfo};
+	use core::{num::IntErrorKind, str::FromStr};
 	use fp_account::AccountId20;
-use frame_support::{
-		WeakBoundedVec,
+	use frame_support::{
 		pallet_prelude::{DispatchResult, *},
+		WeakBoundedVec,
 	};
+	use frame_system::pallet_prelude::*;
+	use serde_json::Value;
 	use sp_core::H160;
 	use sp_std::vec::Vec;
-	use serde_json::Value;
-	use core::str::FromStr;
-	use core::num::IntErrorKind;
-	use frame_system::pallet_prelude::*;
-	use crate::{traits::ERScoresTrait, weights::WeightInfo};
-	
+
 	const MAX_ESG_SCORE: u16 = 100;
 	const ACC_KEY: &str = "account";
 	const SCORE_KEY: &str = "score";
@@ -46,11 +44,11 @@ use frame_support::{
 	#[pallet::config]
 	pub trait Config: frame_system::Config {
 		#[pallet::constant]
-		type MaxFileSize: Get<u32>;	
+		type MaxFileSize: Get<u32>;
 		#[pallet::constant]
 		type MaxNumOfSudoOracles: Get<u32>;
 		#[pallet::constant]
-		type MaxNumOfNonSudoOracles: Get<u32>;	
+		type MaxNumOfNonSudoOracles: Get<u32>;
 		type WeightInfo: WeightInfo;
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 	}
@@ -58,28 +56,39 @@ use frame_support::{
 	#[pallet::storage]
 	#[pallet::getter(fn get_oracle_sudo)]
 	pub type SudoOraclesStore<T> =
-	StorageValue<_, Vec<<T as frame_system::Config>::AccountId>, ValueQuery>;
-	
+		StorageValue<_, Vec<<T as frame_system::Config>::AccountId>, ValueQuery>;
+
 	#[pallet::storage]
 	#[pallet::getter(fn get_oracle_nsudo)]
 	pub type NonSudoOraclesStore<T> =
-	StorageValue<_, Vec<<T as frame_system::Config>::AccountId>, ValueQuery>;
-	
+		StorageValue<_, Vec<<T as frame_system::Config>::AccountId>, ValueQuery>;
+
 	#[pallet::storage]
 	#[pallet::getter(fn get_score_of)]
 	pub type ESGScoresMap<T> =
 		StorageMap<_, Blake2_128Concat, <T as frame_system::Config>::AccountId, u16, ValueQuery>;
-	
+
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
-		ESGStored { caller: <T as frame_system::Config>::AccountId },
+		ESGStored {
+			caller: <T as frame_system::Config>::AccountId,
+		},
 
-		OracleDeRegistered { is_sudo: bool, oracle: <T as frame_system::Config>::AccountId },
-		
-		NewOracleRegistered { is_sudo: bool, oracle: <T as frame_system::Config>::AccountId },
+		OracleDeRegistered {
+			is_sudo: bool,
+			oracle: <T as frame_system::Config>::AccountId,
+		},
 
-		ESGStoredWithSkip { caller: <T as frame_system::Config>::AccountId, skipped_indeces: Vec<u16> },
+		NewOracleRegistered {
+			is_sudo: bool,
+			oracle: <T as frame_system::Config>::AccountId,
+		},
+
+		ESGStoredWithSkip {
+			caller: <T as frame_system::Config>::AccountId,
+			skipped_indeces: Vec<u16>,
+		},
 	}
 
 	#[pallet::error]
@@ -96,14 +105,16 @@ use frame_support::{
 	}
 
 	impl<T: Config> Pallet<T> {
-		
 		fn not_valid_addr(ip: &[u8]) -> bool {
 			ip.len() != 42 ||
-			!ip.starts_with(b"0x") ||
-			!ip[2..].iter().all(|&c| c.is_ascii_hexdigit())
+				!ip.starts_with(b"0x") ||
+				!ip[2..].iter().all(|&c| c.is_ascii_hexdigit())
 		}
 
-		fn try_resolve(origin: &OriginFor<T>, oracle: &<T as frame_system::Config>::AccountId) -> (Option<<T as frame_system::Config>::AccountId>, bool) {
+		fn try_resolve(
+			origin: &OriginFor<T>,
+			oracle: &<T as frame_system::Config>::AccountId,
+		) -> (Option<<T as frame_system::Config>::AccountId>, bool) {
 			match origin.clone().into() {
 				Ok(frame_system::RawOrigin::Root) => (Some(oracle.clone()), true),
 				Ok(frame_system::RawOrigin::Signed(id)) => (Some(id), false),
@@ -120,7 +131,10 @@ use frame_support::{
 			<SudoOraclesStore<T>>::get().contains(oracle)
 		}
 
-		fn store_oracle(oracle: &<T as frame_system::Config>::AccountId, is_sudo: bool) -> DispatchResult{
+		fn store_oracle(
+			oracle: &<T as frame_system::Config>::AccountId,
+			is_sudo: bool,
+		) -> DispatchResult {
 			let fn_mutate = |oracles: &mut Vec<<T as frame_system::Config>::AccountId>| {
 				oracles.push(oracle.clone())
 			};
@@ -128,39 +142,40 @@ use frame_support::{
 			match is_sudo {
 				true => {
 					let max_num_of_sudo_oracles = T::MaxNumOfSudoOracles::get();
-					let num_of_sudo_oracles_stored = <SudoOraclesStore<T>>::decode_len().unwrap_or_default() as u32;
+					let num_of_sudo_oracles_stored =
+						<SudoOraclesStore<T>>::decode_len().unwrap_or_default() as u32;
 					if max_num_of_sudo_oracles > num_of_sudo_oracles_stored {
 						<SudoOraclesStore<T>>::mutate(fn_mutate);
 						return Ok(());
-					}
-					else {
+					} else {
 						return Err(Error::<T>::MaxNumOfSudoOraclesReached.into());
-					} 
-
+					}
 				},
 
 				false => {
 					let max_num_of_non_sudo_oracles = T::MaxNumOfNonSudoOracles::get();
-					let num_of_non_sudo_oracles_stored = <NonSudoOraclesStore<T>>::decode_len().unwrap_or_default() as u32;
+					let num_of_non_sudo_oracles_stored =
+						<NonSudoOraclesStore<T>>::decode_len().unwrap_or_default() as u32;
 
 					if max_num_of_non_sudo_oracles > num_of_non_sudo_oracles_stored {
 						<NonSudoOraclesStore<T>>::mutate(fn_mutate);
 						return Ok(());
-					} 
-					else {
+					} else {
 						return Err(Error::<T>::MaxNumOfNonSudoOraclesReached.into());
 					}
-
 				},
 			}
 		}
 
-		fn un_store_oracle(oracle: &<T as frame_system::Config>::AccountId, is_sudo: bool) -> DispatchResult {
+		fn un_store_oracle(
+			oracle: &<T as frame_system::Config>::AccountId,
+			is_sudo: bool,
+		) -> DispatchResult {
 			let fn_mutate = |oracles: &mut Vec<<T as frame_system::Config>::AccountId>| {
 				for (i, orc) in oracles.iter().enumerate() {
 					if orc.eq(oracle) {
 						oracles.remove(i);
-						return Ok(())
+						return Ok(());
 					}
 				}
 				Err(Error::<T>::OracleNotExist.into())
@@ -188,19 +203,19 @@ use frame_support::{
 				.clamp(0, MAX_ESG_SCORE)
 		}
 
-		pub fn try_parse_addr(acc_val: Option<&serde_json::Value>) -> Option<<T as frame_system::Config>::AccountId> {
+		pub fn try_parse_addr(
+			acc_val: Option<&serde_json::Value>,
+		) -> Option<<T as frame_system::Config>::AccountId> {
 			let acc = acc_val.unwrap_or(&Value::Null).as_str().unwrap_or("");
 
 			if Self::not_valid_addr(acc.as_bytes()) {
-				return None
+				return None;
 			}
 
 			H160::from_str(&acc[2..])
-			.map(Into::into)
-			.ok()
-			.and_then(|acc_id: AccountId20| {
-				T::AccountId::decode(&mut acc_id.as_ref()).ok()
-			})
+				.map(Into::into)
+				.ok()
+				.and_then(|acc_id: AccountId20| T::AccountId::decode(&mut acc_id.as_ref()).ok())
 		}
 	}
 
@@ -215,7 +230,7 @@ use frame_support::{
 			let signer = ensure_signed(origin)?;
 
 			if !Self::is_an_oracle(&signer) {
-				return Err(Error::<T>::CallerNotAnOracle.into())
+				return Err(Error::<T>::CallerNotAnOracle.into());
 			}
 
 			let converted_string = core::str::from_utf8(&json_str_bytes)
@@ -230,8 +245,9 @@ use frame_support::{
 
 			esg_data.iter().enumerate().for_each(|(i, ed)| {
 				match Self::try_parse_addr(ed.get(ACC_KEY)) {
-					Some(id) =>
-						<ESGScoresMap<T>>::mutate(&id, |v| *v = Self::parse_score(ed.get(SCORE_KEY))),
+					Some(id) => <ESGScoresMap<T>>::mutate(&id, |v| {
+						*v = Self::parse_score(ed.get(SCORE_KEY))
+					}),
 					// acc_id is either invalid or
 					// not found in json data under current index
 					None => skipped_indeces.push(i as u16),
@@ -243,7 +259,7 @@ use frame_support::{
 					skipped_indeces,
 					caller: signer.clone(),
 				});
-				return Ok(())
+				return Ok(());
 			}
 			Self::deposit_event(Event::ESGStored { caller: signer.clone() });
 			Ok(())
@@ -265,13 +281,13 @@ use frame_support::{
 			};
 
 			if Self::is_an_oracle(&oracle) {
-				return Err(Error::<T>::OracleRegisteredAlready.into())
+				return Err(Error::<T>::OracleRegisteredAlready.into());
 			}
 
 			if is_root || Self::is_sudo_oracle(&acc_id) {
 				let _ = Self::store_oracle(&oracle, is_sudo_oracle)?;
 			} else {
-				return Err(Error::<T>::CallerNotRootOrSudoOracle.into())
+				return Err(Error::<T>::CallerNotRootOrSudoOracle.into());
 			}
 			Self::deposit_event(Event::NewOracleRegistered {
 				oracle: oracle.clone(),
@@ -290,11 +306,11 @@ use frame_support::{
 			let o = ensure_root(origin);
 
 			if o.is_err() {
-				return Err(DispatchError::BadOrigin)
+				return Err(DispatchError::BadOrigin);
 			}
 
 			if !Self::is_an_oracle(&oracle) {
-				return Err(Error::<T>::OracleNotExist.into())
+				return Err(Error::<T>::OracleNotExist.into());
 			}
 
 			let un_stored = Self::un_store_oracle(&oracle, is_sudo_oracle);
@@ -303,9 +319,9 @@ use frame_support::{
 					oracle: oracle.clone(),
 					is_sudo: is_sudo_oracle,
 				});
-				return Ok(())
+				return Ok(());
 			}
-			return un_stored
+			return un_stored;
 		}
 	}
 

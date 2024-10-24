@@ -4,29 +4,35 @@ use super::*;
 use crate::{Pallet as Esg, *};
 use frame_benchmarking::{account, benchmarks, whitelisted_caller};
 use frame_support::WeakBoundedVec;
-use scale_info::prelude::vec::Vec;
 use frame_system::RawOrigin;
+use scale_info::prelude::vec::Vec;
 
 // const MAX_NUM_OF_SUDO_ORACLES: u32 = MaxNumOfSudoOracles::get();
-// const MAX_NUM_OF_NON_SUDO_ORACLES: u32 = Esg::<{T as Esg::Config}>::MaxNumOfNonSudoOracles::get();
+// const MAX_NUM_OF_NON_SUDO_ORACLES: u32 = Esg::<{T as
+// Esg::Config}>::MaxNumOfNonSudoOracles::get();
 const MAX_NUM_OF_SUDO_ORACLES: u32 = 5;
 const MAX_NUM_OF_NON_SUDO_ORACLES: u32 = 100;
 
-fn create_oracle<T: Config>(
-	string: &'static str,
-	n: u32,
-) -> T::AccountId {
+fn create_oracle<T: Config>(string: &'static str, n: u32) -> T::AccountId {
 	let oracle = account(string, n, 0);
 	oracle
 }
 
 fn register_oracles<T: Config>() {
-	for i in 0 .. (MAX_NUM_OF_SUDO_ORACLES - 1) {
-		Esg::<T>::register_an_oracle(RawOrigin::Root.into(), create_oracle::<T>("oracle", u32::MAX - i), true);
+	for i in 0..(MAX_NUM_OF_SUDO_ORACLES - 1) {
+		Esg::<T>::register_an_oracle(
+			RawOrigin::Root.into(),
+			create_oracle::<T>("oracle", u32::MAX - i),
+			true,
+		);
 	}
 
-	for j in 0 .. (MAX_NUM_OF_NON_SUDO_ORACLES - 1) {
-		Esg::<T>::register_an_oracle(RawOrigin::Root.into(), create_oracle::<T>("oracle", u32::MAX - j), false);
+	for j in 0..(MAX_NUM_OF_NON_SUDO_ORACLES - 1) {
+		Esg::<T>::register_an_oracle(
+			RawOrigin::Root.into(),
+			create_oracle::<T>("oracle", u32::MAX - j),
+			false,
+		);
 	}
 }
 

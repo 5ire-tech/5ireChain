@@ -167,7 +167,7 @@ pub fn run() -> Result<()> {
 		//
 		// 	runner.sync_run(|config| cmd.run::<Block, RuntimeApi, ExecutorDispatch>(config))
 		// },
-		 #[cfg(feature = "runtime-benchmarks")]
+		#[cfg(feature = "runtime-benchmarks")]
 		Some(Subcommand::Benchmark(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 
@@ -178,7 +178,7 @@ pub fn run() -> Result<()> {
 					if !cfg!(feature = "runtime-benchmarks") {
 						return Err("Runtime benchmarking wasn't enabled when building the node. \
 							You can enable it with `--features runtime-benchmarks`."
-							.into())
+							.into());
 					} else {
 						match &runner.config().chain_spec {
 							#[cfg(feature = "firechain-qa")]
@@ -186,21 +186,21 @@ pub fn run() -> Result<()> {
 								return cmd
 									.run::<firechain_qa_runtime::Block, sp_statement_store::runtime_api::HostFunctions>(
 										config,
-									)
+									);
 							}),
 							#[cfg(feature = "firechain-mainnet")]
 							spec if spec.is_mainnet() => runner.sync_run(|config| {
 								return cmd
 									.run::<firechain_mainnet_runtime::Block, sp_statement_store::runtime_api::HostFunctions>(
 										config,
-									)
+									);
 							}),
 							#[cfg(feature = "firechain-thunder")]
 							spec if spec.is_thunder() => runner.sync_run(|config| {
 								return cmd
 									.run::<firechain_thunder_runtime::Block, sp_statement_store::runtime_api::HostFunctions>(
 										config,
-									)
+									);
 							}),
 							_ => panic!("No runtime feature (qa, mainnet, thunder) is enabled"),
 						}

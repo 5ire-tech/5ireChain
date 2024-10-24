@@ -49,10 +49,11 @@ use frame_support::{
 	Parameter,
 };
 use pallet_staking::{
-	BalanceOf, Exposure, ExposureOf, FixedNominationsQuota, RewardDestination, ValidatorPrefs, Rewards
+	BalanceOf, Exposure, ExposureOf, FixedNominationsQuota, RewardDestination, Rewards,
+	ValidatorPrefs,
 };
-use sp_staking::currency_to_vote::SaturatingCurrencyToVote;
 use sp_runtime::DispatchError;
+use sp_staking::currency_to_vote::SaturatingCurrencyToVote;
 type AccountId = u64;
 type AccountIndex = u64;
 type BlockNumber = u64;
@@ -80,7 +81,6 @@ frame_support::construct_runtime!(
 		Authorship: pallet_authorship,
 	}
 );
-
 
 parameter_types! {
 	pub MaxOnChainElectableTargets: u16 = 1250;
@@ -243,7 +243,7 @@ impl pallet_esg::Config for Test {
 	type WeightInfo = ();
 	type MaxFileSize = ConstU32<102400>;
 	type RuntimeEvent = RuntimeEvent;
-	type MaxNumOfSudoOracles =  ConstU32<5>;
+	type MaxNumOfSudoOracles = ConstU32<5>;
 	type MaxNumOfNonSudoOracles = ConstU32<5>;
 }
 
@@ -275,16 +275,12 @@ impl Rewards<AccountId> for TestReward {
 	fn payout_validators() -> Vec<AccountId> {
 		vec![]
 	}
-	fn claim_rewards(account:AccountId) -> Result<(), DispatchError> {
+	fn claim_rewards(account: AccountId) -> Result<(), DispatchError> {
 		Ok(())
-	
 	}
 	fn calculate_reward() -> sp_runtime::DispatchResult {
-	
 		Ok(())
 	}
-
-
 }
 
 impl pallet_staking::Config for Test {

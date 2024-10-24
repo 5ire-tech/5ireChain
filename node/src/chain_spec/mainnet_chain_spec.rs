@@ -41,9 +41,7 @@ use sp_runtime::{
 use std::{collections::BTreeMap, str::FromStr};
 
 pub use firechain_mainnet_runtime::{EVMConfig, RuntimeGenesisConfig};
-use firechain_runtime_core_primitives::opaque::{
-	AccountId, Balance,  Signature,
-};
+use firechain_runtime_core_primitives::opaque::{AccountId, Balance, Signature};
 
 pub fn mainnet_config() -> Result<ChainSpec, String> {
 	ChainSpec::from_json_bytes(&include_bytes!("../../../specs/5ire-mainnet-specRaw.json")[..])
@@ -55,7 +53,6 @@ const CHARLETH: &str = "0x798d4Ba9baf0064Ec19eB4F0a1a45785ae9D6DFc";
 const DOROTHY: &str = "0x773539d4Ac0e786233D90A233654ccEE26a613D9";
 const ETHAN: &str = "0xFf64d3F6efE2317EE2807d223a0Bdc4c0c49dfDB";
 const FAITH: &str = "0xC0F0f4ab324C46e55D02D0033343B4Be8A55532d";
-
 
 type AccountPublic = <Signature as Verify>::Signer;
 
@@ -85,7 +82,6 @@ fn session_keys(
 ) -> SessionKeys {
 	SessionKeys { grandpa, babe, im_online, authority_discovery }
 }
-
 
 /// Helper function to generate a crypto pair from seed
 pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
@@ -141,7 +137,6 @@ pub fn testnet_genesis(
 	root_key: AccountId,
 	endowed_accounts: Option<Vec<AccountId>>,
 ) -> RuntimeGenesisConfig {
-
 	let endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| vec![]);
 
 	let mut endowed_accounts_validator: Vec<AccountId> = Vec::new();
@@ -297,7 +292,6 @@ pub fn development_genesis(
 			(x.clone(), x.clone(), STASH, StakerStatus::Nominator(nominations))
 		}))
 		.collect::<Vec<_>>();
-
 
 	const ENDOWMENT: Balance = 5_000_000_000 * DOLLARS;
 	const STASH: Balance = ENDOWMENT / 1000;

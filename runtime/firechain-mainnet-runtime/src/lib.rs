@@ -37,10 +37,9 @@ use frame_support::{
 	pallet_prelude::Get,
 	parameter_types,
 	traits::{
-		AsEnsureOriginWithArg, ConstBool, ConstU128, ConstU16, ConstU32,
-		Currency, EitherOfDiverse, EqualPrivilegeOnly, Everything, FindAuthor, Imbalance,
-		InstanceFilter, KeyOwnerProofSystem, LockIdentifier, Nothing, OnFinalize, OnUnbalanced,
-		WithdrawReasons,
+		AsEnsureOriginWithArg, ConstBool, ConstU128, ConstU16, ConstU32, Currency, EitherOfDiverse,
+		EqualPrivilegeOnly, Everything, FindAuthor, Imbalance, InstanceFilter, KeyOwnerProofSystem,
+		LockIdentifier, Nothing, OnFinalize, OnUnbalanced, WithdrawReasons,
 	},
 	weights::{
 		constants::{
@@ -78,20 +77,27 @@ use pallet_ethereum::{
 	Call::transact, PostLogContent, Transaction as EthereumTransaction, TransactionAction,
 	TransactionData,
 };
-use pallet_evm::{
-	Account as EVMAccount, FeeCalculator, Runner,
-};
+use pallet_evm::{Account as EVMAccount, FeeCalculator, Runner};
 mod precompiles;
 use precompiles::FrontierPrecompiles;
 
 use frame_election_provider_support::bounds::ElectionBoundsBuilder;
+#[cfg(any(feature = "std", test))]
+pub use frame_system::Call as SystemCall;
+#[cfg(any(feature = "std", test))]
+pub use pallet_balances::Call as BalancesCall;
+#[cfg(any(feature = "std", test))]
+pub use pallet_staking::StakerStatus;
+#[cfg(any(feature = "std", test))]
+pub use pallet_sudo::Call as SudoCall;
+#[cfg(any(feature = "std", test))]
+pub use sp_runtime::BuildStorage;
 use sp_runtime::{
-	create_runtime_str,
-	generic, impl_opaque_keys,
+	create_runtime_str, generic, impl_opaque_keys,
 	traits::{
 		self, AccountIdConversion, BlakeTwo256, Block as BlockT, Bounded, ConvertInto,
 		DispatchInfoOf, Dispatchable, NumberFor, OpaqueKeys, PostDispatchInfoOf,
-		SaturatedConversion,  UniqueSaturatedInto,
+		SaturatedConversion, UniqueSaturatedInto,
 	},
 	transaction_validity::{
 		TransactionPriority, TransactionSource, TransactionValidity, TransactionValidityError,
@@ -104,16 +110,6 @@ use sp_std::{marker::PhantomData, prelude::*};
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 use static_assertions::const_assert;
-#[cfg(any(feature = "std", test))]
-pub use frame_system::Call as SystemCall;
-#[cfg(any(feature = "std", test))]
-pub use pallet_balances::Call as BalancesCall;
-#[cfg(any(feature = "std", test))]
-pub use pallet_staking::StakerStatus;
-#[cfg(any(feature = "std", test))]
-pub use pallet_sudo::Call as SudoCall;
-#[cfg(any(feature = "std", test))]
-pub use sp_runtime::BuildStorage;
 
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
@@ -566,7 +562,7 @@ impl pallet_staking::Config for Runtime {
 	type RewardRemainder = Treasury;
 	type RuntimeEvent = RuntimeEvent;
 	type Slash = Treasury; // send the slashed funds to the treasury.
-	type Reward =  (); // rewards are minted from the void
+	type Reward = (); // rewards are minted from the void
 	type SessionsPerEra = SessionsPerEra;
 	type BondingDuration = BondingDuration;
 	type SlashDeferDuration = SlashDeferDuration;
@@ -578,7 +574,7 @@ impl pallet_staking::Config for Runtime {
 	type SessionInterface = Self;
 	type EraPayout = ();
 	type RewardDistribution = Reward;
-    type NextNewSession = Session;
+	type NextNewSession = Session;
 	type MaxNominatorRewardedPerValidator = MaxNominatorRewardedPerValidator;
 	type OffendingValidatorsThreshold = OffendingValidatorsThreshold;
 	type ElectionProvider = ElectionProviderMultiPhase;
@@ -599,13 +595,13 @@ impl pallet_staking::Config for Runtime {
 parameter_types! {
 	pub const EraMinutes:u32 = 720;
 	pub const DecimalPrecision:u32 = 18;
-	pub const TotalMinutesPerYear:u32 = 525600; 
+	pub const TotalMinutesPerYear:u32 = 525600;
 	pub const TotalReward :u32 = 20564830;
 }
 
-impl pallet_reward::Config for Runtime{
+impl pallet_reward::Config for Runtime {
 	type RewardCurrency = Balances;
-	type Balance = Balance ;
+	type Balance = Balance;
 	type RuntimeEvent = RuntimeEvent;
 	type ValidatorSet = Historical;
 	type Validators = Historical;
@@ -614,7 +610,7 @@ impl pallet_reward::Config for Runtime{
 	type TotalMinutesPerYear = TotalMinutesPerYear;
 	type EraMinutes = EraMinutes;
 	type TotalReward = TotalReward;
-	type PalletId= RewardPalletId;
+	type PalletId = RewardPalletId;
 	type WeightInfo = pallet_reward::weights::SubstrateWeightInfo<Runtime>;
 }
 
@@ -1481,8 +1477,6 @@ parameter_types! {
 	pub const LiquidityWithdrawalFee: Permill = Permill::from_percent(0);  // should be non-zero if AllowMultiAssetPools is true, otherwise can be zero.
 }
 
-
-
 impl pallet_core_fellowship::Config for Runtime {
 	type WeightInfo = ();
 	type RuntimeEvent = RuntimeEvent;
@@ -1620,7 +1614,7 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 			let authority_id = Babe::authorities()[author_index as usize].clone().0;
 			return Some(H160::from_slice(
 				&sp_core::crypto::ByteArray::to_raw_vec(&authority_id)[4..24],
-			))
+			));
 		}
 		None
 	}
@@ -1716,7 +1710,7 @@ construct_runtime!(
 		System: frame_system,
 		Utility: pallet_utility,
 		Babe: pallet_babe,
-		Timestamp: pallet_timestamp,	
+		Timestamp: pallet_timestamp,
 		// Authorship must be before session in order to note author in the correct session and era
 		// for im-online and staking.
 		Authorship: pallet_authorship,
@@ -1773,7 +1767,7 @@ construct_runtime!(
 		EVM: pallet_evm,
 		DynamicFee: pallet_dynamic_fee,
 		BaseFee: pallet_base_fee,
-		
+
 
 	}
 );
@@ -2552,8 +2546,6 @@ pub mod migrations {
 	pub type Unreleased = ();
 }
 
-
-
 /// Executive: handles dispatch to the various modules.
 pub type Executive = frame_executive::Executive<
 	Runtime,
@@ -2561,7 +2553,7 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
-	Migrations
+	Migrations,
 >;
 
 impl fp_self_contained::SelfContainedCall for RuntimeCall {

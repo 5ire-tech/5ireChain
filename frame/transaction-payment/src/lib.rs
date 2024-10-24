@@ -320,7 +320,7 @@ pub mod pallet {
 	pub struct Pallet<T>(_);
 
 	#[pallet::config]
-	pub trait Config: frame_system::Config + pallet_contracts::Config  {
+	pub trait Config: frame_system::Config + pallet_contracts::Config {
 		/// The overarching event type.
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 
@@ -407,7 +407,7 @@ pub mod pallet {
 		/// has been paid by `who`.
 		TransactionFeePaid { who: T::AccountId, actual_fee: BalanceOf<T>, tip: BalanceOf<T> },
 		/// 50% of caller fees are allocated to the contract deployer
-		DeployerFeeAllocation {address: T::AccountId, fee: u128},
+		DeployerFeeAllocation { address: T::AccountId, fee: u128 },
 	}
 
 	#[pallet::hooks]
@@ -441,7 +441,7 @@ pub mod pallet {
 			if addition == Weight::zero() {
 				// this is most likely because in a test setup we set everything to ()
 				// or to `ConstFeeMultiplier`.
-				return
+				return;
 			}
 
 			// This is the minimum value of the multiplier. Make sure that if we collapse to this

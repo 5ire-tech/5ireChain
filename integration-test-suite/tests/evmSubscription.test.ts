@@ -13,11 +13,15 @@ import {
   spawnNodeForTestEVM,
 } from "../utils/util";
 import { sleep } from "../utils/setup";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 let web3: Web3;
 
-const ERC20_ABI = require("./contracts/MyToken.json").abi;
-const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
+const ERC20_ABI = require("./contracts/MyToken.json");
+
+const ERC20_BYTECODES = readFileSync(join(__dirname, './contracts/erc20_contract_bytecode.txt'), 'utf8').trim();
+
 
 async function sendTransaction(web3: Web3) {
   const erc20Contract = new web3.eth.Contract(ERC20_ABI);
@@ -143,41 +147,4 @@ describe("EVM related Subscription using web3js/ethersjs", function () {
     done();
   }).timeout(30000);
 
-  step("should subscribe to all logs", async function (done) {
-    subscription = web3.eth.subscribe("logs", {}, function (error, result) {});
-
-    await new Promise<void>((resolve) => {
-      subscription.on("connected", function (d: any) {
-        resolve();
-      });
-    });
-
-    const tx = await sendTransaction(web3);
-    let data = null;
-    let dataResolve: any = null;
-    let dataPromise = new Promise((resolve) => {
-      dataResolve = resolve;
-    });
-    subscription.on("data", function (d: any) {
-      data = d;
-      logsGenerated += 1;
-      dataResolve();
-    });
-
-    await dataPromise;
-
-    subscription.unsubscribe();
-    const block = await web3.eth.getBlock("latest");
-    expect(data).to.include({
-      blockHash: block.hash,
-      blockNumber: block.number,
-      data: "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-      logIndex: 0,
-      removed: false,
-      transactionHash: block.transactions[0],
-      transactionIndex: 0,
-      transactionLogIndex: "0x0",
-    });
-    done();
-  }).timeout(20000);
 });

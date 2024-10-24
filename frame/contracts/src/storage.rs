@@ -83,7 +83,7 @@ impl<T: Config> ContractInfo<T> {
 		code_hash: CodeHash<T>,
 	) -> Result<Self, DispatchError> {
 		if <ContractInfoOf<T>>::contains_key(account) {
-			return Err(Error::<T>::DuplicateContract.into())
+			return Err(Error::<T>::DuplicateContract.into());
 		}
 
 		let trie_id = {
@@ -296,7 +296,7 @@ impl<T: Config> ContractInfo<T> {
 		let mut queue = <DeletionQueueManager<T>>::load();
 
 		if queue.is_empty() {
-			return Weight::zero()
+			return Weight::zero();
 		}
 
 		let (weight_per_key, mut remaining_key_budget) = Self::deletion_budget(weight_limit);
@@ -305,7 +305,7 @@ impl<T: Config> ContractInfo<T> {
 		// proceeding. Too little weight for decoding might happen during runtime upgrades
 		// which consume the whole block before the other `on_initialize` blocks are called.
 		if remaining_key_budget == 0 {
-			return weight_limit
+			return weight_limit;
 		}
 
 		while remaining_key_budget > 0 {
@@ -441,7 +441,7 @@ impl<T: Config> DeletionQueueManager<T> {
 	/// the cost of an extra call to `sp_io::storage::next_key` to lookup the next entry in the map
 	fn next(&mut self) -> Option<DeletionQueueEntry<T>> {
 		if self.is_empty() {
-			return None
+			return None;
 		}
 
 		let entry = <DeletionQueue<T>>::get(self.delete_counter);

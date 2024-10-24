@@ -1,9 +1,8 @@
 #![cfg(feature = "runtime-benchmarks")]
 use super::*;
-use frame_benchmarking::whitelisted_caller;
 #[allow(unused)]
 use crate::Pallet as Reward;
-use frame_benchmarking::v2::*;
+use frame_benchmarking::{v2::*, whitelisted_caller};
 use frame_system::RawOrigin as SystemOrigin;
 use sp_std::vec;
 
@@ -15,8 +14,8 @@ mod benchmarks {
 	fn get_rewards() {
 		let caller: T::AccountId = whitelisted_caller();
 		let validator: T::AccountId = whitelisted_caller();
-        let balance : T::Balance = 5000u128.into();
-        ValidatorRewardAccounts::<T>::insert(validator.clone(),balance);
+		let balance: T::Balance = 5000u128.into();
+		ValidatorRewardAccounts::<T>::insert(validator.clone(), balance);
 
 		#[extrinsic_call]
 		get_rewards(SystemOrigin::Signed(caller), validator.clone());

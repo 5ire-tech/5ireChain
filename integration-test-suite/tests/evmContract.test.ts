@@ -14,10 +14,13 @@ import { sleep } from "../utils/setup";
 
 import { expect } from "chai";
 import { step } from "mocha-steps";
+import { readFileSync } from "fs";
+import { join } from "path";
 let web3: Web3;
 
-const ERC20_ABI = require("./contracts/MyToken.json").abi;
-const ERC20_BYTECODES = require("./contracts/MyToken.json").bytecode;
+const ERC20_ABI = require("./contracts/MyToken.json");
+
+const ERC20_BYTECODES = readFileSync(join(__dirname, './contracts/erc20_contract_bytecode.txt'), 'utf8').trim();
 const TEST_ACCOUNT = "0xdd33Af49c851553841E94066B54Fd28612522901";
 let contractAddress: string;
 
@@ -111,7 +114,7 @@ describe("EVM related Contract using web3js/ethersjs", function () {
     const contract = new web3.eth.Contract(ERC20_ABI, contractAddress, {
       from: alith.address,
     });
-    let expectedTotalSupply = BigInt(2 ** 256) - BigInt(1);
+    let expectedTotalSupply = BigInt("1000000000000000000000000");
 
     expect(await contract.methods.totalSupply().call()).to.eq(
       expectedTotalSupply.toString(),
