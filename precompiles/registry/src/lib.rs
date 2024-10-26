@@ -1,4 +1,3 @@
-
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use core::marker::PhantomData;
@@ -47,9 +46,8 @@ where
 			.is_active_precompile(address.0, handle.remaining_gas())
 		{
 			IsPrecompileResult::Answer { is_precompile, .. } => Ok(is_precompile),
-			IsPrecompileResult::OutOfGas => Err(PrecompileFailure::Error {
-				exit_status: ExitError::OutOfGas,
-			}),
+			IsPrecompileResult::OutOfGas =>
+				Err(PrecompileFailure::Error { exit_status: ExitError::OutOfGas }),
 		}
 	}
 
