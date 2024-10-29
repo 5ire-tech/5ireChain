@@ -44,7 +44,7 @@ docker run -d -p 30333:30333 -p 9944:9944 5irechain/5ire-node:mainnet --no-telem
 ```
 
 
-## Connect to 5ireChain GA Thunder testnet
+## Connect to 5ireChain Thunder testnet
 
 ### Pull Docker Image 
 ```bash
@@ -110,6 +110,37 @@ cargo build --release --features firechain-qa
 
 ```bash
 ./target/release/firechain-node --chain qa-dev --alice
+```
+### Prefund famous accounts
+
+These addresses are derived from Substrate's famous mnemonic: `bottom drive obey lake curtain smoke basket hold race lonely fit walk`. 5ireChain is EVM-compatible chain , so these accounts can be used in Metamask, any web3 tools that supports EVM-compatible chains.
+
+
+```bash
+# Alith:
+- Address: 0xf24FF3a9CF04c71Dbc94D0b566f7A27B94566cac
+- PrivKey: 0x5fb92d6e98884f76de468fa3f6278f8807c48bebc13595d45af5bdc4da702133
+
+# Baltathar:
+- Address: 0x3Cd0A705a2DC65e5b1E1205896BaA2be8A07c6e0
+- PrivKey: 0x8075991ce870b93a8870eca0c0f91913d12f47948ca0fd25b49c6fa7cdbeee8b
+
+# Charleth:
+- Address: 0x798d4Ba9baf0064Ec19eB4F0a1a45785ae9D6DFc
+- PrivKey: 0x0b6e18cafb6ed99687ec547bd28139cafdd2bffe70e6b688025de6b445aa5c5b
+
+# Dorothy:
+- Address: 0x773539d4Ac0e786233D90A233654ccEE26a613D9
+- PrivKey: 0x39539ab1876910bbf3a223d84a29e28f1cb4e2e456503e7e91ed39b2e7223d68
+
+# Ethan:
+- Address: 0xFf64d3F6efE2317EE2807d223a0Bdc4c0c49dfDB
+- PrivKey: 0x7dce9bc8babb68fec1409be38c8e1a52650206a7ed90ff956ae8a6d15eeaaef4
+
+# Faith:
+- Address: 0xC0F0f4ab324C46e55D02D0033343B4Be8A55532d
+- PrivKey: 0xb9d2ea9a615f3165812e8d44de0d24da9bbd164b65c4f0573e1ce2c8dbd9c8df
+
 ```
 
 ## Contributions & Code of Conduct
