@@ -38,13 +38,6 @@ type FirePrecompilesAt<R> = (
 	>,
 );
 
-/// The PrecompileSet installed in the Moonriver runtime.
-/// We include the nine Istanbul precompiles
-/// (https://github.com/ethereum/go-ethereum/blob/3c46f557/core/vm/contracts.go#L69)
-/// The following distribution has been decided for the precompiles
-/// 0-1023: Ethereum Mainnet Precompiles
-/// 1024-2047 Precompiles that are not in Ethereum Mainnet but are neither Moonbeam specific
-/// 2048-4095 Moonbeam specific precompiles
 pub type FirePrecompiles<R> = PrecompileSetBuilder<
 	R,
 	(
