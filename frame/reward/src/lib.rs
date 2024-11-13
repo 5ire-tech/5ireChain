@@ -122,12 +122,6 @@ pub mod pallet {
 	pub type ValidatorRewardAccounts<T: Config> =
 		StorageMap<_, Blake2_128Concat, T::AccountId, T::Balance, ValueQuery>;
 
-	/// Specifics regarding the rewards distributed within the designated era of the nominator
-	#[pallet::storage]
-	#[pallet::getter(fn nominator_reward_accounts)]
-	pub type NominatorRewardAccounts<T: Config> =
-		StorageMap<_, Blake2_128Concat, T::AccountId, T::Balance, ValueQuery>;
-
 	/// Storage that tracks the rewards earned by nominators for each validator
 	#[pallet::storage]
 	#[pallet::getter(fn nominator_earning_accounts)]
