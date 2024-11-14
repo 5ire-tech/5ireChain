@@ -96,14 +96,6 @@ pub mod pallet {
 		type WeightInfo: WeightInfo;
 	}
 
-	// #[pallet::hooks]
-	// impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
-	// 	fn on_runtime_upgrade() -> frame_support::weights::Weight {
-	// 		migrate_to_v1::<T>()
-	// 	}
-
-	// }
-
 	/// The era reward which are distributed among the validator and nominator
 	#[pallet::storage]
 	#[pallet::getter(fn total_rewards)]
@@ -120,12 +112,6 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn validator_reward_accounts)]
 	pub type ValidatorRewardAccounts<T: Config> =
-		StorageMap<_, Blake2_128Concat, T::AccountId, T::Balance, ValueQuery>;
-
-	/// Specifics regarding the rewards distributed within the designated era of the nominator
-	#[pallet::storage]
-	#[pallet::getter(fn nominator_reward_accounts)]
-	pub type NominatorRewardAccounts<T: Config> =
 		StorageMap<_, Blake2_128Concat, T::AccountId, T::Balance, ValueQuery>;
 
 	/// Storage that tracks the rewards earned by nominators for each validator
