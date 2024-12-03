@@ -160,7 +160,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to 0. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 113,
+	spec_version: 114,
 	impl_version: 0,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
@@ -1630,7 +1630,7 @@ pub const GAS_PER_SECOND: u64 = 40_000_000;
 pub const WEIGHT_PER_GAS: u64 = WEIGHT_REF_TIME_PER_SECOND / GAS_PER_SECOND;
 
 parameter_types! {
-	pub const ChainId: u64 = 997;
+	pub const ChainId: u64 = 997995;
 	pub BlockGasLimit: U256 = U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT.ref_time()/ WEIGHT_PER_GAS);
 	pub const GasLimitPovSizeRatio: u64 = 4;
 	pub PrecompilesValue: FirePrecompiles<Runtime> = FirePrecompiles::<_>::new();
