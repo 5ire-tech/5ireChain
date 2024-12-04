@@ -80,7 +80,7 @@ use pallet_ethereum::{
 };
 use pallet_evm::{Account as EVMAccount, FeeCalculator, Runner};
 mod precompiles;
-use precompiles::FrontierPrecompiles;
+pub use precompiles::{FirePrecompiles, PrecompileName};
 
 use sp_runtime::{
 	create_runtime_str, generic, impl_opaque_keys,
@@ -1638,7 +1638,7 @@ parameter_types! {
 	pub const ChainId: u64 = 997;
 	pub BlockGasLimit: U256 = U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT.ref_time() / WEIGHT_PER_GAS);
 	pub const GasLimitPovSizeRatio: u64 = 4;
-	pub PrecompilesValue: FrontierPrecompiles<Runtime> = FrontierPrecompiles::<_>::new();
+	pub PrecompilesValue: FirePrecompiles<Runtime> = FirePrecompiles::<_>::new();
 	pub WeightPerGas: Weight = Weight::from_parts(WEIGHT_PER_GAS, 0);
 }
 
@@ -1684,7 +1684,7 @@ impl pallet_evm::Config for Runtime {
 	type AddressMapping = pallet_evm::IdentityAddressMapping;
 	type Currency = Balances;
 	type RuntimeEvent = RuntimeEvent;
-	type PrecompilesType = FrontierPrecompiles<Self>;
+	type PrecompilesType = FirePrecompiles<Self>;
 	type PrecompilesValue = PrecompilesValue;
 	type ChainId = ChainId;
 	type BlockGasLimit = BlockGasLimit;

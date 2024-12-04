@@ -21,6 +21,8 @@ static_assertions = "1.1.0"
 log = { version = "0.4.17", default-features = false }
 
 primitive-types = { version = "0.12.0", default-features = false, features = ["codec", "scale-info", "num-traits"] }
+num_enum = { workspace = true }
+
 firechain-runtime-core-primitives = {path="../core-primitives", default-features = false}
 # primitives
 sp-authority-discovery = { workspace = true}
@@ -119,9 +121,12 @@ pallet-evm-precompile-modexp = { workspace = true }
 pallet-evm-precompile-sha3fips = { workspace = true }
 pallet-evm-precompile-simple = { workspace = true }
 pallet-hotfix-sufficients = { workspace = true }
+precompile-utils = { workspace = true }
+pallet-evm-precompile-batch = {workspace = true }
 
 [build-dependencies]
 substrate-wasm-builder = { workspace = true, optional = true }
+precompile-utils = { workspace = true, features = ["std", "testing"] }
 
 [features]
 default = ["std"]
@@ -221,7 +226,8 @@ std = [
 	'pallet-evm/std',
 	'pallet-evm-precompile-simple/std',
 	'pallet-evm-precompile-sha3fips/std',
-	"firechain-runtime-core-primitives/std"
+	"firechain-runtime-core-primitives/std",
+	"pallet-evm-precompile-batch/std",
 ]
 runtime-benchmarks = [
 	"frame-benchmarking/runtime-benchmarks",
