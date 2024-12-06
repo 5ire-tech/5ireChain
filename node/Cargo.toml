@@ -18,7 +18,7 @@ array-bytes = "6.1"
 clap = { version = "4.2.5", features = ["derive"], optional = true }
 
 hex-literal = "0.3.4"
-codec = { package = "parity-scale-codec", version = "3.6.1" }
+codec = { package = "parity-scale-codec", version = "3.6.12" }
 rand = "0.8"
 jsonrpsee = { version = "0.16.2", features = ["server"] }
 hex = { version = "0.4", default-features = false }

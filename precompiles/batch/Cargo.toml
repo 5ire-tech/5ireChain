@@ -14,7 +14,7 @@ slices = { workspace = true }
 # Substrate
 frame-support = { workspace = true }
 frame-system = { workspace = true }
-parity-scale-codec = { version = "3.6.1", default-features = false, features = ["max-encoded-len"] }
+parity-scale-codec = { version = "3.6.12", default-features = false, features = ["max-encoded-len"] }
 sp-core = { workspace = true }
 sp-io = { workspace = true }
 sp-std = { workspace = true }
@@ -33,7 +33,7 @@ sha3 = { workspace = true }
 
 pallet-balances = { workspace = true, features = ["insecure_zero_ed", "std"] }
 pallet-timestamp = { workspace = true, features = ["std"] }
-parity-scale-codec = { version = "3.6.1", default-features = false, features = ["max-encoded-len", "std"] }
+parity-scale-codec = { version = "3.6.12", default-features = false, features = ["max-encoded-len", "std"] }
 precompile-utils = { workspace = true, features = ["std", "testing"] }
 scale-info = { workspace = true, features = ["derive", "std"] }
 sp-runtime = { workspace = true, features = ["std"] }

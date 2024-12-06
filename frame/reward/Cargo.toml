@@ -13,7 +13,7 @@ sp-staking = { workspace = true }
 sp-std = { workspace = true }
 sp-runtime = { workspace = true }
 scale-info = { workspace = true, features = ["derive"] }
-parity-scale-codec = { version = "3.6.1", default-features = false, features = [
+parity-scale-codec = { version = "3.6.12", default-features = false, features = [
   "derive",
 ] }
 frame-benchmarking = { workspace = true }

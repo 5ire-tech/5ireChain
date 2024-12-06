@@ -13,7 +13,7 @@ readme = "README.md"
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
-codec = { package = "parity-scale-codec", version = "3.6.1", default-features = false }
+codec = { package = "parity-scale-codec", version = "3.6.12", default-features = false }
 rand = { version = "0.8.5", default-features = false, features = ["std_rng"] }
 frame-benchmarking = { workspace = true}
 frame-support = { workspace = true}
@@ -25,7 +25,7 @@ sp-session = { workspace = true}
 sp-std = { workspace = true}
 
 [dev-dependencies]
-codec = { package = "parity-scale-codec", version = "3.6.1", features = ["derive"] }
+codec = { package = "parity-scale-codec", version = "3.6.12", features = ["derive"] }
 scale-info = "2.1.1"
 frame-election-provider-support = { workspace = true }
 pallet-balances = { workspace = true }
