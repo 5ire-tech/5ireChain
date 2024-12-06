@@ -97,8 +97,6 @@ mmr-rpc = { workspace = true }
 # These dependencies are used for runtime benchmarking
 frame-benchmarking = { optional = true, workspace = true }
 frame-benchmarking-cli = { optional = true, workspace = true }
-# Cli for try runtime
-try-runtime-cli = { optional = true, workspace = true }
 # frame dependencies
 frame-system = { workspace = true }
 pallet-transaction-payment = { workspace = true }
@@ -137,11 +135,6 @@ sc-cli = { workspace = true, optional = true }
 frame-benchmarking-cli = { optional = true, workspace = true }
 substrate-frame-cli = { optional = true, workspace = true }
 
-
-# CLI-specific dependencies
-
-try-runtime-cli = { optional = true, workspace = true }
-
 [dev-dependencies]
 sc-client-db = { workspace = true }
 pallet-timestamp = { workspace = true }
@@ -157,7 +150,6 @@ cli = [
 	"clap",
 	"clap_complete",
 	"substrate-build-script-utils",
-	"try-runtime-cli",
 ]
 firechain-qa = ["cli", "firechain-qa-runtime/default"]
 firechain-mainnet = ["cli", "firechain-mainnet-runtime/default"]
@@ -178,7 +170,6 @@ try-runtime = [
 	"firechain-qa-runtime/try-runtime",
 	"firechain-mainnet-runtime/try-runtime",
 	"firechain-thunder-runtime/try-runtime",
-	"try-runtime-cli/try-runtime",
 ]
 
 rpc-binary-search-estimate = ["fc-rpc/rpc-binary-search-estimate"]
