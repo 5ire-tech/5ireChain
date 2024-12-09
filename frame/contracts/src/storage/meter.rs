@@ -33,7 +33,6 @@ use frame_support::{
 	},
 	DefaultNoBound, RuntimeDebugNoBound,
 };
-use sp_api::HashT;
 use sp_runtime::{
 	traits::{Saturating, Zero},
 	DispatchError, FixedPointNumber, FixedU128,
