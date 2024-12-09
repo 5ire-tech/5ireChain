@@ -542,15 +542,9 @@ pub mod pallet {
 			);
 
 			let queued_keys: Vec<_> = initial_validators_1
-				.iter()
-				.cloned()
-				.map(|v| {
-					(
-						v.clone(),
-						Pallet::<T>::load_keys(&v).expect("Validator in session 1 missing keys!"),
-					)
-				})
-				.collect();
+			.into_iter()
+			.filter_map(|v| Pallet::<T>::load_keys(&v).map(|k| (v, k)))
+			.collect();
 
 			// Tell everyone about the genesis session keys
 			T::SessionHandler::on_genesis_session::<T::Keys>(&queued_keys);
@@ -1056,9 +1050,14 @@ impl<T: Config> EstimateNextNewSession<BlockNumberFor<T>> for Pallet<T> {
 	}
 }
 
-impl<T: Config> frame_support::traits::DisabledValidators for Pallet<T> {
+	impl<T: Config> frame_support::traits::DisabledValidators for Pallet<T> {
+		
 	fn is_disabled(index: u32) -> bool {
 		<Pallet<T>>::disabled_validators().binary_search(&index).is_ok()
+	}
+
+	fn disabled_validators() -> Vec<u32> {
+		<Pallet<T>>::disabled_validators()
 	}
 }
 

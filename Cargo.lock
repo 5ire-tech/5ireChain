@@ -2488,26 +2488,6 @@ dependencies = [
 
 [[package]]
 name = "evm"
-version = "0.39.1"
-source = "git+https://github.com/rust-blockchain/evm?rev=b7b82c7e1fc57b7449d6dfa6826600de37cc1e65#b7b82c7e1fc57b7449d6dfa6826600de37cc1e65"
-dependencies = [
- "auto_impl",
- "environmental",
- "ethereum 0.14.0",
- "evm-core 0.39.0",
- "evm-gasometer 0.39.0",
- "evm-runtime 0.39.0",
- "log",
- "parity-scale-codec",
- "primitive-types 0.12.2",
- "rlp",
- "scale-info",
- "serde",
- "sha3",
-]
-
-[[package]]
-name = "evm"
 version = "0.41.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "767f43e9630cc36cf8ff2777cbb0121b055f0d1fd6eaaa13b46a1808f0d0e7e9"
@@ -2515,9 +2495,9 @@ dependencies = [
  "auto_impl",
  "environmental",
  "ethereum 0.15.0",
- "evm-core 0.41.0",
- "evm-gasometer 0.41.0",
- "evm-runtime 0.41.0",
+ "evm-core",
+ "evm-gasometer",
+ "evm-runtime",
  "log",
  "parity-scale-codec",
  "primitive-types 0.12.2",
@@ -2525,17 +2505,6 @@ dependencies = [
  "scale-info",
  "serde",
  "sha3",
-]
-
-[[package]]
-name = "evm-core"
-version = "0.39.0"
-source = "git+https://github.com/rust-blockchain/evm?rev=b7b82c7e1fc57b7449d6dfa6826600de37cc1e65#b7b82c7e1fc57b7449d6dfa6826600de37cc1e65"
-dependencies = [
- "parity-scale-codec",
- "primitive-types 0.12.2",
- "scale-info",
- "serde",
 ]
 
 [[package]]
@@ -2552,37 +2521,14 @@ dependencies = [
 
 [[package]]
 name = "evm-gasometer"
-version = "0.39.0"
-source = "git+https://github.com/rust-blockchain/evm?rev=b7b82c7e1fc57b7449d6dfa6826600de37cc1e65#b7b82c7e1fc57b7449d6dfa6826600de37cc1e65"
-dependencies = [
- "environmental",
- "evm-core 0.39.0",
- "evm-runtime 0.39.0",
- "primitive-types 0.12.2",
-]
-
-[[package]]
-name = "evm-gasometer"
 version = "0.41.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1dc0eb591abc5cd7b05bef6a036c2bb6c66ab6c5e0c5ce94bfe377ab670b1fd7"
 dependencies = [
  "environmental",
- "evm-core 0.41.0",
- "evm-runtime 0.41.0",
+ "evm-core",
+ "evm-runtime",
  "primitive-types 0.12.2",
-]
-
-[[package]]
-name = "evm-runtime"
-version = "0.39.0"
-source = "git+https://github.com/rust-blockchain/evm?rev=b7b82c7e1fc57b7449d6dfa6826600de37cc1e65#b7b82c7e1fc57b7449d6dfa6826600de37cc1e65"
-dependencies = [
- "auto_impl",
- "environmental",
- "evm-core 0.39.0",
- "primitive-types 0.12.2",
- "sha3",
 ]
 
 [[package]]
@@ -2593,7 +2539,7 @@ checksum = "84bbe09b64ae13a29514048c1bb6fda6374ac0b4f6a1f15a443348ab88ef42cd"
 dependencies = [
  "auto_impl",
  "environmental",
- "evm-core 0.41.0",
+ "evm-core",
  "primitive-types 0.12.2",
  "sha3",
 ]
@@ -2741,7 +2687,7 @@ source = "git+https://github.com/polkadot-evm/frontier.git?branch=polkadot-v1.11
 dependencies = [
  "ethereum 0.15.0",
  "ethereum-types",
- "evm 0.41.1",
+ "evm",
  "fc-api",
  "fc-mapping-sync",
  "fc-rpc-core",
@@ -3472,7 +3418,7 @@ name = "fp-evm"
 version = "3.0.0-dev"
 source = "git+https://github.com/polkadot-evm/frontier.git?branch=polkadot-v1.11.0#5779b59043ae018d07d84f4e8e0c49087f804d3a"
 dependencies = [
- "evm 0.41.1",
+ "evm",
  "frame-support",
  "num_enum 0.7.3",
  "parity-scale-codec",
@@ -7118,7 +7064,7 @@ version = "4.0.0-dev"
 dependencies = [
  "ethereum 0.14.0",
  "ethereum-types",
- "evm 0.39.1",
+ "evm",
  "fp-consensus",
  "fp-ethereum",
  "fp-evm",
@@ -7147,7 +7093,7 @@ name = "pallet-evm"
 version = "6.0.0-dev"
 dependencies = [
  "environmental",
- "evm 0.39.1",
+ "evm",
  "fp-account",
  "fp-evm",
  "frame-benchmarking",
@@ -7177,7 +7123,7 @@ version = "6.0.0-dev"
 source = "git+https://github.com/polkadot-evm/frontier.git?branch=polkadot-v1.11.0#5779b59043ae018d07d84f4e8e0c49087f804d3a"
 dependencies = [
  "environmental",
- "evm 0.41.1",
+ "evm",
  "fp-account",
  "fp-evm",
  "frame-benchmarking",
@@ -7212,7 +7158,7 @@ name = "pallet-evm-precompile-batch"
 version = "0.1.0"
 dependencies = [
  "derive_more 0.99.18",
- "evm 0.39.1",
+ "evm",
  "fp-evm",
  "frame-support",
  "frame-system",
@@ -7292,7 +7238,7 @@ dependencies = [
 name = "pallet-evm-test-vector-support"
 version = "1.0.0-dev"
 dependencies = [
- "evm 0.39.1",
+ "evm",
  "fp-evm",
  "hex",
  "serde",
@@ -8496,7 +8442,7 @@ version = "0.1.0"
 dependencies = [
  "derive_more 0.99.18",
  "environmental",
- "evm 0.39.1",
+ "evm",
  "fp-evm",
  "frame-support",
  "frame-system",
