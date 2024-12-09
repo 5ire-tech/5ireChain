@@ -2477,7 +2477,7 @@ dependencies = [
 
 [[package]]
 name = "firechain-thunder-runtime"
-version = "1.0.9"
+version = "1.1.0"
 dependencies = [
  "firechain-runtime-core-primitives",
  "fp-account",
@@ -2522,6 +2522,7 @@ dependencies = [
  "pallet-evm-chain-id",
  "pallet-evm-precompile-batch",
  "pallet-evm-precompile-modexp",
+ "pallet-evm-precompile-registry",
  "pallet-evm-precompile-sha3fips",
  "pallet-evm-precompile-simple",
  "pallet-fast-unstake",
