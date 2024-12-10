@@ -1,6 +1,6 @@
 [package]
 name = "pallet-babe"
-version = "4.0.0-dev"
+version = "28.0.0"
 authors.workspace = true
 edition.workspace = true
 license = "Apache-2.0"
@@ -13,34 +13,33 @@ readme = "README.md"
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
-codec = { package = "parity-scale-codec", version = "3.6.12", default-features = false, features = ["derive"] }
-log = { version = "0.4.17", default-features = false }
-scale-info = { version = "2.5.0", default-features = false, features = ["derive", "serde"] }
-frame-benchmarking = { workspace = true, optional = true}
-frame-support = { workspace = true }
-frame-system = { workspace = true }
-pallet-authorship = { workspace = true }
-pallet-session = { workspace = true }
-pallet-timestamp = { workspace = true }
-sp-application-crypto = { workspace = true, features = ["serde"] }
-sp-consensus-babe = { workspace = true, features = ["serde"] }
-sp-core = { workspace = true, features = ["serde"] }
-sp-io = { workspace = true}
-sp-runtime = { workspace = true, features = ["serde"] }
-sp-session = { workspace = true}
-sp-staking = { workspace = true, features = ["serde"] }
-sp-std = { workspace = true}
-pallet-esg = { workspace = true }
+codec = { package = "parity-scale-codec", version = "3.6.1", default-features = false, features = ["derive"] }
+log = { workspace = true }
+scale-info = { version = "2.11.1", default-features = false, features = ["derive", "serde"] }
+frame-benchmarking = { workspace = true, default-features = false, optional = true }
+frame-support = { workspace = true, default-features = false }
+frame-system = { workspace = true, default-features = false }
+pallet-authorship = { workspace = true, default-features = false }
+pallet-session = { workspace = true, default-features = false }
+pallet-timestamp = { workspace = true, default-features = false }
+sp-application-crypto = { workspace = true, default-features = false, features = ["serde"] }
+sp-consensus-babe = { workspace = true, default-features = false, features = ["serde"] }
+sp-core = { workspace = true, default-features = false, features = ["serde"] }
+sp-io = { workspace = true, default-features = false }
+sp-runtime = { workspace = true, default-features = false, features = ["serde"] }
+sp-session = { workspace = true, default-features = false }
+sp-staking = { workspace = true, default-features = false, features = ["serde"] }
+sp-std = { workspace = true, default-features = false }
 
 [dev-dependencies]
 frame-election-provider-support = { workspace = true }
 pallet-balances = { workspace = true }
 pallet-offences = { workspace = true }
-pallet-staking = { path = "../staking" }
+pallet-staking = { workspace = true }
 sp-core = { workspace = true }
 
 [features]
-default = [ "std" ]
+default = ["std"]
 std = [
 	"codec/std",
 	"frame-benchmarking?/std",
@@ -63,7 +62,6 @@ std = [
 	"sp-session/std",
 	"sp-staking/std",
 	"sp-std/std",
-	"pallet-esg/std",
 ]
 runtime-benchmarks = [
 	"frame-benchmarking/runtime-benchmarks",
@@ -76,7 +74,6 @@ runtime-benchmarks = [
 	"pallet-timestamp/runtime-benchmarks",
 	"sp-runtime/runtime-benchmarks",
 	"sp-staking/runtime-benchmarks",
-	"pallet-esg/runtime-benchmarks",
 ]
 try-runtime = [
 	"frame-election-provider-support/try-runtime",
@@ -88,6 +85,5 @@ try-runtime = [
 	"pallet-session/try-runtime",
 	"pallet-staking/try-runtime",
 	"pallet-timestamp/try-runtime",
-	"pallet-esg/try-runtime",
 	"sp-runtime/try-runtime",
 ]

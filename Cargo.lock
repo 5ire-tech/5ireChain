@@ -6701,7 +6701,7 @@ dependencies = [
 
 [[package]]
 name = "pallet-babe"
-version = "4.0.0-dev"
+version = "28.0.0"
 dependencies = [
  "frame-benchmarking",
  "frame-election-provider-support",
@@ -6710,7 +6710,6 @@ dependencies = [
  "log",
  "pallet-authorship",
  "pallet-balances",
- "pallet-esg",
  "pallet-offences",
  "pallet-session 4.0.0-dev",
  "pallet-staking 4.0.0-dev",

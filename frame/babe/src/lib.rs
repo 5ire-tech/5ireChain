@@ -30,7 +30,6 @@ use frame_support::{
 	BoundedVec, WeakBoundedVec,
 };
 use frame_system::pallet_prelude::{BlockNumberFor, HeaderFor};
-use pallet_session::validation::OneSessionHandlerAll;
 use sp_consensus_babe::{
 	digests::{NextConfigDescriptor, NextEpochDescriptor, PreDigest},
 	AllowedSlots, BabeAuthorityWeight, BabeEpochConfiguration, ConsensusLog, Epoch,
@@ -284,7 +283,7 @@ pub mod pallet {
 	/// entropy was fixed (i.e. it was known to chain observers). Since epochs are defined in
 	/// slots, which may be skipped, the block numbers may not line up with the slot numbers.
 	#[pallet::storage]
-	pub(super) type EpochStart<T: Config> =
+	pub type EpochStart<T: Config> =
 		StorageValue<_, (BlockNumberFor<T>, BlockNumberFor<T>), ValueQuery>;
 
 	/// How late the current block is compared to its parent.
@@ -324,7 +323,7 @@ pub mod pallet {
 	#[pallet::genesis_config]
 	pub struct GenesisConfig<T: Config> {
 		pub authorities: Vec<(AuthorityId, BabeAuthorityWeight)>,
-		pub epoch_config: Option<BabeEpochConfiguration>,
+		pub epoch_config: BabeEpochConfiguration,
 		#[serde(skip)]
 		pub _config: sp_std::marker::PhantomData<T>,
 	}
@@ -334,9 +333,7 @@ pub mod pallet {
 		fn build(&self) {
 			SegmentIndex::<T>::put(0);
 			Pallet::<T>::initialize_genesis_authorities(&self.authorities);
-			EpochConfig::<T>::put(
-				self.epoch_config.clone().expect("epoch_config must not be None"),
-			);
+			EpochConfig::<T>::put(&self.epoch_config);
 		}
 	}
 
@@ -385,7 +382,11 @@ pub mod pallet {
 							});
 
 							public
-								.make_bytes(RANDOMNESS_VRF_CONTEXT, &transcript, &signature.output)
+								.make_bytes(
+									RANDOMNESS_VRF_CONTEXT,
+									&transcript,
+									&signature.pre_output,
+								)
 								.ok()
 						});
 
@@ -499,7 +500,7 @@ impl<T: Config> FindAuthor<u32> for Pallet<T> {
 		for (id, mut data) in digests.into_iter() {
 			if id == BABE_ENGINE_ID {
 				let pre_digest: PreDigest = PreDigest::decode(&mut data).ok()?;
-				return Some(pre_digest.authority_index());
+				return Some(pre_digest.authority_index())
 			}
 		}
 
@@ -591,8 +592,7 @@ impl<T: Config> Pallet<T> {
 
 		if authorities.is_empty() {
 			log::warn!(target: LOG_TARGET, "Ignoring empty epoch change.");
-
-			return;
+			return
 		}
 
 		// Update epoch index.
@@ -623,7 +623,7 @@ impl<T: Config> Pallet<T> {
 							session_index,
 						);
 
-						return;
+						return
 					}
 
 					if skipped_epochs.is_full() {
@@ -665,7 +665,7 @@ impl<T: Config> Pallet<T> {
 		let next_randomness = NextRandomness::<T>::get();
 
 		let next_epoch = NextEpochDescriptor {
-			authorities: next_authorities.to_vec(),
+			authorities: next_authorities.into_inner(),
 			randomness: next_randomness,
 		};
 		Self::deposit_consensus(ConsensusLog::NextEpochData(next_epoch));
@@ -701,7 +701,7 @@ impl<T: Config> Pallet<T> {
 			epoch_index: EpochIndex::<T>::get(),
 			start_slot: Self::current_epoch_start(),
 			duration: T::EpochDuration::get(),
-			authorities: Self::authorities().to_vec(),
+			authorities: Self::authorities().into_inner(),
 			randomness: Self::randomness(),
 			config: EpochConfig::<T>::get()
 				.expect("EpochConfig is initialized in genesis; we never `take` or `kill` it; qed"),
@@ -726,7 +726,7 @@ impl<T: Config> Pallet<T> {
 			epoch_index: next_epoch_index,
 			start_slot,
 			duration: T::EpochDuration::get(),
-			authorities: NextAuthorities::<T>::get().to_vec(),
+			authorities: NextAuthorities::<T>::get().into_inner(),
 			randomness: NextRandomness::<T>::get(),
 			config: NextEpochConfig::<T>::get().unwrap_or_else(|| {
 				EpochConfig::<T>::get().expect(
@@ -779,7 +779,7 @@ impl<T: Config> Pallet<T> {
 		// we use the same values as genesis because we haven't collected any
 		// randomness yet.
 		let next = NextEpochDescriptor {
-			authorities: Self::authorities().to_vec(),
+			authorities: Self::authorities().into_inner(),
 			randomness: Self::randomness(),
 		};
 
@@ -791,7 +791,7 @@ impl<T: Config> Pallet<T> {
 		// let's ensure that we only do the initialization once per block
 		let initialized = Self::initialized().is_some();
 		if initialized {
-			return;
+			return
 		}
 
 		let pre_digest =
@@ -902,8 +902,9 @@ impl<T: Config> OnTimestampSet<T::Moment> for Pallet<T> {
 		let timestamp_slot = moment / slot_duration;
 		let timestamp_slot = Slot::from(timestamp_slot.saturated_into::<u64>());
 
-		assert!(
-			CurrentSlot::<T>::get() == timestamp_slot,
+		assert_eq!(
+			CurrentSlot::<T>::get(),
+			timestamp_slot,
 			"Timestamp slot must match `CurrentSlot`"
 		);
 	}
@@ -1012,17 +1013,6 @@ fn compute_randomness(
 	}
 
 	sp_io::hashing::blake2_256(&s)
-}
-
-// Our implementation
-impl<T: Config> OneSessionHandlerAll<T::AccountId> for Pallet<T> {
-	type Key = AuthorityId;
-
-	fn on_new_session_all<'a, I: 'a>(_changed: bool, _validators: I, _queued_validators: I)
-	where
-		I: Iterator<Item = (&'a T::AccountId, AuthorityId)>,
-	{
-	}
 }
 
 pub mod migrations {
