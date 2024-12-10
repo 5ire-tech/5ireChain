@@ -17,7 +17,13 @@
 
 use super::*;
 use crate as pallet_transaction_payment;
+
 use codec::Encode;
+
+use sp_runtime::{
+	testing::TestXt, traits::One, transaction_validity::InvalidTransaction, BuildStorage,
+};
+
 use frame_support::{
 	assert_noop, assert_ok,
 	dispatch::{DispatchClass, DispatchInfo, GetDispatchInfo, PostDispatchInfo},
@@ -27,10 +33,6 @@ use frame_support::{
 use frame_system as system;
 use mock::*;
 use pallet_balances::Call as BalancesCall;
-use pallet_contracts::ContractDeployer;
-use sp_runtime::{
-	testing::TestXt, traits::One, transaction_validity::InvalidTransaction, BuildStorage,
-};
 
 pub struct ExtBuilder {
 	balance_factor: u64,
@@ -271,10 +273,8 @@ fn signed_ext_length_fee_is_also_updated_per_congestion() {
 			<NextFeeMultiplier<Runtime>>::put(Multiplier::saturating_from_rational(3, 2));
 			let len = 10;
 
-			assert_ok!(
-				ChargeTransactionPayment::<Runtime>::from(10) // tipped
-					.pre_dispatch(&1, CALL, &info_from_weight(Weight::from_parts(3, 0)), len)
-			);
+			assert_ok!(ChargeTransactionPayment::<Runtime>::from(10) // tipped
+				.pre_dispatch(&1, CALL, &info_from_weight(Weight::from_parts(3, 0)), len));
 			assert_eq!(
 				Balances::free_balance(1),
 				100 // original
@@ -384,7 +384,7 @@ fn query_call_info_and_fee_details_works() {
                         adjusted_weight_fee: info
                             .weight
                             .min(BlockWeights::get().max_block)
-                            .ref_time() as u64 * 2 * 3 / 2  /* weight * weight_fee * multipler */
+                            .ref_time() as u64 * 2 * 3 / 2  /* weight * weight_fee * multiplier */
                     }),
                     tip: 0,
                 },
@@ -582,44 +582,6 @@ fn actual_weight_higher_than_max_refunds_nothing() {
 				&Ok(())
 			));
 			assert_eq!(Balances::free_balance(2), 200 - 5 - 10 - 100 - 5);
-		});
-}
-
-#[test]
-fn test_contract_fee_handling() {
-	ExtBuilder::default()
-		.balance_factor(10)
-		.base_weight(Weight::from_parts(5, 0))
-		.build()
-		.execute_with(|| {
-			let caller_account: u64 = 1;
-			let contract_deployer: u64 = 2;
-			let tip: u64 = 10;
-
-			// Insert the contract address of the deployer
-			ContractDeployer::<Runtime>::insert(&caller_account, contract_deployer);
-
-			// Initialize the balances of the deployer and contract accounts
-			let _ = pallet_balances::Pallet::<Runtime>::deposit_creating(&caller_account, 1000);
-			let _ = pallet_balances::Pallet::<Runtime>::deposit_creating(&contract_deployer, 1000);
-			assert_eq!(Balances::free_balance(contract_deployer), 1200);
-
-			// Initialize the transaction with a tip
-			let pre_dispatch_data = ChargeTransactionPayment::<Runtime>::from(tip)
-				.pre_dispatch(&caller_account, CALL, &DispatchInfo::default(), 10)
-				.unwrap();
-
-			// Complete the transaction and handle post-dispatch fee charging
-			assert_ok!(ChargeTransactionPayment::<Runtime>::post_dispatch(
-				Some(pre_dispatch_data),
-				&DispatchInfo::default(),
-				&default_post_info(),
-				10,
-				&Ok(())
-			));
-
-			// Check that the balance of the contract account has increased correctly
-			assert_eq!(Balances::free_balance(contract_deployer), 1212);
 		});
 }
 

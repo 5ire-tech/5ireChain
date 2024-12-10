@@ -19,9 +19,7 @@
 
 #![cfg(test)]
 
-use crate::{
-	self as pallet_grandpa, AuthorityId, AuthorityList, Config, ConsensusLog, OneSessionHandlerAll,
-};
+use crate::{self as pallet_grandpa, AuthorityId, AuthorityList, Config, ConsensusLog};
 use ::grandpa as finality_grandpa;
 use codec::Encode;
 use frame_election_provider_support::{
@@ -29,7 +27,7 @@ use frame_election_provider_support::{
 	onchain, SequentialPhragmen,
 };
 use frame_support::{
-	parameter_types,
+	derive_impl, parameter_types,
 	traits::{ConstU128, ConstU32, ConstU64, KeyOwnerProofSystem, OnFinalize, OnInitialize},
 };
 use pallet_session::historical as pallet_session_historical;
@@ -40,13 +38,12 @@ use sp_runtime::{
 	curve::PiecewiseLinear,
 	impl_opaque_keys,
 	testing::{TestXt, UintAuthorityId},
-	traits::{IdentityLookup, OpaqueKeys},
+	traits::OpaqueKeys,
 	BuildStorage, DigestItem, Perbill,
 };
 use sp_staking::{EraIndex, SessionIndex};
 
 type Block = frame_system::mocking::MockBlock<Test>;
-type AccountId = u64;
 
 frame_support::construct_runtime!(
 	pub enum Test
@@ -60,7 +57,6 @@ frame_support::construct_runtime!(
 		Grandpa: pallet_grandpa,
 		Offences: pallet_offences,
 		Historical: pallet_session_historical,
-		EsgScore: pallet_esg,
 	}
 );
 
@@ -70,30 +66,10 @@ impl_opaque_keys! {
 	}
 }
 
+#[derive_impl(frame_system::config_preludes::TestDefaultConfig)]
 impl frame_system::Config for Test {
-	type BaseCallFilter = frame_support::traits::Everything;
-	type BlockWeights = ();
-	type BlockLength = ();
-	type DbWeight = ();
-	type RuntimeOrigin = RuntimeOrigin;
-	type Nonce = u64;
-	type RuntimeCall = RuntimeCall;
-	type Hash = H256;
-	type Hashing = sp_runtime::traits::BlakeTwo256;
-	type AccountId = u64;
-	type Lookup = IdentityLookup<Self::AccountId>;
 	type Block = Block;
-	type RuntimeEvent = RuntimeEvent;
-	type BlockHashCount = ConstU64<250>;
-	type Version = ();
-	type PalletInfo = PalletInfo;
 	type AccountData = pallet_balances::AccountData<u128>;
-	type OnNewAccount = ();
-	type OnKilledAccount = ();
-	type SystemWeightInfo = ();
-	type SS58Prefix = ();
-	type OnSetCode = ();
-	type MaxConsumers = frame_support::traits::ConstU32<16>;
 }
 
 impl<C> frame_system::offchain::SendTransactionTypes<C> for Test
@@ -108,55 +84,6 @@ parameter_types! {
 	pub const Period: u64 = 1;
 	pub const Offset: u64 = 0;
 }
-// 5ire's implementation
-parameter_types! {
-	pub MaxNominations: u32 =  0u32;
-	pub MaxOnChainElectableTargets: u16 = 1250;
-}
-
-//5ire's implementation
-pub struct MyAllSessionHandler;
-impl OneSessionHandlerAll<u64> for MyAllSessionHandler {
-	type Key = UintAuthorityId;
-	fn on_new_session_all<'a, I: 'a>(changed: bool, validators: I, queued_validators: I)
-	where
-		I: Iterator<Item = (&'a u64, Self::Key)>,
-		u64: 'a,
-	{
-	}
-}
-
-impl sp_runtime::BoundToRuntimeAppPublic for MyAllSessionHandler {
-	type Public = UintAuthorityId;
-}
-
-// 5ire's implementation
-pub struct TestElectionDP;
-
-impl frame_election_provider_support::ElectionDataProvider for TestElectionDP {
-	type AccountId = u64;
-	type BlockNumber = u64;
-	type MaxVotesPerVoter = MaxNominations;
-
-	fn desired_targets() -> frame_election_provider_support::data_provider::Result<u32> {
-		frame_election_provider_support::data_provider::Result::Ok(0u32)
-	}
-	fn electable_targets(
-		_maybe_max_len: frame_election_provider_support::DataProviderBounds,
-	) -> frame_election_provider_support::data_provider::Result<Vec<Self::AccountId>> {
-		frame_election_provider_support::data_provider::Result::Ok(Vec::<u64>::new())
-	}
-	fn electing_voters(
-		_maybe_max_len: frame_election_provider_support::DataProviderBounds,
-	) -> frame_election_provider_support::data_provider::Result<
-		Vec<frame_election_provider_support::VoterOf<Self>>,
-	> {
-		frame_election_provider_support::data_provider::Result::Err("not implemented!!")
-	}
-	fn next_election_prediction(_now: Self::BlockNumber) -> Self::BlockNumber {
-		0u64
-	}
-}
 
 /// Custom `SessionHandler` since we use `TestSessionKeys` as `Keys`.
 impl pallet_session::Config for Test {
@@ -169,9 +96,6 @@ impl pallet_session::Config for Test {
 	type SessionHandler = <TestSessionKeys as OpaqueKeys>::KeyTypeIdProviders;
 	type Keys = TestSessionKeys;
 	type WeightInfo = ();
-	type AllSessionHandler = (MyAllSessionHandler,);
-	type DataProvider = TestElectionDP;
-	type TargetsBound = MaxOnChainElectableTargets;
 }
 
 impl pallet_session::historical::Config for Test {
@@ -197,7 +121,7 @@ impl pallet_balances::Config for Test {
 	type FreezeIdentifier = ();
 	type MaxFreezes = ();
 	type RuntimeHoldReason = ();
-	type MaxHolds = ();
+	type RuntimeFreezeReason = ();
 }
 
 impl pallet_timestamp::Config for Test {
@@ -207,19 +131,23 @@ impl pallet_timestamp::Config for Test {
 	type WeightInfo = ();
 }
 
+pallet_staking_reward_curve::build! {
+	const REWARD_CURVE: PiecewiseLinear<'static> = curve!(
+		min_inflation: 0_025_000u64,
+		max_inflation: 0_100_000,
+		ideal_stake: 0_500_000,
+		falloff: 0_050_000,
+		max_piece_count: 40,
+		test_precision: 0_005_000,
+	);
+}
+
 parameter_types! {
 	pub const SessionsPerEra: SessionIndex = 3;
 	pub const BondingDuration: EraIndex = 3;
+	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
 	pub const OffendingValidatorsThreshold: Perbill = Perbill::from_percent(17);
 	pub static ElectionsBoundsOnChain: ElectionBounds = ElectionBoundsBuilder::default().build();
-}
-
-impl pallet_esg::Config for Test {
-	type RuntimeEvent = RuntimeEvent;
-	type MaxFileSize = ConstU32<1024000>;
-	type WeightInfo = ();
-	type MaxNumOfSudoOracles = ConstU32<5>;
-	type MaxNumOfNonSudoOracles = ConstU32<5>;
 }
 
 pub struct OnChainSeqPhragmen;
@@ -232,22 +160,8 @@ impl onchain::Config for OnChainSeqPhragmen {
 	type Bounds = ElectionsBoundsOnChain;
 }
 
-pub struct TestReward;
-impl pallet_staking::Rewards<AccountId> for TestReward {
-	fn payout_validators() -> Vec<AccountId> {
-		vec![]
-	}
-	fn claim_rewards(account: AccountId) -> Result<(), sp_runtime::DispatchError> {
-		Ok(())
-	}
-	fn calculate_reward() -> sp_runtime::DispatchResult {
-		Ok(())
-	}
-}
-
 impl pallet_staking::Config for Test {
 	type RewardRemainder = ();
-	type RewardDistribution = TestReward;
 	type CurrencyToVote = ();
 	type RuntimeEvent = RuntimeEvent;
 	type Currency = Balances;
@@ -260,8 +174,8 @@ impl pallet_staking::Config for Test {
 	type AdminOrigin = frame_system::EnsureRoot<Self::AccountId>;
 	type SessionInterface = Self;
 	type UnixTime = pallet_timestamp::Pallet<Test>;
-	type EraPayout = ();
-	type MaxNominatorRewardedPerValidator = ConstU32<64>;
+	type EraPayout = pallet_staking::ConvertCurve<RewardCurve>;
+	type MaxExposurePageSize = ConstU32<64>;
 	type OffendingValidatorsThreshold = OffendingValidatorsThreshold;
 	type NextNewSession = Session;
 	type ElectionProvider = onchain::OnChainExecution<OnChainSeqPhragmen>;
@@ -270,12 +184,11 @@ impl pallet_staking::Config for Test {
 	type TargetList = pallet_staking::UseValidatorsMap<Self>;
 	type NominationsQuota = pallet_staking::FixedNominationsQuota<16>;
 	type MaxUnlockingChunks = ConstU32<32>;
+	type MaxControllersInDeprecationBatch = ConstU32<100>;
 	type HistoryDepth = ConstU32<84>;
 	type EventListeners = ();
 	type BenchmarkingConfig = pallet_staking::TestBenchmarkingConfig;
 	type WeightInfo = ();
-	type ESG = EsgScore;
-	type Reliability = EsgScore;
 }
 
 impl pallet_offences::Config for Test {

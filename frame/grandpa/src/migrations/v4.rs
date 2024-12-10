@@ -38,7 +38,7 @@ pub fn migrate<T: crate::Config, N: AsRef<str>>(new_pallet_name: N) -> Weight {
 			target: LOG_TARGET,
 			"New pallet name is equal to the old prefix. No migration needs to be done.",
 		);
-		return Weight::zero();
+		return Weight::zero()
 	}
 	let storage_version = StorageVersion::get::<crate::Pallet<T>>();
 	log::info!(
@@ -63,7 +63,7 @@ pub fn migrate<T: crate::Config, N: AsRef<str>>(new_pallet_name: N) -> Weight {
 }
 
 /// Some checks prior to migration. This can be linked to
-/// [`frame_support::traits::OnRuntimeUpgrade::pre_upgrade`] for further testing.
+/// `frame_support::traits::OnRuntimeUpgrade::pre_upgrade` for further testing.
 ///
 /// Panics if anything goes wrong.
 pub fn pre_migration<T: crate::Config, N: AsRef<str>>(new: N) {
@@ -99,7 +99,7 @@ pub fn pre_migration<T: crate::Config, N: AsRef<str>>(new: N) {
 }
 
 /// Some checks for after migration. This can be linked to
-/// [`frame_support::traits::OnRuntimeUpgrade::post_upgrade`] for further testing.
+/// `frame_support::traits::OnRuntimeUpgrade::post_upgrade` for further testing.
 ///
 /// Panics if anything goes wrong.
 pub fn post_migration() {

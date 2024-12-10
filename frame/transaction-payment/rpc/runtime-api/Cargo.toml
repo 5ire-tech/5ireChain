@@ -1,6 +1,6 @@
 [package]
 name = "pallet-transaction-payment-rpc-runtime-api"
-version = "4.0.0-dev"
+version = "28.0.0"
 authors.workspace = true
 edition.workspace = true
 license = "Apache-2.0"
@@ -13,14 +13,14 @@ readme = "README.md"
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
-codec = { package = "parity-scale-codec", version = "3.6.12", default-features = false, features = ["derive"] }
-pallet-transaction-payment = { path = "../..", default-features = false}
-sp-api = { workspace = true, default-features = false}
-sp-runtime = { workspace = true, default-features = false}
-sp-weights = {workspace = true, default-features = false}
+codec = { package = "parity-scale-codec", version = "3.6.1", default-features = false, features = ["derive"] }
+pallet-transaction-payment = { path = "../..", default-features = false }
+sp-api = { workspace = true, default-features = false }
+sp-runtime = { workspace = true, default-features = false }
+sp-weights = { workspace = true, default-features = false }
 
 [features]
-default = [ "std" ]
+default = ["std"]
 std = [
 	"codec/std",
 	"pallet-transaction-payment/std",
