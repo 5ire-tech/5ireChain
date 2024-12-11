@@ -7075,7 +7075,6 @@ dependencies = [
  "frame-system",
  "hex",
  "libsecp256k1",
- "pallet-authorship",
  "pallet-balances",
  "pallet-evm 6.0.0-dev",
  "pallet-timestamp",
@@ -7085,7 +7084,6 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "sp-std 14.0.0 (git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.11.0)",
 ]
 
 [[package]]
@@ -7104,7 +7102,6 @@ dependencies = [
  "hex-literal 0.4.1",
  "impl-trait-for-tuples",
  "log",
- "pallet-authorship",
  "pallet-balances",
  "pallet-evm-precompile-simple",
  "pallet-timestamp",
@@ -7114,7 +7111,6 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "sp-std 14.0.0 (git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.11.0)",
 ]
 
 [[package]]
@@ -7307,7 +7303,6 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "sp-std 14.0.0 (git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.11.0)",
 ]
 
 [[package]]

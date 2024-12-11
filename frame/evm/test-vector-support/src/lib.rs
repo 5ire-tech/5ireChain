@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: Apache-2.0
 // This file is part of Frontier.
-//
-// Copyright (c) 2020-2022 Parity Technologies (UK) Ltd.
-//
+
+// Copyright (C) Parity Technologies (UK) Ltd.
+// SPDX-License-Identifier: Apache-2.0
+
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -15,7 +15,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![deny(unused_crate_dependencies)]
+#![warn(unused_crate_dependencies)]
 
 use std::fs;
 
@@ -50,7 +50,13 @@ pub struct MockHandle {
 
 impl MockHandle {
 	pub fn new(input: Vec<u8>, gas_limit: Option<u64>, context: Context) -> Self {
-		Self { input, gas_limit, context, is_static: false, gas_used: 0 }
+		Self {
+			input,
+			gas_limit,
+			context,
+			is_static: false,
+			gas_used: 0,
+		}
 	}
 }
 
@@ -74,7 +80,12 @@ impl PrecompileHandle for MockHandle {
 		Ok(())
 	}
 
-	fn record_external_cost(&mut self, _: Option<u64>, _: Option<u64>) -> Result<(), ExitError> {
+	fn record_external_cost(
+		&mut self,
+		_: Option<u64>,
+		_: Option<u64>,
+		_: Option<u64>,
+	) -> Result<(), ExitError> {
 		Ok(())
 	}
 
@@ -141,7 +152,11 @@ pub fn test_precompile_test_vectors<P: Precompile>(filepath: &str) -> Result<(),
 					test.name,
 					result.exit_status
 				);
-				assert_eq!(as_hex, test.expected, "test '{}' failed (different output)", test.name);
+				assert_eq!(
+					as_hex, test.expected,
+					"test '{}' failed (different output)",
+					test.name
+				);
 				if let Some(expected_gas) = test.gas {
 					assert_eq!(
 						handle.gas_used, expected_gas,
@@ -149,8 +164,10 @@ pub fn test_precompile_test_vectors<P: Precompile>(filepath: &str) -> Result<(),
 						test.name
 					);
 				}
-			},
-			Err(err) => return Err(format!("Test '{}' returned error: {:?}", test.name, err)),
+			}
+			Err(err) => {
+				return Err(format!("Test '{}' returned error: {:?}", test.name, err));
+			}
 		}
 	}
 
@@ -180,13 +197,17 @@ pub fn test_precompile_failure_test_vectors<P: Precompile>(filepath: &str) -> Re
 		match P::execute(&mut handle) {
 			Ok(..) => {
 				unreachable!("Test should be failed");
-			},
+			}
 			Err(err) => {
 				let expected_err = PrecompileFailure::Error {
 					exit_status: ExitError::Other(test.expected_error.into()),
 				};
-				assert_eq!(expected_err, err, "Test '{}' failed (different error)", test.name);
-			},
+				assert_eq!(
+					expected_err, err,
+					"Test '{}' failed (different error)",
+					test.name
+				);
+			}
 		}
 	}
 
