@@ -32,6 +32,7 @@ use frame_support::{
 	},
 	weights::Weight,
 };
+use pallet_esg::traits::ERScoresTrait;
 use frame_system::{pallet_prelude::BlockNumberFor, RawOrigin};
 use pallet_session::historical;
 use sp_runtime::{
@@ -54,7 +55,7 @@ use crate::{
 	election_size_tracker::StaticTracker, log, slashing, weights::WeightInfo, ActiveEraInfo,
 	BalanceOf, EraInfo, EraPayout, Exposure, ExposureOf, Forcing, IndividualExposure,
 	LedgerIntegrityState, MaxNominationsOf, MaxWinnersOf, Nominations, NominationsQuota,
-	PositiveImbalanceOf, RewardDestination, SessionInterface, StakingLedger, ValidatorPrefs,
+	PositiveImbalanceOf, RewardDestination, SessionInterface, StakingLedger, ValidatorPrefs,Rewards
 };
 
 use super::pallet::*;
@@ -226,24 +227,6 @@ impl<T: Config> Pallet<T> {
 		Ok(used_weight)
 	}
 
-	pub(super) fn do_payout_stakers(
-		validator_stash: T::AccountId,
-		era: EraIndex,
-	) -> DispatchResultWithPostInfo {
-		let controller = Self::bonded(&validator_stash).ok_or_else(|| {
-			Error::<T>::NotStash.with_weight(T::WeightInfo::payout_stakers_alive_staked(0))
-		})?;
-
-		let ledger = Self::ledger(StakingAccount::Controller(controller))?;
-		let page = EraInfo::<T>::get_next_claimable_page(era, &validator_stash, &ledger)
-			.ok_or_else(|| {
-				Error::<T>::AlreadyClaimed
-					.with_weight(T::WeightInfo::payout_stakers_alive_staked(0))
-			})?;
-
-		Self::do_payout_stakers_by_page(validator_stash, era, page)
-	}
-
 	pub(super) fn do_payout_stakers_by_page(
 		validator_stash: T::AccountId,
 		era: EraIndex,
@@ -395,6 +378,8 @@ impl<T: Config> Pallet<T> {
 		let chilled_as_nominator = Self::do_remove_nominator(stash);
 		if chilled_as_validator || chilled_as_nominator {
 			Self::deposit_event(Event::<T>::Chilled { stash: stash.clone() });
+			T::Reliability::chilled_validator_status(stash.clone());
+			T::Reliability::reset_score_of_chilled_waiting_validator(stash.clone());
 		}
 	}
 
@@ -588,15 +573,18 @@ impl<T: Config> Pallet<T> {
 			let validator_payout = validator_payout.min(max_staked_rewards * total_payout);
 			let remainder = total_payout.saturating_sub(validator_payout);
 
-			Self::deposit_event(Event::<T>::EraPaid {
-				era_index: active_era.index,
-				validator_payout,
-				remainder,
+			let _ = T::RewardDistribution::calculate_reward();
+			let reward = T::RewardDistribution::payout_validators();
+			reward.iter().for_each(|accounts| {
+				let _ = T::RewardDistribution::claim_rewards(accounts.clone());
 			});
 
 			// Set ending era reward.
 			<ErasValidatorReward<T>>::insert(&active_era.index, validator_payout);
 			T::RewardRemainder::on_unbalanced(T::Currency::issue(remainder));
+
+			//Reset active validators reliability score to zero
+			T::Reliability::reset_score_after_era_for_chilled_active_validator();
 
 			// Clear offending validators.
 			<OffendingValidators<T>>::kill();
@@ -1419,7 +1407,10 @@ where
 	T: Config + pallet_authorship::Config + pallet_session::Config,
 {
 	fn note_author(author: T::AccountId) {
-		Self::reward_by_ids(vec![(author, 20)])
+		let esg_score = T::ESG::get_score_of(author.clone());
+		let reliability_score = T::Reliability::get_score_of(author.clone());
+		let esg_reliability_score = esg_score.saturating_add(reliability_score);
+		Self::reward_by_ids(vec![(author.clone(), 20.saturating_add(esg_reliability_score).into())])
 	}
 }
 

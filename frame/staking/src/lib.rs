@@ -310,6 +310,7 @@ use frame_support::{
 	traits::{
 		ConstU32, Currency, Defensive, DefensiveMax, DefensiveSaturating, Get, LockIdentifier,
 	},
+	pallet_prelude::DispatchError,
 	weights::Weight,
 	BoundedVec, CloneNoBound, EqNoBound, PartialEqNoBound, RuntimeDebugNoBound,
 };
@@ -828,6 +829,14 @@ pub trait NominationsQuota<Balance> {
 	/// Returns the voter's nomination quota based on its balance and a curve.
 	fn curve(balance: Balance) -> u32;
 }
+///Reward trait
+
+pub trait Rewards<AccountId> {
+	fn payout_validators() -> Vec<AccountId>;
+	fn claim_rewards(account: AccountId) -> Result<(), DispatchError>;
+	fn calculate_reward() -> sp_runtime::DispatchResult;
+}
+
 
 /// A nomination quota that allows up to MAX nominations for all validators.
 pub struct FixedNominationsQuota<const MAX: u32>;

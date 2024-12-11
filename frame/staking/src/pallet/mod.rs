@@ -41,13 +41,13 @@ use sp_staking::{
 	StakingAccount::{self, Controller, Stash},
 };
 use sp_std::prelude::*;
-
+use pallet_esg::traits::ERScoresTrait;
 mod impls;
 
 pub use impls::*;
 
 use crate::{
-	slashing, weights::WeightInfo, AccountIdLookupOf, ActiveEraInfo, BalanceOf, EraPayout,
+	Rewards,slashing, weights::WeightInfo, AccountIdLookupOf, ActiveEraInfo, BalanceOf, EraPayout,
 	EraRewardPoints, Exposure, ExposurePage, Forcing, LedgerIntegrityState, MaxNominationsOf,
 	NegativeImbalanceOf, Nominations, NominationsQuota, PositiveImbalanceOf, RewardDestination,
 	SessionInterface, StakingLedger, UnappliedSlash, UnlockChunk, ValidatorPrefs,
@@ -100,7 +100,10 @@ pub mod pallet {
 			+ MaybeSerializeDeserialize
 			+ sp_std::fmt::Debug
 			+ Default
+			+ From<u32>
 			+ From<u64>
+			+ From<u128>
+			+ Into<u128>
 			+ TypeInfo
 			+ MaxEncodedLen;
 		/// Time used for computing era duration.
@@ -130,6 +133,9 @@ pub mod pallet {
 			BlockNumber = BlockNumberFor<Self>,
 			DataProvider = Pallet<Self>,
 		>;
+
+		/// The reward distribution for validator and nominator
+		type RewardDistribution: Rewards<Self::AccountId>;
 
 		/// Something that defines the maximum number of nominations per nominator.
 		type NominationsQuota: NominationsQuota<BalanceOf<Self>>;
@@ -277,6 +283,12 @@ pub mod pallet {
 		///
 		/// WARNING: this only reports slashing and withdraw events for the time being.
 		type EventListeners: sp_staking::OnStakingUpdate<Self::AccountId, BalanceOf<Self>>;
+
+		/// Esg Score
+		type ESG: ERScoresTrait<Self::AccountId>;
+
+		/// Reliability Score
+		type Reliability: ERScoresTrait<Self::AccountId>;
 
 		/// Some parameters of the benchmarking.
 		type BenchmarkingConfig: BenchmarkingConfig;
@@ -802,6 +814,8 @@ pub mod pallet {
 		ForceEra { mode: Forcing },
 		/// Report of a controller batch deprecation.
 		ControllerBatchDeprecated { failures: u32 },
+		/// Renominate event
+		NominatorPrefsSet { stash: T::AccountId, nominations: Nominations<T> },
 	}
 
 	#[pallet::error]
@@ -1252,7 +1266,8 @@ pub mod pallet {
 			};
 
 			Self::do_remove_validator(stash);
-			Self::do_add_nominator(stash, nominations);
+			Self::do_add_nominator(stash, nominations.clone());
+			Self::deposit_event(Event::<T>::NominatorPrefsSet { stash: ledger.stash, nominations });
 			Ok(())
 		}
 
@@ -1543,30 +1558,6 @@ pub mod pallet {
 
 			UnappliedSlashes::<T>::insert(&era, &unapplied);
 			Ok(())
-		}
-
-		/// Pay out next page of the stakers behind a validator for the given era.
-		///
-		/// - `validator_stash` is the stash account of the validator.
-		/// - `era` may be any era between `[current_era - history_depth; current_era]`.
-		///
-		/// The origin of this call must be _Signed_. Any account can call this function, even if
-		/// it is not one of the stakers.
-		///
-		/// The reward payout could be paged in case there are too many nominators backing the
-		/// `validator_stash`. This call will payout unpaid pages in an ascending order. To claim a
-		/// specific page, use `payout_stakers_by_page`.`
-		///
-		/// If all pages are claimed, it returns an error `InvalidPage`.
-		#[pallet::call_index(18)]
-		#[pallet::weight(T::WeightInfo::payout_stakers_alive_staked(T::MaxExposurePageSize::get()))]
-		pub fn payout_stakers(
-			origin: OriginFor<T>,
-			validator_stash: T::AccountId,
-			era: EraIndex,
-		) -> DispatchResultWithPostInfo {
-			ensure_signed(origin)?;
-			Self::do_payout_stakers(validator_stash, era)
 		}
 
 		/// Rebond a portion of the stash scheduled to be unlocked.
