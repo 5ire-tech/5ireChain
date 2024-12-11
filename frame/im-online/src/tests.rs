@@ -21,15 +21,12 @@
 
 use super::*;
 use crate::mock::*;
-use frame_support::{assert_err, assert_noop, dispatch};
+use frame_support::{assert_noop, dispatch};
 use sp_core::offchain::{
 	testing::{TestOffchainExt, TestTransactionPoolExt},
 	OffchainDbExt, OffchainWorkerExt, TransactionPoolExt,
 };
-use sp_runtime::{
-	testing::UintAuthorityId,
-	transaction_validity::{InvalidTransaction, TransactionValidityError},
-};
+use sp_runtime::testing::UintAuthorityId;
 
 #[test]
 fn test_unresponsiveness_slash_fraction() {
@@ -60,7 +57,7 @@ fn test_unresponsiveness_slash_fraction() {
 
 #[test]
 fn should_report_offline_validators() {
-	new_test_ext(6).execute_with(|| {
+	new_test_ext().execute_with(|| {
 		// given
 		let block = 1;
 		System::set_block_number(block);
@@ -140,7 +137,7 @@ fn heartbeat(
 
 #[test]
 fn should_mark_online_validator_when_heartbeat_is_received() {
-	new_test_ext(3).execute_with(|| {
+	new_test_ext().execute_with(|| {
 		advance_session();
 		// given
 		Validators::mutate(|l| *l = Some(vec![1, 2, 3, 4, 5, 6]));
@@ -175,7 +172,7 @@ fn should_mark_online_validator_when_heartbeat_is_received() {
 
 #[test]
 fn late_heartbeat_and_invalid_keys_len_should_fail() {
-	new_test_ext(6).execute_with(|| {
+	new_test_ext().execute_with(|| {
 		advance_session();
 		// given
 		Validators::mutate(|l| *l = Some(vec![1, 2, 3, 4, 5, 6]));
@@ -187,17 +184,23 @@ fn late_heartbeat_and_invalid_keys_len_should_fail() {
 		assert_eq!(Session::validators(), vec![1, 2, 3]);
 
 		// when
-		assert_err!(heartbeat(1, 3, 0, 0.into(), Session::validators()), "Transaction is outdated");
-		assert_err!(heartbeat(1, 1, 0, 0.into(), Session::validators()), "Transaction is outdated");
+		assert_noop!(
+			heartbeat(1, 3, 0, 1.into(), Session::validators()),
+			"Transaction is outdated"
+		);
+		assert_noop!(
+			heartbeat(1, 1, 0, 1.into(), Session::validators()),
+			"Transaction is outdated"
+		);
 
 		// invalid validators_len
-		assert_err!(heartbeat(1, 2, 0, 0.into(), vec![]), "invalid validators len");
+		assert_noop!(heartbeat(1, 2, 0, 1.into(), vec![]), "invalid validators len");
 	});
 }
 
 #[test]
 fn should_generate_heartbeats() {
-	let mut ext = new_test_ext(3);
+	let mut ext = new_test_ext();
 	let (offchain, _state) = TestOffchainExt::new();
 	let (pool, state) = TestTransactionPoolExt::new();
 	ext.register_extension(OffchainDbExt::new(offchain.clone()));
@@ -208,7 +211,7 @@ fn should_generate_heartbeats() {
 		// given
 		let block = 1;
 		System::set_block_number(block);
-		UintAuthorityId::set_all_keys(vec![0, 1, 2, 3, 4, 5]);
+		UintAuthorityId::set_all_keys(vec![0, 1, 2]);
 		// buffer new validators
 		Session::rotate_session();
 		// enact the change and buffer another one
@@ -245,7 +248,7 @@ fn should_generate_heartbeats() {
 
 #[test]
 fn should_cleanup_received_heartbeats_on_session_end() {
-	new_test_ext(3).execute_with(|| {
+	new_test_ext().execute_with(|| {
 		advance_session();
 
 		Validators::mutate(|l| *l = Some(vec![1, 2, 3]));
@@ -261,14 +264,14 @@ fn should_cleanup_received_heartbeats_on_session_end() {
 		let _ = heartbeat(1, 2, 0, 1.into(), Session::validators()).unwrap();
 
 		// the heartbeat is stored
-		assert!(!ImOnline::received_heartbeats(&2, &0).is_none());
+		assert!(!super::pallet::ReceivedHeartbeats::<Runtime>::get(2, 0).is_none());
 
 		advance_session();
 
 		// after the session has ended we have already processed the heartbeat
 		// message, so any messages received on the previous session should have
 		// been pruned.
-		assert!(ImOnline::received_heartbeats(&2, &0).is_none());
+		assert!(super::pallet::ReceivedHeartbeats::<Runtime>::get(2, 0).is_none());
 	});
 }
 
@@ -276,7 +279,7 @@ fn should_cleanup_received_heartbeats_on_session_end() {
 fn should_mark_online_validator_when_block_is_authored() {
 	use pallet_authorship::EventHandler;
 
-	new_test_ext(6).execute_with(|| {
+	new_test_ext().execute_with(|| {
 		advance_session();
 		// given
 		Validators::mutate(|l| *l = Some(vec![1, 2, 3, 4, 5, 6]));
@@ -295,7 +298,7 @@ fn should_mark_online_validator_when_block_is_authored() {
 		ImOnline::note_author(1);
 
 		// then
-		//assert!(ImOnline::is_online(0));
+		assert!(ImOnline::is_online(0));
 		assert!(!ImOnline::is_online(1));
 		assert!(!ImOnline::is_online(2));
 	});
@@ -305,7 +308,7 @@ fn should_mark_online_validator_when_block_is_authored() {
 fn should_not_send_a_report_if_already_online() {
 	use pallet_authorship::EventHandler;
 
-	let mut ext = new_test_ext(3);
+	let mut ext = new_test_ext();
 	let (offchain, _state) = TestOffchainExt::new();
 	let (pool, pool_state) = TestTransactionPoolExt::new();
 	ext.register_extension(OffchainDbExt::new(offchain.clone()));
@@ -328,9 +331,8 @@ fn should_not_send_a_report_if_already_online() {
 		UintAuthorityId::set_all_keys(vec![1, 2, 3]);
 		// we expect error, since the authority is already online.
 		let mut res = ImOnline::send_heartbeats(4).unwrap();
-		assert_eq!(res.next().unwrap().unwrap_err(), OffchainErr::AlreadyOnline(0));
-		// assert_eq!(res.next().unwrap().unwrap_err(), OffchainErr::AlreadyOnline(1));
-		assert_eq!(res.next().unwrap().is_ok(), true);
+		res.next().unwrap().unwrap();
+		assert_eq!(res.next().unwrap().unwrap_err(), OffchainErr::AlreadyOnline(1));
 		assert_eq!(res.next().unwrap().unwrap_err(), OffchainErr::AlreadyOnline(2));
 		assert_eq!(res.next(), None);
 
@@ -348,14 +350,14 @@ fn should_not_send_a_report_if_already_online() {
 
 		assert_eq!(
 			heartbeat,
-			Heartbeat { block_number: 4, session_index: 2, authority_index: 1, validators_len: 3 }
+			Heartbeat { block_number: 4, session_index: 2, authority_index: 0, validators_len: 3 }
 		);
 	});
 }
 
 #[test]
 fn should_handle_missing_progress_estimates() {
-	let mut ext = new_test_ext(6);
+	let mut ext = new_test_ext();
 	let (offchain, _state) = TestOffchainExt::new();
 	let (pool, state) = TestTransactionPoolExt::new();
 	ext.register_extension(OffchainDbExt::new(offchain.clone()));
@@ -380,7 +382,7 @@ fn should_handle_missing_progress_estimates() {
 		MockCurrentSessionProgress::mutate(|p| *p = Some(None));
 		ImOnline::offchain_worker(block);
 
-		assert_eq!(state.read().transactions.len(), 2);
+		assert_eq!(state.read().transactions.len(), 3);
 	});
 }
 
@@ -391,7 +393,7 @@ fn should_handle_non_linear_session_progress() {
 	// the session more than just one block increment (in BABE session length is defined in slots,
 	// not block numbers).
 
-	let mut ext = new_test_ext(6);
+	let mut ext = new_test_ext();
 	let (offchain, _state) = TestOffchainExt::new();
 	let (pool, _) = TestTransactionPoolExt::new();
 	ext.register_extension(OffchainDbExt::new(offchain.clone()));
@@ -414,7 +416,7 @@ fn should_handle_non_linear_session_progress() {
 
 		Session::rotate_session();
 
-		// if we don't have valid results for the current session progres then
+		// if we don't have valid results for the current session progress then
 		// we'll fallback to `HeartbeatAfter` and only heartbeat on block 5.
 		MockCurrentSessionProgress::mutate(|p| *p = Some(None));
 		assert_eq!(ImOnline::send_heartbeats(2).err(), Some(OffchainErr::TooEarly));
@@ -432,7 +434,7 @@ fn should_handle_non_linear_session_progress() {
 
 #[test]
 fn test_does_not_heartbeat_early_in_the_session() {
-	let mut ext = new_test_ext(6);
+	let mut ext = new_test_ext();
 	let (offchain, _state) = TestOffchainExt::new();
 	let (pool, _) = TestTransactionPoolExt::new();
 	ext.register_extension(OffchainDbExt::new(offchain.clone()));
@@ -449,7 +451,7 @@ fn test_does_not_heartbeat_early_in_the_session() {
 
 #[test]
 fn test_probability_of_heartbeating_increases_with_session_progress() {
-	let mut ext = new_test_ext(6);
+	let mut ext = new_test_ext();
 	let (offchain, state) = TestOffchainExt::new();
 	let (pool, _) = TestTransactionPoolExt::new();
 	ext.register_extension(OffchainDbExt::new(offchain.clone()));
