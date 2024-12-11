@@ -49,6 +49,7 @@ use sp_consensus_grandpa::{
 };
 use sp_runtime::{generic::DigestItem, traits::Zero, DispatchResult};
 use sp_session::{GetSessionNumber, GetValidatorCount};
+use pallet_session::validation::OneSessionHandlerAll;
 use sp_staking::{offence::OffenceReportSystem, SessionIndex};
 use sp_std::prelude::*;
 
@@ -622,5 +623,18 @@ where
 
 	fn on_disabled(i: u32) {
 		Self::deposit_log(ConsensusLog::OnDisabled(i as u64))
+	}
+}
+
+impl<T: Config> OneSessionHandlerAll<T::AccountId> for Pallet<T>
+where
+	T: pallet_session::Config,
+{
+	type Key = AuthorityId;
+
+	fn on_new_session_all<'a, I: 'a>(_changed: bool, _validators: I, _queued_validators: I)
+	where
+		I: Iterator<Item = (&'a T::AccountId, AuthorityId)>,
+	{
 	}
 }

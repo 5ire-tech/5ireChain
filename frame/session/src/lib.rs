@@ -113,14 +113,9 @@ pub mod migrations;
 mod mock;
 #[cfg(test)]
 mod tests;
-pub mod validation;
 pub mod weights;
-use crate::validation::OneSessionHandlerAll;
+pub mod validation;
 use codec::{Decode, MaxEncodedLen};
-use frame_election_provider_support::{
-	bounds::{CountBound, SizeBound},
-	DataProviderBounds, ElectionDataProvider,
-};
 use frame_support::{
 	dispatch::DispatchResult,
 	ensure,
@@ -131,6 +126,11 @@ use frame_support::{
 	weights::Weight,
 	Parameter,
 };
+use frame_election_provider_support::{
+	bounds::{CountBound, SizeBound},
+	DataProviderBounds, ElectionDataProvider,
+};
+use crate::validation::OneSessionHandlerAll;
 use frame_system::pallet_prelude::BlockNumberFor;
 use sp_runtime::{
 	traits::{AtLeast32BitUnsigned, Convert, Member, One, OpaqueKeys, Zero},
@@ -290,7 +290,11 @@ pub trait SessionHandler<ValidatorId> {
 	/// before initialization of your pallet.
 	///
 	/// `changed` is true whenever any of the session keys or underlying economic
-	/// identities or weightings behind those keys has changed.
+	/// identities or weightings behind `validators` keys has changed. `queued_validators`
+	/// could change without `validators` changing. Example of possible sequent calls:
+	///     Session N: on_new_session(false, unchanged_validators, unchanged_queued_validators)
+	///     Session N + 1: on_new_session(false, unchanged_validators, new_queued_validators)
+	/// 	Session N + 2: on_new_session(true, new_queued_validators, new_queued_validators)
 	fn on_new_session<Ks: OpaqueKeys>(
 		changed: bool,
 		validators: &[(ValidatorId, Ks)],
@@ -422,7 +426,7 @@ pub mod pallet {
 	use frame_support::pallet_prelude::*;
 	use frame_system::pallet_prelude::*;
 
-	/// The current storage version.
+	/// The in-code storage version.
 	const STORAGE_VERSION: StorageVersion = StorageVersion::new(0);
 
 	#[pallet::pallet]
@@ -461,14 +465,11 @@ pub mod pallet {
 		/// Handler when a session has changed.
 		type SessionHandler: SessionHandler<Self::ValidatorId>;
 
-		/// Handler when a session has changed.
+		/// All SessionHandler when a session has changed.
 		type AllSessionHandler: AllSessionHandler<Self::ValidatorId>;
 
 		/// The keys.
 		type Keys: OpaqueKeys + Member + Parameter + MaybeSerializeDeserialize;
-
-		/// Weight information for extrinsics in this pallet.
-		type WeightInfo: WeightInfo;
 
 		/// Something that will provide the election data.
 		/// 5ire's implementation
@@ -481,6 +482,9 @@ pub mod pallet {
 		/// overwritten in the `InstantElectionProvider` impl.
 		/// 5ire's implementation
 		type TargetsBound: Get<u32>;
+
+		/// Weight information for extrinsics in this pallet.
+		type WeightInfo: WeightInfo;
 	}
 
 	#[pallet::genesis_config]
@@ -529,22 +533,14 @@ pub mod pallet {
 					);
 					self.keys.iter().map(|x| x.1.clone()).collect()
 				});
-			assert!(
-				!initial_validators_0.is_empty(),
-				"Empty validator set for session 0 in genesis block!"
-			);
 
 			let initial_validators_1 = T::SessionManager::new_session_genesis(1)
 				.unwrap_or_else(|| initial_validators_0.clone());
-			assert!(
-				!initial_validators_1.is_empty(),
-				"Empty validator set for session 1 in genesis block!"
-			);
 
 			let queued_keys: Vec<_> = initial_validators_1
-			.into_iter()
-			.filter_map(|v| Pallet::<T>::load_keys(&v).map(|k| (v, k)))
-			.collect();
+				.into_iter()
+				.filter_map(|v| Pallet::<T>::load_keys(&v).map(|k| (v, k)))
+				.collect();
 
 			// Tell everyone about the genesis session keys
 			T::SessionHandler::on_genesis_session::<T::Keys>(&queued_keys);
@@ -753,7 +749,8 @@ impl<T: Config> Pallet<T> {
 				(all_validators, true)
 			} else {
 				(all_validators.clone().unwrap(), false)
-			};
+			};	
+
 		// Queue next session keys.
 		let (queued_amalgamated, next_changed) = {
 			// until we are certain there has been a change, iterate the prior
@@ -763,7 +760,7 @@ impl<T: Config> Pallet<T> {
 			let mut now_session_keys = session_keys.iter();
 			let mut check_next_changed = |keys: &T::Keys| {
 				if changed {
-					return;
+					return
 				}
 				// since a new validator set always leads to `changed` starting
 				// as true, we can ensure that `now_session_keys` and `next_validators`
@@ -818,6 +815,7 @@ impl<T: Config> Pallet<T> {
 			(queued_amalgamated1, all_changed)
 		};
 
+
 		<QueuedKeys<T>>::put(queued_amalgamated.clone());
 		<QueuedChanged<T>>::put(next_changed);
 		//5ire's implementation
@@ -828,7 +826,6 @@ impl<T: Config> Pallet<T> {
 		Self::deposit_event(Event::NewSession { session_index });
 
 		// Tell everyone about the new session keys.
-		// 5ire's implementation
 		T::SessionHandler::on_new_session::<T::Keys>(changed, &session_keys, &queued_amalgamated);
 		T::AllSessionHandler::on_new_session_all::<T::Keys>(
 			all_changed,
@@ -840,14 +837,14 @@ impl<T: Config> Pallet<T> {
 	/// Disable the validator of index `i`, returns `false` if the validator was already disabled.
 	pub fn disable_index(i: u32) -> bool {
 		if i >= Validators::<T>::decode_len().unwrap_or(0) as u32 {
-			return false;
+			return false
 		}
 
 		<DisabledValidators<T>>::mutate(|disabled| {
 			if let Err(index) = disabled.binary_search(&i) {
 				disabled.insert(index, i);
 				T::SessionHandler::on_disabled(i);
-				return true;
+				return true
 			}
 
 			false
@@ -962,7 +959,7 @@ impl<T: Config> Pallet<T> {
 
 			if let Some(old) = old_keys.as_ref().map(|k| k.get_raw(*id)) {
 				if key == old {
-					continue;
+					continue
 				}
 
 				Self::clear_key_owner(*id, old);
@@ -1050,8 +1047,7 @@ impl<T: Config> EstimateNextNewSession<BlockNumberFor<T>> for Pallet<T> {
 	}
 }
 
-	impl<T: Config> frame_support::traits::DisabledValidators for Pallet<T> {
-		
+impl<T: Config> frame_support::traits::DisabledValidators for Pallet<T> {
 	fn is_disabled(index: u32) -> bool {
 		<Pallet<T>>::disabled_validators().binary_search(&index).is_ok()
 	}

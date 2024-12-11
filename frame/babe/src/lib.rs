@@ -36,6 +36,7 @@ use sp_consensus_babe::{
 	EquivocationProof, Randomness as BabeRandomness, Slot, BABE_ENGINE_ID, RANDOMNESS_LENGTH,
 	RANDOMNESS_VRF_CONTEXT,
 };
+use pallet_session::validation::OneSessionHandlerAll;
 use sp_core::crypto::Wraps;
 use sp_runtime::{
 	generic::DigestItem,
@@ -1013,6 +1014,17 @@ fn compute_randomness(
 	}
 
 	sp_io::hashing::blake2_256(&s)
+}
+
+// Our implementation
+impl<T: Config> OneSessionHandlerAll<T::AccountId> for Pallet<T> {
+	type Key = AuthorityId;
+
+	fn on_new_session_all<'a, I: 'a>(_changed: bool, _validators: I, _queued_validators: I)
+	where
+		I: Iterator<Item = (&'a T::AccountId, AuthorityId)>,
+	{
+	}
 }
 
 pub mod migrations {
