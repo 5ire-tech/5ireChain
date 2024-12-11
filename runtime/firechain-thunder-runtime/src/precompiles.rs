@@ -1,5 +1,6 @@
 use pallet_evm_precompile_batch::BatchPrecompile;
 use pallet_evm_precompile_modexp::Modexp;
+use pallet_evm_precompile_registry::PrecompileRegistry;
 use pallet_evm_precompile_sha3fips::Sha3FIPS256;
 use pallet_evm_precompile_simple::{ECRecover, ECRecoverPublicKey, Identity, Ripemd160, Sha256};
 use precompile_utils::precompile_set::*;
@@ -25,6 +26,11 @@ type FirePrecompilesAt<R> = (
 			// Batch is the only precompile allowed to call Batch.
 			CallableByPrecompile<OnlyFrom<AddressU64<4096>>>,
 		),
+	>,
+	PrecompileAt<
+		AddressU64<4097>,
+		PrecompileRegistry<R>,
+		(CallableByContract, CallableByPrecompile),
 	>,
 );
 

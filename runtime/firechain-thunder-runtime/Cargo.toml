@@ -1,6 +1,6 @@
 [package]
 name = "firechain-thunder-runtime"
-version = "1.0.9"
+version = "1.1.0"
 authors = ["5ire Team <support@5ire.org>"]
 description = "5ire chain Thunder Testnet runtime"
 edition = "2021"
@@ -123,6 +123,7 @@ pallet-evm-precompile-simple = { workspace = true }
 pallet-hotfix-sufficients = { workspace = true }
 precompile-utils = { workspace = true }
 pallet-evm-precompile-batch = {workspace = true }
+pallet-evm-precompile-registry = {workspace = true }
 
 [build-dependencies]
 substrate-wasm-builder = { workspace = true, optional = true }
@@ -228,6 +229,7 @@ std = [
 	'pallet-evm-precompile-sha3fips/std',
 	"firechain-runtime-core-primitives/std",
 	"pallet-evm-precompile-batch/std",
+	"pallet-evm-precompile-registry/std",
 ]
 runtime-benchmarks = [
 	"frame-benchmarking/runtime-benchmarks",
