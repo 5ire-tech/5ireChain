@@ -7238,6 +7238,7 @@ dependencies = [
  "frame-system",
  "log",
  "pallet-authorship",
+ "pallet-esg",
  "pallet-session 28.0.0",
  "parity-scale-codec",
  "scale-info",

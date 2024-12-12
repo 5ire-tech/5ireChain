@@ -27,9 +27,10 @@ sp-io = { workspace = true, default-features = false }
 sp-runtime = { workspace = true, default-features = false, features = ["serde"] }
 sp-staking = { workspace = true, default-features = false, features = ["serde"] }
 sp-std = { workspace = true, default-features = false }
+pallet-session = { workspace = true,default-features = false }
+pallet-esg = { workspace = true, default-features = false}
 
 [dev-dependencies]
-pallet-session = { workspace = true }
 
 [features]
 default = ["std"]
@@ -41,6 +42,7 @@ std = [
 	"log/std",
 	"pallet-authorship/std",
 	"pallet-session/std",
+	"pallet-esg/std",
 	"frame-election-provider-support/std",
 	"scale-info/std",
 	"sp-application-crypto/std",
