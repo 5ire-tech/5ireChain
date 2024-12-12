@@ -1248,6 +1248,10 @@ pub mod pallet {
 	#[pallet::storage]
 	pub(crate) type PristineCode<T: Config> = StorageMap<_, Identity, CodeHash<T>, CodeVec<T>>;
 
+	/// A mapping from a contract's caller to its deployer.
+	#[pallet::storage]
+	pub type ContractDeployer<T: Config> = StorageMap<_, Identity, T::AccountId, T::AccountId>;
+
 	/// A mapping from a contract's code hash to its code info.
 	#[pallet::storage]
 	pub(crate) type CodeInfoOf<T: Config> = StorageMap<_, Identity, CodeHash<T>, CodeInfo<T>>;

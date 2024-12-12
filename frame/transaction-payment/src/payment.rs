@@ -17,13 +17,14 @@
 
 /// ! Traits and default implementation for paying transaction fees.
 use crate::Config;
-
+use pallet_contracts::ContractDeployer;
 use core::marker::PhantomData;
 use sp_runtime::{
 	traits::{DispatchInfoOf, PostDispatchInfoOf, Saturating, Zero},
 	transaction_validity::InvalidTransaction,
 };
-
+use sp_runtime::traits::UniqueSaturatedInto;
+use crate::{Event, Pallet};
 use frame_support::{
 	traits::{
 		fungible::{Balanced, Credit, Debt, Inspect},
@@ -49,8 +50,8 @@ pub trait OnChargeTransaction<T: Config> {
 	/// Note: The `fee` already includes the `tip`.
 	fn withdraw_fee(
 		who: &T::AccountId,
-		call: &T::RuntimeCall,
-		dispatch_info: &DispatchInfoOf<T::RuntimeCall>,
+		call: &<T as frame_system::Config>::RuntimeCall,
+		dispatch_info: &DispatchInfoOf<<T as frame_system::Config>::RuntimeCall>,
 		fee: Self::Balance,
 		tip: Self::Balance,
 	) -> Result<Self::LiquidityInfo, TransactionValidityError>;
@@ -62,8 +63,8 @@ pub trait OnChargeTransaction<T: Config> {
 	/// Note: The `fee` already includes the `tip`.
 	fn correct_and_deposit_fee(
 		who: &T::AccountId,
-		dispatch_info: &DispatchInfoOf<T::RuntimeCall>,
-		post_info: &PostDispatchInfoOf<T::RuntimeCall>,
+		dispatch_info: &DispatchInfoOf<<T as frame_system::Config>::RuntimeCall>,
+		post_info: &PostDispatchInfoOf<<T as frame_system::Config>::RuntimeCall>,
 		corrected_fee: Self::Balance,
 		tip: Self::Balance,
 		already_withdrawn: Self::LiquidityInfo,
@@ -89,8 +90,8 @@ where
 
 	fn withdraw_fee(
 		who: &<T>::AccountId,
-		_call: &<T>::RuntimeCall,
-		_dispatch_info: &DispatchInfoOf<<T>::RuntimeCall>,
+		_call: &<T as frame_system::Config>::RuntimeCall,
+		_dispatch_info: &DispatchInfoOf<<T as frame_system::Config>::RuntimeCall>,
 		fee: Self::Balance,
 		_tip: Self::Balance,
 	) -> Result<Self::LiquidityInfo, TransactionValidityError> {
@@ -112,8 +113,8 @@ where
 
 	fn correct_and_deposit_fee(
 		who: &<T>::AccountId,
-		_dispatch_info: &DispatchInfoOf<<T>::RuntimeCall>,
-		_post_info: &PostDispatchInfoOf<<T>::RuntimeCall>,
+		_dispatch_info: &DispatchInfoOf<<T as frame_system::Config>::RuntimeCall>,
+		_post_info: &PostDispatchInfoOf<<T as frame_system::Config>::RuntimeCall>,
 		corrected_fee: Self::Balance,
 		tip: Self::Balance,
 		already_withdrawn: Self::LiquidityInfo,
@@ -181,8 +182,8 @@ where
 	/// Note: The `fee` already includes the `tip`.
 	fn withdraw_fee(
 		who: &T::AccountId,
-		_call: &T::RuntimeCall,
-		_info: &DispatchInfoOf<T::RuntimeCall>,
+		_call: &<T as frame_system::Config>::RuntimeCall,
+		_info: &DispatchInfoOf<<T as frame_system::Config>::RuntimeCall>,
 		fee: Self::Balance,
 		tip: Self::Balance,
 	) -> Result<Self::LiquidityInfo, TransactionValidityError> {
@@ -209,8 +210,8 @@ where
 	/// Note: The `corrected_fee` already includes the `tip`.
 	fn correct_and_deposit_fee(
 		who: &T::AccountId,
-		_dispatch_info: &DispatchInfoOf<T::RuntimeCall>,
-		_post_info: &PostDispatchInfoOf<T::RuntimeCall>,
+		_dispatch_info: &DispatchInfoOf<<T as frame_system::Config>::RuntimeCall>,
+		_post_info: &PostDispatchInfoOf<<T as frame_system::Config>::RuntimeCall>,
 		corrected_fee: Self::Balance,
 		tip: Self::Balance,
 		already_withdrawn: Self::LiquidityInfo,
@@ -218,11 +219,36 @@ where
 		if let Some(paid) = already_withdrawn {
 			// Calculate how much refund we should return
 			let refund_amount = paid.peek().saturating_sub(corrected_fee);
+			// `refund_owner` is initialized as zero, representing an imbalance in the contract
+			// deployer's account, which will be adjusted later if the contract address is found.
+			let mut refund_deployer = C::PositiveImbalance::zero();
+			// Retrieve the contract address associated with the given `who` address from the
+			// `ContractDeployer` mapping.
+			let contract_address = ContractDeployer::<T>::get(who);
+
+			if let Some(contract_address) = contract_address {
+				// `contract_deployer_revenue` is half of the `corrected_fee`, representing the
+				// revenue to be allocated to the contract deployer.
+				let contract_deployer_revenue = corrected_fee / 2u32.into();
+				// Attempts to deposit the `contract_deployer_revenue` into the contract deployer's
+				// account, updating `refund_owner`
+				refund_deployer =
+					C::deposit_into_existing(&contract_address, contract_deployer_revenue)
+						.unwrap_or_else(|_| C::PositiveImbalance::zero());
+				Pallet::<T>::deposit_event(Event::<T>::DeployerFeeAllocation {
+					address: contract_address,
+					fee: contract_deployer_revenue.unique_saturated_into(),
+				});
+			}
 			// refund to the the account that paid the fees. If this fails, the
 			// account might have dropped below the existential balance. In
 			// that case we don't refund anything.
-			let refund_imbalance = C::deposit_into_existing(who, refund_amount)
+			let refund_fee = C::deposit_into_existing(who, refund_amount)
 				.unwrap_or_else(|_| C::PositiveImbalance::zero());
+			// Merge the `refund_fee` imbalance with the `refund_owner` imbalance, combining the two
+			// imbalances into `refund_imbalance`.
+			let refund_imbalance = refund_fee.merge(refund_deployer);
+			ContractDeployer::<T>::remove(who);
 			// merge the imbalance caused by paying the fees and refunding parts of it again.
 			let adjusted_paid = paid
 				.offset(refund_imbalance)

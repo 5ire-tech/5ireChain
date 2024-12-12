@@ -86,7 +86,7 @@ pub struct WasmBlob<T: Config> {
 #[scale_info(skip_type_params(T))]
 pub struct CodeInfo<T: Config> {
 	/// The account that has uploaded the contract code and hence is allowed to remove it.
-	owner: AccountIdOf<T>,
+	pub owner: AccountIdOf<T>,
 	/// The amount of balance that was deposited by the owner in order to store it on-chain.
 	#[codec(compact)]
 	deposit: BalanceOf<T>,

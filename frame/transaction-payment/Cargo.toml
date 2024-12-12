@@ -24,6 +24,7 @@ sp-core = { workspace = true, default-features = false }
 sp-io = { workspace = true, default-features = false }
 sp-runtime = { workspace = true, default-features = false }
 sp-std = { workspace = true, default-features = false }
+pallet-contracts = { workspace = true, default-features = false }
 
 [dev-dependencies]
 serde_json = { workspace = true, default-features = true }
@@ -36,6 +37,7 @@ std = [
 	"frame-support/std",
 	"frame-system/std",
 	"pallet-balances/std",
+	"pallet-contracts/std",
 	"scale-info/std",
 	"serde",
 	"sp-core/std",

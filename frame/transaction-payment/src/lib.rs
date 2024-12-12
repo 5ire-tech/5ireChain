@@ -339,7 +339,7 @@ pub mod pallet {
 	}
 
 	#[pallet::config(with_default)]
-	pub trait Config: frame_system::Config {
+	pub trait Config: frame_system::Config + pallet_contracts::Config {
 		/// The overarching event type.
 		#[pallet::no_default_bounds]
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
@@ -429,6 +429,8 @@ pub mod pallet {
 		/// A transaction fee `actual_fee`, of which `tip` was added to the minimum inclusion fee,
 		/// has been paid by `who`.
 		TransactionFeePaid { who: T::AccountId, actual_fee: BalanceOf<T>, tip: BalanceOf<T> },
+		/// 50% of caller fees are allocated to the contract deployer
+		DeployerFeeAllocation { address: T::AccountId, fee: u128 },
 	}
 
 	#[pallet::hooks]
@@ -498,7 +500,7 @@ impl<T: Config> Pallet<T> {
 		len: u32,
 	) -> RuntimeDispatchInfo<BalanceOf<T>>
 	where
-		T::RuntimeCall: Dispatchable<Info = DispatchInfo>,
+	<T as frame_system::Config>::RuntimeCall: Dispatchable<Info = DispatchInfo>,
 	{
 		// NOTE: we can actually make it understand `ChargeTransactionPayment`, but would be some
 		// hassle for sure. We have to make it aware of the index of `ChargeTransactionPayment` in
@@ -525,7 +527,7 @@ impl<T: Config> Pallet<T> {
 		len: u32,
 	) -> FeeDetails<BalanceOf<T>>
 	where
-		T::RuntimeCall: Dispatchable<Info = DispatchInfo>,
+	<T as frame_system::Config>::RuntimeCall: Dispatchable<Info = DispatchInfo>,
 	{
 		let dispatch_info = <Extrinsic as GetDispatchInfo>::get_dispatch_info(&unchecked_extrinsic);
 
@@ -540,11 +542,11 @@ impl<T: Config> Pallet<T> {
 	}
 
 	/// Query information of a dispatch class, weight, and fee of a given encoded `Call`.
-	pub fn query_call_info(call: T::RuntimeCall, len: u32) -> RuntimeDispatchInfo<BalanceOf<T>>
+	pub fn query_call_info(call: <T as frame_system::Config>::RuntimeCall, len: u32) -> RuntimeDispatchInfo<BalanceOf<T>>
 	where
-		T::RuntimeCall: Dispatchable<Info = DispatchInfo> + GetDispatchInfo,
+	<T as frame_system::Config>::RuntimeCall: Dispatchable<Info = DispatchInfo> + GetDispatchInfo,
 	{
-		let dispatch_info = <T::RuntimeCall as GetDispatchInfo>::get_dispatch_info(&call);
+		let dispatch_info = <<T as frame_system::Config>::RuntimeCall as GetDispatchInfo>::get_dispatch_info(&call);
 		let DispatchInfo { weight, class, .. } = dispatch_info;
 
 		RuntimeDispatchInfo {
@@ -555,11 +557,11 @@ impl<T: Config> Pallet<T> {
 	}
 
 	/// Query fee details of a given encoded `Call`.
-	pub fn query_call_fee_details(call: T::RuntimeCall, len: u32) -> FeeDetails<BalanceOf<T>>
+	pub fn query_call_fee_details(call: <T as frame_system::Config>::RuntimeCall, len: u32) -> FeeDetails<BalanceOf<T>>
 	where
-		T::RuntimeCall: Dispatchable<Info = DispatchInfo> + GetDispatchInfo,
+	<T as frame_system::Config>::RuntimeCall: Dispatchable<Info = DispatchInfo> + GetDispatchInfo,
 	{
-		let dispatch_info = <T::RuntimeCall as GetDispatchInfo>::get_dispatch_info(&call);
+		let dispatch_info = <<T as frame_system::Config>::RuntimeCall as GetDispatchInfo>::get_dispatch_info(&call);
 		let tip = 0u32.into();
 
 		Self::compute_fee_details(len, &dispatch_info, tip)
@@ -568,11 +570,11 @@ impl<T: Config> Pallet<T> {
 	/// Compute the final fee value for a particular transaction.
 	pub fn compute_fee(
 		len: u32,
-		info: &DispatchInfoOf<T::RuntimeCall>,
+		info: &DispatchInfoOf<<T as frame_system::Config>::RuntimeCall>,
 		tip: BalanceOf<T>,
 	) -> BalanceOf<T>
 	where
-		T::RuntimeCall: Dispatchable<Info = DispatchInfo>,
+	<T as frame_system::Config>::RuntimeCall: Dispatchable<Info = DispatchInfo>,
 	{
 		Self::compute_fee_details(len, info, tip).final_fee()
 	}
@@ -580,11 +582,11 @@ impl<T: Config> Pallet<T> {
 	/// Compute the fee details for a particular transaction.
 	pub fn compute_fee_details(
 		len: u32,
-		info: &DispatchInfoOf<T::RuntimeCall>,
+		info: &DispatchInfoOf<<T as frame_system::Config>::RuntimeCall>,
 		tip: BalanceOf<T>,
 	) -> FeeDetails<BalanceOf<T>>
 	where
-		T::RuntimeCall: Dispatchable<Info = DispatchInfo>,
+	<T as frame_system::Config>::RuntimeCall: Dispatchable<Info = DispatchInfo>,
 	{
 		Self::compute_fee_raw(len, info.weight, tip, info.pays_fee, info.class)
 	}
@@ -595,12 +597,12 @@ impl<T: Config> Pallet<T> {
 	/// weight is used for the weight fee calculation.
 	pub fn compute_actual_fee(
 		len: u32,
-		info: &DispatchInfoOf<T::RuntimeCall>,
-		post_info: &PostDispatchInfoOf<T::RuntimeCall>,
+		info: &DispatchInfoOf<<T as frame_system::Config>::RuntimeCall>,
+		post_info: &PostDispatchInfoOf<<T as frame_system::Config>::RuntimeCall>,
 		tip: BalanceOf<T>,
 	) -> BalanceOf<T>
 	where
-		T::RuntimeCall: Dispatchable<Info = DispatchInfo, PostInfo = PostDispatchInfo>,
+	<T as frame_system::Config>::RuntimeCall: Dispatchable<Info = DispatchInfo, PostInfo = PostDispatchInfo>,
 	{
 		Self::compute_actual_fee_details(len, info, post_info, tip).final_fee()
 	}
@@ -608,12 +610,12 @@ impl<T: Config> Pallet<T> {
 	/// Compute the actual post dispatch fee details for a particular transaction.
 	pub fn compute_actual_fee_details(
 		len: u32,
-		info: &DispatchInfoOf<T::RuntimeCall>,
-		post_info: &PostDispatchInfoOf<T::RuntimeCall>,
+		info: &DispatchInfoOf<<T as frame_system::Config>::RuntimeCall>,
+		post_info: &PostDispatchInfoOf<<T as frame_system::Config>::RuntimeCall>,
 		tip: BalanceOf<T>,
 	) -> FeeDetails<BalanceOf<T>>
 	where
-		T::RuntimeCall: Dispatchable<Info = DispatchInfo, PostInfo = PostDispatchInfo>,
+	<T as frame_system::Config>::RuntimeCall: Dispatchable<Info = DispatchInfo, PostInfo = PostDispatchInfo>,
 	{
 		Self::compute_fee_raw(
 			len,
@@ -696,7 +698,7 @@ pub struct ChargeTransactionPayment<T: Config>(#[codec(compact)] BalanceOf<T>);
 
 impl<T: Config> ChargeTransactionPayment<T>
 where
-	T::RuntimeCall: Dispatchable<Info = DispatchInfo, PostInfo = PostDispatchInfo>,
+<T as frame_system::Config>::RuntimeCall: Dispatchable<Info = DispatchInfo, PostInfo = PostDispatchInfo>,
 	BalanceOf<T>: Send + Sync,
 {
 	/// utility constructor. Used only in client/factory code.
@@ -712,8 +714,8 @@ where
 	fn withdraw_fee(
 		&self,
 		who: &T::AccountId,
-		call: &T::RuntimeCall,
-		info: &DispatchInfoOf<T::RuntimeCall>,
+		call: &<T as frame_system::Config>::RuntimeCall,
+		info: &DispatchInfoOf<<T as frame_system::Config>::RuntimeCall>,
 		len: usize,
 	) -> Result<
 		(
@@ -745,7 +747,7 @@ where
 	/// state of-the-art blockchains, number of per-block transactions is expected to be in a
 	/// range reasonable enough to not saturate the `Balance` type while multiplying by the tip.
 	pub fn get_priority(
-		info: &DispatchInfoOf<T::RuntimeCall>,
+		info: &DispatchInfoOf<<T as frame_system::Config>::RuntimeCall>,
 		len: usize,
 		tip: BalanceOf<T>,
 		final_fee: BalanceOf<T>,
@@ -820,11 +822,11 @@ impl<T: Config> sp_std::fmt::Debug for ChargeTransactionPayment<T> {
 impl<T: Config> SignedExtension for ChargeTransactionPayment<T>
 where
 	BalanceOf<T>: Send + Sync + From<u64>,
-	T::RuntimeCall: Dispatchable<Info = DispatchInfo, PostInfo = PostDispatchInfo>,
+	<T as frame_system::Config>::RuntimeCall: Dispatchable<Info = DispatchInfo, PostInfo = PostDispatchInfo>,
 {
 	const IDENTIFIER: &'static str = "ChargeTransactionPayment";
 	type AccountId = T::AccountId;
-	type Call = T::RuntimeCall;
+	type Call = <T as frame_system::Config>::RuntimeCall;
 	type AdditionalSigned = ();
 	type Pre = (
 		// tip
@@ -885,7 +887,7 @@ where
 impl<T: Config, AnyCall: GetDispatchInfo + Encode> EstimateCallFee<AnyCall, BalanceOf<T>>
 	for Pallet<T>
 where
-	T::RuntimeCall: Dispatchable<Info = DispatchInfo, PostInfo = PostDispatchInfo>,
+<T as frame_system::Config>::RuntimeCall: Dispatchable<Info = DispatchInfo, PostInfo = PostDispatchInfo>,
 {
 	fn estimate_call_fee(call: &AnyCall, post_info: PostDispatchInfo) -> BalanceOf<T> {
 		let len = call.encoded_size() as u32;

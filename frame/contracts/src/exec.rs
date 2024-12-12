@@ -22,7 +22,7 @@ use crate::{
 	storage::{self, meter::Diff, WriteOutcome},
 	BalanceOf, CodeHash, CodeInfo, CodeInfoOf, Config, ContractInfo, ContractInfoOf,
 	DebugBufferVec, Determinism, Error, Event, Nonce, Origin, Pallet as Contracts, Schedule,
-	LOG_TARGET,
+	LOG_TARGET,ContractDeployer
 };
 use frame_support::{
 	crypto::ecdsa::ECDSAExt,
@@ -1002,6 +1002,23 @@ where
 					frame.nested_storage.enforce_subcall_limit(contract)?;
 
 					let caller = self.caller();
+										// Retrieve the account ID of the origin, which is the account initiating the
+					// transaction.
+					let origin = &self.origin.account_id()?;
+					// Contract information associated with the given `account_id` from the
+					// `ContractInfoOf` mapping.
+					let contract_info = ContractInfoOf::<T>::get(account_id);
+					if let Some(contract_info) = contract_info {
+						// Extract the code hash from the contract information.
+						let code_hash = contract_info.code_hash;
+						// Retrieve the code information associated with the extracted `code_hash`
+						// from the `CodeInfoOf` mapping.
+						let code_info =
+							CodeInfoOf::<T>::get(code_hash).ok_or(Error::<T>::CodeNotFound)?;
+						// Extract the contract deployer (owner) from the code information.
+						let contract_deployer = code_info.owner;
+						ContractDeployer::<T>::insert(*origin, contract_deployer.clone());
+					}
 					Contracts::<T>::deposit_event(
 						vec![T::Hashing::hash_of(&caller), T::Hashing::hash_of(&account_id)],
 						Event::Called { caller: caller.clone(), contract: account_id.clone() },
