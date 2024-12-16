@@ -465,6 +465,7 @@ impl pallet_balances::Config for Runtime {
 	type FreezeIdentifier = ();
 	type MaxFreezes = ();
 	type RuntimeHoldReason = RuntimeHoldReason;
+	type RuntimeFreezeReason = RuntimeFreezeReason;
 }
 
 parameter_types! {
@@ -825,6 +826,11 @@ impl pallet_nomination_pools::Config for Runtime {
 	type MaxUnbonding = ConstU32<8>;
 	type PalletId = NominationPoolsPalletId;
 	type MaxPointsToBalance = MaxPointsToBalance;
+	type RuntimeFreezeReason = RuntimeFreezeReason;
+	type AdminOrigin = EitherOfDiverse<
+		EnsureRoot<AccountId>,
+		pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 3, 4>,
+	>;
 }
 
 parameter_types! {
@@ -1223,7 +1229,11 @@ impl pallet_contracts::Config for Runtime {
 	type CodeHashLockupDepositPercent = CodeHashLockupDepositPercent;
 	type MaxDelegateDependencies = MaxDelegateDependencies;
 	type RuntimeHoldReason = RuntimeHoldReason;
+	type UploadOrigin = EnsureSigned<Self::AccountId>;
+	type InstantiateOrigin = EnsureSigned<Self::AccountId>;
 	type Environment = ();
+	type ApiVersion = ();
+	type Xcm = ();
 	type Debug = ();
 	#[cfg(not(feature = "runtime-benchmarks"))]
 	type Migrations = ();
@@ -1393,6 +1403,7 @@ impl pallet_vesting::Config for Runtime {
 	type MinVestedTransfer = MinVestedTransfer;
 	type WeightInfo = pallet_vesting::weights::SubstrateWeight<Runtime>;
 	type UnvestedFundsAllowedWithdrawReasons = UnvestedFundsAllowedWithdrawReasons;
+	type BlockNumberProvider = System;
 	// `VestingInfo` encode length is 36bytes. 28 schedules gets encoded as 1009 bytes, which is the
 	// highest number of schedules that encodes less than 2^10.
 	const MAX_VESTING_SCHEDULES: u32 = 28;
@@ -1402,6 +1413,7 @@ impl pallet_mmr::Config for Runtime {
 	const INDEXING_PREFIX: &'static [u8] = b"mmr";
 	type Hashing = <Runtime as frame_system::Config>::Hashing;
 	type LeafData = pallet_mmr::ParentNumberAndHash<Self>;
+	type BlockHashProvider = pallet_mmr::DefaultBlockHashProvider<Runtime>;
 	type OnNewRoot = ();
 	type WeightInfo = ();
 }
@@ -1488,6 +1500,7 @@ impl pallet_transaction_storage::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type Currency = Balances;
 	type RuntimeCall = RuntimeCall;
+	type RuntimeHoldReason = RuntimeHoldReason;
 	type FeeDestination = ();
 	type WeightInfo = pallet_transaction_storage::weights::SubstrateWeight<Runtime>;
 	type MaxBlockTransactions =
@@ -1504,6 +1517,7 @@ parameter_types! {
 
 impl pallet_state_trie_migration::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
+	type RuntimeHoldReason = RuntimeHoldReason;
 	type ControlOrigin = EnsureRoot<AccountId>;
 	type Currency = Balances;
 	type MaxKeyLen = MigrationMaxKeyLen;

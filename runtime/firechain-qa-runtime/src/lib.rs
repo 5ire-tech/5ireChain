@@ -456,6 +456,7 @@ parameter_types! {
 impl pallet_balances::Config for Runtime {
 	type MaxLocks = MaxLocks;
 	type MaxReserves = MaxReserves;
+	type RuntimeFreezeReason = RuntimeFreezeReason;
 	type ReserveIdentifier = [u8; 8];
 	type Balance = Balance;
 	type DustRemoval = ();
@@ -1396,6 +1397,7 @@ impl pallet_vesting::Config for Runtime {
 	type MinVestedTransfer = MinVestedTransfer;
 	type WeightInfo = pallet_vesting::weights::SubstrateWeight<Runtime>;
 	type UnvestedFundsAllowedWithdrawReasons = UnvestedFundsAllowedWithdrawReasons;
+	type BlockNumberProvider = System;
 	// `VestingInfo` encode length is 36bytes. 28 schedules gets encoded as 1009 bytes, which is the
 	// highest number of schedules that encodes less than 2^10.
 	const MAX_VESTING_SCHEDULES: u32 = 28;
@@ -1405,6 +1407,7 @@ impl pallet_mmr::Config for Runtime {
 	const INDEXING_PREFIX: &'static [u8] = b"mmr";
 	type Hashing = <Runtime as frame_system::Config>::Hashing;
 	type LeafData = pallet_mmr::ParentNumberAndHash<Self>;
+	type BlockHashProvider = pallet_mmr::DefaultBlockHashProvider<Runtime>;
 	type OnNewRoot = ();
 	type WeightInfo = ();
 }
@@ -1505,6 +1508,7 @@ impl pallet_state_trie_migration::Config for Runtime {
 	type MaxKeyLen = MigrationMaxKeyLen;
 	type SignedDepositPerItem = MigrationSignedDepositPerItem;
 	type SignedDepositBase = MigrationSignedDepositBase;
+	type RuntimeHoldReason = RuntimeHoldReason;
 	// Warning: this is not advised, as it might allow the chain to be temporarily DOS-ed.
 	// Preferably, if the chain's governance/maintenance team is planning on using a specific
 	// account for the migration, put it here to make sure only that account can trigger the signed
