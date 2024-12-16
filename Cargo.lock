@@ -2562,6 +2562,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2acce4a10f12dc2fb14a218589d4f1f62ef011b2d0cc4b3cb1bba8e94da14649"
 
 [[package]]
+name = "faster-hex"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "51e2ce894d53b295cf97b05685aa077950ff3e8541af83217fc720a6437169f8"
+
+[[package]]
 name = "fastrand"
 version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3078,7 +3084,9 @@ dependencies = [
  "pallet-ethereum",
  "pallet-evm 6.0.0-dev",
  "pallet-evm-chain-id",
+ "pallet-evm-precompile-batch",
  "pallet-evm-precompile-modexp",
+ "pallet-evm-precompile-registry",
  "pallet-evm-precompile-sha3fips",
  "pallet-evm-precompile-simple",
  "pallet-fast-unstake",
@@ -7109,6 +7117,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-evm-precompile-batch"
+version = "0.1.0"
+dependencies = [
+ "derive_more 0.99.18",
+ "evm",
+ "fp-evm",
+ "frame-support",
+ "frame-system",
+ "hex-literal 0.4.1",
+ "log",
+ "num_enum 0.5.11",
+ "pallet-authorship",
+ "pallet-balances",
+ "pallet-evm 6.0.0-dev",
+ "pallet-timestamp",
+ "parity-scale-codec",
+ "paste",
+ "precompile-utils",
+ "scale-info",
+ "serde",
+ "sha3",
+ "slices",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 14.0.0 (git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.11.0)",
+]
+
+[[package]]
 name = "pallet-evm-precompile-modexp"
 version = "2.0.0-dev"
 dependencies = [
@@ -7116,6 +7153,30 @@ dependencies = [
  "hex",
  "num",
  "pallet-evm-test-vector-support",
+]
+
+[[package]]
+name = "pallet-evm-precompile-registry"
+version = "0.1.0"
+dependencies = [
+ "derive_more 0.99.18",
+ "fp-evm",
+ "frame-support",
+ "frame-system",
+ "hex-literal 0.4.1",
+ "log",
+ "pallet-balances",
+ "pallet-evm 6.0.0-dev",
+ "pallet-scheduler",
+ "pallet-timestamp",
+ "parity-scale-codec",
+ "precompile-utils",
+ "scale-info",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 14.0.0 (git+https://github.com/paritytech/polkadot-sdk.git?branch=release-polkadot-v1.11.0)",
 ]
 
 [[package]]
@@ -10992,6 +11053,18 @@ name = "slice-group-by"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "826167069c09b99d56f31e9ae5c99049e932a98c9dc2dac47645b08dbbf76ba7"
+
+[[package]]
+name = "slices"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f2086e458a369cdca838e9f6ed04b4cc2e3ce636d99abb80c9e2eada107749cf"
+dependencies = [
+ "faster-hex",
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
 
 [[package]]
 name = "smallvec"

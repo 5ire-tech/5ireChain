@@ -133,6 +133,8 @@ pallet-evm-precompile-sha3fips = { workspace = true }
 pallet-evm-precompile-simple = { workspace = true }
 pallet-hotfix-sufficients = { workspace = true }
 precompile-utils = { workspace = true }
+pallet-evm-precompile-batch = {workspace = true }
+pallet-evm-precompile-registry = {workspace = true }
 
 [build-dependencies]
 substrate-wasm-builder = { workspace = true, optional = true }
@@ -234,6 +236,8 @@ std = [
 	'pallet-evm/std',
 	'pallet-evm-precompile-simple/std',
 	'pallet-evm-precompile-sha3fips/std',
+	"pallet-evm-precompile-batch/std",
+	"pallet-evm-precompile-registry/std",
 	"firechain-runtime-core-primitives/std",
 ]
 runtime-benchmarks = [
