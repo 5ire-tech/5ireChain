@@ -52,6 +52,7 @@ frame-system-rpc-runtime-api = { workspace = true }
 frame-try-runtime = { workspace = true, optional = true }
 pallet-alliance = { workspace = true }
 pallet-assets = { workspace = true }
+pallet-asset-rate ={ workspace = true }
 pallet-authority-discovery = { workspace = true }
 pallet-authorship = { workspace = true }
 pallet-babe = { workspace = true }
@@ -89,7 +90,8 @@ pallet-referenda = { workspace = true }
 pallet-remark = { workspace = true}
 pallet-root-testing = { workspace = true }
 pallet-session = { workspace = true, features = [ "historical" ] }
-pallet-staking = { workspace = true}
+pallet-staking = { workspace = true }
+pallet-salary = { workspace = true }
 pallet-staking-runtime-api = { workspace = true }
 pallet-state-trie-migration = { workspace = true }
 pallet-scheduler = { workspace = true}
@@ -133,6 +135,7 @@ std = [
 	"frame-election-provider-support/std",
 	"sp-authority-discovery/std",
 	"pallet-assets/std",
+	"pallet-asset-rate/std",
 	"pallet-authority-discovery/std",
 	"pallet-authorship/std",
 	"sp-consensus-babe/std",

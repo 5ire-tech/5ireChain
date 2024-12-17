@@ -101,6 +101,7 @@ pallet-root-testing = { workspace = true }
 pallet-session = { workspace = true, features = ["historical"] }
 pallet-session-benchmarking = { workspace = true, optional = true }
 pallet-staking = { workspace = true }
+pallet-salary = { workspace = true }
 pallet-staking-runtime-api = { workspace = true }
 pallet-state-trie-migration = { workspace = true }
 pallet-scheduler = { workspace = true }
@@ -193,6 +194,7 @@ std = [
 	"pallet-parameters/std",
 	"sp-session/std",
 	"pallet-sudo/std",
+	"pallet-salary/std",
 	"frame-support/std",
 	"frame-benchmarking/std",
 	"frame-benchmarking-pallet-pov/std",

@@ -64,6 +64,7 @@ frame-system-rpc-runtime-api = { workspace = true }
 frame-try-runtime = { workspace = true, optional = true }
 pallet-alliance = { workspace = true }
 pallet-assets = { workspace = true }
+pallet-asset-rate ={ workspace = true }
 pallet-authority-discovery = { workspace = true }
 pallet-authorship = { workspace = true }
 pallet-babe = { workspace = true }
@@ -151,6 +152,7 @@ std = [
 	"frame-election-provider-support/std",
 	"sp-authority-discovery/std",
 	"pallet-assets/std",
+	"pallet-asset-rate/std",
 	"pallet-authority-discovery/std",
 	"pallet-authorship/std",
 	"sp-consensus-babe/std",
