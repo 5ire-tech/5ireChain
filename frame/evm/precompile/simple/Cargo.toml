@@ -14,8 +14,6 @@ sp-io = { workspace = true }
 fp-evm = { workspace = true }
 
 [dev-dependencies]
-# Frontier
-pallet-evm-test-vector-support = { workspace = true }
 
 [features]
 default = ["std"]

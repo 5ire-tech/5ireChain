@@ -33,6 +33,7 @@ use frame_election_provider_support::{
 use frame_support::{
 	construct_runtime,
 	dispatch::DispatchClass,
+	derive_impl,
 	dynamic_params::{dynamic_pallet_params, dynamic_params},
 	instances::{Instance1, Instance2},
 	ord_parameter_types,
@@ -42,7 +43,7 @@ use frame_support::{
 		AsEnsureOriginWithArg, ConstBool, ConstU128, ConstU16, ConstU32, Currency, EitherOfDiverse,
 		EqualPrivilegeOnly, Everything, FindAuthor, Imbalance, InstanceFilter, KeyOwnerProofSystem,
 		LockIdentifier, Nothing, OnFinalize, OnUnbalanced, WithdrawReasons, fungible::HoldConsideration,
-		LinearStoragePrice
+		LinearStoragePrice, tokens::pay::PayAssetFromAccount
 	},
 	weights::{
 		constants::{
@@ -243,6 +244,7 @@ parameter_types! {
 
 const_assert!(NORMAL_DISPATCH_RATIO.deconstruct() >= AVERAGE_ON_INITIALIZE_RATIO.deconstruct());
 
+#[derive_impl(frame_system::config_preludes::SolochainDefaultConfig)]
 impl frame_system::Config for Runtime {
 	type BaseCallFilter = Everything;
 	type BlockWeights = RuntimeBlockWeights;
@@ -512,8 +514,8 @@ impl pallet_balances::Config for Runtime {
 	type ExistentialDeposit = ExistentialDeposit;
 	type AccountStore = frame_system::Pallet<Runtime>;
 	type WeightInfo = pallet_balances::weights::SubstrateWeight<Runtime>;
-	type FreezeIdentifier = ();
-	type MaxFreezes = ();
+	type FreezeIdentifier = RuntimeFreezeReason;
+	type MaxFreezes = ConstU32<1>;
 	type RuntimeHoldReason = RuntimeHoldReason;
 	type RuntimeFreezeReason = RuntimeFreezeReason;
 }
@@ -1187,6 +1189,7 @@ parameter_types! {
 	pub const MaximumReasonLength: u32 = 300;
 	pub const MaxApprovals: u32 = 100;
 	pub const MaxBalance: Balance = Balance::max_value();
+	pub TreasuryAccount: AccountId = Treasury::account_id();
 }
 
 impl pallet_treasury::Config for Runtime {
@@ -1209,6 +1212,12 @@ impl pallet_treasury::Config for Runtime {
 	type Burn = ();
 	type BurnDestination = ();
 	type SpendFunds = Bounties;
+	type AssetKind = u32;
+	type Beneficiary = AccountId;
+	type BeneficiaryLookup = Indices;
+	type Paymaster = PayAssetFromAccount<Assets, TreasuryAccount>;
+	type BalanceConverter = AssetRate;
+	type PayoutPeriod = SpendPayoutPeriod;
 	type WeightInfo = pallet_treasury::weights::SubstrateWeight<Runtime>;
 	type MaxApprovals = MaxApprovals;
 	type SpendOrigin = EnsureWithSuccess<EnsureRoot<AccountId>, AccountId, MaxBalance>;

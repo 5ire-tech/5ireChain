@@ -42,7 +42,8 @@ use frame_support::{
 	traits::{
 		AsEnsureOriginWithArg, ConstBool, ConstU128, ConstU16, ConstU32, Currency, EitherOfDiverse,
 		EqualPrivilegeOnly, Everything, FindAuthor, Imbalance, InstanceFilter, KeyOwnerProofSystem,
-		LockIdentifier, Nothing, OnFinalize, OnUnbalanced, WithdrawReasons,fungible::HoldConsideration
+		LockIdentifier, Nothing, OnFinalize, OnUnbalanced, WithdrawReasons,fungible::HoldConsideration,
+		LinearStoragePrice
 	},
 	weights::{
 		constants::{
@@ -509,7 +510,7 @@ impl pallet_balances::Config for Runtime {
 	type ExistentialDeposit = ExistentialDeposit;
 	type AccountStore = frame_system::Pallet<Runtime>;
 	type WeightInfo = pallet_balances::weights::SubstrateWeight<Runtime>;
-	type FreezeIdentifier = ();
+	type FreezeIdentifier = RuntimeFreezeReason;
 	type MaxFreezes = ();
 	type RuntimeHoldReason = RuntimeHoldReason;
 }
@@ -883,6 +884,28 @@ impl pallet_nomination_pools::Config for Runtime {
 	>;
 }
 
+pub struct SalaryForRank;
+impl GetSalary<u16, AccountId, Balance> for SalaryForRank {
+	fn get_salary(a: u16, _: &AccountId) -> Balance {
+		Balance::from(a) * 1000 * DOLLARS
+	}
+}
+
+parameter_types! {
+	pub const Budget: Balance = 10_000 * DOLLARS;
+}
+
+impl pallet_salary::Config for Runtime {
+	type WeightInfo = ();
+	type RuntimeEvent = RuntimeEvent;
+	type Paymaster = PayFromAccount<Balances, TreasuryAccount>;
+	type Members = RankedCollective;
+	type Salary = SalaryForRank;
+	type RegistrationPeriod = ConstU32<200>;
+	type PayoutPeriod = ConstU32<200>;
+	type Budget = Budget;
+}
+
 parameter_types! {
 	pub const VoteLockingPeriod: BlockNumber = 30 * DAYS;
 }
@@ -1207,6 +1230,12 @@ impl pallet_treasury::Config for Runtime {
 	type SpendFunds = Bounties;
 	type WeightInfo = pallet_treasury::weights::SubstrateWeight<Runtime>;
 	type MaxApprovals = MaxApprovals;
+	type AssetKind = u32;
+	type Beneficiary = AccountId;
+	type BeneficiaryLookup = Indices;
+	type Paymaster = PayAssetFromAccount<Assets, TreasuryAccount>;
+	type BalanceConverter = AssetRate;
+	type PayoutPeriod = SpendPayoutPeriod;
 	type SpendOrigin = EnsureWithSuccess<EnsureRoot<AccountId>, AccountId, MaxBalance>;
 }
 
@@ -1409,6 +1438,7 @@ impl pallet_grandpa::Config for Runtime {
 
 parameter_types! {
 	pub const BasicDeposit: Balance = 10 * DOLLARS;       // 258 bytes on-chain
+	pub const ByteDeposit: Balance = deposit(0, 1);
 	pub const FieldDeposit: Balance = 250 * CENTS;        // 66 bytes on-chain
 	pub const SubAccountDeposit: Balance = 2 * DOLLARS;   // 53 bytes on-chain
 	pub const MaxSubAccounts: u32 = 100;
@@ -1715,6 +1745,7 @@ impl pallet_dynamic_fee::Config for Runtime {
 parameter_types! {
 	pub DefaultBaseFeePerGas: U256 = U256::from(1_000_000_000_00u128);
 	pub DefaultElasticity: Permill = Permill::from_parts(125_000);
+	pub SuicideQuickClearLimit: u32 = 0;
 }
 pub struct BaseFeeThreshold;
 impl pallet_base_fee::BaseFeeThreshold for BaseFeeThreshold {
@@ -1735,9 +1766,7 @@ impl pallet_base_fee::Config for Runtime {
 	type DefaultElasticity = DefaultElasticity;
 }
 impl pallet_hotfix_sufficients::Config for Runtime {
-	//type AddressMapping = HashedAddressMapping<BlakeTwo256>;
 	type AddressMapping = pallet_evm::IdentityAddressMapping;
-
 	type WeightInfo = pallet_hotfix_sufficients::weights::SubstrateWeight<Self>;
 }
 impl pallet_evm::Config for Runtime {
@@ -1838,6 +1867,7 @@ construct_runtime!(
 		EVM: pallet_evm,
 		DynamicFee: pallet_dynamic_fee,
 		BaseFee: pallet_base_fee,
+		Salary:pallet_salary
 	}
 );
 

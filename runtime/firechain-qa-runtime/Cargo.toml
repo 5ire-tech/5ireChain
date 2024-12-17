@@ -106,6 +106,7 @@ pallet-staking-runtime-api = { workspace = true }
 pallet-state-trie-migration = { workspace = true }
 pallet-scheduler = { workspace = true }
 pallet-sudo = { workspace = true }
+pallet-salary = {workspace = true}
 pallet-timestamp = { workspace = true }
 pallet-treasury = { workspace = true }
 pallet-utility = { workspace = true }
@@ -196,6 +197,7 @@ std = [
 	"pallet-state-trie-migration/std",
 	"sp-session/std",
 	"pallet-sudo/std",
+	"pallet-salary/std",
 	"frame-support/std",
 	"frame-benchmarking/std",
 	"frame-benchmarking-pallet-pov/std",
