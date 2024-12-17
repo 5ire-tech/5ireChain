@@ -23,9 +23,9 @@ use frame_support::{
 };
 use pallet_alliance::{IdentityVerifier, ProposalIndex, ProposalProvider};
 use sp_std::prelude::*;
-
+use pallet_identity::legacy::IdentityField;
 use crate::{
-	AccountId, AllianceMotion, Authorship, Balances, Hash, NegativeImbalance, RuntimeCall,
+	AccountId, AllianceMotion, Authorship, Balances, Hash, NegativeImbalance, RuntimeCall,Runtime,AllianceCollective
 };
 
 pub struct Author;
@@ -46,7 +46,7 @@ impl IdentityVerifier<AccountId> for AllianceIdentityVerifier {
 	fn has_good_judgement(who: &AccountId) -> bool {
 		use pallet_identity::Judgement;
 		crate::Identity::identity(who)
-			.map(|registration| registration.judgements)
+			.map(|(registration, _)| registration.judgements)
 			.map_or(false, |judgements| {
 				judgements
 					.iter()
@@ -89,7 +89,7 @@ impl ProposalProvider<AccountId, Hash, RuntimeCall> for AllianceProposalProvider
 	}
 
 	fn proposal_of(proposal_hash: Hash) -> Option<RuntimeCall> {
-		AllianceMotion::proposal_of(proposal_hash)
+		pallet_collective::ProposalOf::<Runtime, AllianceCollective>::get(proposal_hash)
 	}
 }
 

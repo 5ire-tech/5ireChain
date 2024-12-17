@@ -44,7 +44,7 @@ sp-io = { workspace = true }
 frame-executive = { workspace = true }
 frame-benchmarking = { workspace = true }
 frame-benchmarking-pallet-pov = { workspace = true }
-frame-support = { workspace = true, features = ["tuples-96"] }
+frame-support = { workspace = true, features = ["experimental","tuples-96"] }
 frame-system = { workspace = true }
 frame-system-benchmarking = { workspace = true, optional = true }
 frame-election-provider-support = { workspace = true }

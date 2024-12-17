@@ -1147,34 +1147,6 @@ impl<T: Config> EraInfo<T> {
 			.unwrap_or(1)
 	}
 
-	/// Returns the next page that can be claimed or `None` if nothing to claim.
-	pub(crate) fn get_next_claimable_page(
-		era: EraIndex,
-		validator: &T::AccountId,
-		ledger: &StakingLedger<T>,
-	) -> Option<Page> {
-		if Self::is_non_paged_exposure(era, validator) {
-			return match ledger.legacy_claimed_rewards.binary_search(&era) {
-				// already claimed
-				Ok(_) => None,
-				// Non-paged exposure is considered as a single page
-				Err(_) => Some(0),
-			}
-		}
-
-		// Find next claimable page of paged exposure.
-		let page_count = Self::get_page_count(era, validator);
-		let all_claimable_pages: Vec<Page> = (0..page_count).collect();
-		let claimed_pages = ClaimedRewards::<T>::get(era, validator);
-
-		all_claimable_pages.into_iter().find(|p| !claimed_pages.contains(p))
-	}
-
-	/// Checks if exposure is paged or not.
-	fn is_non_paged_exposure(era: EraIndex, validator: &T::AccountId) -> bool {
-		<ErasStakersClipped<T>>::contains_key(&era, validator)
-	}
-
 	/// Returns validator commission for this era and page.
 	pub(crate) fn get_validator_commission(
 		era: EraIndex,

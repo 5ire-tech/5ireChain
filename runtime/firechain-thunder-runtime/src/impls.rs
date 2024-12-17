@@ -21,9 +21,10 @@ use frame_support::{
 	pallet_prelude::*,
 	traits::{Currency, OnUnbalanced},
 };
+use crate::{Runtime,AllianceCollective};
 use pallet_alliance::{IdentityVerifier, ProposalIndex, ProposalProvider};
 use sp_std::prelude::*;
-
+use pallet_identity::legacy::IdentityField;
 use crate::{
 	AccountId, AllianceMotion, Authorship, Balances, Hash, NegativeImbalance, RuntimeCall,
 };
@@ -39,6 +40,9 @@ impl OnUnbalanced<NegativeImbalance> for Author {
 
 pub struct AllianceIdentityVerifier;
 impl IdentityVerifier<AccountId> for AllianceIdentityVerifier {
+	fn has_required_identities(who: &AccountId) -> bool {
+		crate::Identity::has_identity(who, (IdentityField::Display | IdentityField::Web).bits())
+	}
 
 	fn has_good_judgement(who: &AccountId) -> bool {
 		use pallet_identity::Judgement;
@@ -86,7 +90,7 @@ impl ProposalProvider<AccountId, Hash, RuntimeCall> for AllianceProposalProvider
 	}
 
 	fn proposal_of(proposal_hash: Hash) -> Option<RuntimeCall> {
-		AllianceMotion::proposal_of(proposal_hash)
+		pallet_collective::ProposalOf::<Runtime, AllianceCollective>::get(proposal_hash)
 	}
 }
 
