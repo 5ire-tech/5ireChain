@@ -64,6 +64,7 @@ pallet-alliance = { workspace = true }
 pallet-assets = { workspace = true }
 pallet-authority-discovery = { workspace = true }
 pallet-authorship = { workspace = true }
+pallet-asset-rate = { workspace = true }
 pallet-babe = { workspace = true }
 pallet-bags-list = { workspace = true }
 pallet-balances = { workspace = true }
@@ -89,6 +90,7 @@ pallet-nomination-pools = { workspace = true }
 pallet-nomination-pools-runtime-api = { workspace = true }
 pallet-offences = { workspace = true }
 pallet-preimage = { workspace = true }
+pallet-parameters = {workspace = true }
 pallet-proxy = { workspace = true }
 pallet-insecure-randomness-collective-flip = { workspace = true }
 pallet-ranked-collective = { workspace = true }
@@ -142,6 +144,7 @@ std = [
 	"frame-election-provider-support/std",
 	"sp-authority-discovery/std",
 	"pallet-assets/std",
+	"pallet-asset-rate/std",
 	"pallet-authority-discovery/std",
 	"pallet-authorship/std",
 	"sp-consensus-babe/std",
@@ -187,6 +190,7 @@ std = [
 	"pallet-staking/std",
 	"pallet-staking-runtime-api/std",
 	"pallet-state-trie-migration/std",
+	"pallet-parameters/std",
 	"sp-session/std",
 	"pallet-sudo/std",
 	"frame-support/std",

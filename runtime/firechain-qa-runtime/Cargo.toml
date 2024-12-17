@@ -92,6 +92,7 @@ pallet-nomination-pools-runtime-api = { workspace = true }
 pallet-offences = { workspace = true }
 # pallet-offences-benchmarking = { workspace = true, optional = true }
 pallet-preimage = { workspace = true }
+pallet-parameters ={ workspace = true }
 pallet-proxy = { workspace = true }
 pallet-insecure-randomness-collective-flip = { workspace = true }
 pallet-ranked-collective = { workspace = true }
@@ -184,6 +185,7 @@ std = [
 	"sp-offchain/std",
 	"pallet-offences/std",
 	"pallet-preimage/std",
+	"pallet-parameters/std",
 	"pallet-proxy/std",
 	"sp-core/std",
 	"pallet-insecure-randomness-collective-flip/std",

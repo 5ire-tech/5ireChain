@@ -81,6 +81,7 @@ pallet-nomination-pools-runtime-api = { workspace = true }
 pallet-offences = { workspace = true }
 pallet-preimage = { workspace = true }
 pallet-proxy = { workspace = true }
+pallet-parameters = {workspace = true }
 pallet-insecure-randomness-collective-flip = { workspace = true }
 pallet-ranked-collective = { workspace = true }
 pallet-recovery = { workspace = true }
@@ -189,6 +190,7 @@ std = [
 	"pallet-timestamp/std",
 	"pallet-transaction-payment-rpc-runtime-api/std",
 	"pallet-transaction-payment/std",
+	"pallet-parameters/std",
 	"pallet-transaction-storage/std",
 	"pallet-treasury/std",
 	"sp-transaction-pool/std",

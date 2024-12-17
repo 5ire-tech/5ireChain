@@ -147,7 +147,7 @@ pallet-utility = { version = "28.0.0", git = "https://github.com/paritytech/polk
 node-primitives = { version = "2.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.11.0", default-features = false }
 pallet-asset-tx-payment = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.11.0", default-features = false }
 pallet-assets = { version = "29.1.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.11.0", default-features = false }
-pallet-assets-rate = { version = "29.1.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.11.0", default-features = false }
+pallet-asset-rate = { version = "7.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.11.0", default-features = false }
 frame-benchmarking-pallet-pov = { version = "18.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.11.0", default-features = false }
 frame-election-provider-support = { version = "28.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.11.0", default-features = false }
 pallet-alliance = { version = "27.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.11.0", default-features = false }
@@ -190,6 +190,7 @@ pallet-nomination-pools-runtime-api = { version = "23.0.0", git = "https://githu
 pallet-offences-benchmarking = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.11.0", default-features = false }
 pallet-root-testing = { version = "4.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.11.0", default-features = false }
 pallet-message-queue = { version = "31.0.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.11.0", default-features = false }
+pallet-parameters = { version = "0.1.0", git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.11.0", default-features = false }
 
 # Pallet implementation
 pallet-esg = { version = "1.0.0", path = "frame/esg", default-features = false }

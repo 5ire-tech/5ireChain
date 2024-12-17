@@ -34,6 +34,7 @@ use pallet_identity::legacy::IdentityInfo;
 use frame_support::{
 	construct_runtime,
 	dispatch::DispatchClass,
+	derive_impl,
 	dynamic_params::{dynamic_pallet_params, dynamic_params},
 	instances::{Instance1, Instance2},
 	ord_parameter_types,
@@ -43,7 +44,7 @@ use frame_support::{
 		AsEnsureOriginWithArg, ConstBool, ConstU128, ConstU16, ConstU32, Currency, EitherOfDiverse,
 		EqualPrivilegeOnly, Everything, FindAuthor, Imbalance, InstanceFilter, KeyOwnerProofSystem,
 		LockIdentifier, Nothing, OnFinalize, OnUnbalanced, WithdrawReasons,fungible::HoldConsideration,
-		LinearStoragePrice
+		LinearStoragePrice,tokens::{GetSalary, PayFromAccount,pay::PayAssetFromAccount}
 	},
 	weights::{
 		constants::{
@@ -242,6 +243,7 @@ parameter_types! {
 
 const_assert!(NORMAL_DISPATCH_RATIO.deconstruct() >= AVERAGE_ON_INITIALIZE_RATIO.deconstruct());
 
+#[derive_impl(frame_system::config_preludes::SolochainDefaultConfig)]
 impl frame_system::Config for Runtime {
 	type BaseCallFilter = Everything;
 	type BlockWeights = RuntimeBlockWeights;
@@ -893,6 +895,7 @@ impl GetSalary<u16, AccountId, Balance> for SalaryForRank {
 
 parameter_types! {
 	pub const Budget: Balance = 10_000 * DOLLARS;
+	pub TreasuryAccount: AccountId = Treasury::account_id();
 }
 
 impl pallet_salary::Config for Runtime {
@@ -1206,6 +1209,7 @@ parameter_types! {
 	pub const MaximumReasonLength: u32 = 300;
 	pub const MaxApprovals: u32 = 100;
 	pub const MaxBalance: Balance = Balance::max_value();
+	pub const SpendPayoutPeriod: BlockNumber = 30 * DAYS;
 }
 
 impl pallet_treasury::Config for Runtime {
