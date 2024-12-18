@@ -17,10 +17,10 @@ name = "firechain-node"
 array-bytes = "6.1"
 clap = { version = "4.2.5", features = ["derive"], optional = true }
 
-hex-literal = "0.3.4"
+hex-literal = "0.4.1"
 codec = { package = "parity-scale-codec", version = "3.6.12" }
 rand = "0.8"
-jsonrpsee = { version = "0.16.2", features = ["server"] }
+jsonrpsee = { version = "0.22.5", features = ["server","macros"] }
 hex = { version = "0.4", default-features = false }
 serde_json = { workspace = true }
 serde = { version = "1.0.163", features = ["derive"] }
@@ -57,6 +57,7 @@ sp-runtime = { workspace = true, default-features = false }
 sp-timestamp = { workspace = true }
 #sp-authorship = {  workspace = true }
 sp-inherents = { workspace = true }
+sp-state-machine =  { workspace = true }
 sp-offchain = { workspace = true, features = ["default"] }
 sp-session = { workspace = true, features = ["default"] }
 sp-keyring = { workspace = true }
@@ -140,7 +141,7 @@ sc-client-db = { workspace = true }
 pallet-timestamp = { workspace = true }
 
 [features]
-default = ["rpc-binary-search-estimate"]
+default = [	"sql","rpc-binary-search-estimate"]
 all = ["cli", "firechain-qa", "firechain-mainnet", "firechain-thunder"]
 cli = [
 	"sc-cli",
@@ -150,6 +151,10 @@ cli = [
 	"clap",
 	"clap_complete",
 	"substrate-build-script-utils",
+]
+sql = [
+	"fc-db/sql",
+	"fc-mapping-sync/sql",
 ]
 firechain-qa = ["cli", "firechain-qa-runtime/default"]
 firechain-mainnet = ["cli", "firechain-mainnet-runtime/default"]

@@ -29,7 +29,7 @@ use sc_client_api::{Backend, BlockBackend};
 use sc_consensus_babe::{self, BabeWorkerHandle, SlotProportion};
 use sc_executor::NativeElseWasmExecutor;
 use sc_network::{event::Event, NetworkEventStream};
-use sc_network_sync::warp::WarpSyncParams;
+use sc_network_sync::strategy::warp::WarpSyncParams;
 use sc_service::{config::Configuration, error::Error as ServiceError, TaskManager};
 use sc_telemetry::{Telemetry, TelemetryWorker};
 use sc_transaction_pool_api::OffchainTransactionPoolFactory;
@@ -59,7 +59,6 @@ use crate::{
 };
 
 use fc_rpc_core::types::{FeeHistoryCache, FeeHistoryCacheLimit, FilterPool};
-pub use fc_storage::overrides_handle;
 
 /// The full client type definition.
 pub type FullClient<RuntimeApi, Executor> =
@@ -101,7 +100,7 @@ pub fn new_partial<RuntimeApi, Executor>(
 			BabeWorkerHandle<Block>,
 			// grandpa::SharedVoterState,
 			Option<Telemetry>,
-			FrontierBackend,
+			FrontierBackend<FullClient<RuntimeApi, Executor>>,
 		),
 	>,
 	ServiceError,
