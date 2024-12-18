@@ -141,7 +141,7 @@ sc-client-db = { workspace = true }
 pallet-timestamp = { workspace = true }
 
 [features]
-default = [	"sql","rpc-binary-search-estimate"]
+default = ["rpc-binary-search-estimate"]
 all = ["cli", "firechain-qa", "firechain-mainnet", "firechain-thunder"]
 cli = [
 	"sc-cli",
@@ -151,10 +151,6 @@ cli = [
 	"clap",
 	"clap_complete",
 	"substrate-build-script-utils",
-]
-sql = [
-	"fc-db/sql",
-	"fc-mapping-sync/sql",
 ]
 firechain-qa = ["cli", "firechain-qa-runtime/default"]
 firechain-mainnet = ["cli", "firechain-mainnet-runtime/default"]
