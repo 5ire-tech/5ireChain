@@ -180,12 +180,12 @@ where
 		io.merge(
 			EthFilter::new(
 				client.clone(),
-				frontier_backend,
+				frontier_backend.clone(),
 				graph.clone(),
 				filter_pool,
 				500_usize, // max stored filters
 				max_past_logs,
-				block_data_cache,
+				block_data_cache.clone(),
 			)
 			.into_rpc(),
 		)?;

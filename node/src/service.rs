@@ -243,6 +243,7 @@ RuntimeApi:
 /// Creates a full service from the configuration.
 pub fn new_full_base<N: NetworkBackend<Block,<Block as BlockT>::Hash>,RuntimeApi, Executor>(
 	mut config: Configuration,
+	mixnet_config: Option<sc_mixnet::Config>,
 	disable_hardware_benchmarks: bool,
 	with_startup_data: impl FnOnce(
 		&sc_consensus_babe::BabeBlockImport<
@@ -253,7 +254,7 @@ pub fn new_full_base<N: NetworkBackend<Block,<Block as BlockT>::Hash>,RuntimeApi
 		&sc_consensus_babe::BabeLink<Block>,
 	),
 	eth_config: EthConfiguration,
-) -> Result<TaskManager, ServiceError>
+) -> Result<NewFullBase<RuntimeApi, Executor>, ServiceError>
 where
 	RuntimeApi:
 		ConstructRuntimeApi<Block, FullClient<RuntimeApi, Executor>> + Send + Sync + 'static,
@@ -717,7 +718,14 @@ where
 	}
 
 	network_starter.start_network();
-	Ok(task_manager)
+	Ok(NewFullBase {
+		task_manager,
+		client,
+		network,
+		sync: sync_service,
+		transaction_pool,
+		rpc_handlers,
+	})
 }
 
 /// Builds a new object suitable for chain operations.
@@ -804,8 +812,8 @@ where
 				config,
 				mixnet_config,
 				cli.no_hardware_benchmarks,
-				eth_config,
 				|_, _| (),
+				eth_config,
 			)
 			.map(|NewFullBase { task_manager, .. }| task_manager)?;
 			task_manager
@@ -815,8 +823,8 @@ where
 				config,
 				mixnet_config,
 				cli.no_hardware_benchmarks,
-				eth_config,
 				|_, _| (),
+				eth_config,
 			)
 			.map(|NewFullBase { task_manager, .. }| task_manager)?;
 			task_manager
