@@ -143,10 +143,11 @@ pub fn run() -> Result<()> {
 
 				#[cfg(feature = "firechain-mainnet")]
 				spec if spec.is_mainnet() => runner.run_node_until_exit(|config| async move {
+					let cli_service = Cli::from_args();
 					service::new_full::<
 						firechain_mainnet_runtime::RuntimeApi,
 						FirechainMainnetRuntimeExecutor,
-					>(config, cli.no_hardware_benchmarks, cli.eth.clone())
+					>(config,cli_service,cli.no_hardware_benchmarks, cli.eth.clone())
 					.map_err(sc_cli::Error::Service)
 				}),
 

@@ -35,6 +35,7 @@ sc-executor = { workspace = true }
 sc-service = { workspace = true }
 sc-telemetry = { workspace = true }
 sc-keystore = { workspace = true }
+sc-mixnet = { workspace = true }
 sp-keystore = { workspace = true }
 sc-transaction-pool = { workspace = true }
 sc-transaction-pool-api = { workspace = true }

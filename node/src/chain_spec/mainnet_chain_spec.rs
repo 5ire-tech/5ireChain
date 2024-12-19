@@ -136,7 +136,7 @@ pub fn testnet_genesis(
 	initial_nominators: Vec<AccountId>,
 	root_key: AccountId,
 	endowed_accounts: Option<Vec<AccountId>>,
-) -> RuntimeGenesisConfig {
+) ->  serde_json::Value {
 	let endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| vec![]);
 
 	let mut endowed_accounts_validator: Vec<AccountId> = Vec::new();
@@ -191,12 +191,10 @@ pub fn testnet_genesis(
 
 	endowed_balance.extend(endowed_validator_balance);
 
-	RuntimeGenesisConfig {
-		system: Default::default(),
-		balances: BalancesConfig { balances: endowed_balance },
-		indices: IndicesConfig { indices: vec![] },
-		session: SessionConfig {
-			keys: initial_authorities
+	serde_json::json!({
+		"balances": { "balances": endowed_balance },
+		"session":  {
+			"keys": initial_authorities
 				.iter()
 				.map(|x| {
 					(
@@ -207,47 +205,22 @@ pub fn testnet_genesis(
 				})
 				.collect::<Vec<_>>(),
 		},
-		staking: StakingConfig {
-			validator_count: initial_authorities.len() as u32,
-			minimum_validator_count: initial_authorities.len() as u32,
-			invulnerables: initial_authorities.iter().map(|x| x.0.clone()).collect(),
-			slash_reward_fraction: Perbill::from_percent(10),
-			stakers,
-			..Default::default()
+		"staking": {
+			"validator_count": initial_authorities.len() as u32,
+			"minimum_validator_count": initial_authorities.len() as u32,
+			"invulnerables": initial_authorities.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
+			"slash_reward_fraction": Perbill::from_percent(10),
+			"stakers": stakers.clone(),
 		},
-		democracy: DemocracyConfig::default(),
-		elections: ElectionsConfig::default(),
-		council: CouncilConfig::default(),
-		technical_committee: TechnicalCommitteeConfig::default(),
-		sudo: SudoConfig { key: Some(root_key) },
-		babe: BabeConfig {
-			epoch_config: Some(firechain_mainnet_runtime::BABE_GENESIS_EPOCH_CONFIG),
-			..Default::default()
+		"sudo": SudoConfig { key: Some(root_key) },
+		"babe": {
+			"epoch_config": Some(firechain_mainnet_runtime::BABE_GENESIS_EPOCH_CONFIG),
 		},
-		im_online: ImOnlineConfig { keys: vec![] },
-		authority_discovery: Default::default(),
-		grandpa: Default::default(),
-		technical_membership: Default::default(),
-		treasury: Default::default(),
-		vesting: Default::default(),
-		assets: Default::default(),
-		pool_assets: Default::default(),
-		transaction_storage: Default::default(),
-		transaction_payment: Default::default(),
-		alliance: Default::default(),
-		alliance_motion: Default::default(),
-		nomination_pools: NominationPoolsConfig {
-			min_create_bond: 10 * DOLLARS,
-			min_join_bond: DOLLARS,
-			..Default::default()
+		"nomination_pools": {
+			"min_create_bond": 10 * DOLLARS,
+			"min_join_bond": DOLLARS,
 		},
-		// EVM compatibility
-		evm: Default::default(),
-		ethereum: Default::default(),
-		dynamic_fee: Default::default(),
-		base_fee: Default::default(),
-		reward: Default::default(),
-	}
+	})
 }
 
 /// Helper function to create RuntimeGenesisConfig for development
@@ -406,7 +379,7 @@ pub fn development_config() -> ChainSpec {
 		.build()
 }
 
-fn local_mainnet_genesis() -> RuntimeGenesisConfig {
+fn local_mainnet_genesis() -> serde_json::Value {
 	testnet_genesis(
 		vec![authority_keys_from_seed(ALITH, "Alice"), authority_keys_from_seed(BALTATHAR, "Bob")],
 		vec![],
@@ -417,19 +390,11 @@ fn local_mainnet_genesis() -> RuntimeGenesisConfig {
 
 /// Local mainnet config (multivalidator Alice + Bob)
 pub fn local_mainnet_config() -> ChainSpec {
-	ChainSpec::from_genesis(
-		"5ireChain Local Testnet",
-		"mainnet_5ireChain_local",
-		ChainType::Local,
-		local_mainnet_genesis,
-		vec![],
-		None,
-		None,
-		None,
-		Some(
-			serde_json::from_str("{\"tokenDecimals\": 18, \"tokenSymbol\": \"5IRE\"}")
-				.expect("Provided valid json map"),
-		),
-		Default::default(),
-	)
+	ChainSpec::builder(wasm_binary_unwrap(), Default::default())
+	.with_name("5ireChain Local Testnet")
+	.with_id("mainnet_5ireChain_local")
+	.with_chain_type(ChainType::Local)
+	.with_genesis_config_patch(local_mainnet_genesis())
+	.with_properties(fire_chain_spec_properties())
+	.build()
 }
