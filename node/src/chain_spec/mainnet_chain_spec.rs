@@ -19,11 +19,11 @@
 //! Substrate chain configurations.
 
 use firechain_mainnet_runtime::{
-	constants::currency::*, wasm_binary_unwrap, AuthorityDiscoveryConfig, BabeConfig,
+	constants::currency::*, AuthorityDiscoveryConfig, BabeConfig,
 	BalancesConfig, Block, CouncilConfig, DemocracyConfig, ElectionsConfig, EthereumConfig,
 	GrandpaConfig, ImOnlineConfig, IndicesConfig, MaxNominations, NominationPoolsConfig,
-	SessionConfig, SessionKeys, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
-	TechnicalCommitteeConfig,
+	SessionConfig, SessionKeys, StakerStatus, StakingConfig, SudoConfig,
+	TechnicalCommitteeConfig,wasm_binary_unwrap
 };
 use fp_evm::GenesisAccount;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
@@ -192,7 +192,7 @@ pub fn testnet_genesis(
 	endowed_balance.extend(endowed_validator_balance);
 
 	RuntimeGenesisConfig {
-		system: SystemConfig { code: wasm_binary_unwrap().to_vec(), ..Default::default() },
+		system: Default::default(),
 		balances: BalancesConfig { balances: endowed_balance },
 		indices: IndicesConfig { indices: vec![] },
 		session: SessionConfig {
@@ -262,7 +262,7 @@ pub fn development_genesis(
 	)>,
 	initial_nominators: Vec<AccountId>,
 	root_key: AccountId,
-) -> RuntimeGenesisConfig {
+) -> serde_json::Value {
 	let mut endowed_accounts: Vec<AccountId> = testnet_accounts();
 	// endow all authorities and nominators.
 	initial_authorities
@@ -295,15 +295,57 @@ pub fn development_genesis(
 
 	const ENDOWMENT: Balance = 5_000_000_000 * DOLLARS;
 	const STASH: Balance = ENDOWMENT / 1000;
+	let evm_accounts = {
+		let mut map = BTreeMap::new();
+		map.insert(
+			// H160 address of Alice dev account
+			// Derived from SS58 (42 prefix) address
+			// SS58: 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+			// hex: 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d
+			// Using the full hex key, truncating to the first 20 bytes (the first 40 hex chars)
+			H160::from_str("d43593c715fdd31c61141abd04a99fd6822c8558")
+				.expect("internal H160 is valid; qed"),
+			fp_evm::GenesisAccount {
+				balance: U256::from_str("0xffffffffffffffffffffffffffffffff")
+					.expect("internal U256 is valid; qed"),
+				code: Default::default(),
+				nonce: Default::default(),
+				storage: Default::default(),
+			},
+		);
+		map.insert(
+			// H160 address of CI test runner account
+			H160::from_str("6be02d1d3665660d22ff9624b7be0551ee1ac91b")
+				.expect("internal H160 is valid; qed"),
+			fp_evm::GenesisAccount {
+				balance: U256::from_str("0xffffffffffffffffffffffffffffffff")
+					.expect("internal U256 is valid; qed"),
+				code: Default::default(),
+				nonce: Default::default(),
+				storage: Default::default(),
+			},
+		);
+		map.insert(
+			// H160 address for benchmark usage
+			H160::from_str("1000000000000000000000000000000000000001")
+				.expect("internal H160 is valid; qed"),
+			fp_evm::GenesisAccount {
+				nonce: U256::from(1),
+				balance: U256::from(1_000_000_000_000_000_000_000_000u128),
+				storage: Default::default(),
+				code: vec![0x00],
+			},
+		);
+		map
+	};
 
-	RuntimeGenesisConfig {
-		system: SystemConfig { code: wasm_binary_unwrap().to_vec(), ..Default::default() },
-		balances: BalancesConfig {
-			balances: endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT)).collect(),
+	serde_json::json!({
+		"balances": {
+			"balances": endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT)) .collect::<Vec<_>>(),
 		},
-		indices: IndicesConfig { indices: vec![] },
-		session: SessionConfig {
-			keys: initial_authorities
+		"indices": IndicesConfig { indices: vec![] },
+		"session": {
+			"keys": initial_authorities
 				.iter()
 				.map(|x| {
 					(
@@ -314,97 +356,27 @@ pub fn development_genesis(
 				})
 				.collect::<Vec<_>>(),
 		},
-		staking: StakingConfig {
-			validator_count: initial_authorities.len() as u32,
-			minimum_validator_count: initial_authorities.len() as u32,
-			invulnerables: initial_authorities.iter().map(|x| x.0.clone()).collect(),
-			slash_reward_fraction: Perbill::from_percent(10),
-			stakers,
-			..Default::default()
+		"staking": {
+			"validator_count": initial_authorities.len() as u32,
+			"minimum_validator_count": initial_authorities.len() as u32,
+			"invulnerables": initial_authorities.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
+			"slash_reward_fraction": Perbill::from_percent(10),
+			"stakers": stakers.clone(),
 		},
-		democracy: DemocracyConfig::default(),
-		elections: ElectionsConfig::default(),
-		council: CouncilConfig::default(),
-		technical_committee: TechnicalCommitteeConfig::default(),
-		sudo: SudoConfig { key: Some(root_key) },
-		babe: BabeConfig {
-			epoch_config: Some(firechain_mainnet_runtime::BABE_GENESIS_EPOCH_CONFIG),
-			..Default::default()
+		"sudo": { "key": Some(root_key) },
+		"babe": {
+			"epoch_config": Some(firechain_mainnet_runtime::BABE_GENESIS_EPOCH_CONFIG),
+		
 		},
-		im_online: ImOnlineConfig { keys: vec![] },
-		authority_discovery: AuthorityDiscoveryConfig { keys: vec![], ..Default::default() },
-		grandpa: GrandpaConfig { authorities: vec![], ..Default::default() },
-		technical_membership: Default::default(),
-		treasury: Default::default(),
-		vesting: Default::default(),
-		assets: Default::default(),
-		pool_assets: Default::default(),
-		transaction_storage: Default::default(),
-
-		transaction_payment: Default::default(),
-		alliance: Default::default(),
-		alliance_motion: Default::default(),
-		nomination_pools: NominationPoolsConfig {
-			min_create_bond: 10 * DOLLARS,
-			min_join_bond: DOLLARS,
-			..Default::default()
+		"nomination_pools": {
+			"min_create_bond": 10 * DOLLARS,
+			"min_join_bond": DOLLARS,
 		},
-
-		// EVM compatibility
-		evm: EVMConfig {
-			accounts: {
-				let mut map = BTreeMap::new();
-				map.insert(
-					// SS58: 5Ge11vgR8YoB7xJPEj4j1eRmvx6vKBLk3uq1nv37eeEbYmR9
-					// hex: 0xca55cbeb97bf4ad51541ec60a784381b5df71bab3c605ee98f48c9cd8e790d70
-					H160::from_str("48Df7B35247786418a7e279e508325952B9Fc92F")
-						.expect("internal H160 is valid; qed"),
-					GenesisAccount {
-						balance: U256::from_str("0xfffffffffffffffffffff")
-							.expect("internal U256 is valid; qed"),
-						code: Default::default(),
-						nonce: Default::default(),
-						storage: Default::default(),
-					},
-				);
-				map.insert(
-					// SS58: 5CrF9cwmf3SvradcJP7jU5BfXqGGniAt5jCMi6XeCNo2LBDB
-					// hex: 0x22bb61e352da49e18ca6d292cb7ed667678fa88870860efb4c8bdf91e8a44a01
-					H160::from_str("74E4214c9C3D9726E1A0B57357C4dd117641c536")
-						.expect("internal H160 is valid; qed"),
-					GenesisAccount {
-						balance: U256::from_str("0xfffffffffffffffffffff")
-							.expect("internal U256 is valid; qed"),
-						code: Default::default(),
-						nonce: Default::default(),
-						storage: Default::default(),
-					},
-				);
-				map.insert(
-					// SS58: 5FFVZ9cfrRTHf4eaXLZfGkDwot1ULv46ddgT3fLcs4fxe6CS
-					// hex: 0x8ceefcc55493e13574f43c75a59142c0de950bdc431ffc1b12add8c786e7cc6c
-					H160::from_str("FE31f14425993A3d9aeDEd195C56999eBE097d92")
-						.expect("internal H160 is valid; qed"),
-					GenesisAccount {
-						balance: U256::from_str("0xfffffffffffffffffffff")
-							.expect("internal U256 is valid; qed"),
-						code: Default::default(),
-						nonce: Default::default(),
-						storage: Default::default(),
-					},
-				);
-				map
-			},
-			_marker: Default::default(),
-		},
-		ethereum: EthereumConfig { _marker: Default::default() },
-		dynamic_fee: Default::default(),
-		base_fee: Default::default(),
-		reward: Default::default(),
-	}
+		"evm": { "accounts": evm_accounts },
+	})
 }
 
-fn development_config_genesis() -> RuntimeGenesisConfig {
+fn development_config_genesis() -> serde_json::Value  {
 	development_genesis(
 		vec![authority_keys_from_seed(ALITH, "Alice")],
 		vec![],
@@ -412,24 +384,26 @@ fn development_config_genesis() -> RuntimeGenesisConfig {
 	)
 }
 
+pub fn fire_chain_spec_properties() -> serde_json::map::Map<String, serde_json::Value> {
+	serde_json::json!({
+		"tokenDecimals": 18,
+		"tokenSymbol": "5IRE",
+	})
+	.as_object()
+	.expect("Map given; 5IRE")
+	.clone()
+}
+
 /// Development config (single validator Alice)
 /// Need to work on it..
 pub fn development_config() -> ChainSpec {
-	ChainSpec::from_genesis(
-		"Development",
-		"mainnet_5ireChain_dev",
-		ChainType::Development,
-		development_config_genesis,
-		vec![],
-		None,
-		None,
-		None,
-		Some(
-			serde_json::from_str("{\"tokenDecimals\": 18, \"tokenSymbol\": \"5IRE\"}")
-				.expect("Provided valid json map"),
-		),
-		Default::default(),
-	)
+	ChainSpec::builder(wasm_binary_unwrap(), Default::default())
+		.with_name("Development")
+		.with_id("mainnet_5ireChain_dev")
+		.with_chain_type(ChainType::Development)
+		.with_genesis_config_patch(development_config_genesis())
+		.with_properties(fire_chain_spec_properties())
+		.build()
 }
 
 fn local_mainnet_genesis() -> RuntimeGenesisConfig {
