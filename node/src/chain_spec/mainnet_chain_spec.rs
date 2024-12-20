@@ -19,13 +19,11 @@
 //! Substrate chain configurations.
 
 use firechain_mainnet_runtime::{
-	constants::currency::*, AuthorityDiscoveryConfig, BabeConfig,
-	BalancesConfig, Block, CouncilConfig, DemocracyConfig, ElectionsConfig, EthereumConfig,
-	GrandpaConfig, ImOnlineConfig, IndicesConfig, MaxNominations, NominationPoolsConfig,
-	SessionConfig, SessionKeys, StakerStatus, StakingConfig, SudoConfig,
-	TechnicalCommitteeConfig,wasm_binary_unwrap
+	constants::currency::*,
+	Block, IndicesConfig, MaxNominations,
+	SessionKeys, StakerStatus, SudoConfig,
+	wasm_binary_unwrap
 };
-use fp_evm::GenesisAccount;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sc_chain_spec::ChainSpecExtension;
 use sc_service::ChainType;

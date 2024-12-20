@@ -243,7 +243,6 @@ RuntimeApi:
 /// Creates a full service from the configuration.
 pub fn new_full_base<N: NetworkBackend<Block,<Block as BlockT>::Hash>,RuntimeApi, Executor>(
 	mut config: Configuration,
-	mixnet_config: Option<sc_mixnet::Config>,
 	disable_hardware_benchmarks: bool,
 	with_startup_data: impl FnOnce(
 		&sc_consensus_babe::BabeBlockImport<
@@ -797,20 +796,12 @@ where
 	RuntimeApi::RuntimeApi: sp_authority_discovery::AuthorityDiscoveryApi<Block>,
 	Executor: sc_executor::NativeExecutionDispatch + 'static,
 {
-	// new_full_base::<RuntimeApi, Executor>(
-	// 	config,
-	// 	disable_hardware_benchmarks,
-	// 	|_, _| (),
-	// 	eth_config,
-	// )
-	let mixnet_config = cli.mixnet_params.config(config.role.is_authority());
 	let database_path = config.database.path().map(Path::to_path_buf);
 
 	let task_manager = match config.network.network_backend {
 		sc_network::config::NetworkBackendType::Libp2p => {
 			let task_manager = new_full_base::<sc_network::NetworkWorker<_, _>,RuntimeApi, Executor>(
 				config,
-				mixnet_config,
 				cli.no_hardware_benchmarks,
 				|_, _| (),
 				eth_config,
@@ -821,7 +812,6 @@ where
 		sc_network::config::NetworkBackendType::Litep2p => {
 			let task_manager = new_full_base::<sc_network::Litep2pNetworkBackend,RuntimeApi, Executor>(
 				config,
-				mixnet_config,
 				cli.no_hardware_benchmarks,
 				|_, _| (),
 				eth_config,

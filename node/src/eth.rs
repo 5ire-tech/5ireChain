@@ -124,7 +124,7 @@ impl<Api> EthCompatRuntimeApiCollection for Api where
 }
 
 #[allow(clippy::too_many_arguments)]
-pub async fn spawn_frontier_tasks<RuntimeApi, Executor>(
+pub fn spawn_frontier_tasks<RuntimeApi, Executor>(
 	task_manager: &TaskManager,
 	client: Arc<FullClient<RuntimeApi, Executor>>,
 	backend: Arc<FullBackend>,

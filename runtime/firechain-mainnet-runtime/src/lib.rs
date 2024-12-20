@@ -26,7 +26,6 @@ use codec::{Decode, Encode, MaxEncodedLen};
 use firechain_runtime_core_primitives::opaque::{
 	AccountId, AccountIndex, Balance, BlockNumber, Hash, Header, Moment, Nonce, Signature,
 };
-use pallet_identity::legacy::IdentityField;
 use frame_election_provider_support::{
 	onchain, BalancingConfig, ElectionDataProvider, SequentialPhragmen, VoteWeight,
 };
