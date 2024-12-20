@@ -2927,6 +2927,7 @@ dependencies = [
  "sp-consensus-babe",
  "sp-consensus-grandpa",
  "sp-core",
+ "sp-genesis-builder",
  "sp-inherents",
  "sp-io",
  "sp-offchain",
@@ -2942,7 +2943,7 @@ dependencies = [
 
 [[package]]
 name = "firechain-node"
-version = "1.0.0"
+version = "1.11.0"
 dependencies = [
  "array-bytes 6.2.3",
  "clap",

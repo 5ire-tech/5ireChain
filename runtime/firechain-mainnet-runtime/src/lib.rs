@@ -35,6 +35,7 @@ use frame_support::{
 	dispatch::DispatchClass,
 	derive_impl,
 	dynamic_params::{dynamic_pallet_params, dynamic_params},
+	genesis_builder_helper::{build_state, get_preset},
 	instances::{Instance1, Instance2},
 	ord_parameter_types,
 	pallet_prelude::Get,
@@ -2539,6 +2540,20 @@ impl_runtime_apis! {
 		) -> Result<(), mmr::Error> {
 			let nodes = leaves.into_iter().map(|leaf|mmr::DataOrHash::Data(leaf.into_opaque_leaf())).collect();
 			pallet_mmr::verify_leaves_proof::<mmr::Hashing, _>(root, nodes, proof)
+		}
+	}
+
+	impl sp_genesis_builder::GenesisBuilder<Block> for Runtime {
+		fn build_state(config: Vec<u8>) -> sp_genesis_builder::Result {
+			build_state::<RuntimeGenesisConfig>(config)
+		}
+
+		fn get_preset(id: &Option<sp_genesis_builder::PresetId>) -> Option<Vec<u8>> {
+			get_preset::<RuntimeGenesisConfig>(id, |_| None)
+		}
+
+		fn preset_names() -> Vec<sp_genesis_builder::PresetId> {
+			vec![]
 		}
 	}
 

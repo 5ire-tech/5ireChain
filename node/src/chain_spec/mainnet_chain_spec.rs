@@ -206,10 +206,10 @@ pub fn testnet_genesis(
 				.collect::<Vec<_>>(),
 		},
 		"staking": {
-			"validator_count": initial_authorities.len() as u32,
-			"minimum_validator_count": initial_authorities.len() as u32,
+			"validatorCount": initial_authorities.len() as u32,
+			"minimumValidatorCount": initial_authorities.len() as u32,
 			"invulnerables": initial_authorities.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
-			"slash_reward_fraction": Perbill::from_percent(10),
+			"slashRewardFraction": Perbill::from_percent(10),
 			"stakers": stakers.clone(),
 		},
 		"sudo": SudoConfig { key: Some(root_key) },
@@ -330,20 +330,20 @@ pub fn development_genesis(
 				.collect::<Vec<_>>(),
 		},
 		"staking": {
-			"validator_count": initial_authorities.len() as u32,
-			"minimum_validator_count": initial_authorities.len() as u32,
+			"validatorCount": initial_authorities.len() as u32,
+			"minimumValidatorCount": initial_authorities.len() as u32,
 			"invulnerables": initial_authorities.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
-			"slash_reward_fraction": Perbill::from_percent(10),
+			"slashRewardFraction": Perbill::from_percent(10),
 			"stakers": stakers.clone(),
 		},
 		"sudo": { "key": Some(root_key) },
 		"babe": {
-			"epoch_config": Some(firechain_mainnet_runtime::BABE_GENESIS_EPOCH_CONFIG),
+			"epochConfig": Some(firechain_mainnet_runtime::BABE_GENESIS_EPOCH_CONFIG),
 		
 		},
-		"nomination_pools": {
-			"min_create_bond": 10 * DOLLARS,
-			"min_join_bond": DOLLARS,
+		"nominationPools": {
+			"minCreateBond": 10 * DOLLARS,
+			"minJoinBond": DOLLARS,
 		},
 		"evm": { "accounts": evm_accounts },
 	})
