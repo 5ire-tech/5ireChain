@@ -147,16 +147,17 @@ pub fn run() -> Result<()> {
 					service::new_full::<
 						firechain_mainnet_runtime::RuntimeApi,
 						FirechainMainnetRuntimeExecutor,
-					>(config,cli_service,cli.no_hardware_benchmarks, cli.eth.clone())
+					>(config,cli_service,cli.eth.clone())
 					.map_err(sc_cli::Error::Service)
 				}),
 
 				#[cfg(feature = "firechain-thunder")]
 				spec if spec.is_thunder() => runner.run_node_until_exit(|config| async move {
+					let cli_service = Cli::from_args();
 					service::new_full::<
 						firechain_thunder_runtime::RuntimeApi,
 						FirechainThunderRuntimeExecutor,
-					>(config, cli.no_hardware_benchmarks, cli.eth.clone())
+					>(config, cli_service, cli.eth.clone())
 					.map_err(sc_cli::Error::Service)
 				}),
 

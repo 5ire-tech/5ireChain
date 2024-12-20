@@ -436,8 +436,8 @@ where
 		enable_dev_signer: eth_config.enable_dev_signer,
 		network: network.clone(),
 		sync: sync_service.clone(),
-		frontier_backend: match frontier_backend.clone() {
-			fc_db::Backend::KeyValue(b) => Arc::new(b),
+		frontier_backend: match &*frontier_backend {
+			fc_db::Backend::KeyValue(b) => b.clone(),
 		},
 		storage_override: storage_override.clone(),
 		block_data_cache: block_data_cache.clone(),
@@ -784,7 +784,6 @@ where
 pub fn new_full<RuntimeApi, Executor>(
 	config: Configuration,
 	cli: Cli,
-	disable_hardware_benchmarks: bool,
 	eth_config: EthConfiguration,
 ) -> Result<TaskManager, ServiceError>
 where
