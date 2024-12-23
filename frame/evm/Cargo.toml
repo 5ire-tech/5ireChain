@@ -20,7 +20,7 @@ hex-literal = { workspace = true }
 impl-trait-for-tuples = "0.2.2"
 log = { workspace = true }
 rlp = { workspace = true, optional = true }
-scale-codec = { package = "parity-scale-codec", workspace = true }
+scale-codec = { workspace = true }
 scale-info = { workspace = true }
 # Substrate
 frame-benchmarking = { workspace = true, optional = true }

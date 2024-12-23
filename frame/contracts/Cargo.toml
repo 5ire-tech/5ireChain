@@ -49,8 +49,8 @@ sp-io = { workspace = true , default-features = false }
 sp-runtime = { workspace = true, default-features = false }
 sp-std = { workspace = true ,default-features = false }
 
-xcm = { package = "staging-xcm", workspace = true, default-features = false }
-xcm-builder = { package = "staging-xcm-builder", workspace = true,default-features = false }
+xcm = { workspace = true, default-features = false }
+xcm-builder = { workspace = true,default-features = false }
 
 [dev-dependencies]
 array-bytes = "6.1"
@@ -61,7 +61,7 @@ wat = "1"
 pallet-contracts-fixtures = { path = "./fixtures" }
 
 # Polkadot Dependencies
-xcm-builder = { package = "staging-xcm-builder", workspace = true }
+xcm-builder = { workspace = true }
 
 # Substrate Dependencies
 pallet-balances = { workspace = true  }
