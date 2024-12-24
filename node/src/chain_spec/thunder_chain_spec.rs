@@ -232,10 +232,8 @@ pub fn development_genesis(
 	)>,
 	initial_nominators: Vec<AccountId>,
 	root_key: AccountId,
-	endowed_accounts: Option<Vec<AccountId>>,
 ) -> serde_json::Value {
-	let mut endowed_accounts: Vec<AccountId> =
-		endowed_accounts.unwrap_or_else(|| testnet_accounts());
+	let mut endowed_accounts: Vec<AccountId> = testnet_accounts();
 	// endow all authorities and nominators.
 	initial_authorities
 		.iter()
@@ -312,7 +310,7 @@ pub fn development_genesis(
 	const STASH: Balance = ENDOWMENT / 1000;
 
 	serde_json::json!({
-		"balances": { "balances": endowed_accounts },
+		"balances": {"balances": endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT)) .collect::<Vec<_>>(), },
 		"session":  {
 			"keys": initial_authorities
 				.iter()
@@ -350,7 +348,6 @@ fn development_config_genesis() -> serde_json::Value  {
 		vec![authority_keys_from_seed(ALITH, "Alice")],
 		vec![],
 		array_bytes::hex_n_into_unchecked::<_, _, 20>(ALITH),
-		None,
 	)
 }
 
@@ -379,7 +376,7 @@ fn local_testnet_genesis() -> serde_json::Value {
 	testnet_genesis(
 		vec![authority_keys_from_seed(ALITH, "Alice"), authority_keys_from_seed(BALTATHAR, "Bob")],
 		vec![],
-		get_account_id_from_seed::<ecdsa::Public>("Alice"),
+		array_bytes::hex_n_into_unchecked::<_, _, 20>(ALITH),
 		None,
 	)
 }
