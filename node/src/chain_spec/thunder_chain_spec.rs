@@ -211,11 +211,11 @@ pub fn testnet_genesis(
 		},
 		"sudo": SudoConfig { key: Some(root_key) },
 		"babe": {
-			"epoch_config": Some(firechain_thunder_runtime::BABE_GENESIS_EPOCH_CONFIG),
+			"epochConfig": Some(firechain_thunder_runtime::BABE_GENESIS_EPOCH_CONFIG),
 		},
-		"nomination_pools": {
-			"min_create_bond": 10 * DOLLARS,
-			"min_join_bond": DOLLARS,
+		"nominationPools": {
+			"minCreateBond": 10 * DOLLARS,
+			"minJoinBond": DOLLARS,
 		},
 	})
 }
