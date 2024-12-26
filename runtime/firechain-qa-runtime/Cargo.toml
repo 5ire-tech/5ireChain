@@ -41,6 +41,7 @@ sp-consensus-grandpa = { workspace = true }
 sp-block-builder = { workspace = true }
 sp-inherents = { workspace = true }
 node-primitives = { workspace = true }
+sp-genesis-builder = { workspace = true }
 sp-offchain = { workspace = true }
 sp-core = { workspace = true }
 sp-std = { workspace = true }
@@ -195,6 +196,7 @@ std = [
 	"pallet-session/std",
 	"sp-api/std",
 	"sp-runtime/std",
+	"sp-genesis-builder/std",
 	"sp-staking/std",
 	"pallet-staking/std",
 	"pallet-staking-runtime-api/std",
