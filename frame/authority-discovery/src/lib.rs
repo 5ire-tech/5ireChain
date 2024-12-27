@@ -25,7 +25,7 @@
 
 use frame_support::{
 	traits::{Get, OneSessionHandler},
-	WeakBoundedVec,
+	WeakBoundedVec, derive_impl
 };
 use pallet_session::validation::OneSessionHandlerAll;
 use sp_authority_discovery::AuthorityId;
@@ -182,11 +182,11 @@ mod tests {
 	use crate as pallet_authority_discovery;
 	use frame_support::{
 		parameter_types,
-		traits::{ConstU32, ConstU64},
+		traits::ConstU32,
 	};
 	use sp_application_crypto::Pair;
 	use sp_authority_discovery::AuthorityPair;
-	use sp_core::{crypto::key_types, H256};
+	use sp_core::crypto::key_types;
 	use sp_io::TestExternalities;
 	use sp_runtime::{
 		testing::UintAuthorityId,
@@ -219,7 +219,7 @@ mod tests {
 	pub struct MyAllSessionHandler;
 	impl OneSessionHandlerAll<AuthorityId> for MyAllSessionHandler {
 		type Key = UintAuthorityId;
-		fn on_new_session_all<'a, I: 'a>(changed: bool, validators: I, queued_validators: I)
+		fn on_new_session_all<'a, I: 'a>(_: bool, _: I, _: I)
 		where
 			I: Iterator<Item = (&'a AuthorityId, Self::Key)>,
 			u64: 'a,
@@ -290,32 +290,12 @@ mod tests {
 		pub const Offset: BlockNumber = 0;
 	}
 
+	#[derive_impl(frame_system::config_preludes::TestDefaultConfig)]
 	impl frame_system::Config for Test {
-		type BaseCallFilter = frame_support::traits::Everything;
-		type BlockWeights = ();
-		type BlockLength = ();
-		type DbWeight = ();
-		type RuntimeOrigin = RuntimeOrigin;
-		type Nonce = u64;
-		type RuntimeCall = RuntimeCall;
-		type Hash = H256;
-		type Hashing = ::sp_runtime::traits::BlakeTwo256;
 		type AccountId = AuthorityId;
 		type Lookup = IdentityLookup<Self::AccountId>;
 		type Block = Block;
-		type RuntimeEvent = RuntimeEvent;
-		type BlockHashCount = ConstU64<250>;
-		type Version = ();
-		type PalletInfo = PalletInfo;
-		type AccountData = ();
-		type OnNewAccount = ();
-		type OnKilledAccount = ();
-		type SystemWeightInfo = ();
-		type SS58Prefix = ();
-		type OnSetCode = ();
-		type MaxConsumers = ConstU32<16>;
 	}
-
 	pub struct TestSessionHandler;
 	impl pallet_session::SessionHandler<AuthorityId> for TestSessionHandler {
 		const KEY_TYPE_IDS: &'static [KeyTypeId] = &[key_types::DUMMY];

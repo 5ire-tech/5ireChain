@@ -41,13 +41,16 @@ frame-benchmarking = { workspace = true , default-features = false, optional = t
 frame-support = { workspace = true , default-features = false }
 frame-system = { workspace = true , default-features = false }
 pallet-balances = { workspace = true , default-features = false, optional = true }
+pallet-assets = { workspace = true }
 pallet-contracts-uapi = { path = "uapi" }
 pallet-contracts-proc-macro = { path = "proc-macro" }
+pallet-message-queue = { workspace = true  }
 sp-api = { workspace = true , default-features = false }
 sp-core = { workspace = true , default-features = false }
 sp-io = { workspace = true , default-features = false }
 sp-runtime = { workspace = true, default-features = false }
 sp-std = { workspace = true ,default-features = false }
+
 
 xcm = { workspace = true, default-features = false }
 xcm-builder = { workspace = true,default-features = false }
@@ -66,10 +69,8 @@ xcm-builder = { workspace = true }
 # Substrate Dependencies
 pallet-balances = { workspace = true  }
 pallet-timestamp = { workspace = true }
-pallet-message-queue = { workspace = true  }
 pallet-insecure-randomness-collective-flip = { workspace = true }
 pallet-utility = { workspace = true }
-pallet-assets = { workspace = true }
 pallet-proxy = { workspace = true }
 sp-keystore = { workspace = true }
 sp-tracing = { workspace = true }
@@ -83,10 +84,12 @@ std = [
 	"frame-support/std",
 	"frame-system/std",
 	"log/std",
+	"pallet-assets/std",
 	"pallet-balances?/std",
 	"pallet-insecure-randomness-collective-flip/std",
 	"pallet-proxy/std",
 	"pallet-timestamp/std",
+	"pallet-message-queue/std",
 	"pallet-utility/std",
 	"rand?/std",
 	"scale-info/std",

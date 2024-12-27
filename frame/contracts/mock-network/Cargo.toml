@@ -19,7 +19,7 @@ pallet-contracts = { path = ".." }
 pallet-contracts-uapi = { path = "../uapi", default-features = false }
 pallet-contracts-proc-macro = { path = "../proc-macro" }
 pallet-insecure-randomness-collective-flip = { path = "../../insecure-randomness-collective-flip" }
-pallet-message-queue = { path = "../../message-queue" }
+pallet-message-queue = { path = "../../message-queue",default-features = false }
 pallet-proxy = { path = "../../proxy" }
 pallet-timestamp = { path = "../../timestamp" }
 pallet-utility = { path = "../../utility" }
