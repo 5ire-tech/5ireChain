@@ -14,6 +14,7 @@ sp-io = { workspace = true }
 fp-evm = { workspace = true }
 
 [dev-dependencies]
+pallet-evm-test-vector-support = { workspace = true }
 
 [features]
 default = ["std"]

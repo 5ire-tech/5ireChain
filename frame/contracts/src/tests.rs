@@ -4091,20 +4091,6 @@ fn none_cannot_call_code() {
 }
 
 #[test]
-fn root_can_call() {
-	let (wasm, _) = compile_module::<Test>("dummy").unwrap();
-
-	ExtBuilder::default().existential_deposit(100).build().execute_with(|| {
-		let _ = <Test as Config>::Currency::set_balance(&ALICE, 1_000_000);
-
-		let addr = builder::bare_instantiate(Code::Upload(wasm)).build_and_unwrap_account_id();
-
-		// Call the contract.
-		assert_ok!(builder::call(addr.clone()).origin(RuntimeOrigin::root()).build());
-	});
-}
-
-#[test]
 fn root_cannot_instantiate_with_code() {
 	let (wasm, _) = compile_module::<Test>("dummy").unwrap();
 

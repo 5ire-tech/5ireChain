@@ -565,7 +565,7 @@ mod tests {
 			table_import,
 			r#"
 			(module
-				(import "seal0" "table" (table 1 anyfunc))
+				(import "seal0" "table" (table 1 funcref))
 
 				(func (export "call"))
 				(func (export "deploy"))
