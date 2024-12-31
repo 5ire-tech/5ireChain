@@ -145,6 +145,7 @@ impl pallet_staking::Config for Test {
 	type RewardDistribution = Reward;
 	type CurrencyToVote = ();
 	type RuntimeEvent = RuntimeEvent;
+	type MaxExposurePageSize = ConstU32<256>;
 	type Currency = Balances;
 	type CurrencyBalance = <Self as pallet_balances::Config>::Balance;
 	type Slash = ();
@@ -168,6 +169,7 @@ impl pallet_staking::Config for Test {
 	type HistoryDepth = ConstU32<84>;
 	type EventListeners = ();
 	type BenchmarkingConfig = pallet_staking::TestBenchmarkingConfig;
+	type MaxControllersInDeprecationBatch = ConstU32<100>;
 	type WeightInfo = ();
 	type ESG = EsgScore;
 	type Reliability = ImOnline;
@@ -217,6 +219,7 @@ impl pallet_balances::Config for Test {
 	type FreezeIdentifier = ();
 	type MaxFreezes = ();
 	type RuntimeHoldReason = ();
+	type RuntimeFreezeReason = RuntimeFreezeReason;
 }
 
 parameter_types! {

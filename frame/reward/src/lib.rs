@@ -8,11 +8,9 @@
 use frame_support::{ensure, pallet_prelude::DispatchResult};
 pub use pallet::*;
 use pallet_staking::{
-	BalanceOf, CurrentEra, ErasRewardPoints, ErasStakers, Exposure, IndividualExposure, Rewards,
-	Validators,
+	BalanceOf, CurrentEra, ErasRewardPoints, ErasStakersOverview, ErasStakersPaged, IndividualExposure, Rewards, Validators
 };
 use parity_scale_codec::Codec;
-// use crate::migration::migrate_to_v1;
 use frame_support::{
 	pallet_prelude::StorageVersion,
 	traits::{
@@ -26,6 +24,8 @@ use sp_runtime::{
 	traits::{AccountIdConversion, AtLeast32BitUnsigned, Convert, Zero},
 	FixedPointOperand,
 };
+
+use sp_staking::PagedExposureMetadata;
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
 
@@ -96,14 +96,6 @@ pub mod pallet {
 		type WeightInfo: WeightInfo;
 	}
 
-	// #[pallet::hooks]
-	// impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
-	// 	fn on_runtime_upgrade() -> frame_support::weights::Weight {
-	// 		migrate_to_v1::<T>()
-	// 	}
-
-	// }
-
 	/// The era reward which are distributed among the validator and nominator
 	#[pallet::storage]
 	#[pallet::getter(fn total_rewards)]
@@ -170,6 +162,8 @@ pub mod pallet {
 		WaitTheEraToComplete,
 		/// Insufficient Reward Balance
 		InsufficientRewardBalance,
+		// No Validator is present
+		NoSuchValidator
 	}
 
 	#[pallet::genesis_config]
@@ -244,7 +238,7 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 		validators.iter().for_each(|validator_id| {
 			let validator = T::ValidatorId::convert(validator_id.clone()).unwrap();
 			let validator_points = Self::retrieve_validator_point(validator.clone());
-			let validator_exposure = ErasStakers::<T>::get(Self::current_era(), validator.clone());
+			let validator_exposure = ErasStakersOverview::<T>::get(Self::current_era(), validator.clone()).unwrap_or_else(|| Err(Error::<T>::NoSuchValidator).expect("no such validator"));
 			let total_reward = Self::calculate_era_reward();
 			let validator_era_reward = Self::calculate_validator_era_reward(
 				validator_points.into(),
@@ -252,7 +246,7 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 				total_reward,
 			);
 			let nominators = Self::check_nominators(validator.clone());
-			if nominators.is_empty() {
+			if nominators.is_zero() {
 				Self::allocate_rewards(
 					validator.clone(),
 					None,
@@ -274,7 +268,9 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 			if remaining_reward_for_nominators.is_zero() {
 				return;
 			}
-			nominators.iter().for_each(|nominator| {
+			let nominators = ErasStakersPaged::<T>::get((Self::current_era(),validator.clone(),0)).unwrap();
+			
+			nominators.others.iter().for_each(|nominator| {
 				let mut current_nominators = EraReward::<T>::get(validator.clone());
 				if !current_nominators.contains(&nominator.who.clone()) {
 					current_nominators.push(nominator.who.clone());
@@ -381,7 +377,7 @@ impl<T: Config> Pallet<T> {
 	fn calculate_validator_commission_reward(
 		validator: T::AccountId,
 		validator_era_reward: f64,
-		exposure: Exposure<<T as frame_system::Config>::AccountId, BalanceOf<T>>,
+		exposure: PagedExposureMetadata<BalanceOf<T>>,
 	) -> (f64, f64) {
 		let validator_commission = Self::validator_commission(validator.clone());
 		let validator_share =
@@ -506,9 +502,8 @@ impl<T: Config> Pallet<T> {
 	/// Determine whether the validator has nominators in the current era.
 	fn check_nominators(
 		validator: T::AccountId,
-	) -> Vec<IndividualExposure<T::AccountId, <T as pallet_staking::Config>::CurrencyBalance>> {
-		let exposure = ErasStakers::<T>::get(Self::current_era(), validator.clone());
-		let nominators = exposure.others;
-		nominators
+	) -> u32 {
+		let exposure = ErasStakersOverview::<T>::get(Self::current_era(), validator.clone()).unwrap_or_else(|| Err(Error::<T>::NoSuchValidator).expect("no such validator"));
+		exposure.nominator_count
 	}
 }
