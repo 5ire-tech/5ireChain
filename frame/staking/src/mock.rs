@@ -32,7 +32,7 @@ use frame_support::{
 };
 use frame_system::{EnsureRoot, EnsureSignedBy};
 use sp_io;
-use sp_runtime::{curve::PiecewiseLinear, testing::UintAuthorityId, traits::Zero, BuildStorage};
+use sp_runtime::{testing::UintAuthorityId, traits::Zero, BuildStorage};
 use sp_staking::{
 	offence::{DisableStrategy, OffenceDetails, OnOffenceHandler},
 	OnStakingUpdate,
@@ -95,6 +95,9 @@ frame_support::construct_runtime!(
 		Session: pallet_session,
 		Historical: pallet_session::historical,
 		VoterBagsList: pallet_bags_list::<Instance1>,
+		Offences: pallet_offences,
+		ImOnline: pallet_im_online,
+		EsgScore: pallet_esg,
 	}
 );
 
@@ -116,6 +119,7 @@ parameter_types! {
 	pub static Period: BlockNumber = 5;
 	pub static Offset: BlockNumber = 0;
 	pub static MaxControllersInDeprecationBatch: u32 = 5900;
+	pub static MaxOnChainElectableTargets: u16 = 1250;
 }
 
 #[derive_impl(frame_system::config_preludes::TestDefaultConfig)]
@@ -140,6 +144,36 @@ impl pallet_balances::Config for Test {
 	type RuntimeFreezeReason = ();
 }
 
+impl pallet_offences::Config for Test {
+	type RuntimeEvent = RuntimeEvent;
+	type IdentificationTuple = pallet_session::historical::IdentificationTuple<Self>;
+	type OnOffenceHandler = Staking;
+}
+
+pub type Extrinsic = sp_runtime::testing::TestXt<RuntimeCall, ()>;
+
+impl<T> frame_system::offchain::SendTransactionTypes<T> for Test
+where
+	RuntimeCall: From<T>,
+{
+	type Extrinsic = Extrinsic;
+	type OverarchingCall = RuntimeCall;
+}
+
+impl pallet_im_online::Config for Test {
+	type AuthorityId = UintAuthorityId;
+	type RuntimeEvent = RuntimeEvent;
+	type ValidatorSet = Historical;
+	type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
+	type ReportUnresponsiveness = Offences;
+	type UnsignedPriority = ConstU64<{ 1 << 20 }>;
+	type WeightInfo = ();
+	type MaxKeys = ConstU32<10_000>;
+	type MaxPeerInHeartbeats = ConstU32<10_000>;
+	type DataProvider = Staking;
+	type TargetsBound = MaxOnChainElectableTargets;
+}
+
 sp_runtime::impl_opaque_keys! {
 	pub struct SessionKeys {
 		pub other: OtherSessionHandler,
@@ -155,6 +189,9 @@ impl pallet_session::Config for Test {
 	type ValidatorIdOf = crate::StashOf<Test>;
 	type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
 	type WeightInfo = ();
+	type AllSessionHandler = (ImOnline,);
+	type DataProvider = Staking;
+	type TargetsBound = MaxOnChainElectableTargets;
 }
 
 impl pallet_session::historical::Config for Test {
@@ -175,7 +212,6 @@ impl pallet_timestamp::Config for Test {
 
 parameter_types! {
 	pub const BondingDuration: EraIndex = 3;
-	pub const RewardCurve: &'static PiecewiseLinear<'static> = &I_NPOS;
 	pub const OffendingValidatorsThreshold: Perbill = Perbill::from_percent(75);
 }
 
@@ -257,6 +293,31 @@ impl OnStakingUpdate<AccountId, Balance> for EventListenerMock {
 	}
 }
 
+impl pallet_esg::Config for Test {
+	type WeightInfo = ();
+	type RuntimeEvent = RuntimeEvent;
+	type MaxFileSize = ConstU32<1024000>;
+	type MaxNumOfSudoOracles = ConstU32<5>;
+	type MaxNumOfNonSudoOracles = ConstU32<5>;
+}
+
+pub struct TestReward;
+impl Rewards<AccountId> for TestReward {
+	fn payout_validators() -> Vec<AccountId> {
+		let mut validators = vec![11, 21, 31, 41, 51];
+		let mut nominators = vec![100, 101];
+
+		validators.append(&mut nominators);
+		validators
+	}
+	fn claim_rewards(_: AccountId) -> Result<(), DispatchError> {
+		Ok(())
+	}
+	fn calculate_reward() -> sp_runtime::DispatchResult {
+		Ok(())
+	}
+}
+
 impl crate::pallet::pallet::Config for Test {
 	type Currency = Balances;
 	type CurrencyBalance = <Self as pallet_balances::Config>::Balance;
@@ -271,7 +332,7 @@ impl crate::pallet::pallet::Config for Test {
 	type AdminOrigin = EnsureOneOrRoot;
 	type BondingDuration = BondingDuration;
 	type SessionInterface = Self;
-	type EraPayout = ConvertCurve<RewardCurve>;
+	type EraPayout = ();
 	type NextNewSession = Session;
 	type MaxExposurePageSize = MaxExposurePageSize;
 	type OffendingValidatorsThreshold = OffendingValidatorsThreshold;
@@ -286,6 +347,9 @@ impl crate::pallet::pallet::Config for Test {
 	type MaxControllersInDeprecationBatch = MaxControllersInDeprecationBatch;
 	type EventListeners = EventListenerMock;
 	type BenchmarkingConfig = TestBenchmarkingConfig;
+	type RewardDistribution = TestReward;
+	type ESG = EsgScore;
+	type Reliability = EsgScore;
 	type WeightInfo = ();
 }
 
@@ -656,16 +720,6 @@ pub(crate) fn start_active_era(era_index: EraIndex) {
 	// One way or another, current_era must have changed before the active era, so they must match
 	// at this point.
 	assert_eq!(current_era(), active_era());
-}
-
-pub(crate) fn current_total_payout_for_duration(duration: u64) -> Balance {
-	let (payout, _rest) = <Test as Config>::EraPayout::era_payout(
-		Staking::eras_total_stake(active_era()),
-		Balances::total_issuance(),
-		duration,
-	);
-	assert!(payout > 0);
-	payout
 }
 
 pub(crate) fn maximum_payout_for_duration(duration: u64) -> Balance {
