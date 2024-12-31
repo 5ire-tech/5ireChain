@@ -6424,6 +6424,7 @@ dependencies = [
  "log",
  "pallet-authorship",
  "pallet-balances",
+ "pallet-esg",
  "pallet-offences",
  "pallet-session 28.0.0",
  "pallet-staking 4.0.0-dev",

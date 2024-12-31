@@ -37,6 +37,7 @@ pallet-balances = { workspace = true }
 pallet-offences = { workspace = true }
 pallet-staking = { workspace = true }
 sp-core = { workspace = true }
+pallet-esg = { workspace = true }
 
 [features]
 default = ["std"]
