@@ -22,6 +22,7 @@ use frame_election_provider_support::{
 	data_provider, BoundedSupportsOf, DataProviderBounds, ElectionDataProvider, ElectionProvider,
 	ScoreProvider, SortedListProvider, VoteWeight, VoterOf,
 };
+use scale_info::prelude::vec;
 use frame_support::{
 	defensive,
 	dispatch::WithPostDispatchInfo,

@@ -31,6 +31,9 @@ pallet-session = { workspace = true,default-features = false }
 pallet-esg = { workspace = true, default-features = false}
 
 [dev-dependencies]
+pallet-timestamp = { workspace = true }
+pallet-staking = { workspace = true }
+pallet-balances = { workspace = true }
 
 [features]
 default = ["std"]
@@ -42,6 +45,8 @@ std = [
 	"log/std",
 	"pallet-authorship/std",
 	"pallet-session/std",
+	"pallet-balances/std",
+	"pallet-staking/std",
 	"pallet-esg/std",
 	"frame-election-provider-support/std",
 	"scale-info/std",

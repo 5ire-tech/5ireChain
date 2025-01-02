@@ -21,32 +21,40 @@
 
 use frame_support::{
 	derive_impl, parameter_types,
-	traits::{ConstU32, ConstU64},
+	traits::{ConstU32, ConstU64, ConstU128,Imbalance, OnUnbalanced},
 	weights::Weight,
 };
+use frame_election_provider_support::{{bounds::ElectionBounds,bounds::ElectionBoundsBuilder},onchain,SequentialPhragmen};
 use pallet_session::historical as pallet_session_historical;
+use pallet_staking::Rewards;
 use sp_core::H256;
 use sp_runtime::{
 	testing::{TestXt, UintAuthorityId},
 	traits::{BlakeTwo256, ConvertInto, IdentityLookup},
-	BuildStorage, Permill,
+	BuildStorage, Permill,DispatchError,Perbill
 };
 use sp_staking::{
 	offence::{OffenceError, ReportOffence},
-	SessionIndex,
+	SessionIndex,EraIndex
 };
 
 use crate as imonline;
 use crate::Config;
+type AccountId = u64;
+type DummyValidatorId = u64;
 
 type Block = frame_system::mocking::MockBlock<Runtime>;
 
 frame_support::construct_runtime!(
 	pub enum Runtime {
 		System: frame_system,
+		Balances:pallet_balances,
 		Session: pallet_session,
 		ImOnline: imonline,
 		Historical: pallet_session_historical,
+		Staking: pallet_staking,
+		EsgScore: pallet_esg,
+		Timestamp: pallet_timestamp
 	}
 );
 
@@ -130,12 +138,12 @@ impl frame_system::Config for Runtime {
 	type BlockHashCount = ConstU64<250>;
 	type Version = ();
 	type PalletInfo = PalletInfo;
-	type AccountData = ();
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
 	type SystemWeightInfo = ();
 	type SS58Prefix = ();
 	type OnSetCode = ();
+	type AccountData = pallet_balances::AccountData<u128>;
 	type MaxConsumers = ConstU32<16>;
 }
 
@@ -143,6 +151,13 @@ parameter_types! {
 	pub const Period: u64 = 1;
 	pub const Offset: u64 = 0;
 	pub MaxOnChainElectableTargets: u16 = 1250;
+	pub static SessionsPerEra: SessionIndex = 4;
+	pub static SlashDeferDuration: EraIndex = 0;
+	pub const BondingDuration: EraIndex = 3;
+	pub const OffendingValidatorsThreshold: Perbill = Perbill::from_percent(40);
+	pub static RewardOnUnbalanceWasCalled: bool = false;
+	pub static RewardRemainderUnbalanced: u128 = 0;
+	pub static ElectionsBounds: ElectionBounds = ElectionBoundsBuilder::default().build();
 }
 
 impl pallet_session::Config for Runtime {
@@ -161,12 +176,97 @@ impl pallet_session::Config for Runtime {
 	type DataProvider = Staking;
 }
 
-impl pallet_staking::Config for Test {
+impl pallet_balances::Config for Runtime {
+	type MaxLocks = ();
+	type MaxReserves = ();
+	type ReserveIdentifier = [u8; 8];
+	type Balance = u128;
+	type DustRemoval = ();
+	type RuntimeEvent = RuntimeEvent;
+	type ExistentialDeposit = ConstU128<1>;
+	type AccountStore = System;
+	type WeightInfo = ();
+	type FreezeIdentifier = ();
+	type MaxFreezes = ();
+	type RuntimeHoldReason = ();
+	type RuntimeFreezeReason = RuntimeFreezeReason;
+}
+
+impl pallet_timestamp::Config for Runtime {
+	type Moment = u64;
+	type OnTimestampSet = ();
+	type MinimumPeriod = ConstU64<5>;
+	type WeightInfo = ();
+}
+
+pub struct RewardRemainderMock;
+impl OnUnbalanced<pallet_staking::NegativeImbalanceOf<Runtime>> for RewardRemainderMock {
+	fn on_nonzero_unbalanced(amount: pallet_staking::NegativeImbalanceOf<Runtime>) {
+		RewardRemainderUnbalanced::mutate(|v| {
+			*v += amount.peek();
+		});
+		drop(amount);
+	}
+}
+
+pub struct MockReward {}
+impl OnUnbalanced<pallet_staking::PositiveImbalanceOf<Runtime>> for MockReward {
+	fn on_unbalanced(_: pallet_staking::PositiveImbalanceOf<Runtime>) {
+		RewardOnUnbalanceWasCalled::set(true);
+	}
+}
+
+pub struct TestReward;
+impl Rewards<AccountId> for TestReward {
+	fn payout_validators() -> Vec<AccountId> {
+		vec![]
+	}
+	fn claim_rewards(_: AccountId) -> Result<(), DispatchError> {
+		Ok(())
+	}
+	fn calculate_reward() -> sp_runtime::DispatchResult {
+		Ok(())
+	}
+}
+
+pub struct ImOnlineSession;
+impl pallet_staking::SessionInterface<AccountId> for ImOnlineSession {
+	fn disable_validator(_validator_index: u32) -> bool {
+		true
+	}
+
+	fn validators() -> Vec<AccountId> {
+		Validators::get().unwrap()
+	}
+
+	fn prune_historical_up_to(_up_to: SessionIndex) {}
+}
+
+
+pub struct OnChainSeqPhragmen;
+impl onchain::Config for OnChainSeqPhragmen {
+	type System = Runtime;
+	type Solver = SequentialPhragmen<DummyValidatorId, Perbill>;
+	type DataProvider = Staking;
+	type WeightInfo = ();
+	type MaxWinners = ConstU32<100>;
+	type Bounds = ElectionsBounds;
+}
+
+impl pallet_esg::Config for Runtime {
+	type WeightInfo = ();
+	type MaxFileSize = ConstU32<102400>;
+	type RuntimeEvent = RuntimeEvent;
+	type MaxNumOfSudoOracles = ConstU32<5>;
+	type MaxNumOfNonSudoOracles = ConstU32<5>;
+}
+
+impl pallet_staking::Config for Runtime {
 	type Currency = Balances;
 	type RewardDistribution = TestReward;
 	type CurrencyBalance = <Self as pallet_balances::Config>::Balance;
 	type UnixTime = Timestamp;
-	type CurrencyToVote = SaturatingCurrencyToVote;
+	type CurrencyToVote = ();
 	type RewardRemainder = RewardRemainderMock;
 	type RuntimeEvent = RuntimeEvent;
 	type Slash = ();
@@ -176,17 +276,18 @@ impl pallet_staking::Config for Test {
 	type BondingDuration = BondingDuration;
 	type AdminOrigin = frame_system::EnsureRoot<u64>;
 	type SessionInterface = ImOnlineSession;
+	type MaxExposurePageSize = ConstU32<64>;
+	type MaxControllersInDeprecationBatch = ConstU32<100>;
 	type EraPayout = ();
 	type NextNewSession = Session;
-	type MaxNominatorRewardedPerValidator = ConstU32<64>;
 	type OffendingValidatorsThreshold = OffendingValidatorsThreshold;
 	type ElectionProvider = onchain::OnChainExecution<OnChainSeqPhragmen>;
 	type GenesisElectionProvider = Self::ElectionProvider;
-	type VoterList = VoterBagsList;
+	type VoterList = pallet_staking::UseNominatorsAndValidatorsMap<Self>;
 	type TargetList = pallet_staking::UseValidatorsMap<Self>;
-	type MaxUnlockingChunks = MaxUnlockingChunks;
-	type NominationsQuota = FixedNominationsQuota<16>;
-	type HistoryDepth = HistoryDepth;
+	type MaxUnlockingChunks = ConstU32<32>;
+	type NominationsQuota = pallet_staking::FixedNominationsQuota<16>;
+	type HistoryDepth = ConstU32<84>;
 	type EventListeners = ();
 	type BenchmarkingConfig = pallet_staking::TestBenchmarkingConfig;
 	type WeightInfo = ();
