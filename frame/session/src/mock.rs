@@ -248,6 +248,57 @@ impl Convert<u64, Option<u64>> for TestValidatorIdOf {
 	}
 }
 
+
+// 5ire's implementation
+parameter_types! {
+	pub MaxNominations: u32 =  0u32;
+	pub MaxOnChainElectableTargets: u16 = 1250;
+}
+
+//5ire's implementation
+pub struct MyAllSessionHandler;
+impl OneSessionHandlerAll<u64> for MyAllSessionHandler {
+	type Key = UintAuthorityId;
+	fn on_new_session_all<'a, I: 'a>(_: bool, _: I, _: I)
+	where
+		I: Iterator<Item = (&'a u64, Self::Key)>,
+		u64: 'a,
+	{
+	}
+}
+
+impl sp_runtime::BoundToRuntimeAppPublic for MyAllSessionHandler {
+	type Public = UintAuthorityId;
+}
+
+// 5ire's implementation
+pub struct TestElectionDP;
+
+impl frame_election_provider_support::ElectionDataProvider for TestElectionDP {
+	type AccountId = u64;
+	type BlockNumber = u64;
+	type MaxVotesPerVoter = MaxNominations;
+
+	fn desired_targets() -> frame_election_provider_support::data_provider::Result<u32> {
+		frame_election_provider_support::data_provider::Result::Ok(0u32)
+	}
+	fn electable_targets(
+		_maybe_max_len: DataProviderBounds,
+	) -> frame_election_provider_support::data_provider::Result<Vec<Self::AccountId>> {
+		frame_election_provider_support::data_provider::Result::Ok(Vec::<u64>::new())
+	}
+	fn electing_voters(
+		_maybe_max_len: DataProviderBounds,
+	) -> frame_election_provider_support::data_provider::Result<
+		Vec<frame_election_provider_support::VoterOf<Self>>,
+	> {
+		frame_election_provider_support::data_provider::Result::Err("not implemented!!")
+	}
+	fn next_election_prediction(_ : Self::BlockNumber) -> Self::BlockNumber {
+		0u64
+	}
+}
+
 impl Config for Test {
 	type ShouldEndSession = TestShouldEndSession;
 	#[cfg(feature = "historical")]
@@ -261,6 +312,9 @@ impl Config for Test {
 	type RuntimeEvent = RuntimeEvent;
 	type NextSessionRotation = ();
 	type WeightInfo = ();
+	type AllSessionHandler = (MyAllSessionHandler,);
+	type DataProvider = TestElectionDP;
+	type TargetsBound = MaxOnChainElectableTargets;
 }
 
 #[cfg(feature = "historical")]

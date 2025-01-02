@@ -2,8 +2,6 @@ use crate::{
 	mock::*, EraReward, Error, NominatorEarningsAccount, Rewards, ValidatorRewardAccounts,
 };
 use frame_support::{assert_noop, assert_ok, traits::Currency};
-use frame_system::Event;
-use sp_runtime::Perbill;
 
 pub const VALIDATOR: u64 = 11;
 pub const NOMINATOR: u64 = 22;
@@ -11,7 +9,7 @@ pub const USER: u64 = 1;
 pub const USER_2: u64 = 2;
 
 pub fn add_reward_balance() {
-	Balances::deposit_creating(&Reward::account_id(), 15000000);
+	let _ = Balances::deposit_creating(&Reward::account_id(), 15000000);
 }
 
 pub fn assert_last_event(generic_event: RuntimeEvent) {

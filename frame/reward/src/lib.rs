@@ -8,7 +8,7 @@
 use frame_support::{ensure, pallet_prelude::DispatchResult};
 pub use pallet::*;
 use pallet_staking::{
-	BalanceOf, CurrentEra, ErasRewardPoints, ErasStakersOverview, ErasStakersPaged, IndividualExposure, Rewards, Validators
+	BalanceOf, CurrentEra, ErasRewardPoints, ErasStakersOverview, ErasStakersPaged, Rewards, Validators
 };
 use parity_scale_codec::Codec;
 use frame_support::{
@@ -163,7 +163,7 @@ pub mod pallet {
 		/// Insufficient Reward Balance
 		InsufficientRewardBalance,
 		// No Validator is present
-		NoSuchValidator
+		NoSuchValidator,
 	}
 
 	#[pallet::genesis_config]
@@ -245,8 +245,8 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 				validator_exposure.total,
 				total_reward,
 			);
-			let nominators = Self::check_nominators(validator.clone());
-			if nominators.is_zero() {
+			let nominators_count = Self::check_nominators(validator.clone());
+			if nominators_count.is_zero() {
 				Self::allocate_rewards(
 					validator.clone(),
 					None,
@@ -268,9 +268,9 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 			if remaining_reward_for_nominators.is_zero() {
 				return;
 			}
-			let nominators = ErasStakersPaged::<T>::get((Self::current_era(),validator.clone(),0)).unwrap();
-			
-			nominators.others.iter().for_each(|nominator| {
+
+			if let Some(nominator) = ErasStakersPaged::<T>::get((Self::current_era(),validator.clone(),0)) {
+			nominator.others.iter().for_each(|nominator| {
 				let mut current_nominators = EraReward::<T>::get(validator.clone());
 				if !current_nominators.contains(&nominator.who.clone()) {
 					current_nominators.push(nominator.who.clone());
@@ -288,9 +288,10 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 					Self::convert_float64_to_unsigned128(nominator_reward).into(),
 				);
 			});
-		});
+		 }
+	  });
 		Ok(())
-	}
+  }
 }
 
 impl<T: Config> Pallet<T> {

@@ -25,7 +25,7 @@
 
 use frame_support::{
 	traits::{Get, OneSessionHandler},
-	WeakBoundedVec, derive_impl
+	WeakBoundedVec,derive_impl
 };
 use pallet_session::validation::OneSessionHandlerAll;
 use sp_authority_discovery::AuthorityId;
@@ -296,6 +296,7 @@ mod tests {
 		type Lookup = IdentityLookup<Self::AccountId>;
 		type Block = Block;
 	}
+	
 	pub struct TestSessionHandler;
 	impl pallet_session::SessionHandler<AuthorityId> for TestSessionHandler {
 		const KEY_TYPE_IDS: &'static [KeyTypeId] = &[key_types::DUMMY];

@@ -142,6 +142,7 @@ impl frame_system::Config for Runtime {
 parameter_types! {
 	pub const Period: u64 = 1;
 	pub const Offset: u64 = 0;
+	pub MaxOnChainElectableTargets: u16 = 1250;
 }
 
 impl pallet_session::Config for Runtime {
@@ -155,6 +156,42 @@ impl pallet_session::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
 	type WeightInfo = ();
+	type AllSessionHandler = (ImOnline,);
+	type TargetsBound = MaxOnChainElectableTargets;
+	type DataProvider = Staking;
+}
+
+impl pallet_staking::Config for Test {
+	type Currency = Balances;
+	type RewardDistribution = TestReward;
+	type CurrencyBalance = <Self as pallet_balances::Config>::Balance;
+	type UnixTime = Timestamp;
+	type CurrencyToVote = SaturatingCurrencyToVote;
+	type RewardRemainder = RewardRemainderMock;
+	type RuntimeEvent = RuntimeEvent;
+	type Slash = ();
+	type Reward = MockReward;
+	type SessionsPerEra = SessionsPerEra;
+	type SlashDeferDuration = SlashDeferDuration;
+	type BondingDuration = BondingDuration;
+	type AdminOrigin = frame_system::EnsureRoot<u64>;
+	type SessionInterface = ImOnlineSession;
+	type EraPayout = ();
+	type NextNewSession = Session;
+	type MaxNominatorRewardedPerValidator = ConstU32<64>;
+	type OffendingValidatorsThreshold = OffendingValidatorsThreshold;
+	type ElectionProvider = onchain::OnChainExecution<OnChainSeqPhragmen>;
+	type GenesisElectionProvider = Self::ElectionProvider;
+	type VoterList = VoterBagsList;
+	type TargetList = pallet_staking::UseValidatorsMap<Self>;
+	type MaxUnlockingChunks = MaxUnlockingChunks;
+	type NominationsQuota = FixedNominationsQuota<16>;
+	type HistoryDepth = HistoryDepth;
+	type EventListeners = ();
+	type BenchmarkingConfig = pallet_staking::TestBenchmarkingConfig;
+	type WeightInfo = ();
+	type ESG = EsgScore;
+	type Reliability = ImOnline;
 }
 
 impl pallet_session::historical::Config for Runtime {
@@ -212,6 +249,8 @@ impl Config for Runtime {
 	type WeightInfo = ();
 	type MaxKeys = ConstU32<10_000>;
 	type MaxPeerInHeartbeats = ConstU32<10_000>;
+	type DataProvider = Staking;
+	type TargetsBound = MaxOnChainElectableTargets;
 }
 
 impl<LocalCall> frame_system::offchain::SendTransactionTypes<LocalCall> for Runtime
