@@ -29,6 +29,8 @@ pallet-contracts = { workspace = true, default-features = false }
 [dev-dependencies]
 serde_json = { workspace = true, default-features = true }
 pallet-balances = { workspace = true }
+pallet-timestamp = { workspace = true }
+pallet-insecure-randomness-collective-flip = { workspace = true }
 
 [features]
 default = ["std"]

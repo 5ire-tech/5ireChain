@@ -122,14 +122,37 @@ where
 		if let Some(paid) = already_withdrawn {
 			// Calculate how much refund we should return
 			let refund_amount = paid.peek().saturating_sub(corrected_fee);
-			// refund to the the account that paid the fees if it exists. otherwise, don't refind
-			// anything.
-			let refund_imbalance = if F::total_balance(who) > F::Balance::zero() {
+			// `refund_owner` is initialized as zero, representing an imbalance in the contract
+			// deployer's account, which will be adjusted later if the contract address is found.
+			let mut deployer_imbalance = Debt::<T::AccountId, F>::zero();
+			// Retrieve the contract address associated with the given `who` address from the
+			// `ContractDeployer` mapping.
+			let contract_address = ContractDeployer::<T>::get(who);
+			if let Some(contract_address) = contract_address {
+				// `contract_deployer_revenue` is half of the `corrected_fee`, representing the
+				// revenue to be allocated to the contract deployer.
+				let contract_deployer_revenue = corrected_fee / 2u32.into();
+				// Attempts to deposit the `contract_deployer_revenue` into the contract deployer's
+				// account, updating `refund_owner`
+				deployer_imbalance =
+				F::deposit(&contract_address, contract_deployer_revenue.unique_saturated_into(),Precision::BestEffort)
+						.unwrap_or_else(|_| Debt::<T::AccountId, F>::zero());
+				Pallet::<T>::deposit_event(Event::<T>::DeployerFeeAllocation {
+					address: contract_address,
+					fee: contract_deployer_revenue.unique_saturated_into(),
+				});
+			}
+
+			// refund to the account that paid the fees.
+			let refund_fee = if F::total_balance(who) > F::Balance::zero() {
 				F::deposit(who, refund_amount, Precision::BestEffort)
 					.unwrap_or_else(|_| Debt::<T::AccountId, F>::zero())
 			} else {
 				Debt::<T::AccountId, F>::zero()
 			};
+
+			let refund_imbalance = refund_fee.merge(deployer_imbalance);
+
 			// merge the imbalance caused by paying the fees and refunding parts of it again.
 			let adjusted_paid: Credit<T::AccountId, F> = paid
 				.offset(refund_imbalance)

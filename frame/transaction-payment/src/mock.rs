@@ -20,7 +20,8 @@ use crate as pallet_transaction_payment;
 
 use sp_core::H256;
 use sp_runtime::traits::{BlakeTwo256, IdentityLookup};
-
+use pallet_contracts::{Frame,DefaultAddressGenerator};
+use frame_system::EnsureSigned;
 use frame_support::{
 	derive_impl,
 	dispatch::DispatchClass,
@@ -39,6 +40,9 @@ frame_support::construct_runtime!(
 		System: system,
 		Balances: pallet_balances,
 		TransactionPayment: pallet_transaction_payment::{Pallet, Storage, Event<T>},
+		Timestamp:pallet_timestamp,
+		Randomness: pallet_insecure_randomness_collective_flip,
+		Contracts:pallet_contracts
 	}
 );
 
@@ -68,6 +72,11 @@ parameter_types! {
 	pub static WeightToFee: u64 = 1;
 	pub static TransactionByteFee: u64 = 1;
 	pub static OperationalFeeMultiplier: u8 = 5;
+	pub static DepositPerByte: BalanceOf<Runtime> = 1;
+	pub const DepositPerItem: BalanceOf<Runtime> = 2;
+	pub static MaxDelegateDependencies: u32 = 32;
+	pub static DefaultDepositLimit: BalanceOf<Runtime> = 10_000_000;
+	pub static CodeHashLockupDepositPercent: Perbill = Perbill::from_percent(0);
 }
 
 #[derive_impl(frame_system::config_preludes::TestDefaultConfig)]
@@ -109,7 +118,7 @@ impl pallet_balances::Config for Runtime {
 	type WeightInfo = ();
 	type FreezeIdentifier = ();
 	type MaxFreezes = ();
-	type RuntimeHoldReason = ();
+	type RuntimeHoldReason = RuntimeHoldReason;
 	type RuntimeFreezeReason = ();
 }
 
@@ -152,6 +161,47 @@ impl OnUnbalanced<fungible::Credit<<Runtime as frame_system::Config>::AccountId,
 			}
 		}
 	}
+}
+
+impl pallet_insecure_randomness_collective_flip::Config for Runtime {}
+
+impl pallet_timestamp::Config for Runtime {
+	type Moment = u64;
+	type OnTimestampSet = ();
+	type MinimumPeriod = ConstU64<1>;
+	type WeightInfo = ();
+}
+
+#[derive_impl(pallet_contracts::config_preludes::TestDefaultConfig)]
+impl pallet_contracts::Config for Runtime {
+	type Time = Timestamp;
+	type Randomness = Randomness;
+	type Currency = Balances;
+	type RuntimeEvent = RuntimeEvent;
+	type RuntimeCall = RuntimeCall;
+	type CallFilter = ();
+	type CallStack = [Frame<Self>; 5];
+	type WeightPrice = ();
+	type WeightInfo = ();
+	type ChainExtension = ();
+	type Schedule = ();
+	type DepositPerByte = DepositPerByte;
+	type DepositPerItem = DepositPerItem;
+	type DefaultDepositLimit = DefaultDepositLimit;
+	type AddressGenerator = DefaultAddressGenerator;
+	type MaxCodeLen = ConstU32<{ 123 * 1024 }>;
+	type MaxStorageKeyLen = ConstU32<128>;
+	type UnsafeUnstableInterface = ();
+	type MaxDebugBufferLen = ConstU32<{ 2 * 1024 * 1024 }>;
+	type Migrations = ();
+	type CodeHashLockupDepositPercent = CodeHashLockupDepositPercent;
+	type MaxDelegateDependencies = MaxDelegateDependencies;
+	type Debug = ();
+	type UploadOrigin = EnsureSigned<Self::AccountId>;
+	type InstantiateOrigin = EnsureSigned<Self::AccountId>;
+	type Environment = ();
+	type ApiVersion = ();
+	type Xcm = ();
 }
 
 impl Config for Runtime {
