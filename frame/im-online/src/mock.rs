@@ -26,7 +26,9 @@ use frame_support::{
 };
 use frame_election_provider_support::{{bounds::ElectionBounds,bounds::ElectionBoundsBuilder},onchain,SequentialPhragmen};
 use pallet_session::historical as pallet_session_historical;
-use pallet_staking::Rewards;
+use pallet_staking::{
+	RewardDestination, Rewards, ValidatorPrefs,
+};
 use sp_core::H256;
 use sp_runtime::{
 	testing::{TestXt, UintAuthorityId},
@@ -107,14 +109,22 @@ impl ReportOffence<u64, IdentificationTuple, Offence> for OffenceHandler {
 	}
 }
 
-pub fn new_test_ext() -> sp_io::TestExternalities {
+pub fn new_test_ext(n: u64) -> sp_io::TestExternalities {
 	let t = frame_system::GenesisConfig::<Runtime>::default().build_storage().unwrap();
 	let mut result: sp_io::TestExternalities = t.into();
 	// Set the default keys, otherwise session will discard the validator.
 	result.execute_with(|| {
-		for i in 1..=6 {
+		for i in 1..=n {
 			System::inc_providers(&i);
-			assert_eq!(Session::set_keys(RuntimeOrigin::signed(i), (i - 1).into(), vec![]), Ok(()));
+			// i'm using controller id; i same as that of stash id; i
+			Staking::bond(
+				RuntimeOrigin::signed(i),
+				(100 + (100 * i)) as u128,
+				RewardDestination::Controller,
+			)
+			.unwrap();
+			Staking::validate(RuntimeOrigin::signed(i), ValidatorPrefs::default()).unwrap();
+			Session::set_keys(RuntimeOrigin::signed(i), (i).into(), vec![]).unwrap();
 		}
 	});
 	result
