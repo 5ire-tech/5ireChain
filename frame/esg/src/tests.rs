@@ -1,6 +1,6 @@
 pub use crate::{mock::*, Error};
 use fp_account::AccountId20;
-use frame_support::{assert_err, assert_noop, assert_ok, WeakBoundedVec};
+use frame_support::{assert_noop, assert_ok, WeakBoundedVec};
 use sp_runtime::DispatchError;
 
 const MAX_ESG_SCORE: u16 = 100;

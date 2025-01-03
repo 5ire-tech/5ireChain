@@ -372,9 +372,6 @@ where
 	}
 }
 
-pub(crate) type StakingCall = crate::Call<Test>;
-pub(crate) type TestCall = <Test as frame_system::Config>::RuntimeCall;
-
 parameter_types! {
 	// if true, skips the try-state for the test running.
 	pub static SkipTryStateCheck: bool = false;
@@ -720,36 +717,6 @@ pub(crate) fn start_active_era(era_index: EraIndex) {
 	// One way or another, current_era must have changed before the active era, so they must match
 	// at this point.
 	assert_eq!(current_era(), active_era());
-}
-
-pub(crate) fn maximum_payout_for_duration(duration: u64) -> Balance {
-	let (payout, rest) = <Test as Config>::EraPayout::era_payout(
-		Staking::eras_total_stake(active_era()),
-		Balances::total_issuance(),
-		duration,
-	);
-	payout + rest
-}
-
-/// Time it takes to finish a session.
-///
-/// Note, if you see `time_per_session() - BLOCK_TIME`, it is fine. This is because we set the
-/// timestamp after on_initialize, so the timestamp is always one block old.
-pub(crate) fn time_per_session() -> u64 {
-	Period::get() * BLOCK_TIME
-}
-
-/// Time it takes to finish an era.
-///
-/// Note, if you see `time_per_era() - BLOCK_TIME`, it is fine. This is because we set the
-/// timestamp after on_initialize, so the timestamp is always one block old.
-pub(crate) fn time_per_era() -> u64 {
-	time_per_session() * SessionsPerEra::get() as u64
-}
-
-/// Time that will be calculated for the reward per era.
-pub(crate) fn reward_time_per_era() -> u64 {
-	time_per_era() - BLOCK_TIME
 }
 
 pub(crate) fn reward_all_elected() {

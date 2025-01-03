@@ -25,7 +25,7 @@
 
 use frame_support::{
 	traits::{Get, OneSessionHandler},
-	WeakBoundedVec,derive_impl
+	WeakBoundedVec
 };
 use pallet_session::validation::OneSessionHandlerAll;
 use sp_authority_discovery::AuthorityId;
@@ -181,7 +181,7 @@ mod tests {
 	use super::*;
 	use crate as pallet_authority_discovery;
 	use frame_support::{
-		parameter_types,
+		parameter_types, derive_impl,
 		traits::ConstU32,
 	};
 	use sp_application_crypto::Pair;

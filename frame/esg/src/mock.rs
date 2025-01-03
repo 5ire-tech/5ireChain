@@ -7,7 +7,7 @@ use crate as pallet_esg;
 use fp_account::AccountId20;
 use frame_support::{
 	parameter_types,
-	traits::{ConstU16, ConstU32, ConstU64},
+	traits::{ConstU16,ConstU64},
 };
 use frame_system as system;
 use sp_core::{Decode, H160, H256};

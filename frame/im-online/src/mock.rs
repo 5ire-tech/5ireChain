@@ -120,7 +120,7 @@ pub fn new_test_ext(n: u64) -> sp_io::TestExternalities {
 			Staking::bond(
 				RuntimeOrigin::signed(i),
 				(100 + (100 * i)) as u128,
-				RewardDestination::Controller,
+				RewardDestination::Staked
 			)
 			.unwrap();
 			Staking::validate(RuntimeOrigin::signed(i), ValidatorPrefs::default()).unwrap();
