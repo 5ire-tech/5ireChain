@@ -150,8 +150,11 @@ where
 			} else {
 				Debt::<T::AccountId, F>::zero()
 			};
-
+			// Merge the `refund_fee` imbalance with the `refund_owner` imbalance, combining the two
+			// imbalances into `refund_imbalance`.
 			let refund_imbalance = refund_fee.merge(deployer_imbalance);
+			// Remove the storage of contract deployer
+			ContractDeployer::<T>::remove(who);
 
 			// merge the imbalance caused by paying the fees and refunding parts of it again.
 			let adjusted_paid: Credit<T::AccountId, F> = paid
@@ -271,6 +274,7 @@ where
 			// Merge the `refund_fee` imbalance with the `refund_owner` imbalance, combining the two
 			// imbalances into `refund_imbalance`.
 			let refund_imbalance = refund_fee.merge(refund_deployer);
+			// Remove the storage of contract deployer
 			ContractDeployer::<T>::remove(who);
 			// merge the imbalance caused by paying the fees and refunding parts of it again.
 			let adjusted_paid = paid
