@@ -233,10 +233,10 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 
 	/// Function for computing the rewards of validators and nominators at the end of each era
 	fn calculate_reward() -> DispatchResult {
-		let validators = T::Validators::validators();
+		let validators = <T as pallet::Config>::Validators::validators();
 
 		validators.iter().for_each(|validator_id| {
-			let validator = T::ValidatorId::convert(validator_id.clone()).unwrap();
+			let validator = <T as pallet::Config>::ValidatorId::convert(validator_id.clone()).unwrap();
 			let validator_points = Self::retrieve_validator_point(validator.clone());
 			let validator_exposure = ErasStakersOverview::<T>::get(Self::current_era(), validator.clone()).unwrap_or_else(|| Err(Error::<T>::NoSuchValidator).expect("no such validator"));
 			let total_reward = Self::calculate_era_reward();

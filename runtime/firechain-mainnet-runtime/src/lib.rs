@@ -645,6 +645,8 @@ impl pallet_staking::Config for Runtime {
 	type Currency = Balances;
 	type CurrencyBalance = Balance;
 	type UnixTime = Timestamp;
+	type Validators = Historical;
+	type ValidatorId = pallet_staking::StashOf<Self>;
 	type CurrencyToVote = sp_staking::currency_to_vote::U128CurrencyToVote;
 	type RewardRemainder = Treasury;
 	type MaxExposurePageSize = ConstU32<256>;
@@ -2715,7 +2717,7 @@ pub type Migrations = migrations::Unreleased;
 #[allow(deprecated, missing_docs)]
 pub mod migrations {
 	/// Unreleased migrations. Add new ones here:
-	pub type Unreleased = ();
+	pub type Unreleased = pallet_staking::migrations::v14::MigrateToV14<crate::Runtime>;
 }
 
 /// Executive: handles dispatch to the various modules.

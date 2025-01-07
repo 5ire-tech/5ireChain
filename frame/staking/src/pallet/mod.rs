@@ -25,14 +25,14 @@ use frame_support::{
 	pallet_prelude::*,
 	traits::{
 		Currency, Defensive, DefensiveSaturating, EnsureOrigin, EstimateNextNewSession, Get,
-		InspectLockableCurrency, LockableCurrency, OnUnbalanced, UnixTime, WithdrawReasons,
+		InspectLockableCurrency, LockableCurrency, OnUnbalanced, UnixTime, WithdrawReasons, ValidatorSet
 	},
 	weights::Weight,
 	BoundedVec,
 };
 use frame_system::{ensure_root, ensure_signed, pallet_prelude::*};
 use sp_runtime::{
-	traits::{SaturatedConversion, StaticLookup, Zero},
+	traits::{SaturatedConversion, StaticLookup, Zero, Convert},
 	ArithmeticError, Perbill, Percent,
 };
 
@@ -204,6 +204,17 @@ pub mod pallet {
 		/// The payout for validators and the system for the current era.
 		/// See [Era payout](./index.html#era-payout).
 		type EraPayout: EraPayout<BalanceOf<Self>>;
+
+		// Returns the Active set of Validators
+		type Validators: frame_support::traits::ValidatorSet<Self::AccountId>;
+
+		// Converts the default validator id into account id
+		type ValidatorId: Convert<
+			<<Self as Config>::Validators as ValidatorSet<
+				<Self as frame_system::Config>::AccountId,
+			>>::ValidatorId,
+			Option<Self::AccountId>,
+		>;
 
 		/// Something that can estimate the next session change, accurately or as a best effort
 		/// guess.
