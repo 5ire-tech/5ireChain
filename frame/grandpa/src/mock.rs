@@ -243,6 +243,8 @@ impl pallet_staking::Config for Test {
 	type RewardDistribution = TestReward;
 	type ESG = EsgScore;
 	type Reliability = EsgScore;
+	type Validators = Historical;
+	type ValidatorId = pallet_staking::StashOf<Test>;
 }
 
 impl pallet_esg::Config for Test {

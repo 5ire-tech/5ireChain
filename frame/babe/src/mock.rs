@@ -246,6 +246,8 @@ impl pallet_staking::Config for Test {
 	type RewardDistribution = TestReward;
 	type ESG = ESG;
 	type Reliability = ESG;
+	type Validators = Historical;
+	type ValidatorId = pallet_staking::StashOf<Test>;
 	type WeightInfo = ();
 }
 

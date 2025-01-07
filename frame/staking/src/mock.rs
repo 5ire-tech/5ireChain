@@ -350,6 +350,8 @@ impl crate::pallet::pallet::Config for Test {
 	type RewardDistribution = TestReward;
 	type ESG = EsgScore;
 	type Reliability = EsgScore;
+	type Validators = Historical;
+	type ValidatorId = crate::StashOf<Test>;
 	type WeightInfo = ();
 }
 

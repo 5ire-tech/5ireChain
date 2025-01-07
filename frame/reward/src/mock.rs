@@ -168,6 +168,8 @@ impl pallet_staking::Config for Test {
 	type MaxUnlockingChunks = ConstU32<32>;
 	type HistoryDepth = ConstU32<84>;
 	type EventListeners = ();
+	type Validators = Historical;
+	type ValidatorId = pallet_staking::StashOf<Test>;
 	type BenchmarkingConfig = pallet_staking::TestBenchmarkingConfig;
 	type MaxControllersInDeprecationBatch = ConstU32<100>;
 	type WeightInfo = ();

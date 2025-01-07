@@ -303,6 +303,8 @@ impl pallet_staking::Config for Runtime {
 	type WeightInfo = ();
 	type ESG = EsgScore;
 	type Reliability = ImOnline;
+	type Validators = Historical;
+	type ValidatorId = pallet_staking::StashOf<Runtime>;
 }
 
 impl pallet_session::historical::Config for Runtime {
