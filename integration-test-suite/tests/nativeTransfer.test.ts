@@ -34,7 +34,7 @@ describe("Native token tests", function () {
 
     // Create a extrinsic, transferring 12345 units to Bob
     const amount = polkadotApi.createType("Balance", "900000000000000000000");
-    const transaction = polkadotApi.tx.balances.transfer(
+    const transaction = polkadotApi.tx.balances.transferKeepAlive(
       baltathar.address,
       amount,
     );

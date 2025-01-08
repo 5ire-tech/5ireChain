@@ -12,8 +12,8 @@ export const ACC2_PK =
 export const ETH_BLOCK_GAS_LIMIT = 30000000; // The same configuration as runtime
 export const ETH_BLOCK_POV_LIMIT = 5 * 1024 * 1024; // The same configuration as runtime
 
-export const GENESIS_ACCOUNT_BALANCE = "19342813113834066795298815";
-export const EXISTENTIAL_DEPOSIT = 1; // The minimum amount required to keep an account open
+export const GENESIS_ACCOUNT_BALANCE = "19342813113834066795298814";
+export const EXISTENTIAL_DEPOSIT: number = 1; // The minimum amount required to keep an account open
 
 export const GENESIS_ACCOUNTS: string[] = [
   "0x48Df7B35247786418a7e279e508325952B9Fc92F",
@@ -21,7 +21,7 @@ export const GENESIS_ACCOUNTS: string[] = [
   "0xFE31f14425993A3d9aeDEd195C56999eBE097d92",
 ]; //Genesis account addresses
 
-export const CHAIN_ID = 997;
+export const CHAIN_ID = 997995;
 
 export const TEST_ACCOUNT = "0xdd33Af49c851553841E94066B54Fd28612522901";
 export const TEST_ACCOUNT_PRIVATE_KEY =

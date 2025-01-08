@@ -32,7 +32,6 @@ describe("EVM related RPC Constants using web3js/ethersjs", function () {
   });
 
   it("should have chainId", async function () {
-    // The chainId is defined by the Substrate Chain Id, default to 42
     expect(await web3.eth.getChainId()).to.equal(CHAIN_ID);
   });
 

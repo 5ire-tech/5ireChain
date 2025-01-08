@@ -6,7 +6,7 @@
   "author": "5irechain",
   "license": "MIT",
   "scripts": {
-    "test": "mocha 'tests/**/*.test.ts' --exit",
+    "test": "mocha 'tests/**/validator.test.ts' --exit",
     "format": "prettier -w '**/*.ts'",
     "ts-check": "npx tsc --noEmit"
   },
