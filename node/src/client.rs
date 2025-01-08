@@ -216,44 +216,34 @@ macro_rules! match_client {
 	};
 }
 
-/// Trivial enum representing runtime variant
-#[derive(Clone)]
-pub enum RuntimeVariant {
-	#[allow(dead_code)]
-	#[cfg(feature = "firechain-qa")]
-	Qa,
-	#[allow(dead_code)]
-	#[cfg(feature = "firechain-mainnet")]
-	Mainnet,
-	#[allow(dead_code)]
-	#[cfg(feature = "firechain-thunder")]
-	Thunder,
-	#[allow(dead_code)]
-	Unrecognized,
-}
-
 /// Can be called for a `Configuration` to check if it is a configuration for
 /// the `Firechain` network.
 pub trait IdentifyVariant {
+	#[cfg(feature = "firechain-qa")]
 	/// Returns `true` if this is a configuration for the `Firechain` qa network.
 	fn is_qa(&self) -> bool;
 
+	#[cfg(feature = "firechain-mainnet")]
 	/// Returns `true` if this is a configuration for the `Firechain` mainnet network.
 	fn is_mainnet(&self) -> bool;
 
+	#[cfg(feature = "firechain-thunder")]
 	/// Returns `true` if this is a configuration for the `Firechain` thunder network.
 	fn is_thunder(&self) -> bool;
 }
 
 impl IdentifyVariant for Box<dyn ChainSpec> {
+	#[cfg(feature = "firechain-qa")]
 	fn is_qa(&self) -> bool {
 		self.id().starts_with("qa")
 	}
 
+	#[cfg(feature = "firechain-mainnet")]
 	fn is_mainnet(&self) -> bool {
 		self.id().starts_with("mainnet")
 	}
 
+	#[cfg(feature = "firechain-thunder")]
 	fn is_thunder(&self) -> bool {
 		self.id().starts_with("thunder")
 	}
