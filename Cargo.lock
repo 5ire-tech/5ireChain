@@ -3140,7 +3140,7 @@ dependencies = [
 
 [[package]]
 name = "firechain-thunder-runtime"
-version = "1.0.8"
+version = "1.1.0"
 dependencies = [
  "firechain-runtime-core-primitives",
  "fp-account",
@@ -3158,6 +3158,7 @@ dependencies = [
  "frame-try-runtime",
  "log",
  "node-primitives",
+ "num_enum 0.5.11",
  "pallet-alliance",
  "pallet-asset-rate",
  "pallet-assets",
@@ -3182,7 +3183,9 @@ dependencies = [
  "pallet-ethereum",
  "pallet-evm 6.0.0-dev",
  "pallet-evm-chain-id",
+ "pallet-evm-precompile-batch",
  "pallet-evm-precompile-modexp",
+ "pallet-evm-precompile-registry",
  "pallet-evm-precompile-sha3fips",
  "pallet-evm-precompile-simple",
  "pallet-fast-unstake",
@@ -3224,6 +3227,7 @@ dependencies = [
  "pallet-vesting",
  "parity-scale-codec",
  "primitive-types 0.12.2",
+ "precompile-utils",
  "scale-info",
  "sp-api",
  "sp-authority-discovery",
