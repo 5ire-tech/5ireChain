@@ -30,6 +30,7 @@ use evm::{
 	ExitError, ExitReason, ExternalOperation, Opcode, Transfer,
 };
 // Substrate
+use crate::ContractDeployer;
 use frame_support::{
 	traits::{
 		tokens::{currency::Currency, ExistenceRequirement},
@@ -37,7 +38,6 @@ use frame_support::{
 	},
 	weights::Weight,
 };
-use crate::ContractDeployer;
 use sp_core::{H160, H256, U256};
 use sp_runtime::traits::UniqueSaturatedInto;
 // Frontier
@@ -96,10 +96,7 @@ where
 
 		#[cfg(feature = "forbid-evm-reentrancy")]
 		if IN_EVM.with(|in_evm| in_evm.replace(true)) {
-			return Err(RunnerError {
-				error: Error::<T>::Reentrancy,
-				weight,
-			});
+			return Err(RunnerError { error: Error::<T>::Reentrancy, weight });
 		}
 
 		let res = Self::execute_inner(
@@ -157,19 +154,15 @@ where
 	{
 		// Used to record the external costs in the evm through the StackState implementation
 		let maybe_weight_info =
-			WeightInfo::new_from_weight_limit(weight_limit, proof_size_base_cost).map_err(
-				|_| RunnerError {
-					error: Error::<T>::GasLimitTooLow,
-					weight,
-				},
-			)?;
+			WeightInfo::new_from_weight_limit(weight_limit, proof_size_base_cost)
+				.map_err(|_| RunnerError { error: Error::<T>::GasLimitTooLow, weight })?;
 		// The precompile check is only used for transactional invocations. However, here we always
 		// execute the check, because the check has side effects.
 		match precompiles.is_precompile(source, gas_limit) {
 			IsPrecompileResult::Answer { extra_cost, .. } => {
 				gas_limit = gas_limit.saturating_sub(extra_cost);
-			}
-			IsPrecompileResult::OutOfGas => {
+			},
+			IsPrecompileResult::OutOfGas =>
 				return Ok(ExecutionInfoV2 {
 					exit_reason: ExitError::OutOfGas.into(),
 					value: Default::default(),
@@ -179,21 +172,18 @@ where
 					},
 					weight_info: maybe_weight_info,
 					logs: Default::default(),
-				})
-			}
+				}),
 		};
 
-		// Only check the restrictions of EIP-3607 if the source of the EVM operation is from an external transaction.
-		// If the source of this EVM operation is from an internal call, like from `eth_call` or `eth_estimateGas` RPC,
-		// we will skip the checks for the EIP-3607.
+		// Only check the restrictions of EIP-3607 if the source of the EVM operation is from an
+		// external transaction. If the source of this EVM operation is from an internal call,
+		// like from `eth_call` or `eth_estimateGas` RPC, we will skip the checks for the
+		// EIP-3607.
 		//
 		// EIP-3607: https://eips.ethereum.org/EIPS/eip-3607
 		// Do not allow transactions for which `tx.sender` has any code deployed.
 		if is_transactional && !<AccountCodes<T>>::get(source).is_empty() {
-			return Err(RunnerError {
-				error: Error::<T>::TransactionMustComeFromEOA,
-				weight,
-			});
+			return Err(RunnerError { error: Error::<T>::TransactionMustComeFromEOA, weight });
 		}
 
 		let total_fee_per_gas = if is_transactional {
@@ -206,18 +196,12 @@ where
 				// With tip, we include as much of the tip on top of base_fee that we can, never
 				// exceeding max_fee_per_gas
 				(Some(max_fee_per_gas), Some(max_priority_fee_per_gas)) => {
-					let actual_priority_fee_per_gas = max_fee_per_gas
-						.saturating_sub(base_fee)
-						.min(max_priority_fee_per_gas);
+					let actual_priority_fee_per_gas =
+						max_fee_per_gas.saturating_sub(base_fee).min(max_priority_fee_per_gas);
 
 					base_fee.saturating_add(actual_priority_fee_per_gas)
-				}
-				_ => {
-					return Err(RunnerError {
-						error: Error::<T>::GasPriceTooLow,
-						weight,
-					})
-				}
+				},
+				_ => return Err(RunnerError { error: Error::<T>::GasPriceTooLow, weight }),
 			}
 		} else {
 			// Gas price check is skipped for non-transactional calls or creates
@@ -225,23 +209,16 @@ where
 		};
 
 		// After eip-1559 we make sure the account can pay both the evm execution and priority fees.
-		let total_fee =
-			total_fee_per_gas
-				.checked_mul(U256::from(gas_limit))
-				.ok_or(RunnerError {
-					error: Error::<T>::FeeOverflow,
-					weight,
-				})?;
+		let total_fee = total_fee_per_gas
+			.checked_mul(U256::from(gas_limit))
+			.ok_or(RunnerError { error: Error::<T>::FeeOverflow, weight })?;
 
 		// Deduct fee from the `source` account. Returns `None` if `total_fee` is Zero.
 		let fee = T::OnChargeTransaction::withdraw_fee(&source, total_fee)
 			.map_err(|e| RunnerError { error: e, weight })?;
 
 		// Execute the EVM call.
-		let vicinity = Vicinity {
-			gas_price: base_fee,
-			origin: source,
-		};
+		let vicinity = Vicinity { gas_price: base_fee, origin: source };
 
 		let metadata = StackSubstateMetadata::new(gas_limit, config);
 		let state = SubstrateStackState::new(&vicinity, metadata, maybe_weight_info);
@@ -345,10 +322,7 @@ where
 		Ok(ExecutionInfoV2 {
 			value: retv,
 			exit_reason: reason,
-			used_gas: fp_evm::UsedGas {
-				standard: used_gas.into(),
-				effective: effective_gas,
-			},
+			used_gas: fp_evm::UsedGas { standard: used_gas.into(), effective: effective_gas },
 			weight_info: state.weight_info(),
 			logs: state.substate.logs,
 		})
@@ -563,7 +537,7 @@ where
 		}
 		let precompiles = T::PrecompilesValue::get();
 		let code_hash = H256::from(sp_io::hashing::keccak_256(&init));
-		let execute= Self::execute(
+		let execute = Self::execute(
 			source,
 			value,
 			gas_limit,
@@ -587,20 +561,20 @@ where
 				(reason, address)
 			},
 		);
-			// Unwrap the `execute` result to get a reference to the underlying value
-			let execute_result = execute.as_ref();
-			// Retrieve the `value` from the unwrapped `execute_result which represents the contract
-			// address
-			let value = execute_result.unwrap().value;
-			// Fetch the contract deployer associated with the contract address `value` from
-			// `ContractDeployer` mapping
-			let deployer = ContractDeployer::<T>::get(value);
-			if deployer.is_none() {
-				// If no deployer is found for the contract address, insert the `source` as the contract
-				// deployer
-				ContractDeployer::<T>::insert(value, source);
-			}
-			execute
+		// Unwrap the `execute` result to get a reference to the underlying value
+		let execute_result = execute.as_ref();
+		// Retrieve the `value` from the unwrapped `execute_result which represents the contract
+		// address
+		let value = execute_result.unwrap().value;
+		// Fetch the contract deployer associated with the contract address `value` from
+		// `ContractDeployer` mapping
+		let deployer = ContractDeployer::<T>::get(value);
+		if deployer.is_none() {
+			// If no deployer is found for the contract address, insert the `source` as the contract
+			// deployer
+			ContractDeployer::<T>::insert(value, source);
+		}
+		execute
 	}
 }
 
@@ -681,11 +655,7 @@ impl<'config> SubstrateStackSubstate<'config> {
 	}
 
 	pub fn log(&mut self, address: H160, topics: Vec<H256>, data: Vec<u8>) {
-		self.logs.push(Log {
-			address,
-			topics,
-			data,
-		});
+		self.logs.push(Log { address, topics, data });
 	}
 
 	fn recursive_is_cold<F: Fn(&Accessed) -> bool>(&self, f: &F) -> bool {
@@ -693,10 +663,7 @@ impl<'config> SubstrateStackSubstate<'config> {
 		if local_is_accessed {
 			false
 		} else {
-			self.parent
-				.as_ref()
-				.map(|p| p.recursive_is_cold(f))
-				.unwrap_or(true)
+			self.parent.as_ref().map(|p| p.recursive_is_cold(f)).unwrap_or(true)
 		}
 	}
 }
@@ -813,10 +780,7 @@ where
 	fn basic(&self, address: H160) -> evm::backend::Basic {
 		let (account, _) = Pallet::<T>::account_basic(&address);
 
-		evm::backend::Basic {
-			balance: account.balance,
-			nonce: account.nonce,
-		}
+		evm::backend::Basic { balance: account.balance, nonce: account.nonce }
 	}
 
 	fn code(&self, address: H160) -> Vec<u8> {
@@ -942,10 +906,7 @@ where
 		T::Currency::transfer(
 			&source,
 			&target,
-			transfer
-				.value
-				.try_into()
-				.map_err(|_| ExitError::OutOfFund)?,
+			transfer.value.try_into().map_err(|_| ExitError::OutOfFund)?,
 			ExistenceRequirement::AllowDeath,
 		)
 		.map_err(|_| ExitError::OutOfFund)
@@ -968,8 +929,7 @@ where
 	}
 
 	fn is_cold(&self, address: H160) -> bool {
-		self.substate
-			.recursive_is_cold(&|a| a.accessed_addresses.contains(&address))
+		self.substate.recursive_is_cold(&|a| a.accessed_addresses.contains(&address))
 	}
 
 	fn is_storage_cold(&self, address: H160, key: H256) -> bool {
@@ -986,19 +946,14 @@ where
 	}
 
 	fn record_external_operation(&mut self, op: evm::ExternalOperation) -> Result<(), ExitError> {
-		let size_limit: u64 = self
-			.metadata()
-			.gasometer()
-			.config()
-			.create_contract_limit
-			.unwrap_or_default() as u64;
+		let size_limit: u64 =
+			self.metadata().gasometer().config().create_contract_limit.unwrap_or_default() as u64;
 		let (weight_info, recorded) = self.info_mut();
 
 		if let Some(weight_info) = weight_info {
 			match op {
-				ExternalOperation::AccountBasicRead => {
-					weight_info.try_record_proof_size_or_fail(ACCOUNT_BASIC_PROOF_SIZE)?
-				}
+				ExternalOperation::AccountBasicRead =>
+					weight_info.try_record_proof_size_or_fail(ACCOUNT_BASIC_PROOF_SIZE)?,
 				ExternalOperation::AddressCodeRead(address) => {
 					let maybe_record = !recorded.account_codes.contains(&address);
 					// Skip if the address has been already recorded this block
@@ -1030,13 +985,11 @@ where
 						}
 						recorded.account_codes.push(address);
 					}
-				}
-				ExternalOperation::IsEmpty => {
-					weight_info.try_record_proof_size_or_fail(IS_EMPTY_CHECK_PROOF_SIZE)?
-				}
-				ExternalOperation::Write(_) => {
-					weight_info.try_record_proof_size_or_fail(WRITE_PROOF_SIZE)?
-				}
+				},
+				ExternalOperation::IsEmpty =>
+					weight_info.try_record_proof_size_or_fail(IS_EMPTY_CHECK_PROOF_SIZE)?,
+				ExternalOperation::Write(_) =>
+					weight_info.try_record_proof_size_or_fail(WRITE_PROOF_SIZE)?,
 			};
 		}
 		Ok(())
@@ -1048,35 +1001,27 @@ where
 		_gas_cost: GasCost,
 		target: evm::gasometer::StorageTarget,
 	) -> Result<(), ExitError> {
-		// If account code or storage slot is in the overlay it is already accounted for and early exit
+		// If account code or storage slot is in the overlay it is already accounted for and early
+		// exit
 		let accessed_storage: Option<AccessedStorage> = match target {
-			StorageTarget::Address(address) => {
+			StorageTarget::Address(address) =>
 				if self.recorded().account_codes.contains(&address) {
 					return Ok(());
 				} else {
 					Some(AccessedStorage::AccountCodes(address))
-				}
-			}
+				},
 			StorageTarget::Slot(address, index) => {
-				if self
-					.recorded()
-					.account_storages
-					.contains_key(&(address, index))
-				{
+				if self.recorded().account_storages.contains_key(&(address, index)) {
 					return Ok(());
 				} else {
 					Some(AccessedStorage::AccountStorages((address, index)))
 				}
-			}
+			},
 			_ => None,
 		};
 
-		let size_limit: u64 = self
-			.metadata()
-			.gasometer()
-			.config()
-			.create_contract_limit
-			.unwrap_or_default() as u64;
+		let size_limit: u64 =
+			self.metadata().gasometer().config().create_contract_limit.unwrap_or_default() as u64;
 		let (weight_info, recorded) = self.info_mut();
 
 		if let Some(weight_info) = weight_info {
@@ -1111,29 +1056,29 @@ where
 				};
 
 			// Proof size is fixed length for writes (a 32-byte hash in a merkle trie), and
-			// the full key/value for reads. For read and writes over the same storage, the full value
-			// is included.
+			// the full key/value for reads. For read and writes over the same storage, the full
+			// value is included.
 			// For cold reads involving code (call, callcode, staticcall and delegatecall):
-			//	- We depend on https://github.com/paritytech/frontier/pull/893
-			//	- Try to get the cached size or compute it on the fly
-			//	- We record the actual size after caching, refunding the difference between it and the initially deducted
+			// 	- We depend on https://github.com/paritytech/frontier/pull/893
+			// 	- Try to get the cached size or compute it on the fly
+			// 	- We record the actual size after caching, refunding the difference between it and
+			//    the initially deducted
 			//	contract size limit.
 			match opcode {
 				Opcode::BALANCE => {
 					weight_info.try_record_proof_size_or_fail(ACCOUNT_BASIC_PROOF_SIZE)?;
-				}
+				},
 				Opcode::EXTCODESIZE | Opcode::EXTCODECOPY | Opcode::EXTCODEHASH => {
 					if let Some(AccessedStorage::AccountCodes(address)) = accessed_storage {
 						record_account_codes_proof_size(address, false)?;
 						recorded.account_codes.push(address);
 					}
-				}
-				Opcode::CALLCODE | Opcode::CALL | Opcode::DELEGATECALL | Opcode::STATICCALL => {
+				},
+				Opcode::CALLCODE | Opcode::CALL | Opcode::DELEGATECALL | Opcode::STATICCALL =>
 					if let Some(AccessedStorage::AccountCodes(address)) = accessed_storage {
 						record_account_codes_proof_size(address, true)?;
 						recorded.account_codes.push(address);
-					}
-				}
+					},
 				Opcode::SLOAD => {
 					if let Some(AccessedStorage::AccountStorages((address, index))) =
 						accessed_storage
@@ -1141,7 +1086,7 @@ where
 						weight_info.try_record_proof_size_or_fail(ACCOUNT_STORAGE_PROOF_SIZE)?;
 						recorded.account_storages.insert((address, index), true);
 					}
-				}
+				},
 				Opcode::SSTORE => {
 					if let Some(AccessedStorage::AccountStorages((address, index))) =
 						accessed_storage
@@ -1150,17 +1095,17 @@ where
 						weight_info.try_record_proof_size_or_fail(size)?;
 						recorded.account_storages.insert((address, index), true);
 					}
-				}
+				},
 				Opcode::CREATE | Opcode::CREATE2 => {
 					weight_info.try_record_proof_size_or_fail(WRITE_PROOF_SIZE)?;
-				}
+				},
 				// When calling SUICIDE a target account will receive the self destructing
 				// address's balance. We need to account for both:
-				//	- Target basic account read
-				//	- 5 bytes of `decode_len`
+				// 	- Target basic account read
+				// 	- 5 bytes of `decode_len`
 				Opcode::SUICIDE => {
 					weight_info.try_record_proof_size_or_fail(IS_EMPTY_CHECK_PROOF_SIZE)?;
-				}
+				},
 				// Rest of dynamic opcodes that do not involve proof size recording, do nothing
 				_ => return Ok(()),
 			};
@@ -1258,22 +1203,13 @@ mod tests {
 					None,
 					|_| (ExitReason::Succeed(ExitSucceed::Stopped), ()),
 				);
-				assert_matches!(
-					res,
-					Err(RunnerError {
-						error: Error::<Test>::Reentrancy,
-						..
-					})
-				);
+				assert_matches!(res, Err(RunnerError { error: Error::<Test>::Reentrancy, .. }));
 				(ExitReason::Error(ExitError::CallTooDeep), ())
 			},
 		);
 		assert_matches!(
 			res,
-			Ok(ExecutionInfoV2 {
-				exit_reason: ExitReason::Error(ExitError::CallTooDeep),
-				..
-			})
+			Ok(ExecutionInfoV2 { exit_reason: ExitReason::Error(ExitError::CallTooDeep), .. })
 		);
 
 		// Should succeed if there is no reentrancy

@@ -22,7 +22,6 @@ use frame_election_provider_support::{
 	data_provider, BoundedSupportsOf, DataProviderBounds, ElectionDataProvider, ElectionProvider,
 	ScoreProvider, SortedListProvider, VoteWeight, VoterOf,
 };
-use scale_info::prelude::vec;
 use frame_support::{
 	defensive,
 	dispatch::WithPostDispatchInfo,
@@ -33,9 +32,10 @@ use frame_support::{
 	},
 	weights::Weight,
 };
-use pallet_esg::traits::ERScoresTrait;
 use frame_system::{pallet_prelude::BlockNumberFor, RawOrigin};
+use pallet_esg::traits::ERScoresTrait;
 use pallet_session::historical;
+use scale_info::prelude::vec;
 use sp_runtime::{
 	traits::{
 		Bounded, CheckedAdd, CheckedSub, Convert, One, SaturatedConversion, Saturating,
@@ -56,7 +56,8 @@ use crate::{
 	election_size_tracker::StaticTracker, log, slashing, weights::WeightInfo, ActiveEraInfo,
 	BalanceOf, EraInfo, EraPayout, Exposure, ExposureOf, Forcing, IndividualExposure,
 	LedgerIntegrityState, MaxNominationsOf, MaxWinnersOf, Nominations, NominationsQuota,
-	PositiveImbalanceOf, RewardDestination, SessionInterface, StakingLedger, ValidatorPrefs,Rewards
+	PositiveImbalanceOf, RewardDestination, Rewards, SessionInterface, StakingLedger,
+	ValidatorPrefs,
 };
 
 use super::pallet::*;

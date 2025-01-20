@@ -42,6 +42,7 @@ use frame_support::{
 	WeakBoundedVec,
 };
 use frame_system::pallet_prelude::BlockNumberFor;
+use pallet_session::validation::OneSessionHandlerAll;
 use scale_info::TypeInfo;
 use sp_consensus_grandpa::{
 	ConsensusLog, EquivocationProof, ScheduledChange, SetId, GRANDPA_ENGINE_ID,
@@ -49,7 +50,6 @@ use sp_consensus_grandpa::{
 };
 use sp_runtime::{generic::DigestItem, traits::Zero, DispatchResult};
 use sp_session::{GetSessionNumber, GetValidatorCount};
-use pallet_session::validation::OneSessionHandlerAll;
 use sp_staking::{offence::OffenceReportSystem, SessionIndex};
 use sp_std::prelude::*;
 

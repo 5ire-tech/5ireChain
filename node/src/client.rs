@@ -8,16 +8,15 @@ use firechain_runtime_core_primitives::opaque::{
 };
 use sc_client_api::{Backend as BackendT, BlockchainEvents, KeysIter, PairsIter};
 use sp_api::{CallApiAt, ProvideRuntimeApi};
-use sp_trie::MerkleValue;
 use sp_blockchain::HeaderBackend;
 use sp_consensus::BlockStatus;
 use sp_runtime::{
 	generic::SignedBlock,
-	traits::{BlakeTwo256, Block as BlockT},
+	traits::{BlakeTwo256, Block as BlockT, NumberFor},
 	Justifications,
 };
-use sp_runtime::traits::NumberFor;
 use sp_storage::{ChildInfo, StorageData, StorageKey};
+use sp_trie::MerkleValue;
 
 use crate::eth::EthCompatRuntimeApiCollection;
 
@@ -427,7 +426,7 @@ impl sc_client_api::StorageProvider<Block, FullBackend> for Client {
 		&self,
 		hash: <Block as BlockT>::Hash,
 		key: &StorageKey,
-	) -> sp_blockchain::Result<Option<MerkleValue<<Block as BlockT>::Hash>>>{
+	) -> sp_blockchain::Result<Option<MerkleValue<<Block as BlockT>::Hash>>> {
 		match_client!(self, closest_merkle_value(hash, key))
 	}
 
@@ -436,8 +435,8 @@ impl sc_client_api::StorageProvider<Block, FullBackend> for Client {
 		hash: <Block as BlockT>::Hash,
 		child_info: &ChildInfo,
 		key: &StorageKey,
-	) -> sp_blockchain::Result<Option<MerkleValue<<Block as BlockT>::Hash>>>{
-		match_client!(self, child_closest_merkle_value(hash,child_info, key))
+	) -> sp_blockchain::Result<Option<MerkleValue<<Block as BlockT>::Hash>>> {
+		match_client!(self, child_closest_merkle_value(hash, child_info, key))
 	}
 }
 

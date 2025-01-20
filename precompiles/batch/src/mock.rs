@@ -63,12 +63,12 @@ impl frame_system::Config for Runtime {
 	type BlockLength = ();
 	type SS58Prefix = SS58Prefix;
 	type OnSetCode = ();
-    type SingleBlockMigrations = ();
-    type MultiBlockMigrator = ();
-    type PreInherents = ();
-    type PostInherents = ();
-    type RuntimeTask = ();
-    type PostTransactions = ();
+	type SingleBlockMigrations = ();
+	type MultiBlockMigrator = ();
+	type PreInherents = ();
+	type PostInherents = ();
+	type RuntimeTask = ();
+	type PostTransactions = ();
 	type MaxConsumers = frame_support::traits::ConstU32<16>;
 }
 
@@ -88,7 +88,7 @@ impl pallet_balances::Config for Runtime {
 	type RuntimeHoldReason = ();
 	type FreezeIdentifier = ();
 	type MaxFreezes = ();
-    type RuntimeFreezeReason = RuntimeFreezeReason;
+	type RuntimeFreezeReason = RuntimeFreezeReason;
 }
 
 pub struct MockPrecompileSet<Runtime>(PhantomData<Runtime>);
@@ -157,8 +157,8 @@ impl pallet_evm::Config for Runtime {
 	type OnCreate = ();
 	type GasLimitPovSizeRatio = GasLimitPovSizeRatio;
 	type Timestamp = Timestamp;
-    type SuicideQuickClearLimit = ();
-    type FindAuthor = ();
+	type SuicideQuickClearLimit = ();
+	type FindAuthor = ();
 	type WeightInfo = pallet_evm::weights::SubstrateWeight<Runtime>;
 }
 

@@ -27,28 +27,34 @@
 //!
 //! ## Execution Lifecycle
 //!
-//! There are a separate set of accounts managed by the EVM pallet. Substrate based accounts can call the EVM Pallet
-//! to deposit or withdraw balance from the Substrate base-currency into a different balance managed and used by
-//! the EVM pallet. Once a user has populated their balance, they can create and call smart contracts using this pallet.
+//! There are a separate set of accounts managed by the EVM pallet. Substrate based accounts can
+//! call the EVM Pallet to deposit or withdraw balance from the Substrate base-currency into a
+//! different balance managed and used by the EVM pallet. Once a user has populated their balance,
+//! they can create and call smart contracts using this pallet.
 //!
-//! There's one-to-one mapping from Substrate accounts and EVM external accounts that is defined by a conversion function.
+//! There's one-to-one mapping from Substrate accounts and EVM external accounts that is defined by
+//! a conversion function.
 //!
 //! ## EVM Pallet vs Ethereum Network
 //!
-//! The EVM pallet should be able to produce nearly identical results compared to the Ethereum mainnet,
-//! including gas cost and balance changes.
+//! The EVM pallet should be able to produce nearly identical results compared to the Ethereum
+//! mainnet, including gas cost and balance changes.
 //!
 //! Observable differences include:
 //!
-//! - The available length of block hashes may not be 256 depending on the configuration of the System pallet
+//! - The available length of block hashes may not be 256 depending on the configuration of the
+//!   System pallet
 //! in the Substrate runtime.
-//! - Difficulty and coinbase, which do not make sense in this pallet and is currently hard coded to zero.
+//! - Difficulty and coinbase, which do not make sense in this pallet and is currently hard coded to
+//!   zero.
 //!
-//! We currently do not aim to make unobservable behaviors, such as state root, to be the same. We also don't aim to follow
-//! the exact same transaction / receipt format. However, given one Ethereum transaction and one Substrate account's
-//! private key, one should be able to convert any Ethereum transaction into a transaction compatible with this pallet.
+//! We currently do not aim to make unobservable behaviors, such as state root, to be the same. We
+//! also don't aim to follow the exact same transaction / receipt format. However, given one
+//! Ethereum transaction and one Substrate account's private key, one should be able to convert any
+//! Ethereum transaction into a transaction compatible with this pallet.
 //!
-//! The gas configurations are configurable. Right now, a pre-defined London hard fork configuration option is provided.
+//! The gas configurations are configurable. Right now, a pre-defined London hard fork configuration
+//! option is provided.
 
 // Ensure we're `no_std` when compiling for Wasm.
 #![cfg_attr(not(feature = "std"), no_std)]
@@ -154,14 +160,16 @@ pub mod pallet {
 		type PrecompilesValue: Get<Self::PrecompilesType>;
 		/// Chain ID of EVM.
 		type ChainId: Get<u64>;
-		/// The block gas limit. Can be a simple constant, or an adjustment algorithm in another pallet.
+		/// The block gas limit. Can be a simple constant, or an adjustment algorithm in another
+		/// pallet.
 		type BlockGasLimit: Get<U256>;
 		/// EVM execution runner.
 		type Runner: Runner<Self>;
 
-		/// To handle fee deduction for EVM transactions. An example is this pallet being used by `pallet_ethereum`
-		/// where the chain implementing `pallet_ethereum` should be able to configure what happens to the fees
-		/// Similar to `OnChargeTransaction` of `pallet_transaction_payment`
+		/// To handle fee deduction for EVM transactions. An example is this pallet being used by
+		/// `pallet_ethereum` where the chain implementing `pallet_ethereum` should be able to
+		/// configure what happens to the fees Similar to `OnChargeTransaction` of
+		/// `pallet_transaction_payment`
 		type OnChargeTransaction: OnChargeEVMTransaction<Self>;
 
 		/// Called on create calls, used to record owner
@@ -173,7 +181,8 @@ pub mod pallet {
 		/// Gas limit Pov size ratio.
 		type GasLimitPovSizeRatio: Get<u64>;
 
-		/// Define the quick clear limit of storage clearing when a contract suicides. Set to 0 to disable it.
+		/// Define the quick clear limit of storage clearing when a contract suicides. Set to 0 to
+		/// disable it.
 		type SuicideQuickClearLimit: Get<u32>;
 
 		/// Get the timestamp for the current block.
@@ -250,24 +259,23 @@ pub mod pallet {
 				T::config(),
 			) {
 				Ok(info) => info,
-				Err(e) => {
+				Err(e) =>
 					return Err(DispatchErrorWithPostInfo {
 						post_info: PostDispatchInfo {
 							actual_weight: Some(e.weight),
 							pays_fee: Pays::Yes,
 						},
 						error: e.error.into(),
-					})
-				}
+					}),
 			};
 
 			match info.exit_reason {
 				ExitReason::Succeed(_) => {
 					Pallet::<T>::deposit_event(Event::<T>::Executed { address: target });
-				}
+				},
 				_ => {
 					Pallet::<T>::deposit_event(Event::<T>::ExecutedFailed { address: target });
-				}
+				},
 			};
 
 			Ok(PostDispatchInfo {
@@ -325,36 +333,27 @@ pub mod pallet {
 				T::config(),
 			) {
 				Ok(info) => info,
-				Err(e) => {
+				Err(e) =>
 					return Err(DispatchErrorWithPostInfo {
 						post_info: PostDispatchInfo {
 							actual_weight: Some(e.weight),
 							pays_fee: Pays::Yes,
 						},
 						error: e.error.into(),
-					})
-				}
+					}),
 			};
 
 			match info {
 				CreateInfo {
-					exit_reason: ExitReason::Succeed(_),
-					value: create_address,
-					..
+					exit_reason: ExitReason::Succeed(_), value: create_address, ..
 				} => {
-					Pallet::<T>::deposit_event(Event::<T>::Created {
-						address: create_address,
-					});
-				}
-				CreateInfo {
-					exit_reason: _,
-					value: create_address,
-					..
-				} => {
+					Pallet::<T>::deposit_event(Event::<T>::Created { address: create_address });
+				},
+				CreateInfo { exit_reason: _, value: create_address, .. } => {
 					Pallet::<T>::deposit_event(Event::<T>::CreatedFailed {
 						address: create_address,
 					});
-				}
+				},
 			}
 
 			Ok(PostDispatchInfo {
@@ -413,36 +412,27 @@ pub mod pallet {
 				T::config(),
 			) {
 				Ok(info) => info,
-				Err(e) => {
+				Err(e) =>
 					return Err(DispatchErrorWithPostInfo {
 						post_info: PostDispatchInfo {
 							actual_weight: Some(e.weight),
 							pays_fee: Pays::Yes,
 						},
 						error: e.error.into(),
-					})
-				}
+					}),
 			};
 
 			match info {
 				CreateInfo {
-					exit_reason: ExitReason::Succeed(_),
-					value: create_address,
-					..
+					exit_reason: ExitReason::Succeed(_), value: create_address, ..
 				} => {
-					Pallet::<T>::deposit_event(Event::<T>::Created {
-						address: create_address,
-					});
-				}
-				CreateInfo {
-					exit_reason: _,
-					value: create_address,
-					..
-				} => {
+					Pallet::<T>::deposit_event(Event::<T>::Created { address: create_address });
+				},
+				CreateInfo { exit_reason: _, value: create_address, .. } => {
 					Pallet::<T>::deposit_event(Event::<T>::CreatedFailed {
 						address: create_address,
 					});
-				}
+				},
 			}
 
 			Ok(PostDispatchInfo {
@@ -474,7 +464,8 @@ pub mod pallet {
 		CreatedFailed { address: H160 },
 		/// A contract has been executed successfully with states applied.
 		Executed { address: H160 },
-		/// A contract has been executed with errors. States are reverted with only gas fees applied.
+		/// A contract has been executed with errors. States are reverted with only gas fees
+		/// applied.
 		ExecutedFailed { address: H160 },
 		/// 50% of caller fees are allocated to the contract deployer
 		DeployerFeeAllocation { address: H160, fee: U256 },
@@ -596,17 +587,7 @@ pub type BalanceOf<T> =
 type NegativeImbalanceOf<C, T> =
 	<C as Currency<<T as frame_system::Config>::AccountId>>::NegativeImbalance;
 
-#[derive(
-	Debug,
-	Clone,
-	Copy,
-	Eq,
-	PartialEq,
-	Encode,
-	Decode,
-	TypeInfo,
-	MaxEncodedLen
-)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Encode, Decode, TypeInfo, MaxEncodedLen)]
 pub struct CodeMetadata {
 	pub size: u64,
 	pub hash: H256,
@@ -698,9 +679,8 @@ where
 
 	fn try_address_origin(address: &H160, origin: OuterOrigin) -> Result<AccountId32, OuterOrigin> {
 		origin.into().and_then(|o| match o {
-			RawOrigin::Signed(who) if AsRef::<[u8; 32]>::as_ref(&who)[0..20] == address[0..20] => {
-				Ok(who)
-			}
+			RawOrigin::Signed(who) if AsRef::<[u8; 32]>::as_ref(&who)[0..20] == address[0..20] =>
+				Ok(who),
 			r => Err(OuterOrigin::from(r)),
 		})
 	}
@@ -848,7 +828,7 @@ impl<T: Config> Pallet<T> {
 
 					let account_id = T::AddressMapping::into_account_id(*address);
 					let _ = frame_system::Pallet::<T>::dec_sufficients(&account_id);
-				}
+				},
 				KillStorageResult::SomeRemaining(_) => (),
 			}
 		}
@@ -895,10 +875,7 @@ impl<T: Config> Pallet<T> {
 			const EMPTY_CODE_HASH: [u8; 32] = hex_literal::hex!(
 				"c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
 			);
-			return CodeMetadata {
-				size: 0,
-				hash: EMPTY_CODE_HASH.into(),
-			};
+			return CodeMetadata { size: 0, hash: EMPTY_CODE_HASH.into() };
 		}
 
 		let meta = CodeMetadata::from_code(&code);
@@ -1008,9 +985,7 @@ where
 			let account_id = T::AddressMapping::into_account_id(*who);
 
 			// Calculate how much refund we should return
-			let refund_amount = paid
-				.peek()
-				.saturating_sub(corrected_fee.unique_saturated_into());
+			let refund_amount = paid.peek().saturating_sub(corrected_fee.unique_saturated_into());
 			// to be allocated to the contract deployer.
 			let contract_deployer_revenue = corrected_fee / 2;
 			// deployer_imbalance` is initialized as zero, representing an imbalance in the contract
@@ -1049,9 +1024,9 @@ where
 			// https://github.com/paritytech/substrate/issues/10117
 			// If we tried to refund something, the account still empty and the ED is set to 0,
 			// we call `make_free_balance_be` with the refunded amount.
-			let refund_imbalance = if C::minimum_balance().is_zero()
-				&& refund_amount > C::Balance::zero()
-				&& C::total_balance(&account_id).is_zero()
+			let refund_imbalance = if C::minimum_balance().is_zero() &&
+				refund_amount > C::Balance::zero() &&
+				C::total_balance(&account_id).is_zero()
 			{
 				// Known bug: Substrate tried to refund to a zeroed AccountData, but
 				// interpreted the account to not exist.
@@ -1130,9 +1105,7 @@ where
 			let account_id = T::AddressMapping::into_account_id(*who);
 
 			// Calculate how much refund we should return
-			let refund_amount = paid
-				.peek()
-				.saturating_sub(corrected_fee.unique_saturated_into());
+			let refund_amount = paid.peek().saturating_sub(corrected_fee.unique_saturated_into());
 			// `contract_deployer_revenue` is half of the `corrected_fee`, representing the revenue
 			// to be allocated to the contract deployer.
 			let contract_deployer_revenue = corrected_fee / 2;
@@ -1150,7 +1123,7 @@ where
 					deployer_imbalance = F::deposit(
 						&owner,
 						contract_deployer_revenue.unique_saturated_into(),
-						Precision::BestEffort
+						Precision::BestEffort,
 					)
 					.unwrap_or_else(|_| Debt::<T::AccountId, F>::zero());
 					Pallet::<T>::deposit_event(Event::<T>::DeployerFeeAllocation {
@@ -1211,14 +1184,14 @@ where
 		corrected_fee: U256,
 		base_fee: U256,
 		already_withdrawn: Self::LiquidityInfo,
-		target: Option<H160>
+		target: Option<H160>,
 	) -> Self::LiquidityInfo {
 		<EVMFungibleAdapter<T::Currency, ()> as OnChargeEVMTransaction<T>>::correct_and_deposit_fee(
 			who,
 			corrected_fee,
 			base_fee,
 			already_withdrawn,
-			target
+			target,
 		)
 	}
 

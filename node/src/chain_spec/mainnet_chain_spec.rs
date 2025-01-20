@@ -19,10 +19,8 @@
 //! Substrate chain configurations.
 
 use firechain_mainnet_runtime::{
-	constants::currency::*,
-	Block, IndicesConfig, MaxNominations,
-	SessionKeys, StakerStatus, SudoConfig,
-	wasm_binary_unwrap
+	constants::currency::*, wasm_binary_unwrap, Block, IndicesConfig, MaxNominations, SessionKeys,
+	StakerStatus, SudoConfig,
 };
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sc_chain_spec::ChainSpecExtension;
@@ -134,7 +132,7 @@ pub fn testnet_genesis(
 	initial_nominators: Vec<AccountId>,
 	root_key: AccountId,
 	endowed_accounts: Option<Vec<AccountId>>,
-) ->  serde_json::Value {
+) -> serde_json::Value {
 	let endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| vec![]);
 
 	let mut endowed_accounts_validator: Vec<AccountId> = Vec::new();
@@ -337,7 +335,7 @@ pub fn development_genesis(
 		"sudo": { "key": Some(root_key) },
 		"babe": {
 			"epochConfig": Some(firechain_mainnet_runtime::BABE_GENESIS_EPOCH_CONFIG),
-		
+
 		},
 		"nominationPools": {
 			"minCreateBond": 10 * DOLLARS,
@@ -347,7 +345,7 @@ pub fn development_genesis(
 	})
 }
 
-fn development_config_genesis() -> serde_json::Value  {
+fn development_config_genesis() -> serde_json::Value {
 	development_genesis(
 		vec![authority_keys_from_seed(ALITH, "Alice")],
 		vec![],
@@ -389,10 +387,10 @@ fn local_mainnet_genesis() -> serde_json::Value {
 /// Local mainnet config (multivalidator Alice + Bob)
 pub fn local_mainnet_config() -> ChainSpec {
 	ChainSpec::builder(wasm_binary_unwrap(), Default::default())
-	.with_name("5ireChain Local Testnet")
-	.with_id("mainnet_5ireChain_local")
-	.with_chain_type(ChainType::Local)
-	.with_genesis_config_patch(local_mainnet_genesis())
-	.with_properties(fire_chain_spec_properties())
-	.build()
+		.with_name("5ireChain Local Testnet")
+		.with_id("mainnet_5ireChain_local")
+		.with_chain_type(ChainType::Local)
+		.with_genesis_config_patch(local_mainnet_genesis())
+		.with_properties(fire_chain_spec_properties())
+		.build()
 }

@@ -1,18 +1,18 @@
 use std::{collections::BTreeMap, sync::Arc};
 
-use jsonrpsee::RpcModule;
 use fc_rpc::DebugApiServer;
+use jsonrpsee::RpcModule;
 // Substrate
+use fc_rpc::Debug;
+use fc_storage::StorageOverride;
 use sc_client_api::{
 	backend::{Backend, StorageProvider},
 	client::BlockchainEvents,
 };
-use fc_rpc::Debug;
 use sc_network::service::traits::NetworkService;
 use sc_network_sync::SyncingService;
 use sc_rpc::SubscriptionTaskExecutor;
 use sc_transaction_pool::{ChainApi, Pool};
-use fc_storage::StorageOverride;
 use sc_transaction_pool_api::TransactionPool;
 use sp_api::{CallApiAt, ProvideRuntimeApi};
 use sp_block_builder::BlockBuilder as BlockBuilderApi;
@@ -214,13 +214,7 @@ where
 	)?;
 
 	io.merge(
-		Debug::new(
-			client.clone(),
-			frontier_backend,
-			storage_override,
-			block_data_cache,
-		)
-		.into_rpc(),
+		Debug::new(client.clone(), frontier_backend, storage_override, block_data_cache).into_rpc(),
 	)?;
 
 	io.merge(Web3::new(client.clone()).into_rpc())?;

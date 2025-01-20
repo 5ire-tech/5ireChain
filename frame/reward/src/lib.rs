@@ -5,9 +5,9 @@
 // staking activities.
 
 #![cfg_attr(not(feature = "std"), no_std)]
-use frame_support::{ensure, pallet_prelude::DispatchResult};
 use frame_support::{
-	pallet_prelude::StorageVersion,
+	ensure,
+	pallet_prelude::{DispatchResult, StorageVersion},
 	traits::{
 		Currency, ExistenceRequirement, ExistenceRequirement::KeepAlive, Get, LockableCurrency,
 		ValidatorSet,
@@ -237,7 +237,8 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 		let validators = <T as pallet::Config>::Validators::validators();
 
 		validators.iter().for_each(|validator_id| {
-			let validator = <T as pallet::Config>::ValidatorId::convert(validator_id.clone()).unwrap();
+			let validator =
+				<T as pallet::Config>::ValidatorId::convert(validator_id.clone()).unwrap();
 			let validator_points = Self::retrieve_validator_point(validator.clone());
 			if let Some(validator_exposure) =
 				ErasStakersOverview::<T>::get(Self::current_era(), validator.clone())

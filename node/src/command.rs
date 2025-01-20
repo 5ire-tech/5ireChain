@@ -148,7 +148,7 @@ pub fn run() -> Result<()> {
 					service::new_full::<
 						firechain_mainnet_runtime::RuntimeApi,
 						FirechainMainnetRuntimeExecutor,
-					>(config,cli_service,cli.eth.clone())
+					>(config, cli_service, cli.eth.clone())
 					.map_err(sc_cli::Error::Service)
 				}),
 

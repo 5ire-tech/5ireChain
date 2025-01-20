@@ -259,10 +259,7 @@ impl<T: Codec> Codec for Vec<T> {
 	fn write(writer: &mut Writer, value: Self) {
 		BoundedVec::<T, ConstU32Max>::write(
 			writer,
-			BoundedVec {
-				inner: value,
-				_phantom: PhantomData,
-			},
+			BoundedVec { inner: value, _phantom: PhantomData },
 		)
 	}
 
@@ -310,10 +307,7 @@ impl<T: Codec, S: Get<u32>> Codec for BoundedVec<T, S> {
 			array.push(item_reader.read().in_array(i)?);
 		}
 
-		Ok(BoundedVec {
-			inner: array,
-			_phantom: PhantomData,
-		})
+		Ok(BoundedVec { inner: array, _phantom: PhantomData })
 	}
 
 	fn write(writer: &mut Writer, value: Self) {
@@ -350,28 +344,19 @@ impl<T: Codec, S: Get<u32>> Codec for BoundedVec<T, S> {
 
 impl<T, S> From<Vec<T>> for BoundedVec<T, S> {
 	fn from(value: Vec<T>) -> Self {
-		BoundedVec {
-			inner: value,
-			_phantom: PhantomData,
-		}
+		BoundedVec { inner: value, _phantom: PhantomData }
 	}
 }
 
 impl<T: Clone, S> From<&[T]> for BoundedVec<T, S> {
 	fn from(value: &[T]) -> Self {
-		BoundedVec {
-			inner: value.to_vec(),
-			_phantom: PhantomData,
-		}
+		BoundedVec { inner: value.to_vec(), _phantom: PhantomData }
 	}
 }
 
 impl<T: Clone, S, const N: usize> From<[T; N]> for BoundedVec<T, S> {
 	fn from(value: [T; N]) -> Self {
-		BoundedVec {
-			inner: value.to_vec(),
-			_phantom: PhantomData,
-		}
+		BoundedVec { inner: value.to_vec(), _phantom: PhantomData }
 	}
 }
 

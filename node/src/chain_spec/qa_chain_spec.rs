@@ -19,8 +19,7 @@
 //! Substrate chain configurations.
 
 use firechain_qa_runtime::{
-	constants::currency::*, wasm_binary_unwrap,
-	Block, MaxNominations, SessionKeys, StakerStatus,
+	constants::currency::*, wasm_binary_unwrap, Block, MaxNominations, SessionKeys, StakerStatus,
 };
 use fp_evm::GenesisAccount;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
@@ -229,39 +228,39 @@ pub fn development_genesis(
 			}
 		});
 
-	let evm_accounts = 	{
-	let mut map = BTreeMap::new();
-	map.insert(
-		H160::from_str("48Df7B35247786418a7e279e508325952B9Fc92F")
-			.expect("internal H160 is valid; qed"),
-		GenesisAccount {
-			balance: U256::from_str("0xfffffffffffffffffffff")
-				.expect("internal U256 is valid; qed"),
-			code: Default::default(),
-			nonce: Default::default(),
-			storage: Default::default(),
-		},
-	);
-	map.insert(
-		H160::from_str("74E4214c9C3D9726E1A0B57357C4dd117641c536")
-			.expect("internal H160 is valid; qed"),
-		GenesisAccount {
-			balance: U256::from_str("0xfffffffffffffffffffff")
-				.expect("internal U256 is valid; qed"),
-			code: Default::default(),
-			nonce: Default::default(),
-			storage: Default::default(),
-		},
-	);
-	map.insert(
-		H160::from_str("FE31f14425993A3d9aeDEd195C56999eBE097d92")
-			.expect("internal H160 is valid; qed"),
-		GenesisAccount {
-			balance: U256::from_str("0xfffffffffffffffffffff")
-				.expect("internal U256 is valid; qed"),
-			code: Default::default(),
-			nonce: Default::default(),
-			storage: Default::default(),
+	let evm_accounts = {
+		let mut map = BTreeMap::new();
+		map.insert(
+			H160::from_str("48Df7B35247786418a7e279e508325952B9Fc92F")
+				.expect("internal H160 is valid; qed"),
+			GenesisAccount {
+				balance: U256::from_str("0xfffffffffffffffffffff")
+					.expect("internal U256 is valid; qed"),
+				code: Default::default(),
+				nonce: Default::default(),
+				storage: Default::default(),
+			},
+		);
+		map.insert(
+			H160::from_str("74E4214c9C3D9726E1A0B57357C4dd117641c536")
+				.expect("internal H160 is valid; qed"),
+			GenesisAccount {
+				balance: U256::from_str("0xfffffffffffffffffffff")
+					.expect("internal U256 is valid; qed"),
+				code: Default::default(),
+				nonce: Default::default(),
+				storage: Default::default(),
+			},
+		);
+		map.insert(
+			H160::from_str("FE31f14425993A3d9aeDEd195C56999eBE097d92")
+				.expect("internal H160 is valid; qed"),
+			GenesisAccount {
+				balance: U256::from_str("0xfffffffffffffffffffff")
+					.expect("internal U256 is valid; qed"),
+				code: Default::default(),
+				nonce: Default::default(),
+				storage: Default::default(),
 			},
 		);
 		map
@@ -332,7 +331,7 @@ pub fn fire_chain_spec_properties() -> serde_json::map::Map<String, serde_json::
 	.clone()
 }
 
-fn development_config_genesis() -> serde_json::Value  {
+fn development_config_genesis() -> serde_json::Value {
 	development_genesis(
 		vec![authority_keys_from_seed(ALITH, "Alice")],
 		vec![],

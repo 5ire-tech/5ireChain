@@ -19,7 +19,6 @@
 
 use crate::{self as pallet_babe, Config, CurrentSlot, OneSessionHandlerAll};
 use codec::Encode;
-use pallet_staking::Rewards;
 use frame_election_provider_support::{
 	bounds::{ElectionBounds, ElectionBoundsBuilder},
 	onchain, SequentialPhragmen,
@@ -29,7 +28,7 @@ use frame_support::{
 	traits::{ConstU128, ConstU32, ConstU64, KeyOwnerProofSystem, OnInitialize},
 };
 use pallet_session::historical as pallet_session_historical;
-use pallet_staking::FixedNominationsQuota;
+use pallet_staking::{FixedNominationsQuota, Rewards};
 use sp_consensus_babe::{AuthorityId, AuthorityPair, Randomness, Slot, VrfSignature};
 use sp_core::{
 	crypto::{KeyTypeId, Pair, VrfSecret},
@@ -39,10 +38,9 @@ type AccountId = u64;
 use sp_io;
 use sp_runtime::{
 	impl_opaque_keys,
-	DispatchError,
 	testing::{Digest, DigestItem, Header, TestXt, UintAuthorityId},
 	traits::{Header as _, OpaqueKeys},
-	BuildStorage, Perbill,
+	BuildStorage, DispatchError, Perbill,
 };
 use sp_staking::{EraIndex, SessionIndex};
 

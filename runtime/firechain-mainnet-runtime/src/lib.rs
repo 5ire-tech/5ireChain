@@ -30,9 +30,8 @@ use frame_election_provider_support::{
 	onchain, BalancingConfig, ElectionDataProvider, SequentialPhragmen, VoteWeight,
 };
 use frame_support::{
-	construct_runtime,
+	construct_runtime, derive_impl,
 	dispatch::DispatchClass,
-	derive_impl,
 	dynamic_params::{dynamic_pallet_params, dynamic_params},
 	genesis_builder_helper::{build_state, get_preset},
 	instances::{Instance1, Instance2},
@@ -40,10 +39,12 @@ use frame_support::{
 	pallet_prelude::Get,
 	parameter_types,
 	traits::{
+		fungible::HoldConsideration,
+		tokens::{pay::PayAssetFromAccount, GetSalary, PayFromAccount},
 		AsEnsureOriginWithArg, ConstBool, ConstU128, ConstU16, ConstU32, Currency, EitherOfDiverse,
-		EqualPrivilegeOnly, Everything, FindAuthor, Imbalance, InstanceFilter, KeyOwnerProofSystem,
-		LockIdentifier, Nothing, OnFinalize, OnUnbalanced, WithdrawReasons, fungible::HoldConsideration,
-		LinearStoragePrice, tokens::{pay::PayAssetFromAccount,GetSalary,PayFromAccount},EnsureOriginWithArg,
+		EnsureOriginWithArg, EqualPrivilegeOnly, Everything, FindAuthor, Imbalance, InstanceFilter,
+		KeyOwnerProofSystem, LinearStoragePrice, LockIdentifier, Nothing, OnFinalize, OnUnbalanced,
+		WithdrawReasons,
 	},
 	weights::{
 		constants::{
@@ -53,14 +54,14 @@ use frame_support::{
 	},
 	PalletId,
 };
-use pallet_election_provider_multi_phase::GeometricDepositBase;
 use frame_system::{
 	limits::{BlockLength, BlockWeights},
 	EnsureRoot, EnsureRootWithSuccess, EnsureSigned, EnsureSignedBy, EnsureWithSuccess,
 };
 #[cfg(feature = "runtime-benchmarks")]
 use pallet_contracts::NoopMigration;
-use pallet_election_provider_multi_phase::SolutionAccuracyOf;
+use pallet_election_provider_multi_phase::{GeometricDepositBase, SolutionAccuracyOf};
+use pallet_identity::legacy::IdentityInfo;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use pallet_session::historical as pallet_session_historical;
 #[allow(deprecated)]
@@ -68,7 +69,6 @@ pub use pallet_transaction_payment::{
 	ConstFeeMultiplier, CurrencyAdapter, Multiplier, TargetedFeeAdjustment,
 };
 use pallet_transaction_payment::{FeeDetails, RuntimeDispatchInfo};
-use pallet_identity::legacy::IdentityInfo;
 use sp_api::impl_runtime_apis;
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_grandpa::AuthorityId as GrandpaId;
@@ -1084,7 +1084,7 @@ impl pallet_remark::Config for Runtime {
 }
 
 impl pallet_root_testing::Config for Runtime {
-	type RuntimeEvent =  RuntimeEvent;
+	type RuntimeEvent = RuntimeEvent;
 }
 
 parameter_types! {

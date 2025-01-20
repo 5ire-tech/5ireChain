@@ -207,9 +207,9 @@ mod tests {
 		let mut precompile_handle = MockPrecompileHandle;
 
 		assert_eq!(
-			using_precompile_handle(&mut precompile_handle, || with_precompile_handle(
-				|handle| handle.is_static()
-			)),
+			using_precompile_handle(&mut precompile_handle, || with_precompile_handle(|handle| {
+				handle.is_static()
+			})),
 			Some(true)
 		);
 	}

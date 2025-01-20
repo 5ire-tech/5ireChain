@@ -33,9 +33,8 @@ use frame_support::{
 use mock::*;
 use pallet_balances::Error as BalancesError;
 use sp_runtime::{
-	assert_eq_error_rate, bounded_vec,
-	traits::BadOrigin,
-	Perbill, Percent, Perquintill, Rounding, TokenError,
+	assert_eq_error_rate, bounded_vec, traits::BadOrigin, Perbill, Percent, Perquintill, Rounding,
+	TokenError,
 };
 use sp_staking::{
 	offence::{DisableStrategy, OffenceDetails, OnOffenceHandler},
@@ -1642,7 +1641,7 @@ fn bond_with_little_staked_value_bounded() {
 
 			// 1 era worth of reward. BUT, we set the timestamp after on_initialize, so outdated by
 			// one block.
-		
+
 			reward_all_elected();
 			mock::start_active_era(1);
 			mock::make_all_reward_payment(0);
@@ -6374,7 +6373,7 @@ mod ledger_recovery {
 			assert_eq!(Balances::balance_locked(crate::STAKING_ID, &333), lock_333_before); // OK
 			assert_eq!(Bonded::<Test>::get(&333), Some(444)); // OK
 			assert!(Payee::<Test>::get(&333).is_some()); // OK
-											 // however, ledger associated with its controller was killed.
+												// however, ledger associated with its controller was killed.
 			assert!(Ledger::<Test>::get(&444).is_none()); // NOK
 
 			// side effects on 444 - ledger, bonded, payee, lock should be completely removed.

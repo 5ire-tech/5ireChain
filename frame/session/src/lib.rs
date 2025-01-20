@@ -113,9 +113,14 @@ pub mod migrations;
 mod mock;
 #[cfg(test)]
 mod tests;
-pub mod weights;
 pub mod validation;
+pub mod weights;
+use crate::validation::OneSessionHandlerAll;
 use codec::{Decode, MaxEncodedLen};
+use frame_election_provider_support::{
+	bounds::{CountBound, SizeBound},
+	DataProviderBounds, ElectionDataProvider,
+};
 use frame_support::{
 	dispatch::DispatchResult,
 	ensure,
@@ -126,11 +131,6 @@ use frame_support::{
 	weights::Weight,
 	Parameter,
 };
-use frame_election_provider_support::{
-	bounds::{CountBound, SizeBound},
-	DataProviderBounds, ElectionDataProvider,
-};
-use crate::validation::OneSessionHandlerAll;
 use frame_system::pallet_prelude::BlockNumberFor;
 use sp_runtime::{
 	traits::{AtLeast32BitUnsigned, Convert, Member, One, OpaqueKeys, Zero},
@@ -749,7 +749,7 @@ impl<T: Config> Pallet<T> {
 				(all_validators, true)
 			} else {
 				(all_validators.clone().unwrap(), false)
-			};	
+			};
 
 		// Queue next session keys.
 		let (queued_amalgamated, next_changed) = {
@@ -814,7 +814,6 @@ impl<T: Config> Pallet<T> {
 
 			(queued_amalgamated1, all_changed)
 		};
-
 
 		<QueuedKeys<T>>::put(queued_amalgamated.clone());
 		<QueuedChanged<T>>::put(next_changed);

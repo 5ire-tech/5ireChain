@@ -17,14 +17,8 @@
 
 /// ! Traits and default implementation for paying transaction fees.
 use crate::Config;
-use pallet_contracts::ContractDeployer;
-use core::marker::PhantomData;
-use sp_runtime::{
-	traits::{DispatchInfoOf, PostDispatchInfoOf, Saturating, Zero},
-	transaction_validity::InvalidTransaction,
-};
-use sp_runtime::traits::UniqueSaturatedInto;
 use crate::{Event, Pallet};
+use core::marker::PhantomData;
 use frame_support::{
 	traits::{
 		fungible::{Balanced, Credit, Debt, Inspect},
@@ -32,6 +26,11 @@ use frame_support::{
 		Currency, ExistenceRequirement, Imbalance, OnUnbalanced, WithdrawReasons,
 	},
 	unsigned::TransactionValidityError,
+};
+use pallet_contracts::ContractDeployer;
+use sp_runtime::{
+	traits::{DispatchInfoOf, PostDispatchInfoOf, Saturating, UniqueSaturatedInto, Zero},
+	transaction_validity::InvalidTransaction,
 };
 
 type NegativeImbalanceOf<C, T> =
@@ -134,9 +133,12 @@ where
 				let contract_deployer_revenue = corrected_fee / 2u32.into();
 				// Attempts to deposit the `contract_deployer_revenue` into the contract deployer's
 				// account, updating `refund_owner`
-				deployer_imbalance =
-				F::deposit(&contract_address, contract_deployer_revenue.unique_saturated_into(),Precision::BestEffort)
-						.unwrap_or_else(|_| Debt::<T::AccountId, F>::zero());
+				deployer_imbalance = F::deposit(
+					&contract_address,
+					contract_deployer_revenue.unique_saturated_into(),
+					Precision::BestEffort,
+				)
+				.unwrap_or_else(|_| Debt::<T::AccountId, F>::zero());
 				Pallet::<T>::deposit_event(Event::<T>::DeployerFeeAllocation {
 					address: contract_address,
 					fee: contract_deployer_revenue.unique_saturated_into(),

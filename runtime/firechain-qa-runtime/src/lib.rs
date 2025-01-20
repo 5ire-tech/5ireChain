@@ -30,22 +30,22 @@ use frame_election_provider_support::{
 	bounds::ElectionBoundsBuilder, onchain, BalancingConfig, ElectionDataProvider,
 	SequentialPhragmen, VoteWeight,
 };
-use pallet_identity::legacy::IdentityInfo;
 use frame_support::{
-	construct_runtime,
+	construct_runtime, derive_impl,
 	dispatch::DispatchClass,
-	derive_impl,
-	genesis_builder_helper::{build_state, get_preset},
 	dynamic_params::{dynamic_pallet_params, dynamic_params},
+	genesis_builder_helper::{build_state, get_preset},
 	instances::{Instance1, Instance2},
 	ord_parameter_types,
 	pallet_prelude::Get,
 	parameter_types,
 	traits::{
+		fungible::HoldConsideration,
+		tokens::{pay::PayAssetFromAccount, GetSalary, PayFromAccount},
 		AsEnsureOriginWithArg, ConstBool, ConstU128, ConstU16, ConstU32, Currency, EitherOfDiverse,
-		EqualPrivilegeOnly, Everything, FindAuthor, Imbalance, InstanceFilter, KeyOwnerProofSystem,
-		LockIdentifier, Nothing, OnFinalize, OnUnbalanced, WithdrawReasons,fungible::HoldConsideration,
-		LinearStoragePrice,tokens::{GetSalary, PayFromAccount,pay::PayAssetFromAccount},EnsureOriginWithArg
+		EnsureOriginWithArg, EqualPrivilegeOnly, Everything, FindAuthor, Imbalance, InstanceFilter,
+		KeyOwnerProofSystem, LinearStoragePrice, LockIdentifier, Nothing, OnFinalize, OnUnbalanced,
+		WithdrawReasons,
 	},
 	weights::{
 		constants::{
@@ -61,9 +61,9 @@ use frame_system::{
 };
 #[cfg(feature = "runtime-benchmarks")]
 use pallet_contracts::NoopMigration;
-use pallet_election_provider_multi_phase::SolutionAccuracyOf;
+use pallet_election_provider_multi_phase::{GeometricDepositBase, SolutionAccuracyOf};
+use pallet_identity::legacy::IdentityInfo;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
-use pallet_election_provider_multi_phase::GeometricDepositBase;
 use pallet_session::historical as pallet_session_historical;
 #[allow(deprecated)]
 pub use pallet_transaction_payment::{
@@ -387,7 +387,6 @@ parameter_types! {
 	pub MaximumSchedulerWeight: Weight = Perbill::from_percent(80) *
 		RuntimeBlockWeights::get().max_block;
 }
-
 
 /// Dynamic parameters that can be changed at runtime through the
 /// `pallet_parameters::set_parameter`.

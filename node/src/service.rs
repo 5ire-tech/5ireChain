@@ -22,27 +22,26 @@
 use crate::rpc::{create_full, BabeDeps, FullDeps, GrandpaDeps};
 // use fc_db::Backend as FrontierBackend;
 use crate::cli::Cli;
-use sc_network::NetworkBackend;
+use fc_storage::StorageOverrideHandler;
 use firechain_runtime_core_primitives::opaque::{Block, BlockNumber, Hash};
 use frame_benchmarking_cli::SUBSTRATE_REFERENCE_HARDWARE;
 use futures::prelude::*;
 use sc_client_api::{Backend, BlockBackend};
 use sc_consensus_babe::{self, BabeWorkerHandle, SlotProportion};
 use sc_executor::NativeElseWasmExecutor;
-use fc_storage::StorageOverrideHandler;
-use sc_network::{event::Event, NetworkEventStream};
-use sc_network::service::traits::NetworkService;
-use sc_network_sync::strategy::warp::WarpSyncParams;
-use sc_service::{config::Configuration, error::Error as ServiceError, TaskManager,RpcHandlers};
+use sc_network::{
+	event::Event, service::traits::NetworkService, NetworkBackend, NetworkEventStream,
+};
+use sc_network_sync::{strategy::warp::WarpSyncParams, SyncingService};
+use sc_service::{config::Configuration, error::Error as ServiceError, RpcHandlers, TaskManager};
 use sc_telemetry::{Telemetry, TelemetryWorker};
-use sp_runtime::traits::Block as BlockT;
-use sc_network_sync::SyncingService;
 use sc_transaction_pool_api::OffchainTransactionPoolFactory;
 use sp_api::ConstructRuntimeApi;
-use std::path::Path;
 use sp_core::U256;
+use sp_runtime::traits::Block as BlockT;
 use std::{
 	collections::BTreeMap,
+	path::Path,
 	sync::{Arc, Mutex},
 };
 // Frontier
@@ -77,7 +76,8 @@ type FullGrandpaBlockImport<RuntimeApi, Executor> = grandpa::GrandpaBlockImport<
 	FullSelectChain,
 >;
 /// The transaction pool type definition.
-pub type TransactionPool<RuntimeApi, Executor> = sc_transaction_pool::FullPool<Block, FullClient<RuntimeApi, Executor>>;
+pub type TransactionPool<RuntimeApi, Executor> =
+	sc_transaction_pool::FullPool<Block, FullClient<RuntimeApi, Executor>>;
 
 /// Creates a new partial node.
 #[allow(clippy::type_complexity)]
@@ -218,9 +218,9 @@ where
 }
 
 /// Result of [`new_full_base`].
-pub struct NewFullBase<RuntimeApi, Executor> 
-where 
-RuntimeApi:
+pub struct NewFullBase<RuntimeApi, Executor>
+where
+	RuntimeApi:
 		ConstructRuntimeApi<Block, FullClient<RuntimeApi, Executor>> + Send + Sync + 'static,
 	RuntimeApi::RuntimeApi: RuntimeApiCollection,
 	RuntimeApi::RuntimeApi: sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>,
@@ -241,7 +241,7 @@ RuntimeApi:
 }
 
 /// Creates a full service from the configuration.
-pub fn new_full_base<N: NetworkBackend<Block,<Block as BlockT>::Hash>,RuntimeApi, Executor>(
+pub fn new_full_base<N: NetworkBackend<Block, <Block as BlockT>::Hash>, RuntimeApi, Executor>(
 	mut config: Configuration,
 	disable_hardware_benchmarks: bool,
 	with_startup_data: impl FnOnce(
@@ -797,28 +797,27 @@ where
 {
 	let database_path = config.database.path().map(Path::to_path_buf);
 
-	let task_manager = match config.network.network_backend {
-		sc_network::config::NetworkBackendType::Libp2p => {
-			let task_manager = new_full_base::<sc_network::NetworkWorker<_, _>,RuntimeApi, Executor>(
-				config,
-				cli.no_hardware_benchmarks,
-				|_, _| (),
-				eth_config,
-			)
-			.map(|NewFullBase { task_manager, .. }| task_manager)?;
-			task_manager
-		},
-		sc_network::config::NetworkBackendType::Litep2p => {
-			let task_manager = new_full_base::<sc_network::Litep2pNetworkBackend,RuntimeApi, Executor>(
-				config,
-				cli.no_hardware_benchmarks,
-				|_, _| (),
-				eth_config,
-			)
-			.map(|NewFullBase { task_manager, .. }| task_manager)?;
-			task_manager
-		},
-	};
+	let task_manager =
+		match config.network.network_backend {
+			sc_network::config::NetworkBackendType::Libp2p => {
+				let task_manager = new_full_base::<
+					sc_network::NetworkWorker<_, _>,
+					RuntimeApi,
+					Executor,
+				>(config, cli.no_hardware_benchmarks, |_, _| (), eth_config)
+				.map(|NewFullBase { task_manager, .. }| task_manager)?;
+				task_manager
+			},
+			sc_network::config::NetworkBackendType::Litep2p => {
+				let task_manager = new_full_base::<
+					sc_network::Litep2pNetworkBackend,
+					RuntimeApi,
+					Executor,
+				>(config, cli.no_hardware_benchmarks, |_, _| (), eth_config)
+				.map(|NewFullBase { task_manager, .. }| task_manager)?;
+				task_manager
+			},
+		};
 
 	if let Some(database_path) = database_path {
 		sc_storage_monitor::StorageMonitorService::try_spawn(

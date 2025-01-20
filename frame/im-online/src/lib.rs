@@ -81,11 +81,11 @@ pub mod migration;
 mod mock;
 mod tests;
 pub mod weights;
+use codec::{Decode, Encode, MaxEncodedLen};
 use frame_election_provider_support::{
 	bounds::{CountBound, SizeBound},
 	DataProviderBounds, ElectionDataProvider,
 };
-use codec::{Decode, Encode, MaxEncodedLen};
 use frame_support::{
 	pallet_prelude::*,
 	traits::{
@@ -99,9 +99,9 @@ use frame_system::{
 	pallet_prelude::*,
 };
 pub use pallet::*;
-use scale_info::TypeInfo;
 use pallet_esg::traits::ERScoresTrait;
 use pallet_session::validation::OneSessionHandlerAll;
+use scale_info::TypeInfo;
 use sp_application_crypto::RuntimeAppPublic;
 use sp_runtime::{
 	offchain::storage::{MutateStorageError, StorageRetrievalError, StorageValueRef},
@@ -359,11 +359,15 @@ pub mod pallet {
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
 		/// A new heartbeat was received from `AuthorityId`.
-		HeartbeatReceived { authority_id: T::AuthorityId },
+		HeartbeatReceived {
+			authority_id: T::AuthorityId,
+		},
 		/// At the end of the session, no offence was committed.
 		AllGood,
 		/// At the end of the session, at least one validator was found to be offline.
-		SomeOffline { offline: Vec<IdentificationTuple<T>> },
+		SomeOffline {
+			offline: Vec<IdentificationTuple<T>>,
+		},
 		// End of Session
 		EndSession {
 			s_idx: SessionIndex,
@@ -904,7 +908,6 @@ impl<T: Config> Pallet<T> {
 		});
 	}
 
-
 	#[cfg(test)]
 	fn set_keys(keys: Vec<T::AuthorityId>) {
 		let bounded_keys = WeakBoundedVec::<_, T::MaxKeys>::try_from(keys)
@@ -1095,4 +1098,3 @@ impl<T: Config> ERScoresTrait<ValidatorId<T>> for Pallet<T> {
 		}
 	}
 }
-

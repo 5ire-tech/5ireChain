@@ -20,10 +20,6 @@ use crate as pallet_transaction_payment;
 
 use codec::Encode;
 
-use sp_runtime::{
-	testing::TestXt, traits::One, transaction_validity::InvalidTransaction, BuildStorage,
-};
-use pallet_contracts::ContractDeployer;
 use frame_support::{
 	assert_noop, assert_ok,
 	dispatch::{DispatchClass, DispatchInfo, GetDispatchInfo, PostDispatchInfo},
@@ -33,6 +29,10 @@ use frame_support::{
 use frame_system as system;
 use mock::*;
 use pallet_balances::Call as BalancesCall;
+use pallet_contracts::ContractDeployer;
+use sp_runtime::{
+	testing::TestXt, traits::One, transaction_validity::InvalidTransaction, BuildStorage,
+};
 
 pub struct ExtBuilder {
 	balance_factor: u64,
@@ -273,8 +273,10 @@ fn signed_ext_length_fee_is_also_updated_per_congestion() {
 			<NextFeeMultiplier<Runtime>>::put(Multiplier::saturating_from_rational(3, 2));
 			let len = 10;
 
-			assert_ok!(ChargeTransactionPayment::<Runtime>::from(10) // tipped
-				.pre_dispatch(&1, CALL, &info_from_weight(Weight::from_parts(3, 0)), len));
+			assert_ok!(
+				ChargeTransactionPayment::<Runtime>::from(10) // tipped
+					.pre_dispatch(&1, CALL, &info_from_weight(Weight::from_parts(3, 0)), len)
+			);
 			assert_eq!(
 				Balances::free_balance(1),
 				100 // original

@@ -18,10 +18,6 @@
 use super::*;
 use crate as pallet_transaction_payment;
 
-use sp_core::H256;
-use sp_runtime::traits::{BlakeTwo256, IdentityLookup};
-use pallet_contracts::{Frame,DefaultAddressGenerator};
-use frame_system::EnsureSigned;
 use frame_support::{
 	derive_impl,
 	dispatch::DispatchClass,
@@ -30,7 +26,11 @@ use frame_support::{
 	weights::{Weight, WeightToFee as WeightToFeeT},
 };
 use frame_system as system;
+use frame_system::EnsureSigned;
 use pallet_balances::Call as BalancesCall;
+use pallet_contracts::{DefaultAddressGenerator, Frame};
+use sp_core::H256;
+use sp_runtime::traits::{BlakeTwo256, IdentityLookup};
 
 type Block = frame_system::mocking::MockBlock<Runtime>;
 

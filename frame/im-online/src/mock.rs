@@ -19,25 +19,26 @@
 
 #![cfg(test)]
 
+use frame_election_provider_support::{
+	bounds::{ElectionBounds, ElectionBoundsBuilder},
+	onchain, SequentialPhragmen,
+};
 use frame_support::{
 	derive_impl, parameter_types,
-	traits::{ConstU32, ConstU64, ConstU128,Imbalance, OnUnbalanced},
+	traits::{ConstU128, ConstU32, ConstU64, Imbalance, OnUnbalanced},
 	weights::Weight,
 };
-use frame_election_provider_support::{{bounds::ElectionBounds,bounds::ElectionBoundsBuilder},onchain,SequentialPhragmen};
 use pallet_session::historical as pallet_session_historical;
-use pallet_staking::{
-	RewardDestination, Rewards, ValidatorPrefs,
-};
+use pallet_staking::{RewardDestination, Rewards, ValidatorPrefs};
 use sp_core::H256;
 use sp_runtime::{
 	testing::{TestXt, UintAuthorityId},
 	traits::{BlakeTwo256, ConvertInto, IdentityLookup},
-	BuildStorage, Permill,DispatchError,Perbill
+	BuildStorage, DispatchError, Perbill, Permill,
 };
 use sp_staking::{
 	offence::{OffenceError, ReportOffence},
-	SessionIndex,EraIndex
+	EraIndex, SessionIndex,
 };
 
 use crate as imonline;
@@ -120,7 +121,7 @@ pub fn new_test_ext(n: u64) -> sp_io::TestExternalities {
 			Staking::bond(
 				RuntimeOrigin::signed(i),
 				(100 + (100 * i)) as u128,
-				RewardDestination::Staked
+				RewardDestination::Staked,
 			)
 			.unwrap();
 			Staking::validate(RuntimeOrigin::signed(i), ValidatorPrefs::default()).unwrap();
@@ -251,7 +252,6 @@ impl pallet_staking::SessionInterface<AccountId> for ImOnlineSession {
 
 	fn prune_historical_up_to(_up_to: SessionIndex) {}
 }
-
 
 pub struct OnChainSeqPhragmen;
 impl onchain::Config for OnChainSeqPhragmen {

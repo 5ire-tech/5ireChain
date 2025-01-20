@@ -21,7 +21,7 @@
 
 use super::*;
 use crate::mock::*;
-use frame_support::{assert_err,dispatch};
+use frame_support::{assert_err, dispatch};
 use sp_core::offchain::{
 	testing::{TestOffchainExt, TestTransactionPoolExt},
 	OffchainDbExt, OffchainWorkerExt, TransactionPoolExt,
@@ -328,7 +328,6 @@ fn should_not_send_a_report_if_already_online() {
 		assert_eq!(res.next().unwrap().is_ok(), true);
 		assert_eq!(res.next().unwrap().unwrap_err(), OffchainErr::AlreadyOnline(2));
 		assert_eq!(res.next(), None);
-
 
 		// then
 		let transaction = pool_state.write().transactions.pop().unwrap();

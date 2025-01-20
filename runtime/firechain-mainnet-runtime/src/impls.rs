@@ -17,17 +17,17 @@
 
 //! Some configurable implementations as associated type for the substrate runtime.
 
+use crate::{
+	AccountId, AllianceCollective, AllianceMotion, Authorship, Balances, Hash, NegativeImbalance,
+	Runtime, RuntimeCall,
+};
 use frame_support::{
 	pallet_prelude::*,
 	traits::{Currency, OnUnbalanced},
 };
-use crate::{Runtime,AllianceCollective};
 use pallet_alliance::{IdentityVerifier, ProposalIndex, ProposalProvider};
-use sp_std::prelude::*;
 use pallet_identity::legacy::IdentityField;
-use crate::{
-	AccountId, AllianceMotion, Authorship, Balances, Hash, NegativeImbalance, RuntimeCall,
-};
+use sp_std::prelude::*;
 
 pub struct Author;
 impl OnUnbalanced<NegativeImbalance> for Author {
@@ -43,7 +43,7 @@ impl IdentityVerifier<AccountId> for AllianceIdentityVerifier {
 	fn has_required_identities(who: &AccountId) -> bool {
 		crate::Identity::has_identity(who, (IdentityField::Display | IdentityField::Web).bits())
 	}
-	
+
 	fn has_good_judgement(who: &AccountId) -> bool {
 		use pallet_identity::Judgement;
 		crate::Identity::identity(who)

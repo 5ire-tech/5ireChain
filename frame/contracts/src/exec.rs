@@ -20,9 +20,9 @@ use crate::{
 	gas::GasMeter,
 	primitives::{ExecReturnValue, StorageDeposit},
 	storage::{self, meter::Diff, WriteOutcome},
-	BalanceOf, CodeHash, CodeInfo, CodeInfoOf, Config, ContractInfo, ContractInfoOf,
-	DebugBufferVec, Determinism, Error, Event, Nonce, Origin, Pallet as Contracts, Schedule,
-	LOG_TARGET,ContractDeployer
+	BalanceOf, CodeHash, CodeInfo, CodeInfoOf, Config, ContractDeployer, ContractInfo,
+	ContractInfoOf, DebugBufferVec, Determinism, Error, Event, Nonce, Origin, Pallet as Contracts,
+	Schedule, LOG_TARGET,
 };
 use frame_support::{
 	crypto::ecdsa::ECDSAExt,
@@ -1002,7 +1002,7 @@ where
 					frame.nested_storage.enforce_subcall_limit(contract)?;
 
 					let caller = self.caller();
-										// Retrieve the account ID of the origin, which is the account initiating the
+					// Retrieve the account ID of the origin, which is the account initiating the
 					// transaction.
 					let origin = &self.origin.account_id()?;
 					// Contract information associated with the given `account_id` from the

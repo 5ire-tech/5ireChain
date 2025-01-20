@@ -248,7 +248,6 @@ impl Convert<u64, Option<u64>> for TestValidatorIdOf {
 	}
 }
 
-
 // 5ire's implementation
 parameter_types! {
 	pub MaxNominations: u32 =  0u32;
@@ -294,7 +293,7 @@ impl frame_election_provider_support::ElectionDataProvider for TestElectionDP {
 	> {
 		frame_election_provider_support::data_provider::Result::Err("not implemented!!")
 	}
-	fn next_election_prediction(_ : Self::BlockNumber) -> Self::BlockNumber {
+	fn next_election_prediction(_: Self::BlockNumber) -> Self::BlockNumber {
 		0u64
 	}
 }

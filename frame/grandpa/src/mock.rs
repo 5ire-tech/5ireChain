@@ -19,7 +19,9 @@
 
 #![cfg(test)]
 
-use crate::{self as pallet_grandpa, AuthorityId, AuthorityList, Config, ConsensusLog, OneSessionHandlerAll};
+use crate::{
+	self as pallet_grandpa, AuthorityId, AuthorityList, Config, ConsensusLog, OneSessionHandlerAll,
+};
 use ::grandpa as finality_grandpa;
 use codec::Encode;
 use frame_election_provider_support::{

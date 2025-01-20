@@ -307,14 +307,14 @@ mod pallet;
 use codec::{Decode, Encode, HasCompact, MaxEncodedLen};
 use frame_support::{
 	defensive, defensive_assert,
+	pallet_prelude::DispatchError,
 	traits::{
 		ConstU32, Currency, Defensive, DefensiveMax, DefensiveSaturating, Get, LockIdentifier,
 	},
-	pallet_prelude::DispatchError,
 	weights::Weight,
 	BoundedVec, CloneNoBound, EqNoBound, PartialEqNoBound, RuntimeDebugNoBound,
 };
-use scale_info::{prelude::vec,TypeInfo};
+use scale_info::{prelude::vec, TypeInfo};
 use sp_runtime::{
 	curve::PiecewiseLinear,
 	traits::{AtLeast32BitUnsigned, Convert, StaticLookup, Zero},
@@ -836,7 +836,6 @@ pub trait Rewards<AccountId> {
 	fn claim_rewards(account: AccountId) -> Result<(), DispatchError>;
 	fn calculate_reward() -> sp_runtime::DispatchResult;
 }
-
 
 /// A nomination quota that allows up to MAX nominations for all validators.
 pub struct FixedNominationsQuota<const MAX: u32>;

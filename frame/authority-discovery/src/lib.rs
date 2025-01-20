@@ -25,7 +25,7 @@
 
 use frame_support::{
 	traits::{Get, OneSessionHandler},
-	WeakBoundedVec
+	WeakBoundedVec,
 };
 use pallet_session::validation::OneSessionHandlerAll;
 use sp_authority_discovery::AuthorityId;
@@ -180,10 +180,7 @@ impl<T: Config> OneSessionHandlerAll<T::AccountId> for Pallet<T> {
 mod tests {
 	use super::*;
 	use crate as pallet_authority_discovery;
-	use frame_support::{
-		parameter_types, derive_impl,
-		traits::ConstU32,
-	};
+	use frame_support::{derive_impl, parameter_types, traits::ConstU32};
 	use sp_application_crypto::Pair;
 	use sp_authority_discovery::AuthorityPair;
 	use sp_core::crypto::key_types;
@@ -296,7 +293,7 @@ mod tests {
 		type Lookup = IdentityLookup<Self::AccountId>;
 		type Block = Block;
 	}
-	
+
 	pub struct TestSessionHandler;
 	impl pallet_session::SessionHandler<AuthorityId> for TestSessionHandler {
 		const KEY_TYPE_IDS: &'static [KeyTypeId] = &[key_types::DUMMY];

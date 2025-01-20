@@ -148,8 +148,7 @@ fn transaction_without_enough_gas_should_not_work() {
 		};
 		let dispatch_info = extrinsic.get_dispatch_info();
 		assert_err!(
-			call.validate_self_contained(&source, &dispatch_info, 0)
-				.unwrap(),
+			call.validate_self_contained(&source, &dispatch_info, 0).unwrap(),
 			InvalidTransaction::Payment
 		);
 	});
@@ -165,9 +164,7 @@ fn transaction_with_to_low_nonce_should_not_work() {
 		let mut transaction = eip1559_erc20_creation_unsigned_transaction();
 		transaction.nonce = U256::from(1);
 		let signed = transaction.sign(&alice.private_key, None);
-		let call = crate::Call::<Test>::transact {
-			transaction: signed,
-		};
+		let call = crate::Call::<Test>::transact { transaction: signed };
 		let source = call.check_self_contained().unwrap().unwrap();
 		let extrinsic = CheckedExtrinsic::<u64, _, SignedExtra, H160> {
 			signed: fp_self_contained::CheckedSignature::SelfContained(source),
@@ -176,8 +173,7 @@ fn transaction_with_to_low_nonce_should_not_work() {
 		let dispatch_info = extrinsic.get_dispatch_info();
 
 		assert_eq!(
-			call.validate_self_contained(&source, &dispatch_info, 0)
-				.unwrap(),
+			call.validate_self_contained(&source, &dispatch_info, 0).unwrap(),
 			ValidTransactionBuilder::default()
 				.and_provides((alice.address, U256::from(1)))
 				.priority(0u64)
@@ -192,9 +188,7 @@ fn transaction_with_to_low_nonce_should_not_work() {
 		transaction.nonce = U256::from(0);
 
 		let signed2 = transaction.sign(&alice.private_key, None);
-		let call2 = crate::Call::<Test>::transact {
-			transaction: signed2,
-		};
+		let call2 = crate::Call::<Test>::transact { transaction: signed2 };
 		let source2 = call2.check_self_contained().unwrap().unwrap();
 		let extrinsic2 = CheckedExtrinsic::<u64, _, SignedExtra, _> {
 			signed: fp_self_contained::CheckedSignature::SelfContained(source),
@@ -220,9 +214,7 @@ fn transaction_with_to_hight_nonce_should_fail_in_block() {
 		transaction.nonce = U256::one();
 
 		let signed = transaction.sign(&alice.private_key, None);
-		let call = crate::Call::<Test>::transact {
-			transaction: signed,
-		};
+		let call = crate::Call::<Test>::transact { transaction: signed };
 		let source = call.check_self_contained().unwrap().unwrap();
 		let extrinsic = CheckedExtrinsic::<_, _, SignedExtra, _> {
 			signed: fp_self_contained::CheckedSignature::SelfContained(source),
@@ -314,10 +306,7 @@ fn contract_should_be_created_at_given_address() {
 	ext.execute_with(|| {
 		let t = eip1559_erc20_creation_transaction(alice);
 		assert_ok!(Ethereum::execute(alice.address, &t, None,));
-		assert_ne!(
-			pallet_evm::AccountCodes::<Test>::get(erc20_address).len(),
-			0
-		);
+		assert_ne!(pallet_evm::AccountCodes::<Test>::get(erc20_address).len(), 0);
 	});
 }
 
@@ -335,7 +324,7 @@ fn transaction_should_generate_correct_gas_used() {
 		match info {
 			CallOrCreateInfo::Create(info) => {
 				assert_eq!(info.used_gas.standard, expected_gas);
-			}
+			},
 			CallOrCreateInfo::Call(_) => panic!("expected create info"),
 		}
 	});
@@ -383,7 +372,7 @@ fn call_should_handle_errors() {
 					hex::encode(info.value),
 					"0000000000000000000000000000000000000000000000000000000000000001"
 				);
-			}
+			},
 			CallOrCreateInfo::Create(_) => panic!("expected call info"),
 		}
 
@@ -493,9 +482,7 @@ fn self_contained_transaction_with_extra_gas_should_adjust_weight_with_post_disp
 		let mut transaction = eip1559_erc20_creation_unsigned_transaction();
 		transaction.gas_limit = 9_000_000.into();
 		let signed = transaction.sign(&alice.private_key, None);
-		let call = crate::Call::<Test>::transact {
-			transaction: signed,
-		};
+		let call = crate::Call::<Test>::transact { transaction: signed };
 		let source = call.check_self_contained().unwrap().unwrap();
 		let extrinsic = CheckedExtrinsic::<_, _, frame_system::CheckWeight<Test>, _> {
 			signed: fp_self_contained::CheckedSignature::SelfContained(source),
@@ -542,10 +529,7 @@ fn validated_transaction_apply_zero_gas_price_works() {
 		}
 		.sign(&alice.private_key, None);
 
-		assert_ok!(crate::ValidatedTransaction::<Test>::apply(
-			alice.address,
-			transaction
-		));
+		assert_ok!(crate::ValidatedTransaction::<Test>::apply(alice.address, transaction));
 		// Alice didn't pay fees, transfer 100 to Bob.
 		assert_eq!(Balances::free_balance(&substrate_alice), 900);
 		// Bob received 100 from Alice.
@@ -615,9 +599,6 @@ fn proof_size_base_cost_should_keep_the_same_in_execution_and_estimate() {
 			Some(100),
 			vec![],
 		);
-		assert_eq!(
-			estimate_tx_data.proof_size_base_cost(),
-			tx_data.proof_size_base_cost()
-		);
+		assert_eq!(estimate_tx_data.proof_size_base_cost(), tx_data.proof_size_base_cost());
 	});
 }

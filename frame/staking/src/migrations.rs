@@ -71,26 +71,35 @@ pub mod v14 {
 			let on_chain = Pallet::<T>::on_chain_storage_version();
 
 			let current_era = CurrentEra::<T>::get().unwrap_or(0);
-			 // Fetch the active validators for the current era
+			// Fetch the active validators for the current era
 			let active_validators = T::Validators::validators();
-			    // Iterate through each active validator
+			// Iterate through each active validator
 			for validator in active_validators {
-				 // Convert the validator to its associated identifier type
-				if let Some(validator_id) = T::ValidatorId::convert(validator.clone()){
-					 // Retrieve the exposure details for the validator in the current era
-					let validator_exposure = ErasStakers::<T>::get(current_era, validator_id.clone());
+				// Convert the validator to its associated identifier type
+				if let Some(validator_id) = T::ValidatorId::convert(validator.clone()) {
+					// Retrieve the exposure details for the validator in the current era
+					let validator_exposure =
+						ErasStakers::<T>::get(current_era, validator_id.clone());
 
 					let page_size = T::MaxExposurePageSize::get().defensive_max(1);
-					
-					 // Split the validator's exposure into metadata and pages
-					let (exposure_metadata, exposure_pages) = validator_exposure.into_pages(page_size);
+
+					// Split the validator's exposure into metadata and pages
+					let (exposure_metadata, exposure_pages) =
+						validator_exposure.into_pages(page_size);
 
 					// Store the exposure metadata in the ErasStakersOverview storage
-					<ErasStakersOverview<T>>::insert(current_era, &validator_id.clone(), &exposure_metadata);
+					<ErasStakersOverview<T>>::insert(
+						current_era,
+						&validator_id.clone(),
+						&exposure_metadata,
+					);
 
-					 // Store each exposure page in the ErasStakersPaged storage
+					// Store each exposure page in the ErasStakersPaged storage
 					exposure_pages.iter().enumerate().for_each(|(page, paged_exposure)| {
-						<ErasStakersPaged<T>>::insert((current_era, &validator_id.clone(), page as Page), &paged_exposure);
+						<ErasStakersPaged<T>>::insert(
+							(current_era, &validator_id.clone(), page as Page),
+							&paged_exposure,
+						);
 					});
 				}
 			}
