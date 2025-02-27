@@ -21,7 +21,7 @@ This is our roadmap
 
 Prior to starting a 5ireChain node, you must set up your development environment with the necessary compiler and tools corresponding to your operating system.
 
-https://docs.substrate.io/install/
+[Polkadot SDK](https://docs.polkadot.com/develop/parachains/install-polkadot-sdk/)
 
 ## Connect to 5ireChain Mainnet
 
@@ -48,20 +48,20 @@ docker run -d -p 30333:30333 -p 9944:9944 5irechain/5ire-node:mainnet --no-telem
 
 ### Pull Docker Image 
 ```bash
-docker pull 5irechain/5ire-thunder-node:ga
+docker pull 5irechain/5ire-thunder-node:latest
 ```
 
 
 ### Run docker image with full-node role
 
 ```bash
-docker run -d -p 30333:30333 -p 9944:9944 5irechain/5ire-thunder-node:ga --no-telemetry --base-path /5ire/data/ --chain /5ire/specs/5ire-thunder-SpecRaw.json --bootnodes /ip4/18.220.218.66/tcp/30333/p2p/12D3KooWA33HomkBqsKNqEbaP3ubXCSxHmqDNNPDf2qPzmiS9FsL --pruning archive --rpc-external --rpc-cors all
+docker run -d -p 30333:30333 -p 9944:9944 5irechain/5ire-thunder-node:latest --no-telemetry --base-path /5ire/data --chain /5ire/specs/5ire-thunder-specRaw.json --port 30333 --prometheus-port 9916 --prometheus-external --rpc-port 9944 --rpc-cors all --rpc-methods Unsafe --unsafe-rpc-external --rpc-external --rpc-max-connections 40000 --pruning archive --bootnodes /ip4/52.24.217.23/tcp/30333/p2p/12D3KooWBbUqbh78vPnBaaACayZ7u87fA9RH4A7QWcHTL73CehDJ
 ```
 
 ### Run docker image with validator role
 
 ```bash
-docker run -d -p 30333:30333 -p 9944:9944 5irechain/5ire-thunder-node:ga --no-telemetry --base-path /5ire/data --chain /5ire/specs/5ire-thunder-SpecRaw.json --bootnodes /ip4/18.220.218.66/tcp/30333/p2p/12D3KooWA33HomkBqsKNqEbaP3ubXCSxHmqDNNPDf2qPzmiS9FsL --validator
+docker run -d -p 30333:30333 -p 9944:9944 5irechain/5ire-thunder-node:latest --no-telemetry --base-path /5ire/data --chain /5ire/specs/5ire-thunder-SpecRaw.json --bootnodes /ip4/52.24.217.23/tcp/30333/p2p/12D3KooWBbUqbh78vPnBaaACayZ7u87fA9RH4A7QWcHTL73CehDJ --validator --rpc-cors all --rpc-methods Unsafe
 ```
 
 ## Connect to 5ireChain Local Network
