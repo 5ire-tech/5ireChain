@@ -38,11 +38,11 @@ use sc_telemetry::{Telemetry, TelemetryWorker};
 use sc_transaction_pool_api::OffchainTransactionPoolFactory;
 use sp_api::ConstructRuntimeApi;
 use sp_core::U256;
+use crate::eth::FrontierPartialComponents;
 use sp_runtime::traits::Block as BlockT;
 use std::{
-	collections::BTreeMap,
 	path::Path,
-	sync::{Arc, Mutex},
+	sync::Arc
 };
 // Frontier
 //
@@ -62,7 +62,6 @@ use crate::{
 	eth::{new_frontier_partial, spawn_frontier_tasks, BackendType, FrontierBackend},
 };
 
-use fc_rpc_core::types::{FeeHistoryCache, FeeHistoryCacheLimit, FilterPool};
 
 /// The full client type definition.
 pub type FullClient<RuntimeApi, Executor> =
@@ -344,9 +343,6 @@ where
 	> = Default::default();
 	let pubsub_notification_sinks = Arc::new(pubsub_notification_sinks);
 	let prometheus_registry = config.prometheus_registry().cloned();
-	let filter_pool: Option<FilterPool> = Some(Arc::new(Mutex::new(BTreeMap::new())));
-	let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
-	let fee_history_cache_limit: FeeHistoryCacheLimit = 1000;
 	let frontier_backend = Arc::new(frontier_backend);
 	let storage_override = Arc::new(StorageOverrideHandler::new(client.clone()));
 	let block_data_cache = Arc::new(fc_rpc::EthBlockDataCacheTask::new(
@@ -372,6 +368,12 @@ where
 		let dynamic_fee = fp_dynamic_fee::InherentDataProvider(U256::from(target_gas_price));
 		Ok((slot, timestamp, dynamic_fee))
 	};
+
+	let FrontierPartialComponents {
+		filter_pool,
+		fee_history_cache,
+		fee_history_cache_limit,
+	} = new_frontier_partial(&eth_config)?;
 
 	// for ethereum-compatibility rpc.
 	config.rpc_id_provider = Some(Box::new(fc_rpc::EthereumSubIdProvider)); // Need to check??
@@ -521,9 +523,6 @@ where
 	let shared_voter_state = rpc_setup;
 
 	let backends = backend.clone();
-	let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
-	let fee_history_cache_limit: FeeHistoryCacheLimit = 1000;
-	let filter_pool: Option<FilterPool> = Some(Arc::new(Mutex::new(BTreeMap::new())));
 
 	spawn_frontier_tasks(
 		&task_manager,
