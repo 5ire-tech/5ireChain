@@ -3021,7 +3021,7 @@ dependencies = [
 
 [[package]]
 name = "firechain-qa-runtime"
-version = "1.11.0"
+version = "1.11.1"
 dependencies = [
  "firechain-runtime-core-primitives",
  "fp-account",
