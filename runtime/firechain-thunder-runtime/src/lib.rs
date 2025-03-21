@@ -2727,7 +2727,7 @@ pub type Migrations = migrations::Unreleased;
 #[allow(deprecated, missing_docs)]
 pub mod migrations {
 	/// Unreleased migrations. Add new ones here:
-	pub type Unreleased = pallet_staking::migrations::v14::MigrateToV14<crate::Runtime>;
+	pub type Unreleased = ();
 }
 
 /// Executive: handles dispatch to the various modules.
