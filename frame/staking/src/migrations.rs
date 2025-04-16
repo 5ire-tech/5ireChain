@@ -70,43 +70,50 @@ pub mod v14 {
 			let in_code = Pallet::<T>::in_code_storage_version();
 			let on_chain = Pallet::<T>::on_chain_storage_version();
 
-			let current_era = CurrentEra::<T>::get().unwrap_or(0);
-			// Fetch the active validators for the current era
-			let active_validators = T::Validators::validators();
-			// Iterate through each active validator
-			for validator in active_validators {
-				// Convert the validator to its associated identifier type
-				if let Some(validator_id) = T::ValidatorId::convert(validator.clone()) {
-					// Retrieve the exposure details for the validator in the current era
-					let validator_exposure =
-						ErasStakers::<T>::get(current_era, validator_id.clone());
+			let active_era = Pallet::<T>::active_era().map(|info| info.index);
+			let current_era = Pallet::<T>::current_era();
+			let mut eras = sp_std::collections::btree_set::BTreeSet::new();
+			if let Some(active) = active_era {
+				eras.insert(active);
+			}
+			if let Some(current) = current_era {
+				eras.insert(current);
+			}
+			for era in eras {
+				// Fetch the active validators for the era
+				let active_validators = T::Validators::validators();
+				// Iterate through each active validator
+				for validator in active_validators {
+					// Convert the validator to its associated identifier type
+					if let Some(validator_id) = T::ValidatorId::convert(validator.clone()) {
+						// Retrieve the exposure details for the validator in the current era
+						let validator_exposure = ErasStakers::<T>::get(era, validator_id.clone());
 
-					let page_size = T::MaxExposurePageSize::get().defensive_max(1);
+						let page_size = T::MaxExposurePageSize::get().defensive_max(1);
 
-					// Split the validator's exposure into metadata and pages
-					let (exposure_metadata, exposure_pages) =
-						validator_exposure.into_pages(page_size);
+						// Split the validator's exposure into metadata and pages
+						let (exposure_metadata, exposure_pages) =
+							validator_exposure.into_pages(page_size);
 
-					// Store the exposure metadata in the ErasStakersOverview storage
-					<ErasStakersOverview<T>>::insert(
-						current_era,
-						&validator_id.clone(),
-						&exposure_metadata,
-					);
-
-					// Store each exposure page in the ErasStakersPaged storage
-					exposure_pages.iter().enumerate().for_each(|(page, paged_exposure)| {
-						<ErasStakersPaged<T>>::insert(
-							(current_era, &validator_id.clone(), page as Page),
-							&paged_exposure,
+						// Store the exposure metadata in the ErasStakersOverview storage
+						<ErasStakersOverview<T>>::insert(
+							era,
+							&validator_id.clone(),
+							&exposure_metadata,
 						);
-					});
+
+						// Store each exposure page in the ErasStakersPaged storage
+						exposure_pages.iter().enumerate().for_each(|(page, paged_exposure)| {
+							<ErasStakersPaged<T>>::insert(
+								(era, &validator_id.clone(), page as Page),
+								&paged_exposure,
+							);
+						});
+					}
 				}
 			}
-
 			if in_code == 14 && on_chain == 13 {
 				in_code.put::<Pallet<T>>();
-
 				log!(info, "v14 applied successfully.");
 				T::DbWeight::get().reads_writes(1, 1)
 			} else {
@@ -279,7 +286,7 @@ pub mod v11 {
 						warn,
 						"new bags-list name is equal to the old one, only bumping the version"
 					);
-					return T::DbWeight::get().reads(1).saturating_add(T::DbWeight::get().writes(1))
+					return T::DbWeight::get().reads(1).saturating_add(T::DbWeight::get().writes(1));
 				}
 
 				move_pallet(old_pallet_name.as_bytes(), new_pallet_name.as_bytes());
@@ -302,7 +309,7 @@ pub mod v11 {
 
 			// skip storage prefix checks for the same pallet names
 			if new_pallet_name == old_pallet_name {
-				return Ok(())
+				return Ok(());
 			}
 
 			let old_pallet_prefix = twox_128(N::get().as_bytes());
