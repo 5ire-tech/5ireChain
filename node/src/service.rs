@@ -21,24 +21,28 @@
 //! Service implementation. Specialized wrapper over substrate service.
 use crate::rpc::{create_full, BabeDeps, FullDeps, GrandpaDeps};
 // use fc_db::Backend as FrontierBackend;
-// use crate::cli::Cli;
+use crate::cli::Cli;
+use fc_storage::StorageOverrideHandler;
 use firechain_runtime_core_primitives::opaque::{Block, BlockNumber, Hash};
 use frame_benchmarking_cli::SUBSTRATE_REFERENCE_HARDWARE;
 use futures::prelude::*;
 use sc_client_api::{Backend, BlockBackend};
 use sc_consensus_babe::{self, BabeWorkerHandle, SlotProportion};
 use sc_executor::NativeElseWasmExecutor;
-use sc_network::{event::Event, NetworkEventStream};
-use sc_network_sync::warp::WarpSyncParams;
-use sc_service::{config::Configuration, error::Error as ServiceError, TaskManager};
+use sc_network::{
+	event::Event, service::traits::NetworkService, NetworkBackend, NetworkEventStream,
+};
+use sc_network_sync::{strategy::warp::WarpSyncParams, SyncingService};
+use sc_service::{config::Configuration, error::Error as ServiceError, RpcHandlers, TaskManager};
 use sc_telemetry::{Telemetry, TelemetryWorker};
 use sc_transaction_pool_api::OffchainTransactionPoolFactory;
 use sp_api::ConstructRuntimeApi;
-
 use sp_core::U256;
+use crate::eth::FrontierPartialComponents;
+use sp_runtime::traits::Block as BlockT;
 use std::{
-	collections::BTreeMap,
-	sync::{Arc, Mutex},
+	path::Path,
+	sync::Arc
 };
 // Frontier
 //
@@ -58,8 +62,6 @@ use crate::{
 	eth::{new_frontier_partial, spawn_frontier_tasks, BackendType, FrontierBackend},
 };
 
-use fc_rpc_core::types::{FeeHistoryCache, FeeHistoryCacheLimit, FilterPool};
-pub use fc_storage::overrides_handle;
 
 /// The full client type definition.
 pub type FullClient<RuntimeApi, Executor> =
@@ -72,6 +74,10 @@ type FullGrandpaBlockImport<RuntimeApi, Executor> = grandpa::GrandpaBlockImport<
 	FullClient<RuntimeApi, Executor>,
 	FullSelectChain,
 >;
+/// The transaction pool type definition.
+pub type TransactionPool<RuntimeApi, Executor> =
+	sc_transaction_pool::FullPool<Block, FullClient<RuntimeApi, Executor>>;
+
 /// Creates a new partial node.
 #[allow(clippy::type_complexity)]
 pub fn new_partial<RuntimeApi, Executor>(
@@ -101,7 +107,7 @@ pub fn new_partial<RuntimeApi, Executor>(
 			BabeWorkerHandle<Block>,
 			// grandpa::SharedVoterState,
 			Option<Telemetry>,
-			FrontierBackend,
+			FrontierBackend<FullClient<RuntimeApi, Executor>>,
 		),
 	>,
 	ServiceError,
@@ -157,14 +163,12 @@ where
 		telemetry.as_ref().map(|x| x.handle()),
 	)?;
 	let justification_import = grandpa_block_import.clone();
-
-	let _overrides = overrides_handle(client.clone());
 	let frontier_backend = match eth_config.frontier_backend_type {
-		BackendType::KeyValue => FrontierBackend::KeyValue(fc_db::kv::Backend::open(
+		BackendType::KeyValue => FrontierBackend::KeyValue(Arc::new(fc_db::kv::Backend::open(
 			Arc::clone(&client),
 			&config.database,
 			&db_config_dir(config),
-		)?),
+		)?)),
 	};
 
 	let (block_import, babe_link) = sc_consensus_babe::block_import(
@@ -211,8 +215,32 @@ where
 		other: (import_setup, babe_worker_handle, telemetry, frontier_backend),
 	})
 }
+
+/// Result of [`new_full_base`].
+pub struct NewFullBase<RuntimeApi, Executor>
+where
+	RuntimeApi:
+		ConstructRuntimeApi<Block, FullClient<RuntimeApi, Executor>> + Send + Sync + 'static,
+	RuntimeApi::RuntimeApi: RuntimeApiCollection,
+	RuntimeApi::RuntimeApi: sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>,
+	Executor: sc_executor::NativeExecutionDispatch + 'static,
+{
+	/// The task manager of the node.
+	pub task_manager: TaskManager,
+	/// The client instance of the node.
+	pub client: Arc<FullClient<RuntimeApi, Executor>>,
+	/// The networking service of the node.
+	pub network: Arc<dyn NetworkService>,
+	/// The syncing service of the node.
+	pub sync: Arc<SyncingService<Block>>,
+	/// The transaction pool of the node.
+	pub transaction_pool: Arc<TransactionPool<RuntimeApi, Executor>>,
+	/// The rpc handlers of the node.
+	pub rpc_handlers: RpcHandlers,
+}
+
 /// Creates a full service from the configuration.
-pub fn new_full_base<RuntimeApi, Executor>(
+pub fn new_full_base<N: NetworkBackend<Block, <Block as BlockT>::Hash>, RuntimeApi, Executor>(
 	mut config: Configuration,
 	disable_hardware_benchmarks: bool,
 	with_startup_data: impl FnOnce(
@@ -224,7 +252,7 @@ pub fn new_full_base<RuntimeApi, Executor>(
 		&sc_consensus_babe::BabeLink<Block>,
 	),
 	eth_config: EthConfiguration,
-) -> Result<TaskManager, ServiceError>
+) -> Result<NewFullBase<RuntimeApi, Executor>, ServiceError>
 where
 	RuntimeApi:
 		ConstructRuntimeApi<Block, FullClient<RuntimeApi, Executor>> + Send + Sync + 'static,
@@ -255,15 +283,24 @@ where
 	new_frontier_partial(&eth_config)?;
 
 	let auth_disc_publish_non_global_ips = config.network.allow_non_globals_in_dht;
-	let mut net_config = sc_network::config::FullNetworkConfiguration::new(&config.network);
+	let mut net_config =
+		sc_network::config::FullNetworkConfiguration::<_, _, N>::new(&config.network);
+	let metrics = N::register_notification_metrics(
+		config.prometheus_config.as_ref().map(|cfg| &cfg.registry),
+	);
+	let peer_store_handle = net_config.peer_store_handle();
 
 	let grandpa_protocol_name = grandpa::protocol_standard_name(
 		&client.block_hash(0).ok().flatten().expect("Genesis block exists; qed"),
 		&config.chain_spec,
 	);
-	net_config.add_notification_protocol(grandpa::grandpa_peers_set_config(
-		grandpa_protocol_name.clone(),
-	));
+	let (grandpa_protocol_config, grandpa_notification_service) =
+		grandpa::grandpa_peers_set_config::<_, N>(
+			grandpa_protocol_name.clone(),
+			metrics.clone(),
+			Arc::clone(&peer_store_handle),
+		);
+	net_config.add_notification_protocol(grandpa_protocol_config);
 
 	let warp_sync = Arc::new(grandpa::warp_proof::NetworkProvider::new(
 		backend.clone(),
@@ -281,6 +318,8 @@ where
 			import_queue,
 			block_announce_validator_builder: None,
 			warp_sync_params: Some(WarpSyncParams::WithProvider(warp_sync)),
+			block_relay: None,
+			metrics,
 		})?;
 
 	let role = config.role.clone();
@@ -304,10 +343,15 @@ where
 	> = Default::default();
 	let pubsub_notification_sinks = Arc::new(pubsub_notification_sinks);
 	let prometheus_registry = config.prometheus_registry().cloned();
-	let filter_pool: Option<FilterPool> = Some(Arc::new(Mutex::new(BTreeMap::new())));
-	let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
-	let fee_history_cache_limit: FeeHistoryCacheLimit = 1000;
-	let overrides = overrides_handle(client.clone());
+	let frontier_backend = Arc::new(frontier_backend);
+	let storage_override = Arc::new(StorageOverrideHandler::new(client.clone()));
+	let block_data_cache = Arc::new(fc_rpc::EthBlockDataCacheTask::new(
+		task_manager.spawn_handle(),
+		storage_override.clone(),
+		eth_config.eth_log_block_cache,
+		eth_config.eth_statuses_cache,
+		prometheus_registry.clone(),
+	));
 
 	let slot_duration = babe_link.config().slot_duration();
 	let target_gas_price = eth_config.target_gas_price;
@@ -325,6 +369,12 @@ where
 		Ok((slot, timestamp, dynamic_fee))
 	};
 
+	let FrontierPartialComponents {
+		filter_pool,
+		fee_history_cache,
+		fee_history_cache_limit,
+	} = new_frontier_partial(&eth_config)?;
+
 	// for ethereum-compatibility rpc.
 	config.rpc_id_provider = Some(Box::new(fc_rpc::EthereumSubIdProvider)); // Need to check??
 
@@ -339,17 +389,11 @@ where
 		enable_dev_signer: eth_config.enable_dev_signer,
 		network: network.clone(),
 		sync: sync_service.clone(),
-		frontier_backend: match frontier_backend.clone() {
-			fc_db::Backend::KeyValue(b) => Arc::new(b),
+		frontier_backend: match &*frontier_backend {
+			fc_db::Backend::KeyValue(b) => b.clone(),
 		},
-		overrides: overrides.clone(),
-		block_data_cache: Arc::new(fc_rpc::EthBlockDataCacheTask::new(
-			task_manager.spawn_handle(),
-			overrides.clone(),
-			eth_config.eth_log_block_cache,
-			eth_config.eth_statuses_cache,
-			prometheus_registry.clone(),
-		)),
+		storage_override: storage_override.clone(),
+		block_data_cache: block_data_cache.clone(),
 		filter_pool: filter_pool.clone(),
 		max_past_logs: eth_config.max_past_logs,
 		fee_history_cache: fee_history_cache.clone(),
@@ -370,17 +414,11 @@ where
 		enable_dev_signer: eth_config.enable_dev_signer,
 		network: network.clone(),
 		sync: sync_service.clone(),
-		frontier_backend: match frontier_backend.clone() {
-			fc_db::Backend::KeyValue(b) => Arc::new(b),
+		frontier_backend: match &*frontier_backend {
+			fc_db::Backend::KeyValue(b) => b.clone(),
 		},
-		overrides: overrides.clone(),
-		block_data_cache: Arc::new(fc_rpc::EthBlockDataCacheTask::new(
-			task_manager.spawn_handle(),
-			overrides.clone(),
-			eth_config.eth_log_block_cache,
-			eth_config.eth_statuses_cache,
-			prometheus_registry.clone(),
-		)),
+		storage_override: storage_override.clone(),
+		block_data_cache: block_data_cache.clone(),
 		filter_pool: filter_pool.clone(),
 		max_past_logs: eth_config.max_past_logs,
 		fee_history_cache: fee_history_cache.clone(),
@@ -400,17 +438,11 @@ where
 		enable_dev_signer: eth_config.enable_dev_signer,
 		network: network.clone(),
 		sync: sync_service.clone(),
-		frontier_backend: match frontier_backend.clone() {
-			fc_db::Backend::KeyValue(b) => Arc::new(b),
+		frontier_backend: match &*frontier_backend {
+			fc_db::Backend::KeyValue(b) => b.clone(),
 		},
-		overrides: overrides.clone(),
-		block_data_cache: Arc::new(fc_rpc::EthBlockDataCacheTask::new(
-			task_manager.spawn_handle(),
-			overrides.clone(),
-			eth_config.eth_log_block_cache,
-			eth_config.eth_statuses_cache,
-			prometheus_registry.clone(),
-		)),
+		storage_override: storage_override.clone(),
+		block_data_cache: block_data_cache.clone(),
 		filter_pool: filter_pool.clone(),
 		max_past_logs: eth_config.max_past_logs,
 		fee_history_cache: fee_history_cache.clone(),
@@ -491,10 +523,6 @@ where
 	let shared_voter_state = rpc_setup;
 
 	let backends = backend.clone();
-	let overrides = overrides_handle(client.clone());
-	let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
-	let fee_history_cache_limit: FeeHistoryCacheLimit = 1000;
-	let filter_pool: Option<FilterPool> = Some(Arc::new(Mutex::new(BTreeMap::new())));
 
 	spawn_frontier_tasks(
 		&task_manager,
@@ -502,7 +530,7 @@ where
 		backends,
 		frontier_backend,
 		filter_pool,
-		overrides,
+		storage_override,
 		fee_history_cache,
 		fee_history_cache_limit,
 		sync_service.clone(),
@@ -511,10 +539,14 @@ where
 
 	if let Some(hwbench) = hwbench {
 		sc_sysinfo::print_hwbench(&hwbench);
-		if !SUBSTRATE_REFERENCE_HARDWARE.check_hardware(&hwbench) && role.is_authority() {
-			log::warn!(
-				"⚠️  The hardware does not meet the minimal requirements for role 'Authority'."
-			);
+		match SUBSTRATE_REFERENCE_HARDWARE.check_hardware(&hwbench) {
+			Err(err) if role.is_authority() => {
+				log::warn!(
+					"⚠️  The hardware does not meet the minimal requirements {} for role 'Authority'.",
+					err
+				);
+			},
+			_ => {},
 		}
 
 		if let Some(ref mut telemetry) = telemetry {
@@ -604,7 +636,7 @@ where
 					..Default::default()
 				},
 				client.clone(),
-				network.clone(),
+				Arc::new(network.clone()),
 				Box::pin(dht_event_stream),
 				authority_discovery_role,
 				prometheus_registry.clone(),
@@ -645,6 +677,7 @@ where
 			link: grandpa_link,
 			network: network.clone(),
 			sync: Arc::new(sync_service.clone()),
+			notification_service: grandpa_notification_service,
 			telemetry: telemetry.as_ref().map(|x| x.handle()),
 			voting_rule: grandpa::VotingRulesBuilder::default().build(),
 			prometheus_registry: prometheus_registry.clone(),
@@ -672,7 +705,7 @@ where
 				transaction_pool: Some(OffchainTransactionPoolFactory::new(
 					transaction_pool.clone(),
 				)),
-				network_provider: network.clone(),
+				network_provider: Arc::new(network.clone()),
 				is_validator: role.is_authority(),
 				enable_http_requests: true,
 				custom_extensions: |_| vec![],
@@ -683,7 +716,14 @@ where
 	}
 
 	network_starter.start_network();
-	Ok(task_manager)
+	Ok(NewFullBase {
+		task_manager,
+		client,
+		network,
+		sync: sync_service,
+		transaction_pool,
+		rpc_handlers,
+	})
 }
 
 /// Builds a new object suitable for chain operations.
@@ -742,7 +782,7 @@ where
 /// Builds a new service for a full client.
 pub fn new_full<RuntimeApi, Executor>(
 	config: Configuration,
-	disable_hardware_benchmarks: bool,
+	cli: Cli,
 	eth_config: EthConfiguration,
 ) -> Result<TaskManager, ServiceError>
 where
@@ -754,10 +794,38 @@ where
 	RuntimeApi::RuntimeApi: sp_authority_discovery::AuthorityDiscoveryApi<Block>,
 	Executor: sc_executor::NativeExecutionDispatch + 'static,
 {
-	new_full_base::<RuntimeApi, Executor>(
-		config,
-		disable_hardware_benchmarks,
-		|_, _| (),
-		eth_config,
-	)
+	let database_path = config.database.path().map(Path::to_path_buf);
+
+	let task_manager =
+		match config.network.network_backend {
+			sc_network::config::NetworkBackendType::Libp2p => {
+				let task_manager = new_full_base::<
+					sc_network::NetworkWorker<_, _>,
+					RuntimeApi,
+					Executor,
+				>(config, cli.no_hardware_benchmarks, |_, _| (), eth_config)
+				.map(|NewFullBase { task_manager, .. }| task_manager)?;
+				task_manager
+			},
+			sc_network::config::NetworkBackendType::Litep2p => {
+				let task_manager = new_full_base::<
+					sc_network::Litep2pNetworkBackend,
+					RuntimeApi,
+					Executor,
+				>(config, cli.no_hardware_benchmarks, |_, _| (), eth_config)
+				.map(|NewFullBase { task_manager, .. }| task_manager)?;
+				task_manager
+			},
+		};
+
+	if let Some(database_path) = database_path {
+		sc_storage_monitor::StorageMonitorService::try_spawn(
+			cli.storage_monitor,
+			database_path,
+			&task_manager.spawn_essential_handle(),
+		)
+		.map_err(|e| ServiceError::Application(e.into()))?;
+	}
+
+	Ok(task_manager)
 }

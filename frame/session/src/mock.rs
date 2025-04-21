@@ -24,20 +24,12 @@ use crate::historical as pallet_session_historical;
 
 use std::collections::BTreeMap;
 
-use sp_core::{crypto::key_types::DUMMY, H256};
-use sp_runtime::{
-	impl_opaque_keys,
-	testing::UintAuthorityId,
-	traits::{BlakeTwo256, IdentityLookup},
-	BuildStorage,
-};
+use sp_core::crypto::key_types::DUMMY;
+use sp_runtime::{impl_opaque_keys, testing::UintAuthorityId, BuildStorage};
 use sp_staking::SessionIndex;
 use sp_state_machine::BasicExternalities;
 
-use frame_support::{
-	parameter_types,
-	traits::{ConstU32, ConstU64},
-};
+use frame_support::{derive_impl, parameter_types, traits::ConstU64};
 
 impl_opaque_keys! {
 	pub struct MockSessionKeys {
@@ -82,9 +74,9 @@ type Block = frame_system::mocking::MockBlock<Test>;
 frame_support::construct_runtime!(
 	pub enum Test
 	{
-		System: frame_system::{Pallet, Call, Config<T>, Storage, Event<T>},
-		Session: pallet_session::{Pallet, Call, Storage, Event, Config<T>},
-		Historical: pallet_session_historical::{Pallet},
+		System: frame_system,
+		Session: pallet_session,
+		Historical: pallet_session_historical,
 	}
 );
 
@@ -92,8 +84,8 @@ frame_support::construct_runtime!(
 frame_support::construct_runtime!(
 	pub enum Test
 	{
-		System: frame_system::{Pallet, Call, Config<T>, Storage, Event<T>},
-		Session: pallet_session::{Pallet, Call, Storage, Event, Config<T>},
+		System: frame_system,
+		Session: pallet_session,
 	}
 );
 
@@ -232,30 +224,9 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
 	sp_io::TestExternalities::new(t)
 }
 
+#[derive_impl(frame_system::config_preludes::TestDefaultConfig)]
 impl frame_system::Config for Test {
-	type BaseCallFilter = frame_support::traits::Everything;
-	type BlockWeights = ();
-	type BlockLength = ();
-	type DbWeight = ();
-	type RuntimeOrigin = RuntimeOrigin;
-	type Nonce = u64;
-	type RuntimeCall = RuntimeCall;
-	type Hash = H256;
-	type Hashing = BlakeTwo256;
-	type AccountId = u64;
-	type Lookup = IdentityLookup<Self::AccountId>;
 	type Block = Block;
-	type RuntimeEvent = RuntimeEvent;
-	type BlockHashCount = ConstU64<250>;
-	type Version = ();
-	type PalletInfo = PalletInfo;
-	type AccountData = ();
-	type OnNewAccount = ();
-	type OnKilledAccount = ();
-	type SystemWeightInfo = ();
-	type SS58Prefix = ();
-	type OnSetCode = ();
-	type MaxConsumers = ConstU32<16>;
 }
 
 impl pallet_timestamp::Config for Test {
@@ -287,7 +258,7 @@ parameter_types! {
 pub struct MyAllSessionHandler;
 impl OneSessionHandlerAll<u64> for MyAllSessionHandler {
 	type Key = UintAuthorityId;
-	fn on_new_session_all<'a, I: 'a>(changed: bool, validators: I, queued_validators: I)
+	fn on_new_session_all<'a, I: 'a>(_: bool, _: I, _: I)
 	where
 		I: Iterator<Item = (&'a u64, Self::Key)>,
 		u64: 'a,
@@ -322,7 +293,7 @@ impl frame_election_provider_support::ElectionDataProvider for TestElectionDP {
 	> {
 		frame_election_provider_support::data_provider::Result::Err("not implemented!!")
 	}
-	fn next_election_prediction(now: Self::BlockNumber) -> Self::BlockNumber {
+	fn next_election_prediction(_: Self::BlockNumber) -> Self::BlockNumber {
 		0u64
 	}
 }

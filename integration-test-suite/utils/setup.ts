@@ -194,6 +194,7 @@ export function start5ireChainNode(
       `${gitRoot}/tmp/fire/${authority}`,
       `--rpc-port=${ports[authority].ws}`,
       `--port=${ports[authority].p2p}`,
+      `--unsafe-force-node-key-generation`,
       ...(authority == "alice"
         ? [
             "--node-key",

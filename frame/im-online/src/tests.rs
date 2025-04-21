@@ -21,15 +21,12 @@
 
 use super::*;
 use crate::mock::*;
-use frame_support::{assert_err, assert_noop, dispatch};
+use frame_support::{assert_err, dispatch};
 use sp_core::offchain::{
 	testing::{TestOffchainExt, TestTransactionPoolExt},
 	OffchainDbExt, OffchainWorkerExt, TransactionPoolExt,
 };
-use sp_runtime::{
-	testing::UintAuthorityId,
-	transaction_validity::{InvalidTransaction, TransactionValidityError},
-};
+use sp_runtime::testing::UintAuthorityId;
 
 #[test]
 fn test_unresponsiveness_slash_fraction() {
@@ -261,14 +258,14 @@ fn should_cleanup_received_heartbeats_on_session_end() {
 		let _ = heartbeat(1, 2, 0, 1.into(), Session::validators()).unwrap();
 
 		// the heartbeat is stored
-		assert!(!ImOnline::received_heartbeats(&2, &0).is_none());
+		assert!(!super::pallet::ReceivedHeartbeats::<Runtime>::get(2, 0).is_none());
 
 		advance_session();
 
 		// after the session has ended we have already processed the heartbeat
 		// message, so any messages received on the previous session should have
 		// been pruned.
-		assert!(ImOnline::received_heartbeats(&2, &0).is_none());
+		assert!(super::pallet::ReceivedHeartbeats::<Runtime>::get(2, 0).is_none());
 	});
 }
 
@@ -295,7 +292,6 @@ fn should_mark_online_validator_when_block_is_authored() {
 		ImOnline::note_author(1);
 
 		// then
-		//assert!(ImOnline::is_online(0));
 		assert!(!ImOnline::is_online(1));
 		assert!(!ImOnline::is_online(2));
 	});
@@ -329,7 +325,6 @@ fn should_not_send_a_report_if_already_online() {
 		// we expect error, since the authority is already online.
 		let mut res = ImOnline::send_heartbeats(4).unwrap();
 		assert_eq!(res.next().unwrap().unwrap_err(), OffchainErr::AlreadyOnline(0));
-		// assert_eq!(res.next().unwrap().unwrap_err(), OffchainErr::AlreadyOnline(1));
 		assert_eq!(res.next().unwrap().is_ok(), true);
 		assert_eq!(res.next().unwrap().unwrap_err(), OffchainErr::AlreadyOnline(2));
 		assert_eq!(res.next(), None);
@@ -414,7 +409,7 @@ fn should_handle_non_linear_session_progress() {
 
 		Session::rotate_session();
 
-		// if we don't have valid results for the current session progres then
+		// if we don't have valid results for the current session progress then
 		// we'll fallback to `HeartbeatAfter` and only heartbeat on block 5.
 		MockCurrentSessionProgress::mutate(|p| *p = Some(None));
 		assert_eq!(ImOnline::send_heartbeats(2).err(), Some(OffchainErr::TooEarly));

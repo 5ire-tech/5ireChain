@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: Apache-2.0
 // This file is part of Frontier.
-//
-// Copyright (c) 2020-2022 Parity Technologies (UK) Ltd.
-//
+
+// Copyright (C) Parity Technologies (UK) Ltd.
+// SPDX-License-Identifier: Apache-2.0
+
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 // limitations under the License.
 
 #![cfg_attr(not(feature = "std"), no_std)]
-#![deny(unused_crate_dependencies)]
+#![warn(unused_crate_dependencies)]
 
 extern crate alloc;
 
@@ -28,6 +28,7 @@ mod tests;
 
 use alloc::format;
 use core::marker::PhantomData;
+
 use scale_codec::{Decode, DecodeLimit};
 // Substrate
 use frame_support::{
@@ -72,18 +73,23 @@ where
 			let valid_weight =
 				info.weight.ref_time() <= T::GasWeightMapping::gas_to_weight(gas, false).ref_time();
 			if !valid_weight {
-				return Err(PrecompileFailure::Error { exit_status: ExitError::OutOfGas })
+				return Err(PrecompileFailure::Error {
+					exit_status: ExitError::OutOfGas,
+				});
 			}
 		}
 
 		let origin = T::AddressMapping::into_account_id(context.caller);
 
 		if let Some(err) = DispatchValidator::validate_before_dispatch(&origin, &call) {
-			return Err(err)
+			return Err(err);
 		}
 
-		handle
-			.record_external_cost(Some(info.weight.ref_time()), Some(info.weight.proof_size()))?;
+		handle.record_external_cost(
+			Some(info.weight.ref_time()),
+			Some(info.weight.proof_size()),
+			None,
+		)?;
 
 		match call.dispatch(Some(origin).into()) {
 			Ok(post_info) => {
@@ -93,8 +99,16 @@ where
 					handle.record_cost(cost)?;
 
 					handle.refund_external_cost(
-						Some(info.weight.ref_time().saturating_sub(actual_weight.ref_time())),
-						Some(info.weight.proof_size().saturating_sub(actual_weight.proof_size())),
+						Some(
+							info.weight
+								.ref_time()
+								.saturating_sub(actual_weight.ref_time()),
+						),
+						Some(
+							info.weight
+								.proof_size()
+								.saturating_sub(actual_weight.proof_size()),
+						),
 					);
 				}
 
@@ -102,7 +116,7 @@ where
 					exit_status: ExitSucceed::Stopped,
 					output: Default::default(),
 				})
-			},
+			}
 			Err(e) => Err(PrecompileFailure::Error {
 				exit_status: ExitError::Other(
 					format!("dispatch execution failed: {}", <&'static str>::from(e)).into(),
@@ -133,7 +147,7 @@ where
 		if !(info.pays_fee == Pays::Yes && info.class == DispatchClass::Normal) {
 			return Some(PrecompileFailure::Error {
 				exit_status: ExitError::Other("invalid call".into()),
-			})
+			});
 		}
 		None
 	}

@@ -5,27 +5,28 @@
 // staking activities.
 
 #![cfg_attr(not(feature = "std"), no_std)]
-use frame_support::{ensure, pallet_prelude::DispatchResult};
-pub use pallet::*;
-use pallet_staking::{
-	BalanceOf, CurrentEra, ErasRewardPoints, ErasStakers, Exposure, IndividualExposure, Rewards,
-	Validators,
-};
-use parity_scale_codec::Codec;
-// use crate::migration::migrate_to_v1;
 use frame_support::{
-	pallet_prelude::StorageVersion,
+	ensure,
+	pallet_prelude::{DispatchResult, StorageVersion},
 	traits::{
 		Currency, ExistenceRequirement, ExistenceRequirement::KeepAlive, Get, LockableCurrency,
 		ValidatorSet,
 	},
 	PalletId,
 };
+pub use pallet::*;
+use pallet_staking::{
+	BalanceOf, CurrentEra, ErasRewardPoints, ErasStakersOverview, ErasStakersPaged, Rewards,
+	Validators,
+};
+use parity_scale_codec::Codec;
 use scale_info::prelude::{fmt::Debug, vec::Vec};
 use sp_runtime::{
 	traits::{AccountIdConversion, AtLeast32BitUnsigned, Convert, Zero},
 	FixedPointOperand,
 };
+
+use sp_staking::PagedExposureMetadata;
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
 
@@ -96,14 +97,6 @@ pub mod pallet {
 		type WeightInfo: WeightInfo;
 	}
 
-	// #[pallet::hooks]
-	// impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
-	// 	fn on_runtime_upgrade() -> frame_support::weights::Weight {
-	// 		migrate_to_v1::<T>()
-	// 	}
-
-	// }
-
 	/// The era reward which are distributed among the validator and nominator
 	#[pallet::storage]
 	#[pallet::getter(fn total_rewards)]
@@ -170,6 +163,8 @@ pub mod pallet {
 		WaitTheEraToComplete,
 		/// Insufficient Reward Balance
 		InsufficientRewardBalance,
+		// No Validator is present
+		NoSuchValidator,
 	}
 
 	#[pallet::genesis_config]
@@ -239,59 +234,76 @@ impl<T: Config> Rewards<T::AccountId> for Pallet<T> {
 
 	/// Function for computing the rewards of validators and nominators at the end of each era
 	fn calculate_reward() -> DispatchResult {
-		let validators = T::Validators::validators();
+		let validators = <T as pallet::Config>::Validators::validators();
 
 		validators.iter().for_each(|validator_id| {
-			let validator = T::ValidatorId::convert(validator_id.clone()).unwrap();
+			let validator =
+				<T as pallet::Config>::ValidatorId::convert(validator_id.clone()).unwrap();
 			let validator_points = Self::retrieve_validator_point(validator.clone());
-			let validator_exposure = ErasStakers::<T>::get(Self::current_era(), validator.clone());
-			let total_reward = Self::calculate_era_reward();
-			let validator_era_reward = Self::calculate_validator_era_reward(
-				validator_points.into(),
-				validator_exposure.total,
-				total_reward,
-			);
-			let nominators = Self::check_nominators(validator.clone());
-			if nominators.is_empty() {
+			if let Some(validator_exposure) =
+				ErasStakersOverview::<T>::get(Self::current_era(), validator.clone())
+			{
+				let total_reward = Self::calculate_era_reward();
+				let validator_era_reward = Self::calculate_validator_era_reward(
+					validator_points.into(),
+					validator_exposure.total,
+					total_reward,
+				);
+				let nominators_count = Self::check_nominators(validator.clone());
+				if nominators_count.is_zero() {
+					Self::allocate_rewards(
+						validator.clone(),
+						None,
+						Self::convert_float64_to_unsigned128(validator_era_reward).into(),
+					);
+					return;
+				}
+				let (total_validator_reward, remaining_reward_for_nominators) =
+					Self::calculate_validator_commission_reward(
+						validator.clone(),
+						validator_era_reward,
+						validator_exposure.clone(),
+					);
 				Self::allocate_rewards(
 					validator.clone(),
 					None,
-					Self::convert_float64_to_unsigned128(validator_era_reward).into(),
+					Self::convert_float64_to_unsigned128(total_validator_reward).into(),
 				);
-				return;
-			}
-			let (total_validator_reward, remaining_reward_for_nominators) =
-				Self::calculate_validator_commission_reward(
-					validator.clone(),
-					validator_era_reward,
-					validator_exposure.clone(),
-				);
-			Self::allocate_rewards(
-				validator.clone(),
-				None,
-				Self::convert_float64_to_unsigned128(total_validator_reward).into(),
-			);
-			if remaining_reward_for_nominators.is_zero() {
-				return;
-			}
-			nominators.iter().for_each(|nominator| {
-				let mut current_nominators = EraReward::<T>::get(validator.clone());
-				if !current_nominators.contains(&nominator.who.clone()) {
-					current_nominators.push(nominator.who.clone());
-					EraReward::<T>::insert(validator.clone(), current_nominators);
+				if remaining_reward_for_nominators.is_zero() {
+					return;
 				}
-				let nominator_stake = nominator.value;
-				let nominator_reward = Self::calculate_reward_share(
-					nominator_stake.into(),
-					validator_exposure.total.into(),
-					remaining_reward_for_nominators.into(),
-				);
-				Self::allocate_rewards(
-					validator.clone(),
-					Some(nominator.who.clone()),
-					Self::convert_float64_to_unsigned128(nominator_reward).into(),
-				);
-			});
+
+				if let Some(nominator) =
+					ErasStakersPaged::<T>::get((Self::current_era(), validator.clone(), 0))
+				{
+					nominator.others.iter().for_each(|nominator| {
+						let mut current_nominators = EraReward::<T>::get(validator.clone());
+						if !current_nominators.contains(&nominator.who.clone()) {
+							current_nominators.push(nominator.who.clone());
+							EraReward::<T>::insert(validator.clone(), current_nominators);
+						}
+						let nominator_stake = nominator.value;
+						let nominator_reward = Self::calculate_reward_share(
+							nominator_stake.into(),
+							validator_exposure.total.into(),
+							remaining_reward_for_nominators.into(),
+						);
+						Self::allocate_rewards(
+							validator.clone(),
+							Some(nominator.who.clone()),
+							Self::convert_float64_to_unsigned128(nominator_reward).into(),
+						);
+					});
+				} else {
+					log::info!(
+						"No nominators data found for validator: {:?} in era: {:?}",
+						validator,
+						Self::current_era()
+					);
+				}
+			} else {
+				log::info!("Exposure not found for the validator {:?}", validator);
+			}
 		});
 		Ok(())
 	}
@@ -325,7 +337,7 @@ impl<T: Config> Pallet<T> {
 			ensure!(free_balance >= validator_reward, Error::<T>::InsufficientRewardBalance);
 			return Ok(());
 		}
-		let mut total_nominator_reward: T::Balance = 0u128.into();
+		let mut total_nominator_reward: T::Balance = (0u128).into();
 		nominators.iter().for_each(|nominator| {
 			let nominator_reward = NominatorEarningsAccount::<T>::get(validator.clone(), nominator);
 			total_nominator_reward += nominator_reward;
@@ -381,7 +393,7 @@ impl<T: Config> Pallet<T> {
 	fn calculate_validator_commission_reward(
 		validator: T::AccountId,
 		validator_era_reward: f64,
-		exposure: Exposure<<T as frame_system::Config>::AccountId, BalanceOf<T>>,
+		exposure: PagedExposureMetadata<BalanceOf<T>>,
 	) -> (f64, f64) {
 		let validator_commission = Self::validator_commission(validator.clone());
 		let validator_share =
@@ -495,20 +507,22 @@ impl<T: Config> Pallet<T> {
 		era_reward: f64,
 	) -> f64 {
 		let era_reward_points = <ErasRewardPoints<T>>::get(Self::active_era());
-		let validator_points_stake = validator_points as u128 + validator_stake.into();
+		let validator_points_stake = (validator_points as u128) + validator_stake.into();
 		let total_stake = pallet_staking::ErasTotalStake::<T>::get(Self::current_era());
-		let total_points = era_reward_points.total as u128 + total_stake.into();
+		let total_points = (era_reward_points.total as u128) + total_stake.into();
 		let reward =
 			((validator_points_stake as f64) / (total_points as f64)) * (era_reward as f64);
 		reward
 	}
 
 	/// Determine whether the validator has nominators in the current era.
-	fn check_nominators(
-		validator: T::AccountId,
-	) -> Vec<IndividualExposure<T::AccountId, <T as pallet_staking::Config>::CurrencyBalance>> {
-		let exposure = ErasStakers::<T>::get(Self::current_era(), validator.clone());
-		let nominators = exposure.others;
-		nominators
+	fn check_nominators(validator: T::AccountId) -> u32 {
+		let mut default_nominator_count = 0;
+		if let Some(exposure) =
+			ErasStakersOverview::<T>::get(Self::current_era(), validator.clone())
+		{
+			default_nominator_count = exposure.nominator_count;
+		}
+		default_nominator_count
 	}
 }

@@ -17,16 +17,17 @@
 
 //! Some configurable implementations as associated type for the substrate runtime.
 
+use crate::{
+	AccountId, AllianceCollective, AllianceMotion, Authorship, Balances, Hash, NegativeImbalance,
+	Runtime, RuntimeCall,
+};
 use frame_support::{
 	pallet_prelude::*,
 	traits::{Currency, OnUnbalanced},
 };
 use pallet_alliance::{IdentityVerifier, ProposalIndex, ProposalProvider};
+use pallet_identity::legacy::IdentityField;
 use sp_std::prelude::*;
-
-use crate::{
-	AccountId, AllianceMotion, Authorship, Balances, Hash, NegativeImbalance, RuntimeCall,
-};
 
 pub struct Author;
 impl OnUnbalanced<NegativeImbalance> for Author {
@@ -39,14 +40,13 @@ impl OnUnbalanced<NegativeImbalance> for Author {
 
 pub struct AllianceIdentityVerifier;
 impl IdentityVerifier<AccountId> for AllianceIdentityVerifier {
-	fn has_identity(who: &AccountId, fields: u64) -> bool {
-		crate::Identity::has_identity(who, fields)
+	fn has_required_identities(who: &AccountId) -> bool {
+		crate::Identity::has_identity(who, (IdentityField::Display | IdentityField::Web).bits())
 	}
-
 	fn has_good_judgement(who: &AccountId) -> bool {
 		use pallet_identity::Judgement;
 		crate::Identity::identity(who)
-			.map(|registration| registration.judgements)
+			.map(|(registration, _)| registration.judgements)
 			.map_or(false, |judgements| {
 				judgements
 					.iter()
@@ -89,7 +89,7 @@ impl ProposalProvider<AccountId, Hash, RuntimeCall> for AllianceProposalProvider
 	}
 
 	fn proposal_of(proposal_hash: Hash) -> Option<RuntimeCall> {
-		AllianceMotion::proposal_of(proposal_hash)
+		pallet_collective::ProposalOf::<Runtime, AllianceCollective>::get(proposal_hash)
 	}
 }
 

@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: Apache-2.0
 // This file is part of Frontier.
-//
-// Copyright (c) 2020-2022 Parity Technologies (UK) Ltd.
-//
+
+// Copyright (C) Parity Technologies (UK) Ltd.
+// SPDX-License-Identifier: Apache-2.0
+
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16,11 +16,12 @@
 // limitations under the License.
 
 #![cfg_attr(not(feature = "std"), no_std)]
-#![deny(unused_crate_dependencies)]
+#![warn(unused_crate_dependencies)]
 
 extern crate alloc;
 
 use alloc::vec::Vec;
+
 use ed25519_dalek::{Signature, Verifier, VerifyingKey};
 use fp_evm::{ExitError, ExitSucceed, LinearCostPrecompile, PrecompileFailure};
 
@@ -34,7 +35,7 @@ impl LinearCostPrecompile for Ed25519Verify {
 		if input.len() < 128 {
 			return Err(PrecompileFailure::Error {
 				exit_status: ExitError::Other("input must contain 128 bytes".into()),
-			})
+			});
 		};
 
 		let mut i = [0u8; 128];
@@ -74,7 +75,7 @@ mod tests {
 		match Ed25519Verify::execute(&input, cost) {
 			Ok((_, _)) => {
 				panic!("Test not expected to pass");
-			},
+			}
 			Err(e) => {
 				assert_eq!(
 					e,
@@ -83,12 +84,13 @@ mod tests {
 					}
 				);
 				Ok(())
-			},
+			}
 		}
 	}
 
 	#[test]
 	fn test_verify() -> Result<(), PrecompileFailure> {
+		#[allow(clippy::zero_prefixed_literal)]
 		let secret_key_bytes: [u8; ed25519_dalek::SECRET_KEY_LENGTH] = [
 			157, 097, 177, 157, 239, 253, 090, 096, 186, 132, 074, 244, 146, 236, 044, 196, 068,
 			073, 197, 105, 123, 050, 105, 025, 112, 059, 172, 003, 028, 174, 127, 096,
@@ -120,8 +122,10 @@ mod tests {
 				assert_eq!(output[1], 0u8);
 				assert_eq!(output[2], 0u8);
 				assert_eq!(output[3], 0u8);
-			},
-			Err(e) => return Err(e),
+			}
+			Err(e) => {
+				return Err(e);
+			}
 		};
 
 		// try again with a different message
@@ -140,8 +144,10 @@ mod tests {
 				assert_eq!(output[1], 0u8);
 				assert_eq!(output[2], 0u8);
 				assert_eq!(output[3], 1u8); // non-zero indicates error (in our case, 1)
-			},
-			Err(e) => return Err(e),
+			}
+			Err(e) => {
+				return Err(e);
+			}
 		};
 
 		Ok(())

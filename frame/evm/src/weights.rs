@@ -36,7 +36,7 @@
 // --wasm-execution=compiled
 // --output=weights.rs
 // --header=HEADER-APACHE2
-// --template=./.maintain/frame-weight-template.hbs
+// --template=./.scripts/frame-weight-template.hbs
 
 #![cfg_attr(rustfmt, rustfmt_skip)]
 #![allow(unused_parens)]
@@ -49,7 +49,6 @@ use core::marker::PhantomData;
 /// Weight functions needed for pallet_evm.
 pub trait WeightInfo {
 	fn withdraw() -> Weight;
-	fn deposit() -> Weight;
 }
 
 /// Weights for pallet_evm using the Substrate node and recommended hardware.
@@ -62,25 +61,11 @@ impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 		// Minimum execution time: 2_000_000 picoseconds.
 		Weight::from_parts(2_000_000, 0)
 	}
-	fn deposit() -> Weight {
-		// Proof Size summary in bytes:
-		//  Measured:  `0`
-		//  Estimated: `0`
-		// Minimum execution time: 2_000_000 picoseconds.
-		Weight::from_parts(2_000_000, 0)
-	}
 }
 
 // For backwards compatibility and tests
 impl WeightInfo for () {
 	fn withdraw() -> Weight {
-		// Proof Size summary in bytes:
-		//  Measured:  `0`
-		//  Estimated: `0`
-		// Minimum execution time: 2_000_000 picoseconds.
-		Weight::from_parts(2_000_000, 0)
-	}
-	fn deposit() -> Weight {
 		// Proof Size summary in bytes:
 		//  Measured:  `0`
 		//  Estimated: `0`

@@ -57,7 +57,7 @@ use crate::{
 use codec::{Decode, Encode, MaxEncodedLen};
 use frame_support::{
 	ensure,
-	traits::{Currency, Defensive, Get, Imbalance, OnUnbalanced},
+	traits::{Currency, Defensive, DefensiveSaturating, Get, Imbalance, OnUnbalanced},
 };
 use scale_info::TypeInfo;
 use sp_runtime::{
@@ -85,7 +85,7 @@ pub(crate) struct SlashingSpan {
 
 impl SlashingSpan {
 	fn contains_era(&self, era: EraIndex) -> bool {
-		self.start <= era && self.length.map_or(true, |l| self.start + l > era)
+		self.start <= era && self.length.map_or(true, |l| self.start.saturating_add(l) > era)
 	}
 }
 
@@ -123,15 +123,15 @@ impl SlashingSpans {
 	// returns `true` if a new span was started, `false` otherwise. `false` indicates
 	// that internal state is unchanged.
 	pub(crate) fn end_span(&mut self, now: EraIndex) -> bool {
-		let next_start = now + 1;
+		let next_start = now.defensive_saturating_add(1);
 		if next_start <= self.last_start {
-			return false;
+			return false
 		}
 
-		let last_length = next_start - self.last_start;
+		let last_length = next_start.defensive_saturating_sub(self.last_start);
 		self.prior.insert(0, last_length);
 		self.last_start = next_start;
-		self.span_index += 1;
+		self.span_index.defensive_saturating_accrue(1);
 		true
 	}
 
@@ -141,9 +141,9 @@ impl SlashingSpans {
 		let mut index = self.span_index;
 		let last = SlashingSpan { index, start: last_start, length: None };
 		let prior = self.prior.iter().cloned().map(move |length| {
-			let start = last_start - length;
+			let start = last_start.defensive_saturating_sub(length);
 			last_start = start;
-			index -= 1;
+			index.defensive_saturating_reduce(1);
 
 			SlashingSpan { index, start, length: Some(length) }
 		});
@@ -164,13 +164,18 @@ impl SlashingSpans {
 		let old_idx = self
 			.iter()
 			.skip(1) // skip ongoing span.
-			.position(|span| span.length.map_or(false, |len| span.start + len <= window_start));
+			.position(|span| {
+				span.length
+					.map_or(false, |len| span.start.defensive_saturating_add(len) <= window_start)
+			});
 
-		let earliest_span_index = self.span_index - self.prior.len() as SpanIndex;
+		let earliest_span_index =
+			self.span_index.defensive_saturating_sub(self.prior.len() as SpanIndex);
 		let pruned = match old_idx {
 			Some(o) => {
 				self.prior.truncate(o);
-				let new_earliest = self.span_index - self.prior.len() as SpanIndex;
+				let new_earliest =
+					self.span_index.defensive_saturating_sub(self.prior.len() as SpanIndex);
 				Some((earliest_span_index, new_earliest))
 			},
 			None => None,
@@ -237,7 +242,7 @@ pub(crate) fn compute_slash<T: Config>(
 		// kick out the validator even if they won't be slashed,
 		// as long as the misbehavior is from their most recent slashing span.
 		kick_out_if_recent::<T>(params);
-		return None;
+		return None
 	}
 
 	let prior_slash_p = ValidatorSlashInEra::<T>::get(&params.slash_era, params.stash)
@@ -259,7 +264,7 @@ pub(crate) fn compute_slash<T: Config>(
 		// pays out some reward even if the latest report is not max-in-era.
 		// we opt to avoid the nominator lookups and edits and leave more rewards
 		// for more drastic misbehavior.
-		return None;
+		return None
 	}
 
 	// apply slash to validator.
@@ -500,7 +505,7 @@ impl<'a, T: 'a + Config> InspectingSpans<'a, T> {
 
 		let reward = if span_record.slashed < slash {
 			// new maximum span slash. apply the difference.
-			let difference = slash - span_record.slashed;
+			let difference = slash.defensive_saturating_sub(span_record.slashed);
 			span_record.slashed = slash;
 
 			// compute reward.
@@ -537,7 +542,7 @@ impl<'a, T: 'a + Config> Drop for InspectingSpans<'a, T> {
 	fn drop(&mut self) {
 		// only update on disk if we slashed this account.
 		if !self.dirty {
-			return;
+			return
 		}
 
 		if let Some((start, end)) = self.spans.prune(self.window_start) {
@@ -597,19 +602,20 @@ pub fn do_slash<T: Config>(
 	slashed_imbalance: &mut NegativeImbalanceOf<T>,
 	slash_era: EraIndex,
 ) {
-	let controller = match <Pallet<T>>::bonded(stash).defensive() {
-		None => return,
-		Some(c) => c,
-	};
-
-	let mut ledger = match <Pallet<T>>::ledger(&controller) {
-		Some(ledger) => ledger,
-		None => return, // nothing to do.
-	};
+	let mut ledger =
+		match Pallet::<T>::ledger(sp_staking::StakingAccount::Stash(stash.clone())).defensive() {
+			Ok(ledger) => ledger,
+			Err(_) => return, // nothing to do.
+		};
 
 	let value = ledger.slash(value, T::Currency::minimum_balance(), slash_era);
+	if value.is_zero() {
+		// nothing to do
+		return
+	}
 
-	if !value.is_zero() {
+	// Skip slashing for virtual stakers. The pallets managing them should handle the slashing.
+	if !Pallet::<T>::is_virtual_staker(stash) {
 		let (imbalance, missing) = T::Currency::slash(stash, value);
 		slashed_imbalance.subsume(imbalance);
 
@@ -617,15 +623,14 @@ pub fn do_slash<T: Config>(
 			// deduct overslash from the reward payout
 			*reward_payout = reward_payout.saturating_sub(missing);
 		}
-
-		<Pallet<T>>::update_ledger(&controller, &ledger);
-
-		// trigger the event
-		<Pallet<T>>::deposit_event(super::Event::<T>::Slashed {
-			staker: stash.clone(),
-			amount: value,
-		});
 	}
+
+	let _ = ledger
+		.update()
+		.defensive_proof("ledger fetched from storage so it exists in storage; qed.");
+
+	// trigger the event
+	<Pallet<T>>::deposit_event(super::Event::<T>::Slashed { staker: stash.clone(), amount: value });
 }
 
 /// Apply a previously-unapplied slash.
@@ -667,7 +672,7 @@ fn pay_reporters<T: Config>(
 		// nobody to pay out to or nothing to pay;
 		// just treat the whole value as slashed.
 		T::Slash::on_unbalanced(slashed_imbalance);
-		return;
+		return
 	}
 
 	// take rewards out of the slashed imbalance.

@@ -81,7 +81,6 @@ pub mod migration;
 mod mock;
 mod tests;
 pub mod weights;
-
 use codec::{Decode, Encode, MaxEncodedLen};
 use frame_election_provider_support::{
 	bounds::{CountBound, SizeBound},
@@ -274,7 +273,7 @@ pub type ValidatorsListsTuple<T> = (
 pub mod pallet {
 	use super::*;
 
-	/// The current storage version.
+	/// The in-code storage version.
 	const STORAGE_VERSION: StorageVersion = StorageVersion::new(1);
 
 	#[pallet::pallet]
@@ -351,12 +350,6 @@ pub mod pallet {
 			BlockNumber = BlockNumberFor<Self>,
 		>;
 
-		// /// Something that will provide the election data.
-		// type AuthDataProvider: ElectionDataProvider<
-		// AccountId = Self::AuthorityId,
-		// BlockNumber = Self::BlockNumber,
-		// >;
-
 		/// Bounds the number of targets, when calling into [`Config::DataProvider`]. It might be
 		/// overwritten in the `InstantElectionProvider` impl.
 		type TargetsBound: Get<u32>;
@@ -375,7 +368,7 @@ pub mod pallet {
 		SomeOffline {
 			offline: Vec<IdentificationTuple<T>>,
 		},
-
+		// End of Session
 		EndSession {
 			s_idx: SessionIndex,
 			all_offenders: Vec<ValidatorId<T>>,
@@ -423,26 +416,22 @@ pub mod pallet {
 	/// progress estimate from `NextSessionRotation`, as those estimates should be
 	/// more accurate then the value we calculate for `HeartbeatAfter`.
 	#[pallet::storage]
-	#[pallet::getter(fn heartbeat_after)]
-	pub(super) type HeartbeatAfter<T: Config> = StorageValue<_, BlockNumberFor<T>, ValueQuery>;
+	pub type HeartbeatAfter<T: Config> = StorageValue<_, BlockNumberFor<T>, ValueQuery>;
 
 	/// The current set of keys that may issue a heartbeat.
 	#[pallet::storage]
-	#[pallet::getter(fn keys)]
-	pub(super) type Keys<T: Config> =
+	pub type Keys<T: Config> =
 		StorageValue<_, WeakBoundedVec<T::AuthorityId, T::MaxKeys>, ValueQuery>;
 
 	/// For each session index, we keep a mapping of `SessionIndex` and `AuthIndex`.
 	#[pallet::storage]
-	#[pallet::getter(fn received_heartbeats)]
-	pub(super) type ReceivedHeartbeats<T: Config> =
+	pub type ReceivedHeartbeats<T: Config> =
 		StorageDoubleMap<_, Twox64Concat, SessionIndex, Twox64Concat, AuthIndex, bool>;
 
 	/// For each session index, we keep a mapping of `ValidatorId<T>` to the
 	/// number of blocks authored by the given authority.
 	#[pallet::storage]
-	#[pallet::getter(fn authored_blocks)]
-	pub(super) type AuthoredBlocks<T: Config> = StorageDoubleMap<
+	pub type AuthoredBlocks<T: Config> = StorageDoubleMap<
 		_,
 		Twox64Concat,
 		SessionIndex,
@@ -488,7 +477,6 @@ pub mod pallet {
 			let current_session = T::ValidatorSet::session_index();
 			let exists =
 				ReceivedHeartbeats::<T>::contains_key(current_session, heartbeat.authority_index);
-			// session keys
 			let keys = AllKeys::<T>::get();
 			let public = keys.get(heartbeat.authority_index as usize);
 			if let (false, Some(public)) = (exists, public) {
@@ -542,19 +530,19 @@ pub mod pallet {
 			if let Call::heartbeat { heartbeat, signature } = call {
 				if <Pallet<T>>::is_online(heartbeat.authority_index) {
 					// we already received a heartbeat for this authority
-					return InvalidTransaction::Stale.into();
+					return InvalidTransaction::Stale.into()
 				}
 
 				// check if session index from heartbeat is recent
 				let current_session = T::ValidatorSet::session_index();
 				if heartbeat.session_index != current_session {
-					return InvalidTransaction::Stale.into();
+					return InvalidTransaction::Stale.into()
 				}
 
 				// verify that the incoming (unverified) pubkey is actually an authority id
 				let keys = AllKeys::<T>::get();
 				if keys.len() as u32 != heartbeat.validators_len {
-					return InvalidTransaction::Custom(INVALID_VALIDATORS_LEN).into();
+					return InvalidTransaction::Custom(INVALID_VALIDATORS_LEN).into()
 				}
 				let authority_id = match keys.get(heartbeat.authority_index as usize) {
 					Some(id) => id,
@@ -567,7 +555,7 @@ pub mod pallet {
 				});
 
 				if !signature_valid {
-					return InvalidTransaction::BadProof.into();
+					return InvalidTransaction::BadProof.into()
 				}
 
 				ValidTransaction::with_tag_prefix("ImOnline")
@@ -704,7 +692,7 @@ impl<T: Config> Pallet<T> {
 		};
 
 		if !should_heartbeat {
-			return Err(OffchainErr::TooEarly);
+			return Err(OffchainErr::TooEarly)
 		}
 
 		let session_index = T::ValidatorSet::session_index();
@@ -739,14 +727,14 @@ impl<T: Config> Pallet<T> {
 		};
 
 		if Self::is_online(authority_index) {
-			return Err(OffchainErr::AlreadyOnline(authority_index));
+			return Err(OffchainErr::AlreadyOnline(authority_index))
 		}
 
 		// acquire lock for that authority at current heartbeat to make sure we don't
 		// send concurrent heartbeats.
 		Self::with_heartbeat_lock(authority_index, session_index, block_number, || {
 			let call = prepare_heartbeat()?;
-			log::error!(
+			log::info!(
 				target: "runtime::im-online",
 				"[index: {:?}] Reporting im-online at block: {:?} (session: {:?}): {:?}",
 				authority_index,
@@ -813,7 +801,7 @@ impl<T: Config> Pallet<T> {
 			},
 		);
 		if let Err(MutateStorageError::ValueFunctionFailed(err)) = res {
-			return Err(err);
+			return Err(err)
 		}
 
 		let mut new_status = res.map_err(|_| OffchainErr::FailedToAcquireLock)?;

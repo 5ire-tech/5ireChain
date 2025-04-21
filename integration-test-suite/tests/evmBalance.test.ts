@@ -77,18 +77,23 @@ describe("EVM related Balance using web3js/ethersjs", function () {
     await sleep(3 * SECONDS);
     // ALICE_ACCOUNT_BALANCE - (21000 * gasPrice) - value;
 
-    // const expectedAliceBalance = (
-    //   BigInt(INITIAL_ALICE_BALANCE) -
-    //   BigInt(21000) * BigInt(gasPrice) -
-    //   BigInt(web3.utils.toWei(TRANFER_VALUE, "ether"))
-    // ).toString();
-    const expectedTestBalance = (
-      Number(web3.utils.toWei(TRANFER_VALUE, "ether")) - EXISTENTIAL_DEPOSIT
+    const expectedAliceBalance = (
+      BigInt(INITIAL_ALICE_BALANCE) -
+      BigInt(21000) * BigInt(gasPrice) -
+      BigInt(web3.utils.toWei(TRANFER_VALUE, "ether"))
     ).toString();
 
-    // expect(await web3.eth.getBalance(alith.address)).to.equal(
-    //   expectedAliceBalance
-    // );
+
+
+    expect(await web3.eth.getBalance(alith.address)).to.equal(
+      expectedAliceBalance
+    );
+
+    const expectedTestBalance = (
+      BigInt(web3.utils.toWei(TRANFER_VALUE, "ether")) -
+      BigInt(EXISTENTIAL_DEPOSIT)
+    ).toString();
+
     expect(await web3.eth.getBalance(TEST_ACCOUNT)).to.equal(
       expectedTestBalance,
     );

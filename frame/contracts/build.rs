@@ -41,7 +41,7 @@ fn get_latest_version() -> u16 {
 					path
 				);
 
-				return Some(version);
+				return Some(version)
 			}
 			None
 		})
@@ -68,6 +68,5 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		version - 1,
 	)?;
 
-	println!("cargo:rerun-if-changed=src/migration");
 	Ok(())
 }

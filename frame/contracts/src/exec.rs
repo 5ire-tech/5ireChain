@@ -16,12 +16,13 @@
 // limitations under the License.
 
 use crate::{
-	debug::{CallSpan, Tracing},
+	debug::{CallInterceptor, CallSpan, Tracing},
 	gas::GasMeter,
+	primitives::{ExecReturnValue, StorageDeposit},
 	storage::{self, meter::Diff, WriteOutcome},
 	BalanceOf, CodeHash, CodeInfo, CodeInfoOf, Config, ContractDeployer, ContractInfo,
 	ContractInfoOf, DebugBufferVec, Determinism, Error, Event, Nonce, Origin, Pallet as Contracts,
-	Schedule, WasmBlob, LOG_TARGET,
+	Schedule, LOG_TARGET,
 };
 use frame_support::{
 	crypto::ecdsa::ECDSAExt,
@@ -37,7 +38,6 @@ use frame_support::{
 	Blake2_128Concat, BoundedVec, StorageHasher,
 };
 use frame_system::{pallet_prelude::BlockNumberFor, RawOrigin};
-use pallet_contracts_primitives::{ExecReturnValue, StorageDeposit};
 use smallvec::{Array, SmallVec};
 use sp_core::{
 	ecdsa::Public as ECDSAPublic,
@@ -100,7 +100,7 @@ impl<T: Config> Key<T> {
 /// Call or instantiate both called into other contracts and pass through errors happening
 /// in those to the caller. This enum is for the caller to distinguish whether the error
 /// happened during the execution of the callee or in the current execution context.
-#[cfg_attr(test, derive(Debug, PartialEq))]
+#[derive(Copy, Clone, PartialEq, Eq, Debug, codec::Decode, codec::Encode)]
 pub enum ErrorOrigin {
 	/// Caller error origin.
 	///
@@ -112,7 +112,7 @@ pub enum ErrorOrigin {
 }
 
 /// Error returned by contract execution.
-#[cfg_attr(test, derive(Debug, PartialEq))]
+#[derive(Copy, Clone, PartialEq, Eq, Debug, codec::Decode, codec::Encode)]
 pub struct ExecError {
 	/// The reason why the execution failed.
 	pub error: DispatchError,
@@ -287,11 +287,11 @@ pub trait Ext: sealing::Sealed {
 	/// Returns `true` if debug message recording is enabled. Otherwise `false` is returned.
 	fn append_debug_buffer(&mut self, msg: &str) -> bool;
 
+	/// Returns `true` if debug message recording is enabled. Otherwise `false` is returned.
+	fn debug_buffer_enabled(&self) -> bool;
+
 	/// Call some dispatchable and return the result.
-	fn call_runtime(
-		&self,
-		call: <Self::T as Config>::ContractRuntimeCall,
-	) -> DispatchResultWithPostInfo;
+	fn call_runtime(&self, call: <Self::T as Config>::RuntimeCall) -> DispatchResultWithPostInfo;
 
 	/// Recovers ECDSA compressed public key based on signature and message hash.
 	fn ecdsa_recover(&self, signature: &[u8; 65], message_hash: &[u8; 32]) -> Result<[u8; 33], ()>;
@@ -321,6 +321,22 @@ pub trait Ext: sealing::Sealed {
 	/// Returns a nonce that is incremented for every instantiated contract.
 	fn nonce(&mut self) -> u64;
 
+	/// Increment the reference count of a of a stored code by one.
+	///
+	/// # Errors
+	///
+	/// [`Error::CodeNotFound`] is returned if no stored code found having the specified
+	/// `code_hash`.
+	fn increment_refcount(code_hash: CodeHash<Self::T>) -> Result<(), DispatchError>;
+
+	/// Decrement the reference count of a stored code by one.
+	///
+	/// # Note
+	///
+	/// A contract whose reference count dropped to zero isn't automatically removed. A
+	/// `remove_code` transaction must be submitted by the original uploader to do so.
+	fn decrement_refcount(code_hash: CodeHash<Self::T>);
+
 	/// Adds a delegate dependency to [`ContractInfo`]'s `delegate_dependencies` field.
 	///
 	/// This ensures that the delegated contract is not removed while it is still in use. It
@@ -332,20 +348,20 @@ pub trait Ext: sealing::Sealed {
 	/// - [`Error::<T>::MaxDelegateDependenciesReached`]
 	/// - [`Error::<T>::CannotAddSelfAsDelegateDependency`]
 	/// - [`Error::<T>::DelegateDependencyAlreadyExists`]
-	fn add_delegate_dependency(
+	fn lock_delegate_dependency(
 		&mut self,
 		code_hash: CodeHash<Self::T>,
 	) -> Result<(), DispatchError>;
 
 	/// Removes a delegate dependency from [`ContractInfo`]'s `delegate_dependencies` field.
 	///
-	/// This is the counterpart of [`Self::add_delegate_dependency`]. It decreases the reference
-	/// count and refunds the deposit that was charged by [`Self::add_delegate_dependency`].
+	/// This is the counterpart of [`Self::lock_delegate_dependency`]. It decreases the reference
+	/// count and refunds the deposit that was charged by [`Self::lock_delegate_dependency`].
 	///
 	/// # Errors
 	///
 	/// - [`Error::<T>::DelegateDependencyNotFound`]
-	fn remove_delegate_dependency(
+	fn unlock_delegate_dependency(
 		&mut self,
 		code_hash: &CodeHash<Self::T>,
 	) -> Result<(), DispatchError>;
@@ -383,22 +399,6 @@ pub trait Executable<T: Config>: Sized {
 		code_hash: CodeHash<T>,
 		gas_meter: &mut GasMeter<T>,
 	) -> Result<Self, DispatchError>;
-
-	/// Increment the reference count of a of a stored code by one.
-	///
-	/// # Errors
-	///
-	/// [`Error::CodeNotFound`] is returned if no stored code found having the specified
-	/// `code_hash`.
-	fn increment_refcount(code_hash: CodeHash<T>) -> Result<(), DispatchError>;
-
-	/// Decrement the reference count of a stored code by one.
-	///
-	/// # Note
-	///
-	/// A contract whose reference count dropped to zero isn't automatically removed. A
-	/// `remove_code` transaction must be submitted by the original uploader to do so.
-	fn decrement_refcount(code_hash: CodeHash<T>);
 
 	/// Execute the specified exported function and return the result.
 	///
@@ -531,9 +531,9 @@ enum FrameArgs<'a, T: Config, E> {
 		nonce: u64,
 		/// The executable whose `deploy` function is run.
 		executable: E,
-		/// A salt used in the contract address deriviation of the new contract.
+		/// A salt used in the contract address derivation of the new contract.
 		salt: &'a [u8],
-		/// The input data is used in the contract address deriviation of the new contract.
+		/// The input data is used in the contract address derivation of the new contract.
 		input_data: &'a [u8],
 	},
 }
@@ -733,6 +733,30 @@ where
 		stack.run(executable, input_data).map(|ret| (account_id, ret))
 	}
 
+	#[cfg(feature = "runtime-benchmarks")]
+	pub fn bench_new_call(
+		dest: T::AccountId,
+		origin: Origin<T>,
+		gas_meter: &'a mut GasMeter<T>,
+		storage_meter: &'a mut storage::meter::Meter<T>,
+		schedule: &'a Schedule<T>,
+		value: BalanceOf<T>,
+		debug_message: Option<&'a mut DebugBufferVec<T>>,
+		determinism: Determinism,
+	) -> (Self, E) {
+		Self::new(
+			FrameArgs::Call { dest, cached_info: None, delegated_call: None },
+			origin,
+			gas_meter,
+			storage_meter,
+			schedule,
+			value,
+			debug_message,
+			determinism,
+		)
+		.unwrap()
+	}
+
 	/// Create a new call stack.
 	fn new(
 		args: FrameArgs<T, E>,
@@ -828,7 +852,7 @@ where
 			(matches!(determinism, Determinism::Relaxed) &&
 				matches!(entry_point, ExportedFunction::Call)))
 		{
-			return Err(Error::<T>::Indeterministic.into());
+			return Err(Error::<T>::Indeterministic.into())
 		}
 
 		let frame = Frame {
@@ -837,7 +861,7 @@ where
 			contract_info: CachedContract::Cached(contract_info),
 			account_id,
 			entry_point,
-			nested_gas: gas_meter.nested(gas_limit)?,
+			nested_gas: gas_meter.nested(gas_limit),
 			nested_storage: storage_meter.nested(deposit_limit),
 			allows_reentry: true,
 		};
@@ -854,7 +878,7 @@ where
 		deposit_limit: BalanceOf<T>,
 	) -> Result<E, ExecError> {
 		if self.frames.len() == T::CallStack::size() {
-			return Err(Error::<T>::MaxCallDepthReached.into());
+			return Err(Error::<T>::MaxCallDepthReached.into())
 		}
 
 		// We need to make sure that changes made to the contract info are not discarded.
@@ -911,19 +935,22 @@ where
 			// Every non delegate call or instantiate also optionally transfers the balance.
 			self.initial_transfer()?;
 
-			let call_span =
-				T::Debug::new_call_span(executable.code_hash(), entry_point, &input_data);
+			let contract_address = &top_frame!(self).account_id;
 
-			// Call into the Wasm blob.
-			let output = executable
-				.execute(self, &entry_point, input_data)
-				.map_err(|e| ExecError { error: e.error, origin: ErrorOrigin::Callee })?;
+			let call_span = T::Debug::new_call_span(contract_address, entry_point, &input_data);
+
+			let output = T::Debug::intercept_call(contract_address, &entry_point, &input_data)
+				.unwrap_or_else(|| {
+					executable
+						.execute(self, &entry_point, input_data)
+						.map_err(|e| ExecError { error: e.error, origin: ErrorOrigin::Callee })
+				})?;
 
 			call_span.after_call(&output);
 
 			// Avoid useless work that would be reverted anyways.
 			if output.did_revert() {
-				return Ok(output);
+				return Ok(output)
 			}
 
 			// Storage limit is normally enforced as late as possible (when the last frame returns)
@@ -943,7 +970,7 @@ where
 				(ExportedFunction::Constructor, _) => {
 					// It is not allowed to terminate a contract inside its constructor.
 					if matches!(frame.contract_info, CachedContract::Terminated) {
-						return Err(Error::<T>::TerminatedInConstructor.into());
+						return Err(Error::<T>::TerminatedInConstructor.into())
 					}
 
 					// If a special limit was set for the sub-call, we enforce it here.
@@ -1055,7 +1082,7 @@ where
 
 			// Only gas counter changes are persisted in case of a failure.
 			if !persist {
-				return;
+				return
 			}
 
 			// Record the storage meter changes of the nested call into the parent meter.
@@ -1074,7 +1101,7 @@ where
 				// trigger a rollback.
 				if prev.account_id == *account_id {
 					prev.contract_info = CachedContract::Cached(contract);
-					return;
+					return
 				}
 
 				// Predecessor is a different contract: We persist the info and invalidate the first
@@ -1097,7 +1124,7 @@ where
 			}
 			self.gas_meter.absorb_nested(mem::take(&mut self.first_frame.nested_gas));
 			if !persist {
-				return;
+				return
 			}
 			let mut contract = self.first_frame.contract_info.as_contract();
 			self.storage_meter.absorb(
@@ -1135,7 +1162,7 @@ where
 		// If it is a delegate call, then we've already transferred tokens in the
 		// last non-delegate frame.
 		if frame.delegate_caller.is_some() {
-			return Ok(());
+			return Ok(())
 		}
 
 		let value = frame.value_transferred;
@@ -1215,7 +1242,7 @@ where
 
 		let try_call = || {
 			if !self.allows_reentry(&to) {
-				return Err(<Error<T>>::ReentranceDenied.into());
+				return Err(<Error<T>>::ReentranceDenied.into())
 			}
 			// We ignore instantiate frames in our search for a cached contract.
 			// Otherwise it would be possible to recursively call a contract from its own
@@ -1297,7 +1324,7 @@ where
 
 	fn terminate(&mut self, beneficiary: &AccountIdOf<Self::T>) -> Result<(), DispatchError> {
 		if self.is_recursive() {
-			return Err(Error::<T>::TerminatedWhileReentrant.into());
+			return Err(Error::<T>::TerminatedWhileReentrant.into())
 		}
 		let frame = self.top_frame_mut();
 		let info = frame.terminate();
@@ -1305,10 +1332,10 @@ where
 
 		info.queue_trie_for_deletion();
 		ContractInfoOf::<T>::remove(&frame.account_id);
-		E::decrement_refcount(info.code_hash);
+		Self::decrement_refcount(info.code_hash);
 
 		for (code_hash, deposit) in info.delegate_dependencies() {
-			E::decrement_refcount(*code_hash);
+			Self::decrement_refcount(*code_hash);
 			frame
 				.nested_storage
 				.charge_deposit(frame.account_id.clone(), StorageDeposit::Refund(*deposit));
@@ -1446,6 +1473,10 @@ where
 		self.top_frame_mut().nested_storage.charge(diff)
 	}
 
+	fn debug_buffer_enabled(&self) -> bool {
+		self.debug_message.is_some()
+	}
+
 	fn append_debug_buffer(&mut self, msg: &str) -> bool {
 		if let Some(buffer) = &mut self.debug_message {
 			buffer
@@ -1464,10 +1495,7 @@ where
 		}
 	}
 
-	fn call_runtime(
-		&self,
-		call: <Self::T as Config>::ContractRuntimeCall,
-	) -> DispatchResultWithPostInfo {
+	fn call_runtime(&self, call: <Self::T as Config>::RuntimeCall) -> DispatchResultWithPostInfo {
 		let mut origin: T::RuntimeOrigin = RawOrigin::Signed(self.address().clone()).into();
 		origin.add_filter(T::CallFilter::contains);
 		call.dispatch(origin)
@@ -1479,14 +1507,14 @@ where
 
 	fn sr25519_verify(&self, signature: &[u8; 64], message: &[u8], pub_key: &[u8; 32]) -> bool {
 		sp_io::crypto::sr25519_verify(
-			&SR25519Signature(*signature),
+			&SR25519Signature::from(*signature),
 			message,
-			&SR25519Public(*pub_key),
+			&SR25519Public::from(*pub_key),
 		)
 	}
 
 	fn ecdsa_to_eth_address(&self, pk: &[u8; 33]) -> Result<[u8; 20], ()> {
-		ECDSAPublic(*pk).to_eth_address()
+		ECDSAPublic::from(*pk).to_eth_address()
 	}
 
 	#[cfg(test)]
@@ -1497,7 +1525,7 @@ where
 	fn set_code_hash(&mut self, hash: CodeHash<Self::T>) -> Result<(), DispatchError> {
 		let frame = top_frame_mut!(self);
 		if !E::from_storage(hash, &mut frame.nested_gas)?.is_deterministic() {
-			return Err(<Error<T>>::Indeterministic.into());
+			return Err(<Error<T>>::Indeterministic.into())
 		}
 
 		let info = frame.contract_info();
@@ -1514,8 +1542,8 @@ where
 
 		frame.nested_storage.charge_deposit(frame.account_id.clone(), deposit);
 
-		E::increment_refcount(hash)?;
-		E::decrement_refcount(prev_hash);
+		Self::increment_refcount(hash)?;
+		Self::decrement_refcount(prev_hash);
 		Contracts::<Self::T>::deposit_event(
 			vec![T::Hashing::hash_of(&frame.account_id), hash, prev_hash],
 			Event::ContractCodeUpdated {
@@ -1548,7 +1576,26 @@ where
 		}
 	}
 
-	fn add_delegate_dependency(
+	fn increment_refcount(code_hash: CodeHash<Self::T>) -> Result<(), DispatchError> {
+		<CodeInfoOf<Self::T>>::mutate(code_hash, |existing| -> Result<(), DispatchError> {
+			if let Some(info) = existing {
+				*info.refcount_mut() = info.refcount().saturating_add(1);
+				Ok(())
+			} else {
+				Err(Error::<T>::CodeNotFound.into())
+			}
+		})
+	}
+
+	fn decrement_refcount(code_hash: CodeHash<T>) {
+		<CodeInfoOf<T>>::mutate(code_hash, |existing| {
+			if let Some(info) = existing {
+				*info.refcount_mut() = info.refcount().saturating_sub(1);
+			}
+		});
+	}
+
+	fn lock_delegate_dependency(
 		&mut self,
 		code_hash: CodeHash<Self::T>,
 	) -> Result<(), DispatchError> {
@@ -1559,24 +1606,23 @@ where
 		let code_info = CodeInfoOf::<T>::get(code_hash).ok_or(Error::<T>::CodeNotFound)?;
 		let deposit = T::CodeHashLockupDepositPercent::get().mul_ceil(code_info.deposit());
 
-		info.add_delegate_dependency(code_hash, deposit)?;
-		<WasmBlob<T>>::increment_refcount(code_hash)?;
+		info.lock_delegate_dependency(code_hash, deposit)?;
+		Self::increment_refcount(code_hash)?;
 		frame
 			.nested_storage
 			.charge_deposit(frame.account_id.clone(), StorageDeposit::Charge(deposit));
 		Ok(())
 	}
 
-	fn remove_delegate_dependency(
+	fn unlock_delegate_dependency(
 		&mut self,
 		code_hash: &CodeHash<Self::T>,
 	) -> Result<(), DispatchError> {
 		let frame = self.top_frame_mut();
 		let info = frame.contract_info.get(&frame.account_id);
 
-		let deposit = info.remove_delegate_dependency(code_hash)?;
-		<WasmBlob<T>>::decrement_refcount(*code_hash);
-
+		let deposit = info.unlock_delegate_dependency(code_hash)?;
+		Self::decrement_refcount(*code_hash);
 		frame
 			.nested_storage
 			.charge_deposit(frame.account_id.clone(), StorageDeposit::Refund(deposit));
@@ -1620,14 +1666,10 @@ mod tests {
 	use codec::{Decode, Encode};
 	use frame_support::{assert_err, assert_ok, parameter_types};
 	use frame_system::{EventRecord, Phase};
-	use pallet_contracts_primitives::ReturnFlags;
+	use pallet_contracts_uapi::ReturnFlags;
 	use pretty_assertions::assert_eq;
 	use sp_runtime::{traits::Hash, DispatchError};
-	use std::{
-		cell::RefCell,
-		collections::hash_map::{Entry, HashMap},
-		rc::Rc,
-	};
+	use std::{cell::RefCell, collections::hash_map::HashMap, rc::Rc};
 
 	type System = frame_system::Pallet<Test>;
 
@@ -1658,7 +1700,6 @@ mod tests {
 		func_type: ExportedFunction,
 		code_hash: CodeHash<Test>,
 		code_info: CodeInfo<Test>,
-		refcount: u64,
 	}
 
 	#[derive(Default, Clone)]
@@ -1687,36 +1728,10 @@ mod tests {
 						func_type,
 						code_hash: hash,
 						code_info: CodeInfo::<Test>::new(ALICE),
-						refcount: 1,
 					},
 				);
 				hash
 			})
-		}
-
-		fn increment_refcount(code_hash: CodeHash<Test>) -> Result<(), DispatchError> {
-			Loader::mutate(|loader| {
-				match loader.map.entry(code_hash) {
-					Entry::Vacant(_) => Err(<Error<Test>>::CodeNotFound)?,
-					Entry::Occupied(mut entry) => entry.get_mut().refcount += 1,
-				}
-				Ok(())
-			})
-		}
-
-		fn decrement_refcount(code_hash: CodeHash<Test>) {
-			use std::collections::hash_map::Entry::Occupied;
-			Loader::mutate(|loader| {
-				let mut entry = match loader.map.entry(code_hash) {
-					Occupied(e) => e,
-					_ => panic!("code_hash does not exist"),
-				};
-				let refcount = &mut entry.get_mut().refcount;
-				*refcount -= 1;
-				if *refcount == 0 {
-					entry.remove();
-				}
-			});
 		}
 	}
 
@@ -1730,14 +1745,6 @@ mod tests {
 			})
 		}
 
-		fn increment_refcount(code_hash: CodeHash<Test>) -> Result<(), DispatchError> {
-			MockLoader::increment_refcount(code_hash)
-		}
-
-		fn decrement_refcount(code_hash: CodeHash<Test>) {
-			MockLoader::decrement_refcount(code_hash);
-		}
-
 		fn execute<E: Ext<T = Test>>(
 			self,
 			ext: &mut E,
@@ -1745,7 +1752,7 @@ mod tests {
 			input_data: Vec<u8>,
 		) -> ExecResult {
 			if let &Constructor = function {
-				Self::increment_refcount(self.code_hash).unwrap();
+				E::increment_refcount(self.code_hash).unwrap();
 			}
 			// # Safety
 			//
@@ -1756,7 +1763,7 @@ mod tests {
 			// The transmute is necessary because `execute` has to be generic over all
 			// `E: Ext`. However, `MockExecutable` can't be generic over `E` as it would
 			// constitute a cycle.
-			let ext = unsafe { std::mem::transmute(ext) };
+			let ext = unsafe { mem::transmute(ext) };
 			if function == &self.func_type {
 				(self.func)(MockCtx { ext, input_data }, &self)
 			} else {

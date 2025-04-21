@@ -30,7 +30,7 @@ describe("Negative Native token tests", function () {
       "Balance",
       "90000000000000000000000000000",
     );
-    const transaction = polkadotApi.tx.balances.transfer(
+    const transaction = polkadotApi.tx.balances.transferKeepAlive(
       baltathar.address,
       amount,
     );

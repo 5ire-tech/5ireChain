@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: Apache-2.0
 // This file is part of Frontier.
-//
-// Copyright (c) 2020-2022 Parity Technologies (UK) Ltd.
-//
+
+// Copyright (C) Parity Technologies (UK) Ltd.
+// SPDX-License-Identifier: Apache-2.0
+
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -25,11 +25,15 @@
 #![allow(clippy::comparison_chain, clippy::large_enum_variant)]
 #![warn(unused_crate_dependencies)]
 
+extern crate alloc;
+
 #[cfg(all(feature = "std", test))]
 mod mock;
 #[cfg(all(feature = "std", test))]
 mod tests;
 
+use alloc::{vec, vec::Vec};
+use core::marker::PhantomData;
 pub use ethereum::{
 	AccessListItem, BlockV2 as Block, LegacyTransactionMessage, Log, ReceiptV3 as Receipt,
 	TransactionAction, TransactionV2 as Transaction,
@@ -55,7 +59,6 @@ use sp_runtime::{
 	},
 	RuntimeDebug, SaturatedConversion,
 };
-use sp_std::{marker::PhantomData, prelude::*};
 // Frontier
 use fp_consensus::{PostLog, PreLog, FRONTIER_ENGINE_ID};
 pub use fp_ethereum::TransactionData;
@@ -310,7 +313,7 @@ pub mod pallet {
 
 	/// Current building block's transactions and receipts.
 	#[pallet::storage]
-	pub(super) type Pending<T: Config> =
+	pub type Pending<T: Config> =
 		StorageValue<_, Vec<(Transaction, TransactionStatus, Receipt)>, ValueQuery>;
 
 	/// The current Ethereum block.
@@ -354,10 +357,8 @@ impl<T: Config> Pallet<T> {
 			transaction_data.gas_limit.unique_saturated_into(),
 			true,
 		) {
-			weight_limit if weight_limit.proof_size() > 0 => (
-				Some(weight_limit),
-				Some(transaction_data.proof_size_base_cost.unwrap_or_default()),
-			),
+			weight_limit if weight_limit.proof_size() > 0 =>
+				(Some(weight_limit), Some(transaction_data.proof_size_base_cost())),
 			_ => (None, None),
 		}
 	}
@@ -677,7 +678,7 @@ impl<T: Config> Pallet<T> {
 			PostDispatchInfo {
 				actual_weight: {
 					let mut gas_to_weight = T::GasWeightMapping::gas_to_weight(
-						sp_std::cmp::max(
+						core::cmp::max(
 							used_gas.standard.unique_saturated_into(),
 							used_gas.effective.unique_saturated_into(),
 						),

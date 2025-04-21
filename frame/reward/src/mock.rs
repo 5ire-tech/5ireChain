@@ -145,6 +145,7 @@ impl pallet_staking::Config for Test {
 	type RewardDistribution = Reward;
 	type CurrencyToVote = ();
 	type RuntimeEvent = RuntimeEvent;
+	type MaxExposurePageSize = ConstU32<256>;
 	type Currency = Balances;
 	type CurrencyBalance = <Self as pallet_balances::Config>::Balance;
 	type Slash = ();
@@ -156,7 +157,6 @@ impl pallet_staking::Config for Test {
 	type SessionInterface = Self;
 	type UnixTime = pallet_timestamp::Pallet<Self>;
 	type EraPayout = ();
-	type MaxNominatorRewardedPerValidator = ConstU32<64>;
 	type OffendingValidatorsThreshold = OffendingValidatorsThreshold;
 	type NextNewSession = Session;
 	type ElectionProvider =
@@ -168,7 +168,10 @@ impl pallet_staking::Config for Test {
 	type MaxUnlockingChunks = ConstU32<32>;
 	type HistoryDepth = ConstU32<84>;
 	type EventListeners = ();
+	type Validators = Historical;
+	type ValidatorId = pallet_staking::StashOf<Test>;
 	type BenchmarkingConfig = pallet_staking::TestBenchmarkingConfig;
+	type MaxControllersInDeprecationBatch = ConstU32<100>;
 	type WeightInfo = ();
 	type ESG = EsgScore;
 	type Reliability = ImOnline;
@@ -198,6 +201,12 @@ impl frame_system::Config for Test {
 	type SS58Prefix = ConstU16<42>;
 	type OnSetCode = ();
 	type MaxConsumers = frame_support::traits::ConstU32<16>;
+	type MultiBlockMigrator = ();
+	type PreInherents = ();
+	type PostInherents = ();
+	type PostTransactions = ();
+	type SingleBlockMigrations = ();
+	type RuntimeTask = RuntimeTask;
 }
 
 parameter_types! {
@@ -218,7 +227,7 @@ impl pallet_balances::Config for Test {
 	type FreezeIdentifier = ();
 	type MaxFreezes = ();
 	type RuntimeHoldReason = ();
-	type MaxHolds = ();
+	type RuntimeFreezeReason = RuntimeFreezeReason;
 }
 
 parameter_types! {

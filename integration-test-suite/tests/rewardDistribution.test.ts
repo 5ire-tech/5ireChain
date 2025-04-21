@@ -238,7 +238,7 @@ export async function registerOracle(alith: KeyringPair) {
 export async function transfer(alith: KeyringPair, rewardAccount: string) {
   console.log(`\n Transfering coin to reward account.`);
   // Transfer 100 5ire to reward Account
-  const transaction = polkadotApi.tx.balances.transfer(
+  const transaction = polkadotApi.tx.balances.transferKeepAlive(
     rewardAccount,
     "1000000000000000000000",
   );

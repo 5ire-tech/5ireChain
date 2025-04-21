@@ -7,15 +7,16 @@ use firechain_runtime_core_primitives::opaque::{
 	AccountId, Balance, Block, BlockNumber, Hash, Header, Nonce,
 };
 use sc_client_api::{Backend as BackendT, BlockchainEvents, KeysIter, PairsIter};
-use sp_api::{CallApiAt, NumberFor, ProvideRuntimeApi};
+use sp_api::{CallApiAt, ProvideRuntimeApi};
 use sp_blockchain::HeaderBackend;
 use sp_consensus::BlockStatus;
 use sp_runtime::{
 	generic::SignedBlock,
-	traits::{BlakeTwo256, Block as BlockT},
+	traits::{BlakeTwo256, Block as BlockT, NumberFor},
 	Justifications,
 };
 use sp_storage::{ChildInfo, StorageData, StorageKey};
+use sp_trie::MerkleValue;
 
 use crate::eth::EthCompatRuntimeApiCollection;
 
@@ -142,7 +143,7 @@ pub trait AbstractClient<Block, Backend>:
 where
 	Block: BlockT,
 	Backend: BackendT<Block>,
-	Backend::State: sp_api::StateBackend<BlakeTwo256>,
+	Backend::State: sp_state_machine::Backend<BlakeTwo256>,
 	Self::Api: RuntimeApiCollection,
 {
 }
@@ -151,7 +152,7 @@ impl<Block, Backend, Client> AbstractClient<Block, Backend> for Client
 where
 	Block: BlockT,
 	Backend: BackendT<Block>,
-	Backend::State: sp_api::StateBackend<BlakeTwo256>,
+	Backend::State: sp_state_machine::Backend<BlakeTwo256>,
 	Client: BlockchainEvents<Block>
 		+ ProvideRuntimeApi<Block>
 		+ HeaderBackend<Block>
@@ -171,7 +172,7 @@ pub trait ExecuteWithClient {
 	fn execute_with_client<Client, Api, Backend>(self, client: Arc<Client>) -> Self::Output
 	where
 		Backend: sc_client_api::Backend<Block>,
-		Backend::State: sp_api::StateBackend<BlakeTwo256>,
+		Backend::State: sp_state_machine::Backend<BlakeTwo256>,
 		Api: RuntimeApiCollection,
 		Client: AbstractClient<Block, Backend, Api = Api> + 'static;
 }
@@ -214,44 +215,34 @@ macro_rules! match_client {
 	};
 }
 
-/// Trivial enum representing runtime variant
-#[derive(Clone)]
-pub enum RuntimeVariant {
-	#[allow(dead_code)]
-	#[cfg(feature = "firechain-qa")]
-	Qa,
-	#[allow(dead_code)]
-	#[cfg(feature = "firechain-mainnet")]
-	Mainnet,
-	#[allow(dead_code)]
-	#[cfg(feature = "firechain-thunder")]
-	Thunder,
-	#[allow(dead_code)]
-	Unrecognized,
-}
-
 /// Can be called for a `Configuration` to check if it is a configuration for
 /// the `Firechain` network.
 pub trait IdentifyVariant {
+	#[cfg(feature = "firechain-qa")]
 	/// Returns `true` if this is a configuration for the `Firechain` qa network.
 	fn is_qa(&self) -> bool;
 
+	#[cfg(feature = "firechain-mainnet")]
 	/// Returns `true` if this is a configuration for the `Firechain` mainnet network.
 	fn is_mainnet(&self) -> bool;
 
+	#[cfg(feature = "firechain-thunder")]
 	/// Returns `true` if this is a configuration for the `Firechain` thunder network.
 	fn is_thunder(&self) -> bool;
 }
 
 impl IdentifyVariant for Box<dyn ChainSpec> {
+	#[cfg(feature = "firechain-qa")]
 	fn is_qa(&self) -> bool {
 		self.id().starts_with("qa")
 	}
 
+	#[cfg(feature = "firechain-mainnet")]
 	fn is_mainnet(&self) -> bool {
 		self.id().starts_with("mainnet")
 	}
 
+	#[cfg(feature = "firechain-thunder")]
 	fn is_thunder(&self) -> bool {
 		self.id().starts_with("thunder")
 	}
@@ -429,6 +420,23 @@ impl sc_client_api::StorageProvider<Block, FullBackend> for Client {
 		key: &StorageKey,
 	) -> sp_blockchain::Result<Option<<Block as BlockT>::Hash>> {
 		match_client!(self, child_storage_hash(hash, child_info, key))
+	}
+
+	fn closest_merkle_value(
+		&self,
+		hash: <Block as BlockT>::Hash,
+		key: &StorageKey,
+	) -> sp_blockchain::Result<Option<MerkleValue<<Block as BlockT>::Hash>>> {
+		match_client!(self, closest_merkle_value(hash, key))
+	}
+
+	fn child_closest_merkle_value(
+		&self,
+		hash: <Block as BlockT>::Hash,
+		child_info: &ChildInfo,
+		key: &StorageKey,
+	) -> sp_blockchain::Result<Option<MerkleValue<<Block as BlockT>::Hash>>> {
+		match_client!(self, child_closest_merkle_value(hash, child_info, key))
 	}
 }
 
